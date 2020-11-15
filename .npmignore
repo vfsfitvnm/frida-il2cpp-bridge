@@ -1,0 +1,6 @@
+tsconfig.json
+src
+.git
+.idea
+docs
+node_modules
