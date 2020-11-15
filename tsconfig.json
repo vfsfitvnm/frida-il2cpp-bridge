@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "lib": ["esnext"],
+    "module": "commonjs",
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "declaration": false,
+    "strict": true,
+    "alwaysStrict": true,
+    "stripInternal": true,
+    "removeComments": true,
+    "outDir": "./dist"
+  }
+}
