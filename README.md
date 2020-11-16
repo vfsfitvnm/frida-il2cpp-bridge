@@ -13,7 +13,7 @@ async function main() {
     TestAssembly.classes.TestClass.methods.testMethod.intercept({
         onLeave(returnValue) { 
             const testObject = returnValue.value as Il2Cpp.Object;
-            testObject.fields.testField.value = 1000;
+            testObject.fields.testField.value = 100;
             testObject.methods.newTestMethod.invoke(false, Il2Cpp.String.from("testString"));
         }
     });
