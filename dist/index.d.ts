@@ -1,11 +1,9 @@
 declare global {
-
     /**
      * Everything is exposed through this global object.\
      * Every `Il2Cpp.${...}` class has a `handle` property, which is its `NativePointer`.
      */
     namespace Il2Cpp {
-
         /**
          * The Unity version of the current application.
          */
@@ -30,299 +28,335 @@ declare global {
         function initialize(): Promise<void>;
 
         /**
+         * Performs a dump of the assemblies.
+         * ```typescript
          * TODO
+         * ```
          */
         function dump(): Promise<void>;
 
         /**
          * Represents a `Il2CppDomain`.
+         * ```typescript
+         * assert(domain.name == "IL2CPP Root Domain");
+         * ```
          */
         class Domain {
-
             /**
              * Its handle as a `NativePointer`.
              */
             readonly handle: NativePointer;
 
             /**
-             * Its assemblies.\
-             * We can iterate over them using a `for..of` loop, or access a
-             * specific assembly using its name, extension omitted.
+             * We can iterate over the assemblies using a `for..of` loop,
+             * or access a specific assembly using its name, extension omitted.
              * ```typescript
              * for (const assembly of domain.assemblies) {
              * }
-             * const CSharpAssembly = assemblies.Assembly_CSharp;
+             * const mscorlib = assemblies.mscorlib;
              * ```
+             * @return Its assemblies.
              */
             get assemblies(): Accessor<Assembly>;
 
             /**
-             * Its name. Probably `IL2CPP Root Domain`.
+             * @return Its name. Probably `IL2CPP Root Domain`.
              */
             get name(): string | null;
 
             /**
-             * This is how we obtain the domain. This is potentially asynchronous
-             * because the domain could be initialized at any time, e.g.
-             * after `il2cpp_init` is being called.\
-             * The domain will already be attached to the calling thread,
-             * in order to avoid access violation errors.
+             * This is potentially asynchronous because the domain could
+             * be initialized at any time, e.g. after `il2cpp_init` is
+             * being called.\
+             * The domain will already be attached to the caller thread.
              * ```typescript
              * const domain = await Il2Cpp.Domain.get();
              * ```
+             * @return The current application domain.
              */
             static get(): Promise<Domain>;
         }
 
         /**
          * Represents a `Il2CppAssembly`.
+         * ```typescript
+         * const mscorlibAssembly = domain.assemblies.mscorlib;
+         * assert(mscorlibAssembly.name == "mscorlib");
+         * ```
          */
         class Assembly {
-
             /**
              * Its handle as a `NativePointer`.
              */
             readonly handle: NativePointer;
 
             /**
-             * Its image, which contains the information
-             * about the assembly.
-             * ```typescript
-             * const CSharp = assemblies.Assembly_CSharp.image;
-             * ```
+             * @return Its image.
              */
             get image(): Image;
 
             /**
-             * Its name, e.g.`Assembly-CSharp`.
+             * @return Its name.
              */
             get name(): string;
         }
 
         /**
          * Represents a `Il2CppImage`.
+         * ```typescript
+         * let count = 0;
+         * let prev: Il2Cpp.Image | undefined = undefined;
+         * for (const assembly of domain.assemblies) {
+         *     const current = assembly.image;
+         *     if (prev != undefined && prev.classStart != -1) {
+         *         assert(current.classStart == count);
+         *     }
+         *     count += current.classCount;
+         *     prev = assembly.image;
+         * }
+         * //
+         * const mscorlib = domain.assemblies.mscorlib.image;
+         * assert(mscorlib.name == "mscorlib.dll");
+         * ```
          */
         class Image {
-
             /**
              * Its handle as a `NativePointer`.
              */
             readonly handle: NativePointer;
 
             /**
-             * The amount of classes inside the image.
+             * @return The count of its classes.
              */
             get classCount(): number;
 
             /**
              * Non-generic types are stored in sequence.
-             * ```typescript
-             * assert(Image0.classStart == 0 && Image0.classCount == x);
-             * assert(Image1.classStart == x + 1 && Image1.classCount == y);
-             * assert(Image2.classStart == y + 1 && Image2.classCount == z);
-             * // And so on
-             * ```
+             * @return The start index of its classes, `-1` if this information
+             * is not available.
              */
             get classStart(): number | -1;
 
             /**
-             * Its classes.\
-             * We can iterate over them using a `for..of` loop, or access
-             * a specific assembly using its full type name.
+             * We can iterate over its classes using a `for..of` loop,
+             * or access a specific assembly using its full type name.
              * ```typescript
-             * const CSharp = assemblies.Assembly_CSharp.image;
-             * for (const klass of CSharp.classes) {
+             * const mscorlib = assemblies.mscorlib.image;
+             * for (const klass of mscorlib.classes) {
              * }
-             * const MyClass = CSharp.classes.Namespace_MyClass;
+             * const BooleanClass = mscorlib.classes["System.Boolean"];
              * ```
+             * @return Its classes.
              */
             get classes(): Accessor<Class>;
 
             /**
-             * Its name, equals to the name of its assembly plus its
-             * extension,e.g. `Assembly-CSharp.dll`.
+             * @return Its name, equals to the name of its assembly plus its
+             * extension.
              */
             get name(): string;
         }
 
         /**
-         * Represents a `Class`.
+         * Represents a `Il2CppClass`.
+         * ```typescript
+         * const mscorlib = domain.assemblies.mscorlib.image;
+         * //
+         * const BooleanClass = mscorlib.classes["System.Boolean"];
+         * const Int32Class = mscorlib.classes["System.Int32"];
+         * const Int64Class = mscorlib.classes["System.Int64"];
+         * const ObjectClass = mscorlib.classes["System.Object"];
+         * const StringClass = mscorlib.classes["System.String"];
+         * const DateTimeFormatInfoClass = mscorlib.classes["System.Globalization.DateTimeFormatInfo"];
+         * const DayOfWeekClass = mscorlib.classes["System.DayOfWeek"];
+         * const MathClass = mscorlib.classes["System.Math"];
+         * const IFormattableClass = mscorlib.classes["System.IFormattable"];
+         * //
+         * assert(Int32Class.arrayElementSize == 4);
+         * assert(Int64Class.arrayElementSize == 8);
+         * assert(ObjectClass.arrayElementSize == Process.pointerSize);
+         * //
+         * assert(Int32Class.assemblyName == "mscorlib");
+         * //
+         * const ExecutionContext = mscorlib.classes["System.Threading.ExecutionContext"];
+         * const Flags = mscorlib.classes["System.Threading.ExecutionContext.Flags"];
+         * assert(ExecutionContext.handle.equals(Flags.declaringClass!.handle));
+         * //
+         * const dayNames = DateTimeFormatInfoClass.fields.dayNames;
+         * assert(dayNames.type.name == "System.String[]");
+         * assert(dayNames.type.class.elementClass!.type.name == "System.String");
+         * //
+         * assert(StringClass.hasStaticConstructor == (".cctor" in StringClass.methods));
+         * assert(DateTimeFormatInfoClass.hasStaticConstructor == (".cctor" in DateTimeFormatInfoClass.methods));
+         * //
+         * assert(Int32Class.image.name == "mscorlib.dll");
+         * //
+         * assert(DayOfWeekClass.isEnum);
+         * assert(!Int32Class.isEnum);
+         * //
+         * assert(IFormattableClass.isInterface);
+         * //
+         * if (!MathClass.isStaticConstructorFinished) {
+         *     MathClass.ensureInitialized();
+         *     assert(MathClass.isStaticConstructorFinished);
+         * }
+         * //
+         * assert(Int32Class.isStruct);
+         * assert(!StringClass.isStruct);
+         * //
+         * assert(BooleanClass.name == "Boolean");
+         * //
+         * assert(BooleanClass.namespace == "System");
+         * //
+         * assert(BooleanClass.parent!.type.name == "System.ValueType");
+         * assert(ObjectClass.parent == null);
+         * //
+         * assert(BooleanClass.type.name == "System.Boolean");
+         * ```
          */
         class Class {
-
             /**
              * Its handle as a `NativePointer`.
              */
             readonly handle: NativePointer;
 
             /**
-             * The size as array element, e.g. `Process.pointerSize` if
-             * the class is an object, or less if it's a value type.
+             * @return The size as array element.
              */
             get arrayElementSize(): number;
 
             /**
-             * The name of the assembly it belongs to.
+             * @returns The name of the assembly it belongs to.
              */
             get assemblyName(): string;
 
             /**
-             * Its outer class if its a nested class.
              * ```csharp
-             * class Outer
+             * namespace System.Threading
              * {
-             *    class Inner
-             *    {
-             *    }
+             *     class ExecutionContext
+             *     {
+             *         class Flags
+             *         {
+             *         }
+             *     }
              * }
              * ```
-             * e.g:
-             * ```typescript
-             * const Outer = CSharp.classes.Example_Outer;
-             * const Inner = CSharp.classes.Inner;
-             * assert(Outer.handle.equals(Inner.declaringClass.handle));
-             * ```
+             * @return Its outer class if its a nested class, `null` otherwise.
              */
             get declaringClass(): Class | null;
 
             /**
              * Its element class if it's an array.
-             * ```typescript
-             * const StringArray = ...;
-             * assert(StringArray.type.name == "System.String[]");
-             * assert(StringArray.elementClass.type.name == "System.String");
-             * ```
              */
             get elementClass(): Class | null;
 
             /**
-             * The count of its fields.
+             * @return The count of its fields.
              */
             get fieldCount(): number;
 
             /**
-             * Its fields.\
-             * We can iterate over them using a `for..of` loop, or access
+             * We can iterate over the fields a `for..of` loop, or access
              * a specific field using its name.
              * ```typescript
-             * const MyClass = CSharp.classes.Namespace_MyClass;
-             * for (const fields of MyClass.fields) {
+             * const MathClass = mscorlib.classes["System.Math"];
+             * for (const fields of MathClass.fields) {
              * }
-             * const myField = MyClass.fields.myField;
+             * const PI = MathClass.fields.PI;
              * ```
+             * @return Its fields.
              */
             get fields(): Accessor<Field>;
 
             /**
-             * If the class has a static constructor.
+             * @return `true` if it has a static constructor, `false` otherwise.
              */
             get hasStaticConstructor(): boolean;
 
             /**
-             * The image it belongs to.
+             * @return The image it belongs to.
              */
             get image(): Image;
 
             /**
-             * The size of its instance.
+             * @return The size of its instance.
              */
             get instanceSize(): number;
 
             /**
-             * If it's an enum.
+             * @return `true` if it's an `enum`, `false` otherwise.
              */
             get isEnum(): boolean;
 
             /**
-             * If its static constructor has been already called,
-             * so if its static data has been initialized.
+             * @return `true` if it's an `interface`, `false` otherwise.
+             */
+            get isInterface(): boolean;
+
+            /**
+             * @return `true` If its static constructor has been already called,
+             * so if its static data has been initialized, `false` otherwise.
              */
             get isStaticConstructorFinished(): boolean;
 
             /**
-             * If it's a value type (aka struct).
-             * ```typescript
-             * const BooleanClass = mscorlib.classes.System_Boolean;
-             * assert(BooleanClass.isStruct == true);
-             * const StringClass = mscorlib.classes.System_String;
-             * assert(StringClass.isStruct == false);
-             * ```
+             * @return `true` if it's a value type (aka struct), `false` otherwise.
              */
             get isStruct(): boolean;
 
             /**
-             * The count of its methods.
+             * @return The count of its methods.
              */
             get methodCount(): number;
 
             /**
-             * Its callable or manipulable static methods.\
-             * We can iterate over them using a `for..of` loop, or access
-             * a specific method using its name.
+             * We can iterate over the methods using a `for..of` loop,
+             * or access a specific method using its name.
              * ```typescript
-             * const MyClass = CSharp.classes.Namespace_MyClass;
-             * for (const method of MyClass.methods) {
+             * const MathClass = mscorlib.classes["System.Math"];
+             * for (const method of MathClass.methods) {
              * }
-             * const myMethod = MyClass.methods.myMethod;
+             * const Log10 = MyClass.methods.Log10;
              * ```
+             * @return Its methods.
              */
             get methods(): Accessor<Method>;
 
             /**
-             * Its name.
-             * ```typescript
-             * const BooleanClass = mscorlib.classes.System_Boolean;
-             * assert(BooleanClass.name == "Boolean");
-             * ```
+             * @return Its name.
              */
             get name(): string;
 
             /**
-             * Its namespace.
-             * ```typescript
-             * const BooleanClass = mscorlib.classes.System_Boolean;
-             * assert(BooleanClass.namespace == "System");
-             * ```
+             * @return Its namespace.
              */
             get namespace(): string;
 
             /**
-             * Its parent.
-             * ```typescript
-             * const BooleanClass = mscorlib.classes.System_Boolean;
-             * assert(BooleanClass.parent.type.name == "System.ValueType");
-             * ```
+             * @return Its parent if there is, `null.` otherwise.
              */
             get parent(): Class | null;
 
             /**
-             * A pointer to its static fields.
+             * @return A pointer to its static fields.
              */
             get staticFieldsData(): NativePointer;
 
             /**
-             * Its type.
-             * ```typescript
-             * const BooleanClass = mscorlib.classes.System_Boolean;
-             * assert(BooleanClass.type.name == "System.Boolean");
-             * ```
+             * @return Its type.
              */
             get type(): Type;
 
             /**
-             * It makes sure its static data has been initialized.
-             * ```typescript
-             * const BooleanClass = mscorlib.classes.System_Boolean;
-             * BooleanClass.ensureInitialized();
-             * const TrueLiteral = BooleanClass.fields.TrueLiteral.value as Il2Cpp.String;
-             * assert(TrueLiteral.content == "True");
-             * ```
+             * It makes sure its static data has been initialized.\
+             * See {@link isStaticConstructorFinished} for an example.
              */
             ensureInitialized(): void;
 
             /**
              * It traces all its methods.\
-             * See {@link Il2Cpp.Method.trace} for more details.
+             * See {@link Il2Cpp.Method.trace | trace} for more details.
              */
             trace(): void;
         }
@@ -331,306 +365,439 @@ declare global {
          * Represents a `Il2CppGenericClass`.
          */
         class GenericClass {
-
             /**
              * Its handle as a `NativePointer`.
              */
             readonly handle: NativePointer;
 
+            /**
+             * @return Its class.
+             */
             get cachedClass(): Class | null;
         }
 
         /**
          * Represents a `FieldInfo`.
+         * ```typescript
+         * const mscorlib = domain.assemblies.mscorlib.image;
+         * //
+         * const BooleanClass = mscorlib.classes["System.Boolean"];
+         * const MathClass = mscorlib.classes["System.Math"];
+         * const ThreadClass = mscorlib.classes["System.Threading.Thread"];
+         * //
+         * const CoreModule = domain.assemblies["UnityEngine.CoreModule"].image;
+         * const Vector2 = CoreModule.classes["UnityEngine.Vector2"];
+         * //
+         * assert(MathClass.fields.PI.class.handle.equals(MathClass.handle));
+         * //
+         * assert(Vector2.fields.x.isInstance);
+         * assert(!Vector2.fields.oneVector.isInstance);
+         * //
+         * assert(MathClass.fields.PI.isLiteral);
+         * //
+         * assert(ThreadClass.fields.current_thread.isThreadStatic);
+         * assert(!ThreadClass.fields.m_Delegate.isThreadStatic);
+         * //
+         * assert(BooleanClass.fields.TrueLiteral.name == "TrueLiteral");
+         * //
+         * assert(MathClass.fields.PI.type.name == "System.Double");
+         * //
+         * const vec = Vector2.fields.oneVector.value as Il2Cpp.ValueType;
+         * assert(vec.fields.x.value == 1);
+         * assert(vec.fields.y.value == 1);
+         * //
+         * vec.fields.x.value = 42;
+         * assert(vec.fields.x.value == 42);
+         * ```
          */
         class Field implements Valuable {
-
             /**
              * Its handle as a `NativePointer`.
              */
             readonly handle: NativePointer;
 
             /**
-             * The class it belongs to.
-             * ```typescript
-             * const MathClass = mscorlib.classes.System_Math;
-             * const PI = MathClass.fields.PI;
-             * assert(PI.class.handle.equals(MathClass.handle));
-             * ```
+             * @return The class it belongs to.
              */
             get class(): Class;
 
             /**
-             * If it's a instance field.
+             * @return `true` if it's a instance field, `false` otherwise.
              */
             get isInstance(): boolean;
 
             /**
-             * If it's literal, aka known at compilation time.
-             * ```typescript
-             * const MathClass = mscorlib.classes.System_Math;
-             * assert(MathClass.fields.PI.isLiteral == true);
-             * ```
+             * @return `true` if it's literal field, `false` otherwise.
              */
             get isLiteral(): boolean;
 
             /**
-             * If it's thread static, aka each thread has a
-             * different value for it.
+             * @return `true` if it's a thread  field, `false` otherwise.
              */
             get isThreadStatic(): boolean;
 
             /**
-             * Its name.
-             * ```typescript
-             * const BooleanClass = mscorlib.classes.System_Boolean;
-             * const TrueLiteral = BooleanClass.fields.TrueLiteral;
-             * assert(TrueLiteral.name == "TrueLiteral");
-             * ```
+             * @return Its name.
              */
             get name(): string;
 
             /**
-             * Its offset from {@link Il2Cpp.Class.staticFieldsData | staticFieldsData}
-             * if it's static, from a {@link Il2Cpp.Object.handle | handle} otherwise.
+             * A static field offsets is meant as the offset between it's class
+             * {@link Il2Cpp.Class.staticFieldsData | staticFieldsData} and its location.
+             * A static field offsets is meant as the offset between it's object
+             * {@link Il2Cpp.Object.handle | handle} and its location.
+             * @return Its offset.
              */
             get offset(): number;
 
             /**
-             * Its type.
-             * ```typescript
-             * const MathClass = mscorlib.classes.System_Math;
-             * assert(MathClass.fields.PI.type.name == "System.Double");
-             * ```
+             * @return Its type.
              */
             get type(): Type;
 
+            /**
+             * @return Its value.
+             */
             get value(): AllowedType;
 
+            /**
+             * NOTE: Thread static or literal values cannot be altered yet.
+             * @param v Its new value.
+             */
             set value(v: AllowedType);
+
+            /**
+             * @return The actual location of its value.
+             */
+            get valueHandle(): NativePointer;
         }
 
         /**
          * Represents a `MethodInfo`.
+         * ```typescript
+         * const mscorlib = domain.assemblies.mscorlib.image;
+         * //
+         * const BooleanClass = mscorlib.classes["System.Boolean"];
+         * const Int32Class = mscorlib.classes["System.Int32"];
+         * const TupleClass = mscorlib.classes["System.Tuple"];
+         * const MathClass = mscorlib.classes["System.Math"];
+         * const ArrayClass = mscorlib.classes["System.Array"];
+         * //
+         * assert(MathClass.methods.Sqrt.class.handle.equals(MathClass.handle));
+         * //
+         * assert(ArrayClass.methods.Empty.isGeneric);
+         * //
+         * assert(BooleanClass.methods.ToString.isInstance);
+         * assert(!BooleanClass.methods.Parse.isInstance);
+         * //
+         * assert(MathClass.methods.Sqrt.name == "Sqrt");
+         * //
+         * assert(MathClass.methods[".cctor"].parameterCount == 0);
+         * assert(MathClass.methods.Abs.parameterCount == 1);
+         * assert(MathClass.methods.Max.parameterCount == 2);
+         * //
+         * assert(TupleClass.methods.CombineHashCodes.returnType.class.handle.equals(Int32Class.handle));
+         * //
+         * assert(BooleanClass.methods.Parse.invoke<boolean>(Il2Cpp.String.from("true")));
+         * ```
          */
         class Method {
-
             /**
              * Its handle as a `NativePointer`.
              */
             readonly handle: NativePointer;
 
             /**
-             * Its actual pointer in memory.
+             * ```typescript
+             * const MathClass = mscorlib.classes["System.Math"];
+             * Interceptor.attach(MathClass.actualPointer, {
+             *     // ...
+             * });
+             * ```
+             * @return Its actual pointer in memory.
              */
             get actualPointer(): NativePointer;
 
             /**
-             * The class it belongs to.
-             * ```typescript
-             * const MathClass = mscorlib.classes.System_Math;
-             * const Sqrt = MathClass.methods.Sqrt;
-             * assert(Sqrt.class.handle.equals(MathClass.handle));
-             * ```
+             * @return The class it belongs to.
              */
             get class(): Class;
 
             /**
-             * If it's generic.
+             * @return `true` if it's generic, `false` otherwise.
              */
             get isGeneric(): boolean;
 
             /**
-             * If it's inflated, aka a generic with
-             * a concrete type parameter.
+             * @return `true` if it's inflated (a generic with a concrete type parameter),
+             * false otherwise.
              */
             get isInflated(): boolean;
 
             /**
-             * If it's an instance method.
+             *  @return `true` if it's an instance method, `false` otherwise.
              */
             get isInstance(): boolean;
 
             /**
-             * Its name.
-             * ```typescript
-             * const MathClass = mscorlib.classes.System_Math;
-             * assert(MathClass.methods.Sqrt.name == "Sqrt");
-             * ```
+             * @return Its name.
              */
             get name(): string;
 
             /**
-             * The count of its parameters.
+             * @return The count of its parameters.
              */
             get parameterCount(): number;
 
             /**
-             * Its parameters.\
-             * We can iterate over them using a `for..of` loop, or access
-             * a specific parameter using its name.
+             * We can iterate over the parameters using a `for..of` loop,
+             * or access a specific parameter using its name.
              * ```typescript
-             * const CSharp = assemblies.Assembly_CSharp.image;
-             * const MyMethod = CSharp.classes.MyClass.methods.MyMethod;
-             * for (const parameter of MyMethod.parameters) {
+             * const Compare = mscorlib.classes["System.String"].methods.Compare;
+             * for (const parameter of Compare.parameters) {
              * }
-             * const myParameter = MyMethod.myParameter;
+             * const strA = Compare.strA;
              * ```
+             * @return Its parameters.
              */
             get parameters(): Accessor<Parameter>;
 
             /**
-             * Its static fixed offset, useful for static analysis.
+             * @return Its static fixed offset, useful for static analysis.
              */
             get relativePointerAsString(): string;
 
             /**
-             * Its return type.
-             * const Int32Class = mscorlib.classes.System_Int32;
-             * const TupleClass = mscorlib.classes.System_Tuple;
-             * const returnType = TupleClass.methods.CombineHashCodes.returnType;
-             * assert(returnType.class.handle.equals(Int32Class.handle));
+             * @return Its return type.
              */
             get returnType(): Type;
 
+            /**
+             * Abstraction over `Interceptor.replace`.
+             * ```typescript
+             * const MathClass = mscorlib.classes["System.Math"];
+             * MathClass.methods.Max.implementation = (instance, parameters) => {
+             *     const realMax = Math.max(parameters.val1.value, parameters.val2.value);
+             *     return !realMax;
+             * }
+             * ```
+             * @param callback The new method implementation. `null` if you want to
+             * revert it.
+             */
             set implementation(callback: ImplementationCallback | null);
 
             /**
-             * Invokes the static method using the supplied parameters.
+             * Invokes the method.
              * ```typescript
-             * const UnityEngine_CoreModule = domain.assemblies.UnityEngine_CoreModule_dll.image;
-             * const ApplicationClass = UnityEngine_CoreModule.classes.UnityEngine_Application;
-             * const get_identifier = ApplicationClass.methods.get_identifier;
-             * get_identifier.invoke(); // com.example.application
+             * const CoreModule = domain.assemblies["UnityEngine.CoreModule"].image;
+             * const Application = CoreModule.classes["UnityEngine.Application"];
+             * const get_identifier = ApplicationC.methods.get_identifier;
+             * const result = get_identifier.invoke<Il2Cpp.String>();
+             * assert(result.content == "com.example.application");
              * ```
-             */
-            /**
-             * Invokes as static.
+             * @param parameters The parameters required by the method.
+             * @return A value, if any.
              */
             invoke<T extends AllowedType>(...parameters: AllowedType[]): T;
 
             /**
-             * Shorthand for {@link Il2Cpp.Method.intercept | intercept}.
+             * Abstraction over `Interceptor.attach`.
              * ```typescript
-             * const MyMethod = MyClass.methods.MyMethod;
-             * MyMethod.onLeave = returnValue => {
-             *     const myObject = returnValue.value as Il2Cpp.Object;
-             *     assert(myObject.class.type.name == MyMethod.returnType.name);
-             * }
-             * ```
-             * Alternatively, if you need the `InvocationContext`:
-             * ```typescript
-             * const MyMethod = MyClass.methods.MyMethod;
-             * MyMethod.onLeave = function(returnValue) {
-             *     const context = this.context as Arm64CpuContext;
-             *     assert(context.x0.equals(returnValue.handle));
-             * }
-             * ```
-             */
-            /**
-             * Shorthand for {@link Il2Cpp.Method.intercept | intercept}.
-             * ```typescript
-             * const MyMethod = MyClass.methods.MyMethod;
-             * MyMethod.onEnter = (instance, parameters) => {
-             *     if (MyMethod.isInstance) {
-             *         assert(instance.class.handle.equals(MyClass.handle));
-             *     } else {
-             *         assert(instance.handle.isNull());
+             * const StringComparer = mscorlib.classes["System.StringComparer"];
+             * StringComparer.methods.Compare_1.intercept({
+             *     onEnter(instance, parameters) {
+             *         assert(instance == null);
+             *         assert(parameters.x.type.name == "System.String");
+             *         assert(parameters.y.type.name == "System.String");
+             *         (parameters.y.value as Il2Cpp.String).content = "same instance, new content";
+             *         parameters.y.value = Il2Cpp.String("new instance, new content");
+             *     },
+             *     onLeave(returnValue) {
+             *         returnValue.value = returnValue.value * -1;
              *     }
-             * }
+             * });
              * ```
-             * Alternatively, if you need the `InvocationContext`:
+             * @param onEnter The callback to execute when the method is invoked.
+             * @param onLeave The callback to execute when the method is about to return.
+             * @return Frida's `InvocationListener`.
+             */
+            intercept({ onEnter, onLeave }: { onEnter?: OnEnterCallback; onLeave?: OnLeaveCallback }): InvocationListener;
+
+            /**
+             * Prints a message when the method is invoked.
              * ```typescript
-             * const MyMethod = MyClass.methods.MyMethod;
-             * MyMethod.onEnter = function(instance, parameters) {
-             *     const context = this.context as Arm64CpuContext;
-             *     assert(context.x0.equals(instance.handle));
-             *     assert(context.x1.equals(parameters.firstParam.handle));
-             *     assert(context.x2.equals(parameters.secondParam.handle));
-             * }
+             * TODO
              * ```
              */
-            intercept({onEnter, onLeave}: {
-                onEnter?: OnEnterCallback;
-                onLeave?: OnLeaveCallback;
-            }): InvocationListener;
-
             trace(): void;
         }
 
         /**
          * Represents a `ParameterInfo`.
+         * ```typescript
+         * const mscorlib = domain.assemblies.mscorlib.image;
+         * //
+         * const MathClass = mscorlib.classes["System.Math"];
+         * //
+         * assert(MathClass.methods.Sqrt.parameters.d.name == "d");
+         * assert(MathClass.methods.Sqrt.parameters.d.type.name == "System.Double");
+         * ```
          */
         class Parameter implements Valuable {
-
             /**
              * Its handle as a `NativePointer`.
              */
             readonly handle: NativePointer;
 
             /**
-             * Its name.
-             * ```typescript
-             * const MathClass = mscorlib.classes.System_Math;
-             * assert(MathClass.methods.Sqrt.parameters.d.name == "d");
-             * ```
+             * @return Its name.
              */
             get name(): string;
 
             /**
-             * Its type.
-             * ```typescript
-             * const MathClass = mscorlib.classes.System_Math;
-             * assert(MathClass.methods.Sqrt.parameters.d.type.name == "System.Double");
-             * ```
+             *  @return Its type.
              */
             get type(): Type;
 
+            /**
+             * See {@link Il2Cpp.Method.intercept | here} for examples.
+             * @return Its value.
+             */
             get value(): AllowedType;
 
+            /**
+             * See {@link Il2Cpp.Method.intercept | here} for examples.
+             * @param v Its new value.
+             */
             set value(v: AllowedType);
+
+            /**
+             * @return The actual location of its value.
+             */
+            get valueHandle(): NativePointer;
         }
 
         /**
-         * Abstraction over the a value type / struct.
+         * Abstraction over the a value type (`struct`).
+         * NOTE: you may experience few problems with value types.
+         * ```typescript
+         * const engine = domain.assemblies["UnityEngine.CoreModule"].image;
+         * const Vector2 = engine.classes["UnityEngine.Vector2"];
+         * //
+         * const vec = Vector2.fields.positiveInfinityVector.value as Il2Cpp.ValueType;
+         * //
+         * assert(vec.class.type.name == "UnityEngine.Vector2");
+         * //
+         * assert(vec.fields.x.value == Infinity);
+         * assert(vec.fields.y.value == Infinity);
+         * ```
          */
         class ValueType {
-
             /**
              * Its handle as a `NativePointer`.
              */
             readonly handle: NativePointer;
 
-            readonly klass: Class;
+            /**
+             * NOTE: the class is hardcoded when a new instance is created.\
+             * It's not completely reliable.
+             * @return Its class.
+             */
+            get class(): Class;
 
+            /**
+             * @return Its fields.
+             */
             get fields(): Accessor<Field>;
+
+            /**
+             * See {@link Il2Cpp.Object.unbox} for an example.
+             * @return The boxed value type.
+             */
+            box(): Object;
         }
 
         /**
          * Represents a `Object`.
+         * ```typescript
+         * const mscorlib = domain.assemblies.mscorlib.image;
+         * const CoreModule = domain.assemblies["UnityEngine.CoreModule"].image;
+         * //
+         * const OrdinalComparerClass = mscorlib.classes["System.OrdinalComparer"];
+         * const Vector2Class = CoreModule.classes["UnityEngine.Vector2"];
+         * //
+         * const ordinalComparer = Il2Cpp.Object.from(OrdinalComparerClass);
+         * assert(ordinalComparer.class.name == "OrdinalComparer");
+         * assert(ordinalComparer.base.class.name == "StringComparer");
+         * //
+         * const vec = Il2Cpp.Object.from(Vector2Class);
+         * vec.methods[".ctor"].invoke(36, 4);
+         * const vecUnboxed = vec.unbox();
+         * assert(vec.fields.x.value == vecUnboxed.fields.x.value);
+         * assert(vec.fields.y.value == vecUnboxed.fields.y.value);
+         * const vecBoxed = vecUnboxed.box();
+         * assert(vecBoxed.fields.x.value == vecUnboxed.fields.x.value);
+         * assert(vecBoxed.fields.y.value == vecUnboxed.fields.y.value);
+         * assert(!vecBoxed.handle.equals(vec.handle));
+         * ```
          */
         class Object {
-
             /**
              * Its handle as a `NativePointer`.
              */
             readonly handle: NativePointer;
 
-            static get headerSize(): number;
-
+            /**
+             * @return The same object as an instance of its parent.
+             */
             get base(): Object;
 
+            /**
+             * @return Its class.
+             */
             get class(): Class;
 
+            /**
+             * See {@link Il2Cpp.Class.fields} for an example.
+             * @return Its fields.
+             */
             get fields(): Accessor<Field>;
 
+            /**
+             * See {@link Il2Cpp.Class.methods} for an example.
+             * @return Its methods.
+             */
             get methods(): Accessor<Method>;
 
+            /**
+             * NOTE: the object will be allocated only.
+             * @param klass The class of the object to allocate.
+             * @return A new object.
+             */
             static from(klass: Class): Object;
+
+            /**
+             * @return The unboxed value type.
+             */
+            unbox(): ValueType;
         }
 
         /**
          * Represents a `Il2CppString`.
+         * ```typescript
+         * const str = Il2Cpp.String.from("Hello!");
+         * //
+         * assert(str.content == "Hello!");
+         * //
+         * str.content = "Bye";
+         * assert(str.content == "Bye");
+         * //
+         * assert(str.length == 3);
+         * assert(str.content?.length == 3);
+         * //
+         * assert(str.object.class.type.name == "System.String");
+         * assert(str.object.class.type.typeEnum == Il2Cpp.TypeEnum.STRING);
+         * ```
          */
         class String {
             /**
@@ -638,46 +805,135 @@ declare global {
              */
             readonly handle: NativePointer;
 
+            /**
+             * @return Its actual content.
+             */
             get content(): string | null;
 
-            set content(value: string | null);
+            /**
+             * @param v The new content.
+             */
+            set content(v: string | null);
 
+            /**
+             * @return Its length.
+             */
             get length(): number;
 
+            /**
+             * @return The same string as an object.
+             */
             get object(): Object;
 
+            /**
+             * @param content The string content.
+             * @return A new string.
+             */
             static from(content: string): String;
         }
 
         /**
          * Represents a `Il2CppArraySize`.
+         * ```typescript
+         * const mscorlib = domain.assemblies.mscorlib.image;
+         * //
+         * const SingleClass = mscorlib.classes["System.Single"];
+         * //
+         * const array = Il2Cpp.Array.from<number>(SingleClass, [21.5, 55.3, 31.4, 33]);
+         * //
+         * assert(array.elementSize == SingleClass.arrayElementSize);
+         * //
+         * assert(array.length == 4);
+         * //
+         * assert(array.object.class.type.name == "System.Single[]");
+         * //
+         * assert(array.elementType.name == "System.Single");
+         * //
+         * assert(array.object.class.type.typeEnum == Il2Cpp.TypeEnum.SZARRAY);
+         * //
+         * assert(array.get(0) == 21.5);
+         * //
+         * array.set(0, 5);
+         * assert(array.get(0) == 5);
+         * //
+         * let str = "";
+         * for (const e of array) {
+         *     str += Math.ceil(e) + ",";
+         * }
+         * assert(str == "5,56,32,33,");
+         * ```
          */
         class Array<T extends AllowedType> implements Iterable<T> {
-
             /**
              * Its handle as a `NativePointer`.
              */
             readonly handle: NativePointer;
 
+            /**
+             * @return The size of each element.
+             */
             get elementSize(): number;
 
+            /**
+             * @return The type of its elements.
+             */
+            get elementType(): Type;
+
+            /**
+             * @return Its length.
+             */
             get length(): number;
 
+            /**
+             * @return The same array as an object.
+             */
             get object(): Object;
 
-            get type(): Type;
-
+            /**
+             * @param klass The class of the elements.
+             * @param elements The elements.
+             * @return A new array.
+             */
             static from<T extends AllowedType>(klass: Class, elements: T[]): Array<T>;
 
+            /**
+             * @param index The index of the element. It must be between the array bounds.
+             * @return The element at the given index.
+             */
             get(index: number): T;
 
+            /**
+             * @param index The index of the element. It must be between the array bounds.
+             * @param v The value of the element.
+             */
             set(index: number, v: T): void;
 
+            /**
+             * Iterable.
+             */
             [Symbol.iterator](): Iterator<T>;
         }
 
         /**
          * Represents a `Il2CppType`.
+         * ```typescript
+         * const mscorlib = domain.assemblies.mscorlib.image;
+         * //
+         * const StringClass = mscorlib.classes["System.String"];
+         * const Int32Class = mscorlib.classes["System.Int32"];
+         * const ObjectClass = mscorlib.classes["System.Object"];
+         * //
+         * assert(StringClass.type.class.handle.equals(StringClass.handle));
+         * //
+         * const array = Il2Cpp.Array.from<number>(Int32Class, [0, 1, 2, 3, 4]);
+         * assert(array.object.class.type.name == "System.Int32[]");
+         * assert(array.object.class.type.dataType?.name == "System.Int32");
+         * //
+         * assert(StringClass.type.name == "System.String");
+         * //
+         * assert(Int32Class.type.typeEnum == Il2Cpp.TypeEnum.I4);
+         * assert(ObjectClass.type.typeEnum == Il2Cpp.TypeEnum.OBJECT);
+         * ```
          */
         class Type {
             /**
@@ -685,19 +941,41 @@ declare global {
              */
             readonly handle: NativePointer;
 
+            /**
+             * @return Its class.
+             */
             get class(): Class;
 
+            /**
+             * @return If it's an array, the type of its elements, `null` otherwise.
+             */
             get dataType(): Type | null;
 
+            /**
+             * @returns If it's a generic type, its generic class, `null` otherwise.
+             */
             get genericClass(): GenericClass | null;
 
+            /**
+             *  @returns `true` if it's passed by reference, `false` otherwise.
+             */
             get isByReference(): boolean;
 
+            /**
+             * @returns Its name, namespace included and declaring class excluded. If its class is nested,
+             * it corresponds to the class name.
+             */
             get name(): string;
 
+            /**
+             * @returns Its corresponding type.
+             */
             get typeEnum(): TypeEnum;
         }
 
+        /**
+         * Represents the enum `Il2CppTypeEnum`.
+         */
         enum TypeEnum {
             END = 0x00,
             VOID = 0x01,
@@ -734,59 +1012,84 @@ declare global {
             MODIFIER = 0x40,
             SENTINEL = 0x41,
             PINNED = 0x45,
-            ENUM = 0x55,
+            ENUM = 0x55
         }
 
+        /**
+         * Represents something which has an accessible value.
+         */
         interface Valuable {
+            /**
+             * The actual location.
+             */
+            valueHandle: NativePointer;
+
+            /**
+             * The actual "pretty" value.
+             */
             value: AllowedType;
         }
 
         /**
-         * Types you can be familiar with.
+         * Types this module is familiar with.
          */
-        type AllowedType =
-            undefined
-            | boolean
-            | number
-            | Int64
-            | UInt64
-            | NativePointer
-            | ValueType
-            | Object
-            | String
-            | Array<AllowedType>;
+        type AllowedType = undefined | boolean | number | Int64 | UInt64 | NativePointer | ValueType | Object | String | Array<AllowedType>;
 
-        type ImplementationCallback = (
-            this: InvocationContext,
-            instance: Object,
-            parameters: Accessor<Parameter>
-        ) => AllowedType;
+        /**
+         * Callback of a method implementation.
+         */
+        type ImplementationCallback =
+        /**
+         * @param this Frida's `InvocationContext`.
+         * @param instance Instance whose method is being intercepted, `null` if the
+         * method is static.
+         * @param parameters Invocation parameters.
+         * @return The value that should be returned - mandatory.
+         */
+            (this: InvocationContext, instance: Object | null, parameters: Accessor<Parameter>) => AllowedType;
 
-        type OnEnterCallback = (
-            this: InvocationContext,
-            instance: Object,
-            parameters: Accessor<Parameter>
-        ) => void;
+        /**
+         * Callback of a method `onEnter` interception.
+         */
+        type OnEnterCallback =
+        /**
+         * @param this Frida's `InvocationContext`.
+         * @param instance Instance whose method is being intercepted, `null` if the
+         * method is static.
+         * @param parameters Invocation parameters.
+         */
+            (this: InvocationContext, instance: Object | null, parameters: Accessor<Parameter>) => void;
 
-        type OnLeaveCallback = (this: InvocationContext, returnValue: Valuable) => void;
+        /**
+         * Callback of a method `onLeave` interception.
+         */
+        type OnLeaveCallback =
+        /**
+         * @param this Frida's `InvocationContext`.
+         * @param returnValue The value that should be returned.
+         */
+            (this: InvocationContext, returnValue: Valuable) => void;
 
         /**
          * An iterable class with a string index signature.\
          * Upon key clashes, a suffix `_${number}`is appended to the latest key.
          * ```typescript
          * const accessor = new Accessor<string>();
-         * // Let's add something
          * accessor.hello = 0;
          * accessor.hello = 1; // Adding the same key!
          * accessor.hello = 2; // Adding the same key, again!
-         * // Result
          * Object.keys(accessor); // hello, hello_1, hello_2
          * ```
          */
         class Accessor<T> implements Iterable<T> {
-
+            /**
+             * Able to iterate.
+             */
             [Symbol.iterator](): Iterator<T>;
 
+            /**
+             * Index signature.
+             */
             [key: string]: T;
         }
     }
