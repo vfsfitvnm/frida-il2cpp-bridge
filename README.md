@@ -8,7 +8,7 @@ async function main() {
 
     const domain = await Il2Cpp.Domain.get();
     
-    const TestAssembly = domain.assemblies["Test.Assembly"].image!;
+    const TestAssembly = domain.assemblies["Test.Assembly"].image;
     
     TestAssembly.classes.TestClass.methods.testMethod.intercept({
         onLeave(returnValue) { 
@@ -39,10 +39,10 @@ for providing the headers.
 ```shell script
 npm install --save-dev frida-il2cpp-bridge
 ```
-Also make sure your `tsconfig.json` file includes `"moduleResolution": "node"`.
+You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 
 ### Changelog
 - 0.1.0 _Initial release._
 
-### Snippets
+### API
 Read the [docs](./docs/index.html).
