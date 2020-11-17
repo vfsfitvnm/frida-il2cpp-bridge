@@ -1,20 +1,28 @@
-import { sources } from "./utils/api-factory";
-import {inform, ok, raise} from "./utils/console";
+import { resolve, sources } from "./utils/api-factory";
+import { inform, ok, raise } from "./utils/console";
 import UnityVersion from "./utils/unity-version";
 import { forLibrary, il2CppLibraryName, unityLibraryName } from "./utils/platform";
 import Il2CppDomain from "./il2cpp/domain";
 import Il2CppObject from "./il2cpp/object";
 import Il2CppString from "./il2cpp/string";
 import Il2CppArray from "./il2cpp/array";
-import { Il2CppTypeEnum } from "./il2cpp/type-enum";
+import Il2CppTypeEnum from "./il2cpp/type-enum";
+import GC from "./il2cpp/gc";
 
 /** @internal */
 function getMissingExports() {
     return new CModule(`
 #include "stdint.h"
+#include "glib.h"
+#include "string.h"
+#include "stdio.h"
+
+#define TYPE_ATTRIBUTE_INTERFACE 0x00000020
 
 #define FIELD_ATTRIBUTE_STATIC 0x0010
 #define FIELD_ATTRIBUTE_LITERAL 0x0040
+
+#define METHOD_ATTRIBUTE_STATIC 0x0010
 
 typedef struct _Il2CppObject Il2CppObject;
 typedef struct _Il2CppString Il2CppString;
@@ -37,6 +45,10 @@ typedef struct _Il2CppGenericInst Il2CppGenericInst;
 typedef struct _Il2CppGenericClass Il2CppGenericClass;
 typedef struct _Il2CppGenericContext Il2CppGenericContext;
 typedef uint16_t Il2CppChar;
+
+static const uint64_t IL2CPP_BASE = ${Process.getModuleByName(il2CppLibraryName!).base};
+
+const char * (* il2cpp_type_get_name) (const Il2CppType * type) = GUINT_TO_POINTER (${resolve("il2cpp_type_get_name")});
 
 enum _Il2CppTypeEnum
 {
@@ -668,12 +680,96 @@ il2cpp_array_elements (Il2CppArraySize * array) {
     return &array->vector;
 #endif
 }
-#else 
+#else
 void *
 il2cpp_array_elements (Il2CppArray * array) {
     return (void*) array->vector;
 }
 #endif
+
+const gchar *
+il2cpp_class_to_string (const Il2CppClass * klass)
+{
+    GString * text;
+
+    text = g_string_new (NULL);
+
+    g_string_append_printf (text, "// %s\\n", klass->image->name);
+    
+    uint8_t is_enum = klass->enumtype;
+    uint8_t is_valuetype = klass->valuetype;
+    uint8_t is_interface = klass->flags & TYPE_ATTRIBUTE_INTERFACE;
+    
+    if (is_enum) g_string_append_len (text, "enum ", 5);
+    else if (is_valuetype) g_string_append_len (text, "struct ", 7);
+    else if (is_interface) g_string_append_len (text, "interface ", 10);
+    else g_string_append_len (text, "class ", 6);
+
+#if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.1.0")}
+    g_string_append (text, il2cpp_type_get_name (&klass->byval_arg));
+#else
+    g_string_append (text, il2cpp_type_get_name (klass->byval_arg));
+#endif
+    
+    g_string_append_len (text, "\\n{", 2);
+        
+    uint16_t field_count = klass->field_count;
+    if (field_count > 0)
+    {
+        FieldInfo * field;
+        for (uint16_t i = 0; i < field_count; i++)
+        {
+            field = klass->fields + i;
+            g_string_append_len (text, "\\n\\t", 2);
+
+            if (is_enum && i > 0)
+            {
+                g_string_append (text, field->name);
+                g_string_append_c (text, ',');
+            } else
+            {
+                if (!il2cpp_field_is_instance (field)) g_string_append_len (text, "static ", 7);
+                g_string_append_printf (text, "%s %s; // 0x%x", il2cpp_type_get_name (field->type), field->name, field->offset);
+            }
+        }
+    }
+
+    uint16_t method_count = klass->method_count;
+    if (method_count > 0)
+    {
+        const MethodInfo * method;
+
+        g_string_append_c (text, '\\n');
+        for (uint16_t i = 0; i < method_count; i++)
+        {
+            method = klass->methods[i];
+            g_string_append_len (text, "\\n\\t", 2);
+            
+            uint8_t is_static_flag = method->flags & METHOD_ATTRIBUTE_STATIC;
+            
+            if (is_static_flag != 0) g_string_append_len (text, "static ", 7);
+            g_string_append_printf (text, "%s %s(", il2cpp_type_get_name (method->return_type), method->name);
+
+            const ParameterInfo * param;
+
+            uint16_t parameters_count = method->parameters_count;
+            for (uint8_t j = 0; j < parameters_count; j++)
+            {
+                param = method->parameters + j;
+                if (j > 0) g_string_append_len (text, ", ", 2);
+                g_string_append_printf (text, "%s %s", il2cpp_type_get_name (param->parameter_type), param->name);
+            }
+
+            g_string_append_len (text, ");", 2);
+            void * method_pointer = method->methodPointer;
+            if (method_pointer != NULL) g_string_append_printf (text, " // 0x%.8x", GPOINTER_TO_INT (method->methodPointer) - IL2CPP_BASE);
+        }
+    }
+
+    g_string_append_len (text, "\\n}\\n\\n", 4);
+
+    return g_string_free (text, 0);
+}
 `);
 }
 
@@ -683,6 +779,7 @@ il2cpp_array_elements (Il2CppArray * array) {
     String: Il2CppString,
     Array: Il2CppArray,
     TypeEnum: Il2CppTypeEnum,
+    GC: GC,
 
     async initialize() {
         if (Process.platform != "linux") {
@@ -698,58 +795,23 @@ il2cpp_array_elements (Il2CppArray * array) {
             raise(`Unity version "${UnityVersion.CURRENT}" is not valid or supported.`);
         }
 
-        sources.push(Process.getModuleByName(il2CppLibraryName!), getMissingExports());
+        sources.push(Process.getModuleByName(il2CppLibraryName!));
+        sources.push(getMissingExports());
     },
 
-    async dump() {
-        let content = "";
-        const domain = await this.Domain.get() as Il2CppDomain;
+    async dump(filename: string) {
+        const domain = (await this.Domain.get()) as Il2CppDomain;
 
-        const Application = domain.assemblies["UnityEngine.CoreModule"].image.classes["UnityEngine.Application"];
-        const version = Application.methods.get_version.invoke();
-        const identifier = Application.methods.get_identifier.invoke();
-        const persistentDataPath = Application.methods.get_persistentDataPath.invoke();
-        const path = `${persistentDataPath}/${identifier}_${version}_${Process.arch}_${Process.platform}.cs`;
+        inform("Dumping...");
 
-        content += `// ${path}\n\n`;
+        const content = Array.from(domain.assemblies)
+            .map(assembly => Array.from(assembly.image.classes).join(""))
+            .join("\n");
 
-        for (const assembly of domain.assemblies) {
-            inform(`Dumping ${assembly.name}...`);
-            for (const klass of assembly.image.classes) {
-                content += `// ${assembly.name}.dll\n`;
-                content += klass.isStruct ? "struct" : klass.isEnum ? "enum" : klass.isInterface ? "interface" : "class";
-                content += ` ${klass.type.name}\n{`;
-                if (klass.fieldCount > 0) {
-                    content += "\n";
-                    for (const field of klass.fields) {
-                        if (!field.isInstance) content += "static ";
-                        content += `${field.type.name} ${field.name}`;
-                        if (field.isLiteral) content += ` = ${field.value}`
-                        content += `; // 0x${(field.offset).toString(16)}`;
-                    }
-                }
-                if (klass.methodCount > 0) {
-                    content += "\n";
-                    for (const method of klass.methods) {
-                        if (!method.isInstance) content += "static ";
-                        content += `${this.returnType.name} ${this.name}(`;
-                        for (const parameter of method.parameters) {
-                            if (parameter.position > 0) content += ", ";
-                            content += `${parameter.type.name} ${parameter.name}`;
-                        }
-                        content += ");"
-                        if (!method.actualPointer.isNull()) content += ` // ${method.relativePointerAsString}`;
-                    }
-                    content += "\n";
-                }
-                content += "\n";
-            }
-        }
-
-        const file = new File(path, "w");
+        const file = new File(filename, "w");
         file.write(content);
         file.flush();
         file.close();
-        ok(`Dump saved to ${path}.`);
+        ok(`Dump saved to ${filename}.`);
     }
 };

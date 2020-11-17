@@ -1,4 +1,4 @@
 .idea
 /node_modules/
-/dist/*/*.js
+/dist/*.js
 package-lock.json

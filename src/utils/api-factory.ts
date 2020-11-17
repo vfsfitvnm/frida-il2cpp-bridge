@@ -1,4 +1,4 @@
-import {raise} from "./console";
+import { raise } from "./console";
 
 /** @internal BaseType */
 type BT =
@@ -156,7 +156,7 @@ export function resolve(exportName: string) {
         const result = source instanceof Module ? source.findExportByName(exportName) : source[exportName];
         if (result) return result as NativePointer;
     }
-    raise(`Couldn't resolve export "${exportName}".`)
+    raise(`Couldn't resolve export "${exportName}".`);
 }
 
 /** @internal */

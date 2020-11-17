@@ -12,7 +12,7 @@ declare global {
         /**
          * The whole thing must be initialized first.
          * This is potentially asynchronous because
-         * the IL2CPP library could be loaded at any
+         * the `IL2CPP` library could be loaded at any
          * time, so we just make sure it's loaded.
          * The current Unity version will also be
          * detected.
@@ -30,10 +30,55 @@ declare global {
         /**
          * Performs a dump of the assemblies.
          * ```typescript
-         * TODO
+         * const Application = domain.assemblies["UnityEngine.CoreModule"].image.classes["UnityEngine.Application"];
+         * const version = Application.methods.get_version.invoke();
+         * const identifier = Application.methods.get_identifier.invoke();
+         * const persistentDataPath = Application.methods.get_persistentDataPath.invoke();
+         * Il2Cpp.dump(`${persistentDataPath}/${identifier}_${version}.cs`);
          * ```
+         * @param fullPathName Where to save the dump. The caller has to
+         * make sure the application has a write permission for that location.
+         *
          */
-        function dump(): Promise<void>;
+        function dump(fullPathName: string): Promise<void>;
+
+        /**
+         * Garbage collector utility functions.
+         */
+        namespace GC {
+            /**
+             * Forces the GC to collect object from the given
+             * [generation](https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/fundamentals#generations).
+             * @param generation The category of objects to collect.
+             */
+            function collect(generation: 0 | 1 | 2): void;
+
+            /**
+             * Like {@link Il2Cpp.GC.collect | collect}, but I don't know which
+             * generation it collects.\
+             * Available since Unity version `5.3.5`.
+             */
+            function collectALittle(): void;
+
+            /**
+             * Disables the GC.\
+             * Available since Unity version `5.3.5`.
+             */
+            function disable(): void;
+
+            /**
+             * Enables the GC.\
+             * Available since Unity version `5.3.5`.
+             */
+            function enable(): void;
+
+
+            /**
+             * Available since Unity version `2018.3.0`.
+             * @return `true` if the GC is disabled, `false` otherwise.
+             */
+            function isDisabled(): boolean;
+        }
 
         /**
          * Represents a `Il2CppDomain`.
@@ -133,7 +178,7 @@ declare global {
             /**
              * Non-generic types are stored in sequence.
              * @return The start index of its classes, `-1` if this information
-             * is not available.
+             * is not available - since Unity version `2020.2.0`.
              */
             get classStart(): number | -1;
 
@@ -640,6 +685,9 @@ declare global {
          * const MathClass = mscorlib.classes["System.Math"];
          * //
          * assert(MathClass.methods.Sqrt.parameters.d.name == "d");
+         * //
+         * assert(MathClass.methods.Sqrt.parameters.d.position == 0);
+         * //
          * assert(MathClass.methods.Sqrt.parameters.d.type.name == "System.Double");
          * ```
          */
@@ -653,6 +701,11 @@ declare global {
              * @return Its name.
              */
             get name(): string;
+
+            /**
+             * @return Its position.
+             */
+            get position(): number;
 
             /**
              *  @return Its type.
@@ -1083,7 +1136,7 @@ declare global {
          */
         class Accessor<T> implements Iterable<T> {
             /**
-             * Able to iterate.
+             * Iterable.
              */
             [Symbol.iterator](): Iterator<T>;
 

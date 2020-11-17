@@ -24,7 +24,9 @@ export class Accessor<T> implements Iterable<T> {
             },
             get(target: Accessor<T>, key: PropertyKey) {
                 if (typeof key != "string" || Reflect.has(target, key)) return Reflect.get(target, key);
-                raise(`Couldn't find property "${key}", did you mean "${closest(key, Object.keys(target))}"?`);
+                const closestMatch = closest(key, Object.keys(target));
+                if (closestMatch) raise(`Couldn't find property "${key}", did you mean "${closestMatch}"?`);
+                else raise(`Couldn't find property "${key}"`);
             }
         });
     }

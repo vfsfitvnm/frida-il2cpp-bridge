@@ -30,7 +30,7 @@ const loader =
 
 /** @internal */
 export function forLibrary(libraryName: string): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         const library = Process.findModuleByName(libraryName);
         if (library != null) {
             resolve();
@@ -44,16 +44,8 @@ export function forLibrary(libraryName: string): Promise<void> {
                         setTimeout(() => interceptor.detach());
                         resolve();
                     }
-                },
+                }
             });
         }
     });
 }
-
-// export function waitForUnityLibrary() {
-//     return waitForLibrary(unityLibraryName!);
-// }
-//
-// export function waitForIl2CppLibrary() {
-//     return waitForLibrary(il2CppLibraryName!);
-// }
