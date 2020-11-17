@@ -140,6 +140,11 @@ export default class Api {
     }
 
     @lazy
+    static get _classToString() {
+        return create("utf8string", "il2cpp_class_to_string", "pointer");
+    }
+
+    @lazy
     static get _domainGet() {
         return create("pointer", "il2cpp_domain_get");
     }
@@ -192,6 +197,31 @@ export default class Api {
     @lazy
     static get _fieldIsLiteral() {
         return create("bool", "il2cpp_field_is_literal", "pointer");
+    }
+
+    @lazy
+    static get _gcCollect() {
+        return create("void", "il2cpp_gc_collect", "int");
+    }
+
+    @lazy
+    static get _gcCollectALittle() {
+        return create("void", "il2cpp_gc_collect_a_little");
+    }
+
+    @lazy
+    static get _gcDisable() {
+        return create("void", "il2cpp_gc_disable");
+    }
+
+    @lazy
+    static get _gcEnable() {
+        return create("void", "il2cpp_gc_enable");
+    }
+
+    @lazy
+    static get _gcIsDisabled() {
+        return create("bool", "il2cpp_gc_is_disabled");
     }
 
     @lazy
@@ -326,7 +356,7 @@ export default class Api {
 
     @lazy
     static get _valueBox() {
-        return create("pointer", "il2cpp_value_box", "pointer", "pointer")
+        return create("pointer", "il2cpp_value_box", "pointer", "pointer");
     }
 
     @lazy

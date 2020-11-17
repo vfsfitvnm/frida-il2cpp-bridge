@@ -4,7 +4,7 @@ import { getOrNull } from "../utils/helpers";
 import Il2CppClass from "./class";
 import Il2CppGenericClass from "./generic-class";
 import { raise } from "../utils/console";
-import { Il2CppTypeEnum } from "./type-enum";
+import Il2CppTypeEnum from "./type-enum";
 
 /** @internal */
 export default class Il2CppType {

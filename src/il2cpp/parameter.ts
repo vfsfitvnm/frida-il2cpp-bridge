@@ -6,6 +6,8 @@ import { allocRawValue, AllowedType, readRawValue, Valuable } from "./runtime";
 
 /** @internal */
 export default class Il2CppParameter implements Valuable {
+    readonly valueHandle = NULL;
+
     constructor(readonly handle: NativePointer) {
         if (handle.isNull()) raise(`Handle for "${this.constructor.name}" cannot be NULL.`);
     }
@@ -36,10 +38,8 @@ export default class Il2CppParameter implements Valuable {
         Reflect.set(parameter, "valueHandle", holder[startIndex + this.position]);
         Reflect.defineProperty(parameter, "value", {
             get: () => readRawValue(holder[startIndex + this.position], this.type!),
-            set: (v: AllowedType) => (holder[startIndex + this.position] = allocRawValue(v, this.type!)),
+            set: (v: AllowedType) => (holder[startIndex + this.position] = allocRawValue(v, this.type!))
         });
         return parameter;
     }
-
-    readonly valueHandle = NULL;
 }

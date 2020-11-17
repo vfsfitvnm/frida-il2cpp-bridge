@@ -88,6 +88,9 @@
 					<a href="__global.il2cpp.parameter.html#name" class="tsd-kind-icon">name</a>
 				</li>
 				<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+					<a href="__global.il2cpp.parameter.html#position" class="tsd-kind-icon">position</a>
+				</li>
+				<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 					<a href="__global.il2cpp.parameter.html#type" class="tsd-kind-icon">type</a>
 				</li>
 				<li class=" tsd-kind-accessor tsd-parent-kind-class">
@@ -144,6 +147,9 @@
 <span class="hljs-keyword">const</span> MathClass = mscorlib.classes[<span class="hljs-string">&quot;System.Math&quot;</span>];
 <span class="hljs-comment">//</span>
 assert(MathClass.methods.Sqrt.parameters.d.name == <span class="hljs-string">&quot;d&quot;</span>);
+<span class="hljs-comment">//</span>
+assert(MathClass.methods.Sqrt.parameters.d.position == <span class="hljs-number">0</span>);
+<span class="hljs-comment">//</span>
 assert(MathClass.methods.Sqrt.parameters.d.type.name == <span class="hljs-string">&quot;System.Double&quot;</span>);</code></pre>
 				</div>
 			</div>
@@ -176,6 +182,7 @@ assert(MathClass.methods.Sqrt.parameters.d.type.name == <span class="hljs-string
 						<h3>Accessors</h3>
 						<ul class="tsd-index-list">
 							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="__global.il2cpp.parameter.html#name" class="tsd-kind-icon">name</a></li>
+							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="__global.il2cpp.parameter.html#position" class="tsd-kind-icon">position</a></li>
 							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="__global.il2cpp.parameter.html#type" class="tsd-kind-icon">type</a></li>
 							<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="__global.il2cpp.parameter.html#value" class="tsd-kind-icon">value</a></li>
 							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="__global.il2cpp.parameter.html#valuehandle" class="tsd-kind-icon">value<wbr>Handle</a></li>
@@ -192,7 +199,7 @@ assert(MathClass.methods.Sqrt.parameters.d.type.name == <span class="hljs-string
 				<div class="tsd-signature tsd-kind-icon">handle<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">NativePointer</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in index.ts:652</li>
+						<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L710">index.ts:710</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -214,13 +221,33 @@ assert(MathClass.methods.Sqrt.parameters.d.type.name == <span class="hljs-string
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:657</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L715">index.ts:715</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
 						<p>Its name.</p>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+				<a name="position" class="tsd-anchor"></a>
+				<h3>position</h3>
+				<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+					<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> position<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L720">index.ts:720</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+						</div>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						<p>Its position.</p>
 					</li>
 				</ul>
 			</section>
@@ -234,7 +261,7 @@ assert(MathClass.methods.Sqrt.parameters.d.type.name == <span class="hljs-string
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:662</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L725">index.ts:725</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -255,7 +282,7 @@ assert(MathClass.methods.Sqrt.parameters.d.type.name == <span class="hljs-string
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:668</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L731">index.ts:731</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -269,7 +296,7 @@ assert(MathClass.methods.Sqrt.parameters.d.type.name == <span class="hljs-string
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:674</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L737">index.ts:737</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -303,7 +330,7 @@ assert(MathClass.methods.Sqrt.parameters.d.type.name == <span class="hljs-string
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:679</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L742">index.ts:742</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">

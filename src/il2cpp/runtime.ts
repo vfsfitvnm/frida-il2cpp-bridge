@@ -3,8 +3,8 @@ import Il2CppObject from "./object";
 import Il2CppType from "./type";
 import Il2CppArray from "./array";
 import Il2CppString from "./string";
-import {raise} from "../utils/console";
-import {Il2CppTypeEnum} from "./type-enum";
+import { raise } from "../utils/console";
+import Il2CppTypeEnum from "./type-enum";
 
 /** @internal */
 export type AllowedType =
@@ -53,7 +53,9 @@ function isCoherent(value: AllowedType, type: Il2CppType) {
         case Il2CppTypeEnum.SZARRAY:
             return value instanceof Il2CppArray;
         default:
-            raise(`isCoherent: case for "${type.name}" (${Il2CppTypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`);
+            raise(
+                `isCoherent: case for "${type.name}" (${Il2CppTypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`
+            );
     }
 }
 
@@ -103,7 +105,11 @@ export function readFieldValue(pointer: NativePointer, type: Il2CppType): Allowe
         case Il2CppTypeEnum.SZARRAY:
             return new Il2CppArray(pointer.readPointer());
         default:
-            raise(`readFieldValue: case for "${type.name}" (${Il2CppTypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`);
+            raise(
+                `readFieldValue: case for "${type.name}" (${
+                    Il2CppTypeEnum[type.typeEnum]
+                }) has not been handled yet. Please file an issue!)`
+            );
     }
 }
 
@@ -143,12 +149,12 @@ export function writeFieldValue(pointer: NativePointer, value: AllowedType, type
             pointer.writeU16(value as number);
             break;
         case Il2CppTypeEnum.I8: {
-            const v = value instanceof Int64 ? value.toNumber() : value as number;
+            const v = value instanceof Int64 ? value.toNumber() : (value as number);
             pointer.writeS64(v);
             break;
         }
         case Il2CppTypeEnum.U8: {
-            const v = value instanceof UInt64 ? value.toNumber() : value as number;
+            const v = value instanceof UInt64 ? value.toNumber() : (value as number);
             pointer.writeS64(v);
             break;
         }
@@ -173,7 +179,11 @@ export function writeFieldValue(pointer: NativePointer, value: AllowedType, type
             pointer.writePointer((value as Il2CppObject).handle);
             break;
         default:
-            raise(`writeFieldValue: case for "${type.name}" (${Il2CppTypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`);
+            raise(
+                `writeFieldValue: case for "${type.name}" (${
+                    Il2CppTypeEnum[type.typeEnum]
+                }) has not been handled yet. Please file an issue!)`
+            );
     }
 }
 
@@ -222,7 +232,9 @@ export function readRawValue(pointer: NativePointer, type: Il2CppType): AllowedT
         case Il2CppTypeEnum.SZARRAY:
             return new Il2CppArray(pointer);
         default:
-            raise(`readRawValue: case for "${type.name}" (${Il2CppTypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`);
+            raise(
+                `readRawValue: case for "${type.name}" (${Il2CppTypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`
+            );
     }
 }
 
@@ -252,11 +264,11 @@ export function allocRawValue(value: AllowedType, type: Il2CppType) {
         case Il2CppTypeEnum.CHAR:
             return ptr(value as number);
         case Il2CppTypeEnum.I8: {
-            const v = value instanceof Int64 ? value.toNumber() : value as number;
+            const v = value instanceof Int64 ? value.toNumber() : (value as number);
             return ptr(v);
         }
         case Il2CppTypeEnum.U8: {
-            const v = value instanceof UInt64 ? value.toNumber() : value as number;
+            const v = value instanceof UInt64 ? value.toNumber() : (value as number);
             return ptr(v);
         }
         case Il2CppTypeEnum.R4:
@@ -276,7 +288,9 @@ export function allocRawValue(value: AllowedType, type: Il2CppType) {
         case Il2CppTypeEnum.GENERICINST:
             return (value as Il2CppObject).handle;
         default:
-            raise(`allocRawValue: case for "${type.name}" (${Il2CppTypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`);
+            raise(
+                `allocRawValue: case for "${type.name}" (${Il2CppTypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`
+            );
     }
 }
 
@@ -305,4 +319,3 @@ export interface Valuable {
 //
 //     return matches;
 // }
-

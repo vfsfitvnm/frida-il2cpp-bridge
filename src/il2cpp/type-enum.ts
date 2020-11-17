@@ -1,5 +1,5 @@
 /** @internal */
-export enum Il2CppTypeEnum {
+enum Il2CppTypeEnum {
     END = 0x00,
     VOID = 0x01,
     BOOLEAN = 0x02,
@@ -35,5 +35,7 @@ export enum Il2CppTypeEnum {
     MODIFIER = 0x40,
     SENTINEL = 0x41,
     PINNED = 0x45,
-    ENUM = 0x55,
+    ENUM = 0x55
 }
+
+export default Il2CppTypeEnum;

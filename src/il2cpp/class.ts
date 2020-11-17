@@ -117,4 +117,8 @@ export default class Il2CppClass {
     trace() {
         for (const method of this.methods) method.trace();
     }
+
+    toString() {
+        return Api._classToString(this.handle)!;
+    }
 }

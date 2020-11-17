@@ -45,4 +45,4 @@ You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 - 0.1.0 _Initial release._
 
 ### API
-Read the [docs](./docs/index.html).
+Read the [docs](https://vfsfitvnm.github.io/frida-il2cpp-bridge/index.html).

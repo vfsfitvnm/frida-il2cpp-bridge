@@ -94,6 +94,9 @@
 					<a href="__global.il2cpp.class.html#isenum" class="tsd-kind-icon">is<wbr>Enum</a>
 				</li>
 				<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+					<a href="__global.il2cpp.class.html#isinterface" class="tsd-kind-icon">is<wbr>Interface</a>
+				</li>
+				<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 					<a href="__global.il2cpp.class.html#isstaticconstructorfinished" class="tsd-kind-icon">is<wbr>Static<wbr>Constructor<wbr>Finished</a>
 				</li>
 				<li class=" tsd-kind-get-signature tsd-parent-kind-class">
@@ -200,6 +203,7 @@
 <span class="hljs-keyword">const</span> DateTimeFormatInfoClass = mscorlib.classes[<span class="hljs-string">&quot;System.Globalization.DateTimeFormatInfo&quot;</span>];
 <span class="hljs-keyword">const</span> DayOfWeekClass = mscorlib.classes[<span class="hljs-string">&quot;System.DayOfWeek&quot;</span>];
 <span class="hljs-keyword">const</span> MathClass = mscorlib.classes[<span class="hljs-string">&quot;System.Math&quot;</span>];
+<span class="hljs-keyword">const</span> IFormattableClass = mscorlib.classes[<span class="hljs-string">&quot;System.IFormattable&quot;</span>];
 <span class="hljs-comment">//</span>
 assert(Int32Class.arrayElementSize == <span class="hljs-number">4</span>);
 assert(Int64Class.arrayElementSize == <span class="hljs-number">8</span>);
@@ -222,6 +226,8 @@ assert(Int32Class.image.name == <span class="hljs-string">&quot;mscorlib.dll&quo
 <span class="hljs-comment">//</span>
 assert(DayOfWeekClass.isEnum);
 assert(!Int32Class.isEnum);
+<span class="hljs-comment">//</span>
+assert(IFormattableClass.isInterface);
 <span class="hljs-comment">//</span>
 <span class="hljs-keyword">if</span> (!MathClass.isStaticConstructorFinished) {
     MathClass.ensureInitialized();
@@ -273,6 +279,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="__global.il2cpp.class.html#image" class="tsd-kind-icon">image</a></li>
 							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="__global.il2cpp.class.html#instancesize" class="tsd-kind-icon">instance<wbr>Size</a></li>
 							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="__global.il2cpp.class.html#isenum" class="tsd-kind-icon">is<wbr>Enum</a></li>
+							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="__global.il2cpp.class.html#isinterface" class="tsd-kind-icon">is<wbr>Interface</a></li>
 							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="__global.il2cpp.class.html#isstaticconstructorfinished" class="tsd-kind-icon">is<wbr>Static<wbr>Constructor<wbr>Finished</a></li>
 							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="__global.il2cpp.class.html#isstruct" class="tsd-kind-icon">is<wbr>Struct</a></li>
 							<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="__global.il2cpp.class.html#methodcount" class="tsd-kind-icon">method<wbr>Count</a></li>
@@ -302,7 +309,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 				<div class="tsd-signature tsd-kind-icon">handle<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">NativePointer</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in index.ts:228</li>
+						<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L278">index.ts:278</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -324,7 +331,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:233</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L283">index.ts:283</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -344,7 +351,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:238</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L288">index.ts:288</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -364,7 +371,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:254</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L304">index.ts:304</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -395,7 +402,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:259</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L309">index.ts:309</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -417,7 +424,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:264</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L314">index.ts:314</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -437,7 +444,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:277</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L327">index.ts:327</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -465,7 +472,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:282</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L332">index.ts:332</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -485,7 +492,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:287</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L337">index.ts:337</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -505,7 +512,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:292</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L342">index.ts:342</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -525,13 +532,33 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:297</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L347">index.ts:347</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 						<p><code>true</code> if it&#39;s an <code>enum</code>, <code>false</code> otherwise.</p>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+				<a name="isinterface" class="tsd-anchor"></a>
+				<h3>is<wbr>Interface</h3>
+				<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+					<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> isInterface<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L352">index.ts:352</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+						</div>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p><code>true</code> if it&#39;s an <code>interface</code>, <code>false</code> otherwise.</p>
 					</li>
 				</ul>
 			</section>
@@ -545,7 +572,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:303</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L358">index.ts:358</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -566,7 +593,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:308</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L363">index.ts:363</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -586,7 +613,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:313</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L368">index.ts:368</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -606,7 +633,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:326</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L381">index.ts:381</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -634,7 +661,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:331</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L386">index.ts:386</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -654,7 +681,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:336</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L391">index.ts:391</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -674,7 +701,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:341</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L396">index.ts:396</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -694,7 +721,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:346</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L401">index.ts:401</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -714,7 +741,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:351</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L406">index.ts:406</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -737,7 +764,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:357</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L412">index.ts:412</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -759,7 +786,7 @@ assert(BooleanClass.type.name == <span class="hljs-string">&quot;System.Boolean&
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in index.ts:363</li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/1fe8327/src/index.ts#L418">index.ts:418</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
