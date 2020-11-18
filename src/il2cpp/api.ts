@@ -35,8 +35,18 @@ export default class Api {
     }
 
     @lazy
+    static get _classFromName() {
+        return create("pointer", "il2cpp_class_from_name", "pointer", "utf8string", "utf8string");
+    }
+
+    @lazy
     static get _classFromType() {
         return create("pointer", "il2cpp_class_from_type", "pointer");
+    }
+
+    @lazy
+    static get _classGetArrayClass() {
+        return create("pointer", "il2cpp_array_class_get", "pointer", "uint32");
     }
 
     @lazy
@@ -117,6 +127,11 @@ export default class Api {
     @lazy
     static get _classHasStaticConstructor() {
         return create("bool", "il2cpp_class_has_static_constructor", "pointer");
+    }
+
+    @lazy
+    static get _classInit() {
+        return create("void", "il2cpp_runtime_class_init", "pointer");
     }
 
     @lazy
@@ -252,6 +267,21 @@ export default class Api {
     @lazy
     static get _init() {
         return resolve("il2cpp_init");
+    }
+
+    @lazy
+    static get _livenessCalculationBegin() {
+        return create("pointer", "il2cpp_unity_liveness_calculation_begin", "pointer", "int", "pointer", "pointer", "pointer", "pointer");
+    }
+
+    @lazy
+    static get _livenessCalculationEnd() {
+        return create("void", "il2cpp_unity_liveness_calculation_end", "pointer");
+    }
+
+    @lazy
+    static get _livenessCalculationFromStatics() {
+        return create("void", "il2cpp_unity_liveness_calculation_from_statics", "pointer");
     }
 
     @lazy

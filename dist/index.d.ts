@@ -43,6 +43,31 @@ declare global {
         function dump(fullPathName: string): Promise<void>;
 
         /**
+         * It reads the GC descriptor of the given class and looks for its objects
+         * on the heap. During this process, it may stop and start the GC world
+         * multiple times.\
+         * A version with callbacks is not really needed because:
+         * - There aren't performance issues;
+         * - It cannot be stopped;
+         * - The `onMatch` callback can only be called when the GC world starts again,
+         * but the whole thing is enough fast it doesn't make any sense to have
+         * callbacks.
+         *
+         * ```typescript
+         * const StringClass = domain.assemblies.mscorlib.image.classes["System.String"];
+         * const matches = Il2Cpp.choose<Il2Cpp.String>(StringClass);
+         * for (const match of matches) {
+         *     console.log(match);
+         * }
+         * ```
+         * @template T Type parameter to automatically cast the objects to other object-like
+         * entities, like string and arrays. Default is {@link Il2Cpp.Object | Object}.
+         * @param klass The class of the objects you are looking for.
+         * @return An array of ready-to-use objects, strings or arrays. Value types are boxed.
+         */
+        function choose<T extends Object | String | Array<AllowedType> = Object>(klass: Class): T[];
+
+        /**
          * Garbage collector utility functions.
          */
         namespace GC {
@@ -71,7 +96,6 @@ declare global {
              * Available since Unity version `5.3.5`.
              */
             function enable(): void;
-
 
             /**
              * Available since Unity version `2018.3.0`.
@@ -200,6 +224,14 @@ declare global {
              * extension.
              */
             get name(): string;
+
+            /**
+             * @param namespace The class namespace.
+             * @param name The class name.
+             * @return The class for the given namespace and name or `null` if
+             * not found.
+             */
+            getClassFromName(namespace: string, name: string): Class | null;
         }
 
         /**
@@ -216,6 +248,8 @@ declare global {
          * const DayOfWeekClass = mscorlib.classes["System.DayOfWeek"];
          * const MathClass = mscorlib.classes["System.Math"];
          * const IFormattableClass = mscorlib.classes["System.IFormattable"];
+         * //
+         * assert(BooleanClass.arrayClass.name == "Boolean[]");
          * //
          * assert(Int32Class.arrayElementSize == 4);
          * assert(Int64Class.arrayElementSize == 8);
@@ -264,6 +298,12 @@ declare global {
              * Its handle as a `NativePointer`.
              */
             readonly handle: NativePointer;
+
+            /**
+             * The inverse of {@link Il2Cpp.Class.elementClass | elementClass}.
+             * @return The array class which has the caller as element class.
+             */
+            get arrayClass(): Class;
 
             /**
              * @return The size as array element.
@@ -678,6 +718,41 @@ declare global {
         }
 
         /**
+         * Callback of a method implementation.
+         */
+        type ImplementationCallback =
+            /**
+             * @param this Frida's `InvocationContext`.
+             * @param instance Instance whose method is being intercepted, `null` if the
+             * method is static.
+             * @param parameters Invocation parameters.
+             * @return The value that should be returned - mandatory.
+             */
+            (this: InvocationContext, instance: Object | null, parameters: Accessor<Parameter>) => AllowedType;
+
+        /**
+         * Callback of a method `onEnter` interception.
+         */
+        type OnEnterCallback =
+            /**
+             * @param this Frida's `InvocationContext`.
+             * @param instance Instance whose method is being intercepted, `null` if the
+             * method is static.
+             * @param parameters Invocation parameters.
+             */
+            (this: InvocationContext, instance: Object | null, parameters: Accessor<Parameter>) => void;
+
+        /**
+         * Callback of a method `onLeave` interception.
+         */
+        type OnLeaveCallback =
+            /**
+             * @param this Frida's `InvocationContext`.
+             * @param returnValue The value that should be returned.
+             */
+            (this: InvocationContext, returnValue: Valuable) => void;
+
+        /**
          * Represents a `ParameterInfo`.
          * ```typescript
          * const mscorlib = domain.assemblies.mscorlib.image;
@@ -799,6 +874,11 @@ declare global {
              * Its handle as a `NativePointer`.
              */
             readonly handle: NativePointer;
+
+            /**
+             * @param handle It's `NativePointer`.
+             */
+            constructor(handle: NativePointer);
 
             /**
              * @return The same object as an instance of its parent.
@@ -1087,41 +1167,6 @@ declare global {
          * Types this module is familiar with.
          */
         type AllowedType = undefined | boolean | number | Int64 | UInt64 | NativePointer | ValueType | Object | String | Array<AllowedType>;
-
-        /**
-         * Callback of a method implementation.
-         */
-        type ImplementationCallback =
-        /**
-         * @param this Frida's `InvocationContext`.
-         * @param instance Instance whose method is being intercepted, `null` if the
-         * method is static.
-         * @param parameters Invocation parameters.
-         * @return The value that should be returned - mandatory.
-         */
-            (this: InvocationContext, instance: Object | null, parameters: Accessor<Parameter>) => AllowedType;
-
-        /**
-         * Callback of a method `onEnter` interception.
-         */
-        type OnEnterCallback =
-        /**
-         * @param this Frida's `InvocationContext`.
-         * @param instance Instance whose method is being intercepted, `null` if the
-         * method is static.
-         * @param parameters Invocation parameters.
-         */
-            (this: InvocationContext, instance: Object | null, parameters: Accessor<Parameter>) => void;
-
-        /**
-         * Callback of a method `onLeave` interception.
-         */
-        type OnLeaveCallback =
-        /**
-         * @param this Frida's `InvocationContext`.
-         * @param returnValue The value that should be returned.
-         */
-            (this: InvocationContext, returnValue: Valuable) => void;
 
         /**
          * An iterable class with a string index signature.\

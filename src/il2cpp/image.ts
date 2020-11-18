@@ -5,6 +5,7 @@ import UnityVersion from "../utils/unity-version";
 import Il2CppType from "./type";
 import { Accessor } from "../utils/accessor";
 import { raise } from "../utils/console";
+import { getOrNull } from "../utils/helpers";
 
 /** @internal */
 export default class Il2CppImage {
@@ -43,5 +44,9 @@ export default class Il2CppImage {
 
     @lazy get name() {
         return Api._imageGetName(this.handle)!;
+    }
+
+    getClassFromName(namespace: string, name: string) {
+        return getOrNull(Api._classFromName(this.handle, namespace, name), Il2CppClass);
     }
 }
