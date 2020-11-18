@@ -14,6 +14,10 @@ export default class Il2CppClass {
         if (handle.isNull()) raise(`Handle for "${this.constructor.name}" cannot be NULL.`);
     }
 
+    @lazy get arrayClass() {
+        return new Il2CppClass(Api._classGetArrayClass(this.handle, 1));
+    }
+
     @lazy get arrayElementSize() {
         return Api._classGetArrayElementSize(this.handle);
     }
@@ -111,7 +115,7 @@ export default class Il2CppClass {
     }
 
     ensureInitialized() {
-        if (this.hasStaticConstructor && !this.isStaticConstructorFinished) this.methods.cctor.invoke();
+        Api._classInit(this.handle);
     }
 
     trace() {

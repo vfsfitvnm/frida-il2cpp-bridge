@@ -8,6 +8,7 @@ import Il2CppString from "./il2cpp/string";
 import Il2CppArray from "./il2cpp/array";
 import Il2CppTypeEnum from "./il2cpp/type-enum";
 import GC from "./il2cpp/gc";
+import { choose } from "./il2cpp/runtime";
 
 /** @internal */
 function getMissingExports() {
@@ -779,7 +780,10 @@ il2cpp_class_to_string (const Il2CppClass * klass)
     String: Il2CppString,
     Array: Il2CppArray,
     TypeEnum: Il2CppTypeEnum,
+
     GC: GC,
+
+    choose: choose,
 
     async initialize() {
         if (Process.platform != "linux") {

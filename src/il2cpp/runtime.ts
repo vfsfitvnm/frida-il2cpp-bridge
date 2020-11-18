@@ -5,6 +5,8 @@ import Il2CppArray from "./array";
 import Il2CppString from "./string";
 import { raise } from "../utils/console";
 import Il2CppTypeEnum from "./type-enum";
+import Il2CppClass from "./class";
+import Api from "./api";
 
 /** @internal */
 export type AllowedType =
@@ -298,6 +300,33 @@ export function allocRawValue(value: AllowedType, type: Il2CppType) {
 export interface Valuable {
     valueHandle: NativePointer;
     value: AllowedType;
+}
+
+/** @internal */
+export function choose<T extends Il2CppObject | Il2CppString | Il2CppArray<AllowedType> = Il2CppObject>(klass: Il2CppClass): T[] {
+    const isString = klass.type.typeEnum == Il2CppTypeEnum.STRING;
+    const isArray = klass.type.typeEnum == Il2CppTypeEnum.SZARRAY;
+
+    const matches: T[] = [];
+
+    const callback = (objects: NativePointer, size: number, userData: NativePointer) => {
+        for (let i = 0; i < size; i++) {
+            const pointer = objects.add(i * Process.pointerSize).readPointer();
+
+            if (isString) matches.push(new Il2CppString(pointer) as T);
+            else if (isArray) matches.push(new Il2CppArray(pointer) as T);
+            else matches.push(new Il2CppObject(pointer) as T);
+        }
+    };
+
+    const chooseCallback = new NativeCallback(callback, "void", ["pointer", "int", "pointer"]);
+    const onWorld = new NativeCallback(() => {}, "void", []);
+
+    const state = Api._livenessCalculationBegin(klass.handle, 0, chooseCallback, NULL, onWorld, onWorld);
+    Api._livenessCalculationFromStatics(state);
+    Api._livenessCalculationEnd(state);
+
+    return matches;
 }
 
 // export function choose(klass: Il2CppClass) {

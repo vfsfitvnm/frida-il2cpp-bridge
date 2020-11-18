@@ -37,7 +37,7 @@ export default class Il2CppDomain {
 
     static async get() {
         if (this.instance == undefined) {
-            const domainPointer = await new Promise<NativePointer>((resolve) => {
+            const domainPointer = await new Promise<NativePointer>(resolve => {
                 const start = Api._domainGetAssemblies(NULL, Memory.alloc(Process.pointerSize));
                 if (!start.isNull()) {
                     resolve(Api._domainGet());
@@ -46,7 +46,7 @@ export default class Il2CppDomain {
                         onLeave() {
                             setTimeout(() => interceptor.detach());
                             resolve(Api._domainGet());
-                        },
+                        }
                     });
                 }
             });
