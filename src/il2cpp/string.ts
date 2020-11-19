@@ -1,14 +1,9 @@
 import Api from "./api";
 import Il2CppObject from "./object";
-import { raise } from "../utils/console";
 
 /** @internal */
 export default class Il2CppString {
-    constructor(readonly handle: NativePointer) {
-        if (this.handle.isNull()) {
-            raise(`Handle for "${this.constructor.name}" cannot be NULL.`);
-        }
-    }
+    constructor(readonly handle: NativePointer) {}
 
     get content() {
         return Api._stringChars(this.handle).readUtf16String(this.length);

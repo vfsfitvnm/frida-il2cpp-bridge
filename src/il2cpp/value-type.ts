@@ -2,16 +2,11 @@ import { filterAndMap } from "../utils/accessor";
 import { lazy } from "../utils/decorators";
 import Il2CppClass from "./class";
 import Il2CppObject from "./object";
-import { raise } from "../utils/console";
 import Api from "./api";
 
 /** @internal */
 export default class Il2CppValueType {
-    constructor(readonly handle: NativePointer, readonly klass: Il2CppClass) {
-        if (this.handle.isNull()) {
-            raise(`Handle for "${this.constructor.name}" cannot be NULL.`);
-        }
-    }
+    constructor(readonly handle: NativePointer, readonly klass: Il2CppClass) {}
 
     get class() {
         return this.klass;

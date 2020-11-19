@@ -7,11 +7,7 @@ import Il2CppValueType from "./value-type";
 
 /** @internal */
 export default class Il2CppObject {
-    constructor(readonly handle: NativePointer) {
-        if (this.handle.isNull()) {
-            raise(`Handle for "${this.constructor.name}" cannot be NULL.`);
-        }
-    }
+    constructor(readonly handle: NativePointer) {}
 
     @lazy
     static get headerSize() {
