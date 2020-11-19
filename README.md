@@ -42,7 +42,7 @@ npm install --save-dev frida-il2cpp-bridge
 You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 
 ### Changelog
-- 0.1.2 `Il2Cpp.ValueType`, `Il2Cpp.Object` and `Il2Cpp.String` can now have a `NULL` handle.
+- 0.1.3 `Il2Cpp.ValueType`, `Il2Cpp.Object` and `Il2Cpp.String` can now have a `NULL` handle.
 - 0.1.1 Added `Il2Cpp.choose`, `Il2Cpp.Image.getClassFromName`, `Il2Cpp.Class.arrayClass`.
 `Il2Cpp.Class.ensureInitialized` will now call the api `il2cpp_runtime_class_init`.
 - 0.1.0 Initial release.
