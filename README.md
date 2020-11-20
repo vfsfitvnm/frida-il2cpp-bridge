@@ -86,8 +86,8 @@ struct System.Int32
 
     System.Boolean System.IConvertible.ToBoolean(System.IFormatProvider provider); // 0x00a8ef1e
     System.Byte System.IConvertible.ToByte(System.IFormatProvider provider); // 0x00ff3228
-    System.Char System.IConvertible.ToChar(System.IFormatProvider provider); // 0x00cf8ab9
-    System.DateTime System.IConvertible.ToDateTime(System.IFormatProvider provider); // 0x009ee401
+    System.Char System.IConvertible.ToChar(System.IFormatProvider provider); // 0x00cf8ab2
+    System.DateTime System.IConvertible.ToDateTime(System.IFormatProvider provider); // 0x009ee400
     // ....
 }
 ```
