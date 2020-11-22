@@ -391,6 +391,24 @@ declare global {
             get isStruct(): boolean;
 
             /**
+             * @return The count of its implemented interfaces.
+             */
+            get interfaceCount(): number;
+
+            /**
+             * We can iterate over the interfaces using a `for..of` loop,
+             * or access a specific method using its name.
+             * ```typescript
+             * const StringClass = mscorlib.classes["System.String"];
+             * for (const interfaze of StringClass.interfaces) {
+             * }
+             * const IComparable = StringClass.interfaces["System.IComparable"];
+             * ```
+             * @return Its interfaces.
+             */
+            get interfaces(): Accessor<Class>;
+
+            /**
              * @return The count of its methods.
              */
             get methodCount(): number;
@@ -402,7 +420,7 @@ declare global {
              * const MathClass = mscorlib.classes["System.Math"];
              * for (const method of MathClass.methods) {
              * }
-             * const Log10 = MyClass.methods.Log10;
+             * const Log10 = MathClass.methods.Log10;
              * ```
              * @return Its methods.
              */
