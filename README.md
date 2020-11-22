@@ -42,11 +42,16 @@ npm install --save-dev frida-il2cpp-bridge
 You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 
 ### Changelog
+- 0.1.5 Added `Il2Cpp.Class.interfaceCount` and `Il2Cpp.Class.interfaces`. The dump will now include parents and
+ interfaces of each class.
 - 0.1.4 Added few snippets.
 - 0.1.3 `Il2Cpp.ValueType`, `Il2Cpp.Object` and `Il2Cpp.String` can now have a `NULL` handle.
 - 0.1.1 Added `Il2Cpp.choose`, `Il2Cpp.Image.getClassFromName`, `Il2Cpp.Class.arrayClass`.
 `Il2Cpp.Class.ensureInitialized` will now call the api `il2cpp_runtime_class_init`.
 - 0.1.0 Initial release.
+
+### TODO
+- [ ] Add a cache system or another solution to avoid useless and expensive function calls.
 
 ### Snippets
 First things first: read the [docs](https://vfsfitvnm.github.io/frida-il2cpp-bridge/index.html).
@@ -78,17 +83,16 @@ Il2Cpp.dump(`/full/path/to/file.cs`);
 This will produce something like:
 ```cs
 // mscorlib.dll
-struct System.Int32
+class <Module>
 {
-    static System.Int32 MaxValue; // 0x0
-    static System.Int32 MinValue; // 0x0
-    System.Int32 m_value; // 0x10
+}
 
-    System.Boolean System.IConvertible.ToBoolean(System.IFormatProvider provider); // 0x00a8ef1e
-    System.Byte System.IConvertible.ToByte(System.IFormatProvider provider); // 0x00ff3228
-    System.Char System.IConvertible.ToChar(System.IFormatProvider provider); // 0x00cf8ab2
-    System.DateTime System.IConvertible.ToDateTime(System.IFormatProvider provider); // 0x009ee400
-    // ....
+// mscorlib.dll
+class Locale : System.Object
+{
+
+    static System.String GetText(System.String msg); // 0x01fbb020
+    static System.String GetText(System.String fmt, System.Object[] args); // 0x01803a38
 }
 ```
 

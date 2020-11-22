@@ -90,6 +90,16 @@ export default class Api {
     }
 
     @lazy
+    static get _classGetInterfaceCount() {
+        return create("uint16", "il2cpp_class_get_interface_count", "pointer");
+    }
+
+    @lazy
+    static get _classGetInterfaces() {
+        return create("pointer", "il2cpp_class_get_interfaces", "pointer", "pointer");
+    }
+
+    @lazy
     static get _classGetMethodCount() {
         return create("uint16", "il2cpp_class_get_method_count", "pointer");
     }

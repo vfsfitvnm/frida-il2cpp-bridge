@@ -78,6 +78,22 @@ export default class Il2CppClass {
         return Api._classIsStruct(this.handle) && !this.isEnum;
     }
 
+    @lazy get interfaceCount() {
+        return Api._classGetInterfaceCount(this.handle);
+    }
+
+    @lazy get interfaces() {
+        const iterator = Memory.alloc(Process.pointerSize);
+        const accessor = new Accessor<Il2CppClass>();
+        let handle: NativePointer;
+        let interfaze: Il2CppClass;
+        while (!(handle = Api._classGetInterfaces(this.handle, iterator)).isNull()) {
+            interfaze = new Il2CppClass(handle);
+            accessor[interfaze.type.name!] = interfaze;
+        }
+        return accessor;
+    }
+
     @lazy get methodCount() {
         return Api._classGetMethodCount(this.handle);
     }

@@ -13,10 +13,7 @@ import { choose } from "./il2cpp/runtime";
 /** @internal */
 function getMissingExports() {
     return new CModule(`
-#include "stdint.h"
 #include "glib.h"
-#include "string.h"
-#include "stdio.h"
 
 #define TYPE_ATTRIBUTE_INTERFACE 0x00000020
 
@@ -45,11 +42,11 @@ typedef struct _VirtualInvokeData VirtualInvokeData;
 typedef struct _Il2CppGenericInst Il2CppGenericInst;
 typedef struct _Il2CppGenericClass Il2CppGenericClass;
 typedef struct _Il2CppGenericContext Il2CppGenericContext;
-typedef uint16_t Il2CppChar;
+typedef gunichar2 Il2CppChar;
 
-static const uint64_t IL2CPP_BASE = ${Process.getModuleByName(il2CppLibraryName!).base};
+static const guint64 IL2CPP_BASE = ${Process.getModuleByName(il2CppLibraryName!).base};
 
-const char * (* il2cpp_type_get_name) (const Il2CppType * type) = GUINT_TO_POINTER (${resolve("il2cpp_type_get_name")});
+const gchar * (* il2cpp_type_get_name) (const Il2CppType * type) = GUINT_TO_POINTER (${resolve("il2cpp_type_get_name")});
 
 enum _Il2CppTypeEnum
 {
@@ -122,17 +119,17 @@ struct _Il2CppDomain
     Il2CppObject * setup;
 #endif
     struct Il2CppAppContext * default_context;
-    const char * friendly_name;
-    uint32_t domain_id;
+    const gchar * friendly_name;
+    guint32 domain_id;
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("5.5.0")}
-    volatile int threadpool_jobs;
+    volatile gint threadpool_jobs;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.1.0")}
-    void * agent_info;
+    gpointer agent_info;
 #endif
 };
 
-const char *
+const gchar *
 il2cpp_domain_get_name (const Il2CppDomain* domain)
 {
     return domain->friendly_name;
@@ -141,24 +138,24 @@ il2cpp_domain_get_name (const Il2CppDomain* domain)
 struct _Il2CppAssemblyName
 {
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.1.0")}
-    const char * name;
-    const char * culture;
-    const char * hash_value;
-    const char * public_key;
+    const gchar * name;
+    const gchar * culture;
+    const gchar * hash_value;
+    const gchar * public_key;
 #else
-    int32_t nameIndex;
-    int32_t cultureIndex;
-    int32_t hashValueIndex;
-    int32_t publicKeyIndex;
+    gint32 nameIndex;
+    gint32 cultureIndex;
+    gint32 hashValueIndex;
+    gint32 publicKeyIndex;
 #endif
-    uint32_t hash_alg;
-    int32_t hash_len;
-    uint32_t flags;
-    int32_t major;
-    int32_t minor;
-    int32_t build;
-    int32_t revision;
-    uint8_t publicKeyToken[8];
+    guint32 hash_alg;
+    gint32 hash_len;
+    guint32 flags;
+    gint32 major;
+    gint32 minor;
+    gint32 build;
+    gint32 revision;
+    guint8 publicKeyToken[8];
 };
 
 struct _Il2CppAssembly
@@ -166,22 +163,22 @@ struct _Il2CppAssembly
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.1.0")}
     Il2CppImage * image;
 #else
-    int32_t imageIndex;
+    gint32 imageIndex;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.3.0")}
-    uint32_t token;
+    guint32 token;
 #else
-    int32_t customAttributeIndex;
+    gint32 customAttributeIndex;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("5.3.3")}
-    int32_t referencedAssemblyStart;
-    int32_t referencedAssemblyCount;
+    gint32 referencedAssemblyStart;
+    gint32 referencedAssemblyCount;
 #endif
     Il2CppAssemblyName aname;
 };
 
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.1.0")}
-const char *
+const gchar *
 il2cpp_assembly_get_name (const Il2CppAssembly * assembly)
 {
     return assembly->aname.name;
@@ -190,51 +187,51 @@ il2cpp_assembly_get_name (const Il2CppAssembly * assembly)
 
 struct _Il2CppImage
 {
-    const char * name;
+    const gchar * name;
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2017.1.3") && +!UnityVersion.CURRENT.isEqual("2017.2.0")}
-    const char * nameNoExt;
+    const gchar * nameNoExt;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.1.0")}
     Il2CppAssembly * assembly;
 #else
-    int32_t assemblyIndex;
+    gint32 assemblyIndex;
 #endif
 #if ${+UnityVersion.CURRENT.isBelow("2020.2.0")}
-    int32_t typeStart;
+    gint32 typeStart;
 #endif
-    uint32_t typeCount;
+    guint32 typeCount;
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2017.1.0")}
 #if ${+UnityVersion.CURRENT.isBelow("2020.2.0")}
-    int32_t exportedTypeStart;
+    gint32 exportedTypeStart;
 #endif
-    uint32_t exportedTypeCount;
+    guint32 exportedTypeCount;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.3.0")}
 #if ${+UnityVersion.CURRENT.isBelow("2020.2.0")}
-    int32_t customAttributeStart;
+    gint32 customAttributeStart;
 #endif
-    uint32_t customAttributeCount;
+    guint32 customAttributeCount;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2020.2.0")}
     const struct Il2CppMetadataImageHandle * metadataHandle;
     struct Il2CppNameToTypeHandleHashTable * nameToClassHashTable;
 #else
-    int32_t entryPointIndex;
+    gint32 entryPointIndex;
     struct Il2CppNameToTypeDefinitionIndexHashTable * nameToClassHashTable;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2019.1.0")}
     const struct Il2CppCodeGenModule * codeGenModule;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("5.3.2")}
-    uint32_t token;
+    guint32 token;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.1.0")}
-    uint8_t dynamic;
+    guint8 dynamic;
 #endif
 };
 
 #if ${+UnityVersion.CURRENT.isBelow("2020.2.0")}
-uint32_t
+guint32
 il2cpp_image_get_class_start (const Il2CppImage * image)
 {
     return image->typeStart;
@@ -242,7 +239,7 @@ il2cpp_image_get_class_start (const Il2CppImage * image)
 #endif
 
 #if ${+UnityVersion.CURRENT.isBelow("2018.3.0")}
-uint32_t
+guint32
 il2cpp_image_get_class_count (const Il2CppImage * image)
 {
     return image->typeCount;
@@ -253,30 +250,30 @@ struct _Il2CppType
 {
     union
     {
-        void * dummy;
-        int32_t klassIndex;
+        gpointer dummy;
+        gint32 klassIndex;
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2020.2.0")}
         const struct Il2CppMetadataTypeHandle * typeHandle;
 #endif
         const Il2CppType * type;
         struct Il2CppArrayType * array;
-        int32_t genericParameterIndex;
+        gint32 genericParameterIndex;
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2020.2.0")}
         const struct Il2CppMetadataGenericParameterHandle * genericParameterHandle;
 #endif
         Il2CppGenericClass * generic_class;
     } data;
-    unsigned int attrs: 16;
+    guint attrs: 16;
     Il2CppTypeEnum type: 8;
-    unsigned int num_mods: 6;
-    unsigned int byref: 1;
-    unsigned int pinned: 1;
+    guint num_mods: 6;
+    guint byref: 1;
+    guint pinned: 1;
 };
 
-uint16_t
+guint16
 il2cpp_type_offset_of_type (void)
 {
-    return (uint16_t) offsetof (Il2CppType, type);
+    return (guint16) offsetof (Il2CppType, type);
 }
 
 const Il2CppType *
@@ -292,7 +289,7 @@ il2cpp_type_get_generic_class (const Il2CppType * type)
 }
 
 #if ${+UnityVersion.CURRENT.isBelow("2018.1.0")}
-unsigned int
+guint
 il2cpp_type_is_byref (const Il2CppType * type)
 {
     return type->byref;
@@ -301,16 +298,16 @@ il2cpp_type_is_byref (const Il2CppType * type)
 
 struct _VirtualInvokeData
 {
-    void * methodPtr;
+    gpointer methodPtr;
     const MethodInfo * method;
 };
 
 struct _Il2CppClass
 {
     const Il2CppImage * image;
-    void* gc_desc;
-    const char * name;
-    const char * namespaze;
+    gpointer gc_desc;
+    const gchar * name;
+    const gchar * namespaze;
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.1.0")}
     Il2CppType byval_arg;
     Il2CppType this_arg;
@@ -347,112 +344,118 @@ struct _Il2CppClass
     const MethodInfo ** vtable;
 #endif
     struct Il2CppRuntimeInterfaceOffsetPair * interfaceOffsets;
-    void * static_fields;
+    gpointer static_fields;
     const struct Il2CppRGCTXData * rgctx_data;
     Il2CppClass ** typeHierarchy;
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2019.1.0")}
-    void * unity_user_data;
+    gpointer unity_user_data;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.2.0")}
-    uint32_t initializationExceptionGCHandle;
+    guint32 initializationExceptionGCHandle;
 #endif
-    uint32_t cctor_started;
-    uint32_t cctor_finished;
+    guint32 cctor_started;
+    guint32 cctor_finished;
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2019.1.0")}
     __attribute__((aligned(8))) size_t cctor_thread;
 #else
-    __attribute__((aligned(8))) uint64_t cctor_thread;
+    __attribute__((aligned(8))) guint64 cctor_thread;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2020.2.0")}
     const struct Il2CppMetadataGenericContainerHandle * genericContainerHandle;
 #else
-    int32_t genericContainerIndex;
+    gint32 genericContainerIndex;
 #endif
 #if ${+UnityVersion.CURRENT.isBelow("2018.3.0")}
-    int32_t customAttributeIndex;
+    gint32 customAttributeIndex;
 #endif
-    uint32_t instance_size;
-    uint32_t actualSize;
-    uint32_t element_size;
-    int32_t native_size;
-    uint32_t static_fields_size;
-    uint32_t thread_static_fields_size;
-    int32_t thread_static_fields_offset;
-    uint32_t flags;
+    guint32 instance_size;
+    guint32 actualSize;
+    guint32 element_size;
+    gint32 native_size;
+    guint32 static_fields_size;
+    guint32 thread_static_fields_size;
+    gint32 thread_static_fields_offset;
+    guint32 flags;
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("5.3.2")}
-    uint32_t token;
+    guint32 token;
 #endif
-    uint16_t method_count;
-    uint16_t property_count;
-    uint16_t field_count;
-    uint16_t event_count;
-    uint16_t nested_type_count;
-    uint16_t vtable_count;
-    uint16_t interfaces_count;
-    uint16_t interface_offsets_count;
-    uint8_t typeHierarchyDepth;
+    guint16 method_count;
+    guint16 property_count;
+    guint16 field_count;
+    guint16 event_count;
+    guint16 nested_type_count;
+    guint16 vtable_count;
+    guint16 interfaces_count;
+    guint16 interface_offsets_count;
+    guint8 typeHierarchyDepth;
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("5.4.4") && +!UnityVersion.CURRENT.isEqual("5.5.0")}
-    uint8_t genericRecursionDepth;
+    guint8 genericRecursionDepth;
 #endif
-    uint8_t rank;
-    uint8_t minimumAlignment;
+    guint8 rank;
+    guint8 minimumAlignment;
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.3.8")}
-    uint8_t naturalAligment;
+    guint8 naturalAligment;
 #endif
-    uint8_t packingSize;
+    guint8 packingSize;
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.3.0")}
-    uint8_t initialized_and_no_error: 1;
+    guint8 initialized_and_no_error: 1;
 #endif
-    uint8_t valuetype: 1;
-    uint8_t initialized: 1;
-    uint8_t enumtype: 1;
-    uint8_t is_generic: 1;
-    uint8_t has_references: 1;
-    uint8_t init_pending: 1;
-    uint8_t size_inited: 1;
-    uint8_t has_finalize: 1;
-    uint8_t has_cctor: 1;
-    uint8_t is_blittable: 1;
+    guint8 valuetype: 1;
+    guint8 initialized: 1;
+    guint8 enumtype: 1;
+    guint8 is_generic: 1;
+    guint8 has_references: 1;
+    guint8 init_pending: 1;
+    guint8 size_inited: 1;
+    guint8 has_finalize: 1;
+    guint8 has_cctor: 1;
+    guint8 is_blittable: 1;
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("5.3.3")}
-    uint8_t is_import_or_windows_runtime: 1;
+    guint8 is_import_or_windows_runtime: 1;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("5.5.0")}
-    uint8_t is_vtable_initialized: 1;
+    guint8 is_vtable_initialized: 1;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.2.0")}
-    uint8_t has_initialization_error: 1;
+    guint8 has_initialization_error: 1;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("5.5.0")}
     VirtualInvokeData vtable[32];
 #endif
 };
 
-uint16_t
+guint16
+il2cpp_class_get_interface_count (const Il2CppClass * klass)
+{
+    return klass->interfaces_count;
+}
+
+guint16
 il2cpp_class_get_method_count (const Il2CppClass * klass)
 {
     return klass->method_count;
 }
 
-uint16_t
+guint16
 il2cpp_class_get_field_count (const Il2CppClass * klass)
 {
     return klass->field_count;
 }
 
-uint8_t
+guint8
 il2cpp_class_has_static_constructor (const Il2CppClass * klass)
 {
     return klass->has_cctor;
 }
 
-uint32_t
+guint32
 il2cpp_class_is_static_constructor_finished (const Il2CppClass * klass)
 {
     return klass->cctor_finished;
 }
 
 #if ${+UnityVersion.CURRENT.isBelow("2019.3.0")}
-void *
+gpointer
 il2cpp_class_get_static_field_data (const Il2CppClass * klass)
 {
     return klass->static_fields;
@@ -461,7 +464,7 @@ il2cpp_class_get_static_field_data (const Il2CppClass * klass)
 
 struct _Il2CppGenericInst
 {
-    uint32_t type_argc;
+    guint32 type_argc;
     const Il2CppType ** type_argv;
 };
 
@@ -476,7 +479,7 @@ struct _Il2CppGenericClass
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2020.2.0")}
     const Il2CppType * type;
 #else
-    int32_t typeDefinitionIndex;
+    gint32 typeDefinitionIndex;
 #endif
     Il2CppGenericContext context;
     Il2CppClass * cached_class;
@@ -488,7 +491,7 @@ il2cpp_generic_class_get_cached_class (Il2CppGenericClass * class)
     return class->cached_class;
 }
 
-uint32_t
+guint32
 il2cpp_generic_class_get_types_count (Il2CppGenericClass * class)
 {
     return class->context.class_inst->type_argc;
@@ -502,26 +505,26 @@ il2cpp_generic_class_get_types (Il2CppGenericClass * class)
 
 struct _FieldInfo
 {
-    const char * name;
+    const gchar * name;
     const Il2CppType * type;
     Il2CppClass * parent;
-    int32_t offset;
+    gint32 offset;
 #if ${+UnityVersion.CURRENT.isBelow("2018.3.0")}
-    int32_t customAttributeIndex;
+    gint32 customAttributeIndex;
 #endif
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("5.3.2")}
-    uint32_t token;
+    guint32 token;
 #endif
 };
 
-uint8_t
+guint8
 il2cpp_field_is_instance (FieldInfo * field)
 {
     return (field->type->attrs & FIELD_ATTRIBUTE_STATIC) == 0;
 }
 
 #if ${+UnityVersion.CURRENT.isBelow("2019.3.0")}
-uint8_t
+guint8
 il2cpp_field_is_literal (FieldInfo * field)
 {
     return (field->type->attrs & FIELD_ATTRIBUTE_LITERAL) == 0;
@@ -530,16 +533,16 @@ il2cpp_field_is_literal (FieldInfo * field)
 
 struct _ParameterInfo
 {
-    const char * name;
-    int32_t position;
-    uint32_t token;
+    const gchar * name;
+    gint32 position;
+    guint32 token;
 #if ${+UnityVersion.CURRENT.isBelow("2018.3.0")}
-    int32_t customAttributeIndex;
+    gint32 customAttributeIndex;
 #endif
     const Il2CppType * parameter_type;
 };
 
-const char *
+const gchar *
 il2cpp_parameter_get_name(const ParameterInfo * parameter)
 {
     return parameter->name;
@@ -551,7 +554,7 @@ il2cpp_parameter_get_type (const ParameterInfo * parameter)
     return parameter->parameter_type;
 }
 
-int32_t
+gint32
 il2cpp_parameter_get_position (const ParameterInfo * parameter)
 {
     return parameter->position;
@@ -559,9 +562,9 @@ il2cpp_parameter_get_position (const ParameterInfo * parameter)
 
 struct _MethodInfo
 {
-    void * methodPointer;
-    void * invoker_method;
-    const char * name;
+    gpointer methodPointer;
+    gpointer invoker_method;
+    const gchar * name;
     Il2CppClass * klass;
     const Il2CppType * return_type;
     const ParameterInfo * parameters;
@@ -584,22 +587,22 @@ struct _MethodInfo
 #endif
     };
 #if ${+UnityVersion.CURRENT.isBelow("2018.3.0")}
-    int32_t customAttributeIndex;
+    gint32 customAttributeIndex;
 #endif
-    uint32_t token;
-    uint16_t flags;
-    uint16_t iflags;
-    uint16_t slot;
-    uint8_t parameters_count;
-    uint8_t is_generic: 1;
-    uint8_t is_inflated: 1;
+    guint32 token;
+    guint16 flags;
+    guint16 iflags;
+    guint16 slot;
+    guint8 parameters_count;
+    guint8 is_generic: 1;
+    guint8 is_inflated: 1;
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.1.0")}
-    uint8_t wrapper_type: 1;
-    uint8_t is_marshaled_from_native: 1;
+    guint8 wrapper_type: 1;
+    guint8 is_marshaled_from_native: 1;
 #endif
 };
 
-void *
+gpointer
 il2cpp_method_get_pointer(const MethodInfo * method)
 {
     return method->methodPointer;
@@ -609,7 +612,7 @@ const ParameterInfo *
 il2cpp_method_get_parameters (const MethodInfo * method,
                               void ** iter)
 {   
-    uint16_t parameters_count = method->parameters_count;
+    guint16 parameters_count = method->parameters_count;
     
     if (iter != 0 && parameters_count > 0)
     {
@@ -636,13 +639,13 @@ il2cpp_method_get_parameters (const MethodInfo * method,
 struct _Il2CppString
 {
     Il2CppObject object;
-    int32_t length;
+    gint32 length;
     Il2CppChar chars[32];
 };
 
 void
 il2cpp_string_set_length (Il2CppString * string,
-                          int32_t length)
+                          gint32 length)
 {
     string->length = length;
 }
@@ -651,7 +654,7 @@ struct _Il2CppArray
 {
     Il2CppObject obj;
     struct Il2CppArrayBounds * bounds;
-    uint32_t max_length;
+    guint32 max_length;
 #if ${+UnityVersion.CURRENT.isBelow("5.3.3")}
     double vector[32];
 #endif
@@ -663,17 +666,17 @@ struct _Il2CppArraySize
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.1.0")}
     Il2CppObject obj;
     struct Il2CppArrayBounds * bounds;
-    uint32_t max_length;
-    __attribute__((aligned(8))) void * vector[32];
+    guint32 max_length;
+    __attribute__((aligned(8))) gpointer vector[32];
 #else
     Il2CppArray Array;
-    __attribute__((aligned(8))) void * vector;
+    __attribute__((aligned(8))) gpointer vector;
 #endif
 };
 #endif
 
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("5.3.3")}
-void *
+gpointer
 il2cpp_array_elements (Il2CppArraySize * array) {
 #if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.1.0")}
     return array->vector;
@@ -682,11 +685,21 @@ il2cpp_array_elements (Il2CppArraySize * array) {
 #endif
 }
 #else
-void *
+gpointer
 il2cpp_array_elements (Il2CppArray * array) {
     return (void*) array->vector;
 }
 #endif
+
+const gchar *
+il2cpp_class_get_type_name (const Il2CppClass * klass)
+{
+#if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.1.0")}
+    return il2cpp_type_get_name (&klass->byval_arg);
+#else
+    return il2cpp_type_get_name (klass->byval_arg);
+#endif
+}
 
 const gchar *
 il2cpp_class_to_string (const Il2CppClass * klass)
@@ -697,31 +710,39 @@ il2cpp_class_to_string (const Il2CppClass * klass)
 
     g_string_append_printf (text, "// %s\\n", klass->image->name);
     
-    uint8_t is_enum = klass->enumtype;
-    uint8_t is_valuetype = klass->valuetype;
-    uint8_t is_interface = klass->flags & TYPE_ATTRIBUTE_INTERFACE;
+    guint8 is_enum = klass->enumtype;
+    guint8 is_valuetype = klass->valuetype;
+    guint8 is_interface = klass->flags & TYPE_ATTRIBUTE_INTERFACE;
     
     if (is_enum) g_string_append_len (text, "enum ", 5);
     else if (is_valuetype) g_string_append_len (text, "struct ", 7);
     else if (is_interface) g_string_append_len (text, "interface ", 10);
     else g_string_append_len (text, "class ", 6);
 
-#if ${+UnityVersion.CURRENT.isEqualOrAbove("2018.1.0")}
-    g_string_append (text, il2cpp_type_get_name (&klass->byval_arg));
-#else
-    g_string_append (text, il2cpp_type_get_name (klass->byval_arg));
-#endif
+    g_string_append (text, il2cpp_class_get_type_name (klass));
+
+    Il2CppClass * parent = klass->parent;
+    guint16 interfaces_count = klass->interfaces_count;
+    if (parent != NULL || interfaces_count > 0) g_string_append_len (text, " : ", 3);
+    
+    if (parent != NULL) g_string_append (text, il2cpp_class_get_type_name (parent));
+    
+    for (guint16 i = 0; i < interfaces_count; i++)
+    {   
+        if (i > 0 || parent != NULL) g_string_append_len (text, ", ", 2);
+        g_string_append (text, il2cpp_class_get_type_name (klass->implementedInterfaces[i]));
+    }
     
     g_string_append_len (text, "\\n{", 2);
-        
-    uint16_t field_count = klass->field_count;
+
+    guint16 field_count = klass->field_count;
     if (field_count > 0)
     {
         FieldInfo * field;
-        for (uint16_t i = 0; i < field_count; i++)
+        for (guint16 i = 0; i < field_count; i++)
         {
             field = klass->fields + i;
-            g_string_append_len (text, "\\n\\t", 2);
+            g_string_append_len (text, "\\n    ", 5);
 
             if (is_enum && i > 0)
             {
@@ -735,26 +756,26 @@ il2cpp_class_to_string (const Il2CppClass * klass)
         }
     }
 
-    uint16_t method_count = klass->method_count;
+    guint16 method_count = klass->method_count;
     if (method_count > 0)
     {
         const MethodInfo * method;
 
-        g_string_append_c (text, '\\n');
-        for (uint16_t i = 0; i < method_count; i++)
+        if (field_count > 0) g_string_append_c (text, '\\n');
+        for (guint16 i = 0; i < method_count; i++)
         {
             method = klass->methods[i];
-            g_string_append_len (text, "\\n\\t", 2);
+            g_string_append_len (text, "\\n    ", 5);
             
-            uint8_t is_static_flag = method->flags & METHOD_ATTRIBUTE_STATIC;
+            guint8 is_static_flag = method->flags & METHOD_ATTRIBUTE_STATIC;
             
             if (is_static_flag != 0) g_string_append_len (text, "static ", 7);
             g_string_append_printf (text, "%s %s(", il2cpp_type_get_name (method->return_type), method->name);
 
             const ParameterInfo * param;
 
-            uint16_t parameters_count = method->parameters_count;
-            for (uint8_t j = 0; j < parameters_count; j++)
+            guint16 parameters_count = method->parameters_count;
+            for (guint8 j = 0; j < parameters_count; j++)
             {
                 param = method->parameters + j;
                 if (j > 0) g_string_append_len (text, ", ", 2);
@@ -762,7 +783,7 @@ il2cpp_class_to_string (const Il2CppClass * klass)
             }
 
             g_string_append_len (text, ");", 2);
-            void * method_pointer = method->methodPointer;
+            gpointer method_pointer = method->methodPointer;
             if (method_pointer != NULL) g_string_append_printf (text, " // 0x%.8x", GPOINTER_TO_INT (method->methodPointer) - IL2CPP_BASE);
         }
     }
