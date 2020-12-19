@@ -604,7 +604,7 @@ declare global {
          * assert(BooleanClass.methods.Parse.invoke<boolean>(Il2Cpp.String.from("true")));
          * ```
          */
-        class Method {
+        class Method implements Invokable {
             /**
              * Its handle as a `NativePointer`.
              */
@@ -746,7 +746,7 @@ declare global {
              * @param parameters Invocation parameters.
              * @return The value that should be returned - mandatory.
              */
-            (this: InvocationContext, instance: Object | null, parameters: Accessor<Parameter>) => AllowedType;
+            (this: InvocationContext, instance: Object | null, parameters: Accessor<Valuable>) => AllowedType;
 
         /**
          * Callback of a method `onEnter` interception.
@@ -758,7 +758,7 @@ declare global {
              * method is static.
              * @param parameters Invocation parameters.
              */
-            (this: InvocationContext, instance: Object | null, parameters: Accessor<Parameter>) => void;
+            (this: InvocationContext, instance: Object | null, parameters: Accessor<Valuable>) => void;
 
         /**
          * Callback of a method `onLeave` interception.
@@ -854,7 +854,7 @@ declare global {
             /**
              * @return Its fields.
              */
-            get fields(): Accessor<Field>;
+            get fields(): Accessor<Valuable>;
 
             /**
              * See {@link Il2Cpp.Object.unbox} for an example.
@@ -912,13 +912,13 @@ declare global {
              * See {@link Il2Cpp.Class.fields} for an example.
              * @return Its fields.
              */
-            get fields(): Accessor<Field>;
+            get fields(): Accessor<Valuable>;
 
             /**
              * See {@link Il2Cpp.Class.methods} for an example.
              * @return Its methods.
              */
-            get methods(): Accessor<Method>;
+            get methods(): Accessor<Invokable>;
 
             /**
              * NOTE: the object will be allocated only.
@@ -1179,6 +1179,16 @@ declare global {
              * The actual "pretty" value.
              */
             value: AllowedType;
+        }
+
+        /**
+         * Represents an invokable method.
+         */
+        interface Invokable {
+            /**
+             * See {@link Il2Cpp.Method.invoke}.
+             */
+            invoke<T extends AllowedType>(...parameters: AllowedType[]): T;
         }
 
         /**

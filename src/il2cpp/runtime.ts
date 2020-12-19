@@ -42,9 +42,12 @@ function isCoherent(value: AllowedType, type: Il2CppType) {
             return typeof value == "number" || value instanceof Int64;
         case Il2CppTypeEnum.U8:
             return typeof value == "number" || value instanceof UInt64;
+        case Il2CppTypeEnum.I:
+        case Il2CppTypeEnum.U:
         case Il2CppTypeEnum.PTR:
             return value instanceof NativePointer;
         case Il2CppTypeEnum.VALUETYPE:
+            if (type.class.isEnum) return typeof value == "number";
             return value instanceof Il2CppValueType;
         case Il2CppTypeEnum.CLASS:
         case Il2CppTypeEnum.GENERICINST:
@@ -93,11 +96,12 @@ export function readFieldValue(pointer: NativePointer, type: Il2CppType): Allowe
             return pointer.readFloat();
         case Il2CppTypeEnum.R8:
             return pointer.readDouble();
+        case Il2CppTypeEnum.I:
         case Il2CppTypeEnum.U:
         case Il2CppTypeEnum.PTR:
             return pointer.readPointer();
         case Il2CppTypeEnum.VALUETYPE:
-            return new Il2CppValueType(pointer, type.class!);
+            return type.class.isEnum ? pointer.readS32() : new Il2CppValueType(pointer, type.class);
         case Il2CppTypeEnum.CLASS:
         case Il2CppTypeEnum.GENERICINST:
         case Il2CppTypeEnum.OBJECT:
@@ -166,11 +170,14 @@ export function writeFieldValue(pointer: NativePointer, value: AllowedType, type
         case Il2CppTypeEnum.R8:
             pointer.writeDouble(value as number);
             break;
+        case Il2CppTypeEnum.I:
+        case Il2CppTypeEnum.U:
         case Il2CppTypeEnum.PTR:
             pointer.writePointer(value as NativePointer);
             break;
         case Il2CppTypeEnum.VALUETYPE:
-            pointer.writePointer((value as Il2CppValueType).handle);
+            if (type.class.isEnum) pointer.writeS32(value as number);
+            else pointer.writePointer((value as Il2CppValueType).handle);
             break;
         case Il2CppTypeEnum.STRING:
             pointer.writePointer((value as Il2CppString).handle);
@@ -221,10 +228,12 @@ export function readRawValue(pointer: NativePointer, type: Il2CppType): AllowedT
             return pointer.readFloat();
         case Il2CppTypeEnum.R8:
             return pointer.readDouble();
+        case Il2CppTypeEnum.I:
+        case Il2CppTypeEnum.U:
         case Il2CppTypeEnum.PTR:
             return pointer.isNull() ? NULL : pointer.readPointer();
         case Il2CppTypeEnum.VALUETYPE:
-            return new Il2CppValueType(pointer, type.class!);
+            return type.class.isEnum ? +pointer : new Il2CppValueType(pointer, type.class);
         case Il2CppTypeEnum.STRING:
             return pointer.isNull() ? undefined : new Il2CppString(pointer);
         case Il2CppTypeEnum.CLASS:
@@ -282,7 +291,7 @@ export function allocRawValue(value: AllowedType, type: Il2CppType) {
         case Il2CppTypeEnum.U:
             return value as NativePointer;
         case Il2CppTypeEnum.VALUETYPE:
-            return (value as Il2CppValueType).handle;
+            return type.class.isEnum ? ptr(value as number) : (value as Il2CppValueType).handle;
         case Il2CppTypeEnum.STRING:
             return (value as Il2CppString).handle;
         case Il2CppTypeEnum.CLASS:
@@ -300,6 +309,11 @@ export function allocRawValue(value: AllowedType, type: Il2CppType) {
 export interface Valuable {
     valueHandle: NativePointer;
     value: AllowedType;
+}
+
+/** @internal */
+export interface Invokable {
+    invoke<T extends AllowedType>(...parameters: AllowedType[]): T;
 }
 
 /** @internal */

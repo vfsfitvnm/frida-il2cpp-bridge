@@ -42,6 +42,7 @@ npm install --save-dev frida-il2cpp-bridge
 You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 
 ### Changelog
+- 0.1.6 Few minor fixes. `Enums` are now read as 32-bit signed integers.
 - 0.1.5 Added `Il2Cpp.Class.interfaceCount` and `Il2Cpp.Class.interfaces`. The dump will now include parents and
  interfaces of each class.
 - 0.1.4 Added few snippets.

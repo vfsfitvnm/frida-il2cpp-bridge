@@ -34,12 +34,16 @@ export default class Il2CppParameter implements Valuable {
     }
 
     asHeld(holder: InvocationArguments, startIndex: number) {
-        const parameter: Il2CppParameter = { ...this };
-        Reflect.set(parameter, "valueHandle", holder[startIndex + this.position]);
-        Reflect.defineProperty(parameter, "value", {
-            get: () => readRawValue(holder[startIndex + this.position], this.type!),
-            set: (v: AllowedType) => (holder[startIndex + this.position] = allocRawValue(v, this.type!))
-        });
-        return parameter;
+        const position = this.position;
+        const type = this.type;
+        return {
+            valueHandle: holder[startIndex + position],
+            get value() {
+                return readRawValue(holder[startIndex + position], type);
+            },
+            set value(v) {
+                holder[startIndex + position] = allocRawValue(v, type);
+            }
+        } as Valuable;
     }
 }

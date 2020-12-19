@@ -71,14 +71,15 @@ export default class Il2CppField implements Valuable {
         if (!this.isInstance) {
             raise(`"${this.name}" is a static field.`);
         }
-        const field: Il2CppField = { ...this };
-        Reflect.defineProperty(field, "valueHandle", {
-            get: () => handle
-        });
-        Reflect.defineProperty(field, "value", {
-            get: () => readFieldValue(handle, this.type!),
-            set: (v: AllowedType) => writeFieldValue(handle, v, this.type!)
-        });
-        return field;
+        const type = this.type;
+        return {
+            valueHandle: handle,
+            get value() {
+                return readFieldValue(handle, type);
+            },
+            set value(v) {
+                writeFieldValue(handle, v, type);
+            }
+        } as Valuable;
     }
 }
