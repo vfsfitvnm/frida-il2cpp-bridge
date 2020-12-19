@@ -4,6 +4,7 @@ import { filterAndMap } from "../utils/accessor";
 import { lazy } from "../utils/decorators";
 import { raise } from "../utils/console";
 import Il2CppValueType from "./value-type";
+import { readFieldValue, Valuable, writeFieldValue } from "./runtime";
 
 /** @internal */
 export default class Il2CppObject {
@@ -28,14 +29,14 @@ export default class Il2CppObject {
     }
 
     @lazy get fields() {
-        return this.class!.fields[filterAndMap](
+        return this.class.fields[filterAndMap](
             field => field.isInstance,
             field => field.asHeld(this.handle.add(field.offset))
         );
     }
 
     @lazy get methods() {
-        return this.class!.methods[filterAndMap](
+        return this.class.methods[filterAndMap](
             method => method.isInstance,
             method => method.asHeld(this.handle)
         );

@@ -91,6 +91,9 @@
 			<a href="classes/__global.il2cpp.valuetype.html" class="tsd-kind-icon">Value<wbr>Type</a>
 		</li>
 		<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+			<a href="interfaces/__global.il2cpp.invokable.html" class="tsd-kind-icon">Invokable</a>
+		</li>
+		<li class=" tsd-kind-interface tsd-parent-kind-namespace">
 			<a href="interfaces/__global.il2cpp.valuable.html" class="tsd-kind-icon">Valuable</a>
 		</li>
 		<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
@@ -166,6 +169,7 @@
 					<section class="tsd-index-section ">
 						<h3>Interfaces</h3>
 						<ul class="tsd-index-list">
+							<li class="tsd-kind-interface tsd-parent-kind-namespace"><a href="interfaces/__global.il2cpp.invokable.html" class="tsd-kind-icon">Invokable</a></li>
 							<li class="tsd-kind-interface tsd-parent-kind-namespace"><a href="interfaces/__global.il2cpp.valuable.html" class="tsd-kind-icon">Valuable</a></li>
 						</ul>
 					</section>
@@ -203,7 +207,7 @@
 				<div class="tsd-signature tsd-kind-icon">Allowed<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Int64</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">UInt64</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">NativePointer</span><span class="tsd-signature-symbol"> | </span><a href="classes/__global.il2cpp.valuetype.html" class="tsd-signature-type">ValueType</a><span class="tsd-signature-symbol"> | </span><a href="classes/__global.il2cpp.object.html" class="tsd-signature-type">Object</a><span class="tsd-signature-symbol"> | </span><a href="classes/__global.il2cpp.string.html" class="tsd-signature-type">String</a><span class="tsd-signature-symbol"> | </span><a href="classes/__global.il2cpp.array.html" class="tsd-signature-type">Array</a><span class="tsd-signature-symbol">&lt;</span><a href="index.html#allowedtype" class="tsd-signature-type">AllowedType</a><span class="tsd-signature-symbol">&gt;</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/a0e8652/src/index.ts#L1199">index.ts:1199</a></li>
+						<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/4502c50/src/index.ts#L2040">index.ts:2040</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -215,10 +219,10 @@
 			<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
 				<a name="implementationcallback" class="tsd-anchor"></a>
 				<h3>Implementation<wbr>Callback</h3>
-				<div class="tsd-signature tsd-kind-icon">Implementation<wbr>Callback<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>this<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">InvocationContext</span>, instance<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.object.html" class="tsd-signature-type">Object</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, parameters<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.accessor.html" class="tsd-signature-type">Accessor</a><span class="tsd-signature-symbol">&lt;</span><a href="classes/__global.il2cpp.parameter.html" class="tsd-signature-type">Parameter</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="index.html#allowedtype" class="tsd-signature-type">AllowedType</a></div>
+				<div class="tsd-signature tsd-kind-icon">Implementation<wbr>Callback<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>this<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">InvocationContext</span>, instance<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.object.html" class="tsd-signature-type">Object</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, parameters<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.accessor.html" class="tsd-signature-type">Accessor</a><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/__global.il2cpp.valuable.html" class="tsd-signature-type">Valuable</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="index.html#allowedtype" class="tsd-signature-type">AllowedType</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/a0e8652/src/index.ts#L753">index.ts:753</a></li>
+						<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/4502c50/src/index.ts#L1584">index.ts:1584</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -231,7 +235,7 @@
 					<ul class="tsd-parameters">
 						<li class="tsd-parameter-signature">
 							<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias">
-								<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>this<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">InvocationContext</span>, instance<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.object.html" class="tsd-signature-type">Object</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, parameters<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.accessor.html" class="tsd-signature-type">Accessor</a><span class="tsd-signature-symbol">&lt;</span><a href="classes/__global.il2cpp.parameter.html" class="tsd-signature-type">Parameter</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="index.html#allowedtype" class="tsd-signature-type">AllowedType</a></li>
+								<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>this<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">InvocationContext</span>, instance<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.object.html" class="tsd-signature-type">Object</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, parameters<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.accessor.html" class="tsd-signature-type">Accessor</a><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/__global.il2cpp.valuable.html" class="tsd-signature-type">Valuable</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="index.html#allowedtype" class="tsd-signature-type">AllowedType</a></li>
 							</ul>
 							<ul class="tsd-descriptions">
 								<li class="tsd-description">
@@ -257,7 +261,7 @@
 											</div>
 										</li>
 										<li>
-											<h5>parameters: <a href="classes/__global.il2cpp.accessor.html" class="tsd-signature-type">Accessor</a><span class="tsd-signature-symbol">&lt;</span><a href="classes/__global.il2cpp.parameter.html" class="tsd-signature-type">Parameter</a><span class="tsd-signature-symbol">&gt;</span></h5>
+											<h5>parameters: <a href="classes/__global.il2cpp.accessor.html" class="tsd-signature-type">Accessor</a><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/__global.il2cpp.valuable.html" class="tsd-signature-type">Valuable</a><span class="tsd-signature-symbol">&gt;</span></h5>
 											<div class="tsd-comment tsd-typography">
 												<div class="lead">
 													<p>Invocation parameters.</p>
@@ -276,10 +280,10 @@
 			<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
 				<a name="onentercallback" class="tsd-anchor"></a>
 				<h3>On<wbr>Enter<wbr>Callback</h3>
-				<div class="tsd-signature tsd-kind-icon">On<wbr>Enter<wbr>Callback<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>this<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">InvocationContext</span>, instance<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.object.html" class="tsd-signature-type">Object</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, parameters<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.accessor.html" class="tsd-signature-type">Accessor</a><span class="tsd-signature-symbol">&lt;</span><a href="classes/__global.il2cpp.parameter.html" class="tsd-signature-type">Parameter</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+				<div class="tsd-signature tsd-kind-icon">On<wbr>Enter<wbr>Callback<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>this<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">InvocationContext</span>, instance<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.object.html" class="tsd-signature-type">Object</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, parameters<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.accessor.html" class="tsd-signature-type">Accessor</a><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/__global.il2cpp.valuable.html" class="tsd-signature-type">Valuable</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/a0e8652/src/index.ts#L766">index.ts:766</a></li>
+						<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/4502c50/src/index.ts#L1597">index.ts:1597</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -292,7 +296,7 @@
 					<ul class="tsd-parameters">
 						<li class="tsd-parameter-signature">
 							<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias">
-								<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>this<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">InvocationContext</span>, instance<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.object.html" class="tsd-signature-type">Object</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, parameters<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.accessor.html" class="tsd-signature-type">Accessor</a><span class="tsd-signature-symbol">&lt;</span><a href="classes/__global.il2cpp.parameter.html" class="tsd-signature-type">Parameter</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>this<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">InvocationContext</span>, instance<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.object.html" class="tsd-signature-type">Object</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, parameters<span class="tsd-signature-symbol">: </span><a href="classes/__global.il2cpp.accessor.html" class="tsd-signature-type">Accessor</a><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/__global.il2cpp.valuable.html" class="tsd-signature-type">Valuable</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 							</ul>
 							<ul class="tsd-descriptions">
 								<li class="tsd-description">
@@ -318,7 +322,7 @@
 											</div>
 										</li>
 										<li>
-											<h5>parameters: <a href="classes/__global.il2cpp.accessor.html" class="tsd-signature-type">Accessor</a><span class="tsd-signature-symbol">&lt;</span><a href="classes/__global.il2cpp.parameter.html" class="tsd-signature-type">Parameter</a><span class="tsd-signature-symbol">&gt;</span></h5>
+											<h5>parameters: <a href="classes/__global.il2cpp.accessor.html" class="tsd-signature-type">Accessor</a><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/__global.il2cpp.valuable.html" class="tsd-signature-type">Valuable</a><span class="tsd-signature-symbol">&gt;</span></h5>
 											<div class="tsd-comment tsd-typography">
 												<div class="lead">
 													<p>Invocation parameters.</p>
@@ -339,7 +343,7 @@
 				<div class="tsd-signature tsd-kind-icon">On<wbr>Leave<wbr>Callback<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>this<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">InvocationContext</span>, returnValue<span class="tsd-signature-symbol">: </span><a href="interfaces/__global.il2cpp.valuable.html" class="tsd-signature-type">Valuable</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/a0e8652/src/index.ts#L778">index.ts:778</a></li>
+						<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/4502c50/src/index.ts#L1609">index.ts:1609</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -393,7 +397,7 @@
 				<div class="tsd-signature tsd-kind-icon">unity<wbr>Version<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/a0e8652/src/index.ts#L22">index.ts:22</a></li>
+						<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/4502c50/src/index.ts#L853">index.ts:853</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -415,7 +419,7 @@
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/a0e8652/src/index.ts#L80">index.ts:80</a></li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/4502c50/src/index.ts#L911">index.ts:911</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -471,7 +475,7 @@
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/a0e8652/src/index.ts#L55">index.ts:55</a></li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/4502c50/src/index.ts#L886">index.ts:886</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -508,7 +512,7 @@ Il2Cpp.dump(<span class="hljs-string">`<span class="hljs-subst">${persistentData
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/a0e8652/src/index.ts#L40">index.ts:40</a></li>
+								<li>Defined in <a href="https://github.com/vfsfitvnm/frida-il2cpp-bridge/blob/4502c50/src/index.ts#L871">index.ts:871</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">

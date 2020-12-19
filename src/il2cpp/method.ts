@@ -1,5 +1,5 @@
 import Api from "./api";
-import { allocRawValue, AllowedType, readRawValue, Valuable } from "./runtime";
+import { allocRawValue, AllowedType, Invokable, readRawValue, Valuable } from "./runtime";
 import Il2CppParameter from "./parameter";
 import Il2CppObject from "./object";
 import { inform, raise, warn } from "../utils/console";
@@ -148,13 +148,15 @@ export default class Il2CppMethod {
         if (onLeave != undefined) {
             const methodInfo = this;
             interceptorCallbacks.onLeave = function (invocationReturnValue) {
-                const returnValue = { valueHandle: invocationReturnValue.add(0) };
-                Reflect.defineProperty(returnValue, "value", {
-                    get: () => readRawValue(invocationReturnValue, methodInfo.returnType),
-                    set: v => invocationReturnValue.replace(allocRawValue(v, methodInfo.returnType))
-                });
-
-                onLeave.call(this, returnValue as Valuable);
+                onLeave.call(this, {
+                    valueHandle: invocationReturnValue.add(0),
+                    get value() {
+                        return readRawValue(invocationReturnValue, methodInfo.returnType);
+                    },
+                    set value(v) {
+                        invocationReturnValue.replace(allocRawValue(v, methodInfo.returnType));
+                    }
+                } as Valuable);
             };
         }
 
@@ -176,9 +178,12 @@ export default class Il2CppMethod {
         if (!this.isInstance) {
             raise(`"${this.name}" is a static method.`);
         }
-        const method: Il2CppMethod = { ...this };
-        Reflect.set(method, "invoke", (...parameters: AllowedType[]) => this._invoke(holder, ...parameters));
-        return method;
+        const invoke = this._invoke.bind(this, holder);
+        return {
+            invoke<T extends AllowedType>(...parameters: AllowedType[]) {
+                return invoke(...parameters) as T;
+            }
+        } as Invokable;
     }
 
     private _invoke(instance: NativePointer, ...parameters: AllowedType[]) {
@@ -195,14 +200,10 @@ export default class Il2CppMethod {
 }
 
 /** @internal */
-type Il2CppImplementationCallback = (
-    this: InvocationContext,
-    instance: Il2CppObject | null,
-    parameters: Accessor<Il2CppParameter>
-) => AllowedType;
+type Il2CppImplementationCallback = (this: InvocationContext, instance: Il2CppObject | null, parameters: Accessor<Valuable>) => AllowedType;
 
 /** @internal */
-type Il2CppOnEnterCallback = (this: InvocationContext, instance: Il2CppObject | null, parameters: Accessor<Il2CppParameter>) => void;
+type Il2CppOnEnterCallback = (this: InvocationContext, instance: Il2CppObject | null, parameters: Accessor<Valuable>) => void;
 
 /** @internal */
 type Il2CppOnLeaveCallback = (this: InvocationContext, returnValue: Valuable) => void;
