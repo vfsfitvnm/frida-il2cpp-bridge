@@ -1,13 +1,11 @@
 import Api from "./api";
-import { lazy } from "../utils/decorators";
+import {lazy} from "../utils/decorators";
 import Il2CppType from "./type";
-import { raise } from "../utils/console";
-import { allocRawValue, AllowedType, readRawValue, Valuable } from "./runtime";
+import {raise} from "../utils/console";
+import {allocRawValue, readRawValue, Valuable} from "./runtime";
 
 /** @internal */
-export default class Il2CppParameter implements Valuable {
-    readonly valueHandle = NULL;
-
+export default class Il2CppParameter {
     constructor(readonly handle: NativePointer) {
         if (handle.isNull()) raise(`Handle for "${this.constructor.name}" cannot be NULL.`);
     }
@@ -22,15 +20,6 @@ export default class Il2CppParameter implements Valuable {
 
     @lazy get type() {
         return new Il2CppType(Api._parameterGetType(this.handle));
-    }
-
-    get value() {
-        raise(`Cannot access value of parameter "${this.name}" without an invocation context.`);
-        return;
-    }
-
-    set value(v: AllowedType) {
-        raise(`Cannot access value of parameter "${this.name}" without an invocation context.`);
     }
 
     asHeld(holder: InvocationArguments, startIndex: number) {

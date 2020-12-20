@@ -105,7 +105,7 @@ export default class Il2CppClass {
         let method: Il2CppMethod;
         while (!(handle = Api._classGetMethods(this.handle, iterator)).isNull()) {
             method = new Il2CppMethod(handle);
-            accessor[method.name!] = method;
+            accessor[method.name] = method;
         }
         return accessor;
     }

@@ -8,7 +8,7 @@ const matchPattern = /(20\d{2}|\d)\.(\d)\.(\d{1,2})(?:([abcfp]|rc){0,2}\d?)/;
 export default class UnityVersion {
     static readonly MIN = new UnityVersion("5.3.0");
 
-    static readonly MAX = new UnityVersion("2020.2.1");
+    static readonly MAX = new UnityVersion("2021.1.0");
 
     private readonly source: string;
 
@@ -40,7 +40,7 @@ export default class UnityVersion {
             const searchStringHex = "45787065637465642076657273696f6e3a"; // "Expected version: "
             try {
                 const unityLibrary = Process.getModuleByName(unityLibraryName!);
-                for (const range of unityLibrary!.enumerateRanges("r-x")) {
+                for (const range of unityLibrary.enumerateRanges("r--")) {
                     const result = Memory.scanSync(range.base, range.size, searchStringHex)[0];
                     if (result !== undefined) this._CURRENT = new UnityVersion(result.address.readUtf8String()!);
                 }

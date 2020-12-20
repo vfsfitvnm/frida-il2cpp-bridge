@@ -14,11 +14,11 @@ export default class Il2CppArray<T extends AllowedType> implements Iterable<T> {
     }
 
     @lazy get elementSize() {
-        return this.object.class!.type!.dataType!.class!.arrayElementSize;
+        return this.object.class.type.dataType!.class.arrayElementSize;
     }
 
     @lazy get elementType() {
-        return this.object.class!.type!.dataType!;
+        return this.object.class.type.dataType!;
     }
 
     @lazy get elements() {

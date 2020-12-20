@@ -28,7 +28,7 @@ export default class Il2CppImage {
             const end = this.classCount;
             for (let i = 0; i < end; i++) {
                 const klass = new Il2CppClass(Api._imageGetClass(this.handle, i));
-                accessor[klass.type!.name!] = klass;
+                accessor[klass.type.name] = klass;
             }
         } else {
             const end = start + this.classCount;

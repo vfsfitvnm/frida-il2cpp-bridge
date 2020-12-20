@@ -13,7 +13,7 @@ export default class Il2CppValueType {
     }
 
     @lazy get fields() {
-        return this.class!.fields[filterAndMap](
+        return this.class.fields[filterAndMap](
             field => field.isInstance,
             field => field.asHeld(this.handle.add(field.offset).sub(Il2CppObject.headerSize))
         );
