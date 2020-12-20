@@ -68,6 +68,16 @@ declare global {
         function choose<T extends Object | String | Array<AllowedType> = Object>(klass: Class): T[];
 
         /**
+         * It takes a memory snapshot and scans the current tracked objects of the given class.\
+         * It leads to different results if compared to {@link Il2Cpp.choose | choose}.
+         * @template T Type parameter to automatically cast the objects to other object-like
+         * entities, like string and arrays. Default is {@link Il2Cpp.Object | Object}.
+         * @param klass The class of the objects you are looking for.
+         * @return An array of ready-to-use objects, strings or arrays. Value types are boxed.
+         */
+        function choose2<T extends Object | String | Array<AllowedType> = Object>(klass: Class): T[];
+
+        /**
          * Garbage collector utility functions.
          */
         namespace GC {
@@ -784,7 +794,7 @@ declare global {
          * assert(MathClass.methods.Sqrt.parameters.d.type.name == "System.Double");
          * ```
          */
-        class Parameter implements Valuable {
+        class Parameter {
             /**
              * Its handle as a `NativePointer`.
              */
@@ -804,23 +814,6 @@ declare global {
              *  @return Its type.
              */
             get type(): Type;
-
-            /**
-             * See {@link Il2Cpp.Method.intercept | here} for examples.
-             * @return Its value.
-             */
-            get value(): AllowedType;
-
-            /**
-             * See {@link Il2Cpp.Method.intercept | here} for examples.
-             * @param v Its new value.
-             */
-            set value(v: AllowedType);
-
-            /**
-             * @return The actual location of its value.
-             */
-            get valueHandle(): NativePointer;
         }
 
         /**
@@ -1186,7 +1179,7 @@ declare global {
          */
         interface Invokable {
             /**
-             * See {@link Il2Cpp.Method.invoke}.
+             * See {@link Il2Cpp.Method.invoke | invoke}.
              */
             invoke<T extends AllowedType>(...parameters: AllowedType[]): T;
         }

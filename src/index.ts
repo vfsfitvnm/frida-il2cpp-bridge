@@ -8,7 +8,7 @@ import Il2CppString from "./il2cpp/string";
 import Il2CppArray from "./il2cpp/array";
 import Il2CppTypeEnum from "./il2cpp/type-enum";
 import GC from "./il2cpp/gc";
-import { choose } from "./il2cpp/runtime";
+import { choose, choose2 } from "./il2cpp/runtime";
 
 /** @internal */
 function getMissingExports() {
@@ -43,6 +43,13 @@ typedef struct _Il2CppGenericInst Il2CppGenericInst;
 typedef struct _Il2CppGenericClass Il2CppGenericClass;
 typedef struct _Il2CppGenericContext Il2CppGenericContext;
 typedef gunichar2 Il2CppChar;
+typedef struct _Il2CppManagedMemorySnapshot Il2CppManagedMemorySnapshot;
+typedef struct _Il2CppMetadataSnapshot Il2CppMetadataSnapshot;
+typedef struct _Il2CppManagedMemorySection Il2CppManagedMemorySection;
+typedef struct _Il2CppManagedHeap Il2CppManagedHeap;
+typedef struct _Il2CppStacks Il2CppStacks;
+typedef struct _Il2CppGCHandles Il2CppGCHandles;
+typedef struct _Il2CppRuntimeInformation Il2CppRuntimeInformation;
 
 static const guint64 IL2CPP_BASE = ${Process.getModuleByName(il2CppLibraryName!).base};
 
@@ -792,6 +799,69 @@ il2cpp_class_to_string (const Il2CppClass * klass)
 
     return g_string_free (text, 0);
 }
+
+struct _Il2CppMetadataSnapshot
+{
+    guint32 typeCount;
+    struct Il2CppMetadataType * types;
+};
+
+struct _Il2CppManagedMemorySection
+{
+    guint64 sectionStartAddress;
+    guint32 sectionSize;
+    guint8 * sectionBytes;
+};
+
+struct _Il2CppManagedHeap
+{
+    guint32 sectionCount;
+    Il2CppManagedMemorySection * sections;
+};
+
+struct _Il2CppStacks
+{
+    guint32 stackCount;
+    Il2CppManagedMemorySection * stacks;
+};
+
+struct _Il2CppGCHandles
+{
+    guint32 trackedObjectCount;
+    Il2CppObject ** pointersToObjects;
+};
+
+struct _Il2CppRuntimeInformation
+{
+    guint32 pointerSize;
+    guint32 objectHeaderSize;
+    guint32 arrayHeaderSize;
+    guint32 arrayBoundsOffsetInHeader;
+    guint32 arraySizeOffsetInHeader;
+    guint32 allocationGranularity;
+};
+
+struct _Il2CppManagedMemorySnapshot
+{
+    Il2CppManagedHeap heap;
+    Il2CppStacks stacks;
+    Il2CppMetadataSnapshot metadata;
+    Il2CppGCHandles gcHandles;
+    Il2CppRuntimeInformation runtimeInformation;
+    gpointer additionalUserInformation;
+};
+
+guint32
+il2cpp_memory_snapshot_get_tracked_object_count (Il2CppManagedMemorySnapshot * snapshot)
+{
+    return snapshot->gcHandles.trackedObjectCount;
+}
+
+Il2CppObject **
+il2cpp_memory_snapshot_get_objects (Il2CppManagedMemorySnapshot * snapshot)
+{
+    return snapshot->gcHandles.pointersToObjects;
+}
 `);
 }
 
@@ -805,9 +875,10 @@ il2cpp_class_to_string (const Il2CppClass * klass)
     GC: GC,
 
     choose: choose,
+    choose2: choose2,
 
     async initialize() {
-        if (Process.platform != "linux") {
+        if (Process.platform != "linux" && Process.platform != "windows") {
             raise(`Platform "${Process.platform}" is not supported yet.`);
         }
 

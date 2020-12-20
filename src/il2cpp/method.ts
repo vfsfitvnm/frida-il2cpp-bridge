@@ -71,7 +71,7 @@ export default class Il2CppMethod {
         if (this.isInflated) {
             parametersTypesAliasesForFrida.push("pointer");
         }
-        return new NativeFunction(this.actualPointer, this.returnType!.aliasForFrida, parametersTypesAliasesForFrida);
+        return new NativeFunction(this.actualPointer, this.returnType.aliasForFrida, parametersTypesAliasesForFrida);
     }
 
     set implementation(callback: Il2CppImplementationCallback | null) {
@@ -80,15 +80,15 @@ export default class Il2CppMethod {
         if (callback == null) return;
 
         if (this.actualPointer.isNull()) {
-            raise(`Can't replace method ${this.name} from ${this.class?.type?.name}: pointer is NULL.`);
+            raise(`Can't replace method ${this.name} from ${this.class.type.name}: pointer is NULL.`);
         }
 
         const parametersTypesAliasesForFrida = [];
         if (this.isInstance) {
-            parametersTypesAliasesForFrida.push(this.class!.type!.aliasForFrida);
+            parametersTypesAliasesForFrida.push(this.class.type.aliasForFrida);
         }
         for (const parameterInfo of this.parameters) {
-            parametersTypesAliasesForFrida.push(parameterInfo.type!.aliasForFrida);
+            parametersTypesAliasesForFrida.push(parameterInfo.type.aliasForFrida);
         }
         const methodInfo = this;
 
@@ -102,7 +102,7 @@ export default class Il2CppMethod {
             return callback.call(this!, instance, args);
         };
 
-        const nativeCallback = new NativeCallback(replaceCallback, this.returnType!.aliasForFrida, parametersTypesAliasesForFrida);
+        const nativeCallback = new NativeCallback(replaceCallback, this.returnType.aliasForFrida, parametersTypesAliasesForFrida);
 
         Interceptor.replace(this.actualPointer, nativeCallback);
     }
@@ -127,7 +127,7 @@ export default class Il2CppMethod {
 
     intercept({ onEnter, onLeave }: { onEnter?: Il2CppOnEnterCallback; onLeave?: Il2CppOnLeaveCallback }) {
         if (this.actualPointer.isNull()) {
-            raise(`Can't intercept method ${this.name} from ${this.class?.type?.name}: pointer is NULL.`);
+            raise(`Can't intercept method ${this.name} from ${this.class.type.name}: pointer is NULL.`);
         }
 
         const interceptorCallbacks: ScriptInvocationListenerCallbacks = {};
@@ -165,12 +165,12 @@ export default class Il2CppMethod {
 
     trace() {
         if (this.actualPointer.isNull()) {
-            warn(`Can't trace method ${this.name} from ${this.class?.type?.name}: pointer is NULL.`);
+            warn(`Can't trace method ${this.name} from ${this.class.type.name}: pointer is NULL.`);
         }
         try {
             Interceptor.attach(this.actualPointer, () => inform(`${this.relativePointerAsString} ${this.name}`));
         } catch (e) {
-            warn(`Can't trace method ${this.name} from ${this.class?.type?.name}: ${e.message}.`);
+            warn(`Can't trace method ${this.name} from ${this.class.type.name}: ${e.message}.`);
         }
     }
 

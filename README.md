@@ -30,9 +30,9 @@ all, please file a bug in case something doesn't work as expected. Thanks to [Il
 for providing the headers.
 
 ### Platform support
-- [ ] Linux _(not tested)_
+- [x] Linux _(not tested)_
 - [x] Android
-- [ ] Windows _(missing test device and [early instrumentation](src/utils/platform.ts) knowledge)_
+- [x] Windows _(may need a revision, I just hook `LoadLibraryW` for now)_
 - [ ] iOS _(missing test device and [early instrumentation](src/utils/platform.ts) knowledge)_
 
 ### Installation
@@ -42,6 +42,7 @@ npm install --save-dev frida-il2cpp-bridge
 You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 
 ### Changelog
+- 0.1.7 Added `Il2Cpp.choose2` and Windows(ish) support.
 - 0.1.6 Few minor fixes. `Enums` are now read as 32-bit signed integers.
 - 0.1.5 Added `Il2Cpp.Class.interfaceCount` and `Il2Cpp.Class.interfaces`. The dump will now include parents and
  interfaces of each class.
@@ -50,9 +51,6 @@ You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 - 0.1.1 Added `Il2Cpp.choose`, `Il2Cpp.Image.getClassFromName`, `Il2Cpp.Class.arrayClass`.
 `Il2Cpp.Class.ensureInitialized` will now call the api `il2cpp_runtime_class_init`.
 - 0.1.0 Initial release.
-
-### TODO
-- [ ] Add a cache system or another solution to avoid useless and expensive function calls.
 
 ### Snippets
 First things first: read the [docs](https://vfsfitvnm.github.io/frida-il2cpp-bridge/index.html).
@@ -101,6 +99,11 @@ class Locale : System.Object
 ```typescript
 Il2Cpp.choose(YourClass).forEach(instance => {
     // Do whatever you want
+});
+
+// Alternatively
+Il2Cpp.choose2<Il2Cpp.Array<Il2Cpp.Object>>(YourArrayClass).forEach(instance => {
+    // Do whatever you want 2
 });
 ```
 

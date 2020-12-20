@@ -7,6 +7,7 @@ import { raise } from "../utils/console";
 import Il2CppTypeEnum from "./type-enum";
 import Il2CppClass from "./class";
 import Api from "./api";
+import Il2CppMemorySnapshot from "./memory-snapshot";
 
 /** @internal */
 export type AllowedType =
@@ -343,22 +344,29 @@ export function choose<T extends Il2CppObject | Il2CppString | Il2CppArray<Allow
     return matches;
 }
 
-// export function choose(klass: Il2CppClass) {
-//     const snapshot = Il2CppManagedMemorySnapshot.get();
-//
-//     const matches: Il2CppObject[] = [];
-//
-//     const count = snapshot.gcHandles.trackedObjectCount;
-//     const start = snapshot.gcHandles.pointersToObjects;
-//
-//     for (let i = 0; i < count; i++) {
-//         const object = new Il2CppObject(start.add(i * Process.pointerSize).readPointer());
-//         if (object.class.handle.equals(klass.handle)) {
-//             matches.push(object);
-//         }
-//     }
-//
-//     snapshot.free();
-//
-//     return matches;
-// }
+/** @internal */
+export function choose2<T extends Il2CppObject | Il2CppString | Il2CppArray<AllowedType> = Il2CppObject>(klass: Il2CppClass): T[] {
+    const isString = klass.type.typeEnum == Il2CppTypeEnum.STRING;
+    const isArray = klass.type.typeEnum == Il2CppTypeEnum.SZARRAY;
+
+    const matches: T[] = [];
+
+    const snapshot = Il2CppMemorySnapshot.capture();
+    const count = snapshot.trackedObjectCount;
+    const start = snapshot.objectsPointer;
+
+    for (let i = 0; i < count; i++) {
+        const pointer = start.add(i * Process.pointerSize).readPointer();
+        const object = new Il2CppObject(pointer);
+
+        if (object.class.handle.equals(klass.handle)) {
+            if (isString) matches.push(new Il2CppString(pointer) as T);
+            else if (isArray) matches.push(new Il2CppArray(pointer) as T);
+            else matches.push(object as T);
+        }
+    }
+
+    snapshot.free();
+
+    return matches;
+}

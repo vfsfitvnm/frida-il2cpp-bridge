@@ -295,6 +295,26 @@ export default class Api {
     }
 
     @lazy
+    static get _memorySnapshotCapture() {
+        return create("pointer", "il2cpp_capture_memory_snapshot");
+    }
+
+    @lazy
+    static get _memorySnapshotFree() {
+        return create("void", "il2cpp_free_captured_memory_snapshot", "pointer");
+    }
+
+    @lazy
+    static get _memorySnapshotGetTrackedObjectCount() {
+        return create("uint64", "il2cpp_memory_snapshot_get_tracked_object_count", "pointer");
+    }
+
+    @lazy
+    static get _memorySnapshotGetObjects() {
+        return create("pointer", "il2cpp_memory_snapshot_get_objects", "pointer");
+    }
+
+    @lazy
     static get _methodGetClass() {
         return create("pointer", "il2cpp_method_get_class", "pointer");
     }
