@@ -165,11 +165,6 @@ export default class Api {
     }
 
     @lazy
-    static get _classToString() {
-        return create("utf8string", "il2cpp_class_to_string", "pointer");
-    }
-
-    @lazy
     static get _domainGet() {
         return create("pointer", "il2cpp_domain_get");
     }

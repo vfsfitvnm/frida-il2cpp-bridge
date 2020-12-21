@@ -28,19 +28,24 @@ declare global {
         function initialize(): Promise<void>;
 
         /**
-         * Performs a dump of the assemblies.
+         * Performs a dump of the assemblies.\
+         * It's implemented is pure JS (which is a lot slower than the `CModule`
+         * implementation).
+         * Since `QuickJS` is not mature yet (and not ready for string concatenation),
+         * remember to pick `V8` instead.
          * ```typescript
          * const Application = domain.assemblies["UnityEngine.CoreModule"].image.classes["UnityEngine.Application"];
          * const version = Application.methods.get_version.invoke();
          * const identifier = Application.methods.get_identifier.invoke();
          * const persistentDataPath = Application.methods.get_persistentDataPath.invoke();
-         * Il2Cpp.dump(`${persistentDataPath}/${identifier}_${version}.cs`);
+         * Il2Cpp.dump(domain, `${persistentDataPath}/${identifier}_${version}.cs`);
          * ```
+         * @param domain The application {@link Il2Cpp.Domain | domain}.
          * @param fullPathName Where to save the dump. The caller has to
          * make sure the application has a write permission for that location.
          *
          */
-        function dump(fullPathName: string): Promise<void>;
+        function dump(domain: Domain, fullPathName: string): void;
 
         /**
          * It reads the GC descriptor of the given class and looks for its objects

@@ -1,6 +1,6 @@
 {
   "name": "frida-il2cpp-bridge",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "[Frida](https://frida.re/) module to dump, manipulate and hijack any IL2CPP application at runtime with a high level of abstraction.",
   "keywords": [
     "frida", "il2cpp"
@@ -16,6 +16,10 @@
   },
   "author": "vfsfitvnm",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vfsfitvnm/frida-il2cpp-bridge.git"
+  },
   "prettier": {
     "tabWidth": 4,
     "arrowParens": "avoid",

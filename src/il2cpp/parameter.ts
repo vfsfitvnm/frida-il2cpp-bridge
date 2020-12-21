@@ -1,8 +1,8 @@
 import Api from "./api";
-import {lazy} from "../utils/decorators";
+import { lazy } from "../utils/decorators";
 import Il2CppType from "./type";
-import {raise} from "../utils/console";
-import {allocRawValue, readRawValue, Valuable} from "./runtime";
+import { raise } from "../utils/console";
+import { allocRawValue, readRawValue, Valuable } from "./runtime";
 
 /** @internal */
 export default class Il2CppParameter {
