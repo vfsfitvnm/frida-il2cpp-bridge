@@ -7,6 +7,7 @@ import Il2CppType from "./type";
 import Il2CppImage from "./image";
 import { getOrNull } from "../utils/helpers";
 import { raise } from "../utils/console";
+import Il2CppTypeEnum from "./type-enum";
 
 /** @internal */
 export default class Il2CppClass {
@@ -89,7 +90,7 @@ export default class Il2CppClass {
         let interfaze: Il2CppClass;
         while (!(handle = Api._classGetInterfaces(this.handle, iterator)).isNull()) {
             interfaze = new Il2CppClass(handle);
-            accessor[interfaze.type.name!] = interfaze;
+            accessor[interfaze.type.name] = interfaze;
         }
         return accessor;
     }
@@ -139,6 +140,40 @@ export default class Il2CppClass {
     }
 
     toString() {
-        return Api._classToString(this.handle)!;
+        const spacer = "\n    ";
+        let text = "// " + this.image.name + "\n";
+        text += this.isEnum ? "enum" : this.isStruct ? "struct" : this.isInterface ? "interface" : "class";
+        text += " " + this.type.name;
+        if (this.parent != null || this.interfaceCount > 0) text += " : ";
+        if (this.parent != null) {
+            text += this.parent.type.name;
+            if (this.interfaceCount > 0) text += ", ";
+        }
+        if (this.interfaceCount > 0) text += Object.keys(this.interfaces).join(", ");
+        text += "\n{";
+        for (const field of this.fields) {
+            text += spacer + (this.isEnum && field.name != "value__" ? "" : field.type.name + " ") + field.name;
+            if (field.isLiteral) {
+                text += " = ";
+                if (field.type.typeEnum == Il2CppTypeEnum.STRING) text += '"';
+                text += field.value;
+                if (field.type.typeEnum == Il2CppTypeEnum.STRING) text += '"';
+            }
+            text += this.isEnum && field.name != "value__" ? "," : "; // 0x" + field.offset.toString(16);
+        }
+        if (this.fieldCount + this.methodCount > 0) text += "\n";
+        for (const method of this.methods) {
+            text += spacer;
+            if (!method.isInstance) text += "static ";
+            text += method.returnType.name + " " + method.name + "(";
+            for (const parameter of method.parameters) {
+                if (parameter.position > 0) text += ", ";
+                text += parameter.type.name + " " + parameter.name;
+            }
+            text += ");";
+            if (!method.actualPointer.isNull()) text += "// " + method.actualPointer.sub(Api._library.base).toString() + ";";
+        }
+        text += "\n}\n\n";
+        return text;
     }
 }

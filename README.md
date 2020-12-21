@@ -1,6 +1,6 @@
 # frida-il2cpp-bridge
 [Frida](https://frida.re/) module to dump, manipulate and hijack any IL2CPP application at runtime with a high level of abstraction.
-```typescript
+```ts
 import "frida-il2cpp-bridge";
 
 async function main() {
@@ -25,7 +25,7 @@ main().catch(error => console.log(error.stack));
 ```
 
 ### Version support
-It **should** support Unity versions from `5.3.0` to `2020.2.0`. I couldn't test them
+It **should** support Unity versions from `5.3.0` to `2021.1.0`. I couldn't test them
 all, please file a bug in case something doesn't work as expected. Thanks to [Il2CppInspector](https://github.com/djkaty/Il2CppInspector)
 for providing the headers.
 
@@ -42,6 +42,8 @@ npm install --save-dev frida-il2cpp-bridge
 You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 
 ### Changelog
+- 0.1.8 `Il2Cpp.dump` is now sync, and its `CModule` implementation has been dropped. The dump will now include
+ literal (constant) values.
 - 0.1.7 Added `Il2Cpp.choose2` and Windows(ish) support.
 - 0.1.6 Few minor fixes. `Enums` are now read as 32-bit signed integers.
 - 0.1.5 Added `Il2Cpp.Class.interfaceCount` and `Il2Cpp.Class.interfaces`. The dump will now include parents and
@@ -64,7 +66,7 @@ First things first: read the [docs](https://vfsfitvnm.github.io/frida-il2cpp-bri
 * [`Method interception`](#method-interception)
 
 ##### Initialization
-```typescript
+```ts
 import "frida-il2cpp-bridge";
 
 async function main() {
@@ -76,8 +78,8 @@ main().catch(error => console.log(error.stack));
 ```
 
 ##### Dump
-```typescript
-Il2Cpp.dump(`/full/path/to/file.cs`);
+```ts
+Il2Cpp.dump(domain, `/full/path/to/file.cs`);
 ```
 This will produce something like:
 ```cs
@@ -96,7 +98,7 @@ class Locale : System.Object
 ```
 
 ##### Find instances
-```typescript
+```ts
 Il2Cpp.choose(YourClass).forEach(instance => {
     // Do whatever you want
 });
@@ -108,7 +110,7 @@ Il2Cpp.choose2<Il2Cpp.Array<Il2Cpp.Object>>(YourArrayClass).forEach(instance => 
 ```
 
 ##### Print all strings
-```typescript
+```ts
 const corlib = domain.assemblies.mscorlib.image;
 const StringClass = corlib.classes["System.String"];
 
@@ -118,7 +120,7 @@ Il2Cpp.choose<Il2Cpp.String>(StringClass).forEach(str => {
 ```
 
 ##### String manipulation
-```typescript
+```ts
 const str = Il2Cpp.String.from("Hello");
 console.log(str, str.length); // Hello 5
 
@@ -128,7 +130,7 @@ console.log(str, str.length); // Goodbye 7
 
 ##### Array manipulation
 It's not possible to add or remove an array element at the moment.
-```typescript
+```ts
 const corlib = domain.assemblies.mscorlib.image;
 const StringClass = corlib.classes["System.String"];
 
@@ -146,14 +148,14 @@ console.log(arr.get(0)); // Zero
 ```
 
 ##### Class tracing
-```typescript
+```ts
 const corlib = domain.assemblies.mscorlib.image;
 const StringClass = corlib.classes["System.String"];
 
 StringClass.trace();
 ```
 It will log something like:
-```shell script
+```coffeescriptliterate
 [il2cpp] 0x015ed550 get_Chars
 [il2cpp] 0x005602f0 FastAllocateString
 [il2cpp] 0x00ab497c wstrcpy
@@ -165,7 +167,7 @@ You can trace single methods as well.
 
 ##### Method interception
 You can replace any of the parameters and the return value by reassigning them.
-```typescript
+```ts
 const corlib = domain.assemblies.mscorlib.image;
 const StringClass = corlib.classes["System.String"];
 
