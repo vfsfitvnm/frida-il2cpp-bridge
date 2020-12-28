@@ -1,68 +1,177 @@
-import { unityLibraryName } from "./platform";
 import { raise } from "./console";
 
 /** @internal */
 const matchPattern = /(20\d{2}|\d)\.(\d)\.(\d{1,2})(?:([abcfp]|rc){0,2}\d?)/;
 
 /** @internal */
+interface IUnityVersion {
+    readonly source: string;
+    readonly major: number;
+    readonly minor: number;
+    readonly revision: number;
+}
+
+/** @internal */
+function parse(source: string) {
+    if (matchPattern.test(source)) {
+        const matches = source.match(matchPattern)!;
+        return {
+            source: matches[0],
+            major: Number(matches[1]),
+            minor: Number(matches[2]),
+            revision: Number(matches[3])
+        } as IUnityVersion;
+    } else {
+        return {
+            source: source,
+            major: -1,
+            minor: -1,
+            revision: -1
+        } as IUnityVersion;
+    }
+}
+
+/**
+ * Represent the Unity version of the current application.
+ */
 export default class UnityVersion {
-    static readonly MIN = new UnityVersion("5.3.0");
+    /** @internal */
+    readonly isEqualOrAbove_5_3_2: number;
 
-    static readonly MAX = new UnityVersion("2021.1.0");
+    /** @internal */
+    readonly isEqualOrAbove_5_3_3: number;
 
+    /** @internal */
+    readonly isEqualOrAbove_5_3_6: number;
+
+    /** @internal */
+    readonly isEqualOrAbove_5_4_4: number;
+
+    /** @internal */
+    readonly isEqualOrAbove_5_5_0: number;
+
+    /** @internal */
+    readonly isEqualOrAbove_5_6_0: number;
+
+    /** @internal */
+    readonly isEqualOrAbove_2017_1_0: number;
+
+    /** @internal */
+    readonly isEqualOrAbove_2017_1_3: number;
+
+    /** @internal */
+    readonly isEqualOrAbove_2018_1_0: number;
+
+    /** @internal */
+    readonly isEqualOrAbove_2018_2_0: number;
+
+    /** @internal */
+    readonly isEqualOrAbove_2018_3_0: number;
+
+    /** @internal */
+    readonly isEqualOrAbove_2018_3_8: number;
+
+    /** @internal */
+    readonly isEqualOrAbove_2019_1_0: number;
+
+    /** @internal */
+    readonly isEqualOrAbove_2020_2_0: number;
+
+    /** @internal */
+    readonly isBelow_5_3_3: number;
+
+    /** @internal */
+    readonly isBelow_5_3_5: number;
+
+    /** @internal */
+    readonly isBelow_5_3_6: number;
+
+    /** @internal */
+    readonly isBelow_5_5_0: number;
+
+    /** @internal */
+    readonly isBelow_2018_1_0: number;
+
+    /** @internal */
+    readonly isBelow_2018_3_0: number;
+
+    /** @internal */
+    readonly isBelow_2019_3_0: number;
+
+    /** @internal */
+    readonly isBelow_2020_2_0: number;
+
+    /** @internal */
+    readonly isNotEqual_2017_2_0: number;
+
+    /** @internal */
+    readonly isNotEqual_5_5_0: number;
+
+    /** @internal */
     private readonly source: string;
 
+    /** @internal */
     private readonly major: number;
 
+    /** @internal */
     private readonly minor: number;
 
+    /** @internal */
     private readonly revision: number;
 
+    /** @internal */
     constructor(source: string) {
-        if (matchPattern.test(source)) {
-            const matches = source.match(matchPattern)!;
-            this.source = matches[0];
-            this.major = Number(matches[1]);
-            this.minor = Number(matches[2]);
-            this.revision = Number(matches[3]);
-        } else {
-            this.source = source;
-            this.major = -1;
-            this.minor = -1;
-            this.revision = -1;
+        const obj = parse(source);
+        this.source = obj.source;
+        this.major = obj.major;
+        this.minor = obj.minor;
+        this.revision = obj.revision;
+
+        if (this.isBelow("5.3.0") || this.isEqualOrAbove("2021.1.0")) {
+            raise(`Unity version "${this}" is not valid or supported.`);
         }
+
+        this.isEqualOrAbove_5_3_2 = +this.isEqualOrAbove("5.3.2");
+        this.isEqualOrAbove_5_3_3 = +this.isEqualOrAbove("5.3.3");
+        this.isEqualOrAbove_5_3_6 = +this.isEqualOrAbove("5.3.6");
+        this.isEqualOrAbove_5_4_4 = +this.isEqualOrAbove("5.4.4");
+        this.isEqualOrAbove_5_5_0 = +this.isEqualOrAbove("5.5.0");
+        this.isEqualOrAbove_5_6_0 = +this.isEqualOrAbove("5.6.0");
+        this.isEqualOrAbove_2017_1_0 = +this.isEqualOrAbove("2017.1.0");
+        this.isEqualOrAbove_2017_1_3 = +this.isEqualOrAbove("2017.1.3");
+        this.isEqualOrAbove_2018_1_0 = +this.isEqualOrAbove("2018.1.0");
+        this.isEqualOrAbove_2018_2_0 = +this.isEqualOrAbove("2018.2.0");
+        this.isEqualOrAbove_2018_3_0 = +this.isEqualOrAbove("2018.3.0");
+        this.isEqualOrAbove_2018_3_8 = +this.isEqualOrAbove("2018.3.8");
+        this.isEqualOrAbove_2019_1_0 = +this.isEqualOrAbove("2019.1.0");
+        this.isEqualOrAbove_2020_2_0 = +this.isEqualOrAbove("2020.2.0");
+
+        this.isBelow_5_3_3 = +!this.isEqualOrAbove_5_3_3;
+        this.isBelow_5_3_5 = +this.isBelow("5.3.5");
+        this.isBelow_5_3_6 = +!this.isEqualOrAbove_5_3_6;
+        this.isBelow_5_5_0 = +!this.isEqualOrAbove_5_5_0;
+        this.isBelow_2018_1_0 = +!this.isEqualOrAbove_2018_1_0;
+        this.isBelow_2018_3_0 = +!this.isEqualOrAbove_2018_3_0;
+        this.isBelow_2019_3_0 = +this.isBelow("2019.3.0");
+        this.isBelow_2020_2_0 = +!this.isEqualOrAbove_2020_2_0;
+
+        this.isNotEqual_2017_2_0 = +!this.isEqual("2017.2.0");
+        this.isNotEqual_5_5_0 = +!this.isEqual("5.5.0");
     }
 
-    private static _CURRENT: UnityVersion;
-
-    static get CURRENT() {
-        if (this._CURRENT === undefined) {
-            const searchStringHex = "45787065637465642076657273696f6e3a"; // "Expected version: "
-            try {
-                const unityLibrary = Process.getModuleByName(unityLibraryName!);
-                for (const range of unityLibrary.enumerateRanges("r--")) {
-                    const result = Memory.scanSync(range.base, range.size, searchStringHex)[0];
-                    if (result !== undefined) this._CURRENT = new UnityVersion(result.address.readUtf8String()!);
-                }
-            } catch (e) {
-                raise("Couldn't obtain the Unity version. Please specify it. " + e);
-            }
-        }
-        return this._CURRENT;
+    /**
+     * ```typescript
+     * console.log(Il2Cpp.unityVersion); // 2019.4.5f1
+     * ```
+     * @return The current Unity version as a string.
+     */
+    toString() {
+        return this.source;
     }
 
-    get isValid() {
-        return this.major != -1;
-    }
-
-    get isSupported() {
-        return this.isBetween(UnityVersion.MIN, UnityVersion.MAX);
-    }
-
-    compare(other: string | UnityVersion) {
-        if (typeof other == "string") {
-            other = new UnityVersion(other);
-        }
+    /** @internal */
+    private compare(otherSource: string) {
+        const other = parse(otherSource);
 
         if (this.major > other.major) return 1;
         if (this.major < other.major) return -1;
@@ -74,31 +183,28 @@ export default class UnityVersion {
         return 0;
     }
 
-    isEqual(other: string | UnityVersion) {
+    /** @internal */
+    private isEqual(other: string) {
         return this.compare(other) == 0;
     }
 
-    isAbove(other: string | UnityVersion) {
+    /** @internal */
+    private isAbove(other: string) {
         return this.compare(other) == 1;
     }
 
-    isBelow(other: string | UnityVersion) {
+    /** @internal */
+    private isBelow(other: string) {
         return this.compare(other) == -1;
     }
 
-    isEqualOrAbove(other: string | UnityVersion) {
+    /** @internal */
+    private isEqualOrAbove(other: string) {
         return this.compare(other) >= 0;
     }
 
-    isEqualOrBelow(other: string | UnityVersion) {
+    /** @internal */
+    private isEqualOrBelow(other: string) {
         return this.compare(other) <= 0;
-    }
-
-    isBetween(first: string | UnityVersion, second: string | UnityVersion) {
-        return this.isEqualOrAbove(first) && this.isBelow(second);
-    }
-
-    toString() {
-        return this.source;
     }
 }

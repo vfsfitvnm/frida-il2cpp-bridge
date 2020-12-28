@@ -1,14 +1,8 @@
-import { il2CppLibraryName } from "../utils/platform";
-import { lazy } from "../utils/decorators";
-import { create, resolve } from "../utils/api-factory";
+import { lazy } from "./utils/decorators";
+import { create, resolve } from "./utils/api-factory";
 
 /** @internal */
 export default class Api {
-    @lazy
-    static get _library() {
-        return Process.getModuleByName(il2CppLibraryName!);
-    }
-
     @lazy
     static get _arrayGetElements() {
         return create("pointer", "il2cpp_array_elements", "pointer");

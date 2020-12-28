@@ -1,3 +1,10 @@
+import { raise } from "./console";
+
+/** @internal */
+function platformNotSupported(): never {
+    raise(`Platform "${Process.platform}" is not supported yet.`);
+}
+
 /** @internal */
 export const il2CppLibraryName =
     Process.platform == "linux"
@@ -5,8 +12,8 @@ export const il2CppLibraryName =
         : Process.platform == "windows"
         ? "GameAssembly.dll"
         : Process.platform == "darwin"
-        ? undefined
-        : undefined;
+        ? platformNotSupported()
+        : platformNotSupported();
 
 /** @internal */
 export const unityLibraryName =
@@ -15,8 +22,8 @@ export const unityLibraryName =
         : Process.platform == "windows"
         ? "UnityPlayer.dll"
         : Process.platform == "darwin"
-        ? undefined
-        : undefined;
+        ? platformNotSupported()
+        : platformNotSupported();
 
 /** @internal */
 const loader =
@@ -25,17 +32,17 @@ const loader =
         : Process.platform == "windows"
         ? Module.getExportByName("kernel32.dll", "LoadLibraryW")
         : Process.platform == "darwin"
-        ? undefined
-        : undefined;
+        ? platformNotSupported()
+        : platformNotSupported();
 
 /** @internal */
-export function forLibrary(libraryName: string): Promise<void> {
-    return new Promise(resolve => {
+export function forLibrary(libraryName: string) {
+    return new Promise<Module>(resolve => {
         const library = Process.findModuleByName(libraryName);
         if (library != null) {
-            resolve();
+            resolve(library);
         } else {
-            const interceptor = Interceptor.attach(loader!, {
+            const interceptor = Interceptor.attach(loader, {
                 onEnter(args) {
                     const moduleName = Process.platform == "windows" ? args[0].readUtf16String() : args[0].readCString();
                     this.isMatch = moduleName?.endsWith(libraryName);
@@ -43,7 +50,7 @@ export function forLibrary(libraryName: string): Promise<void> {
                 onLeave() {
                     if (this.isMatch) {
                         setTimeout(() => interceptor.detach());
-                        resolve();
+                        resolve(Process.getModuleByName(libraryName));
                     }
                 }
             });
