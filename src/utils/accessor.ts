@@ -4,8 +4,19 @@ import { raise } from "./console";
 /** @internal */
 export const filterAndMap = Symbol();
 
-/** @internal */
+/**
+ * An iterable class with a string index signature.\
+ * Upon key clashes, a suffix `_${number}`is appended to the latest key.
+ * ```typescript
+ * const accessor = new Accessor<string>();
+ * accessor.hello = 0;
+ * accessor.hello = 1; // Adding the same key!
+ * accessor.hello = 2; // Adding the same key, again!
+ * Object.keys(accessor); // hello, hello_1, hello_2
+ * ```
+ */
 export class Accessor<T> implements Iterable<T> {
+    /** @internal */
     constructor(keyClashProtection = false) {
         return new Proxy(this, {
             set(target: Accessor<T>, key: PropertyKey, value: T) {
@@ -31,15 +42,22 @@ export class Accessor<T> implements Iterable<T> {
         });
     }
 
+    /**
+     * Iterable.
+     */
     *[Symbol.iterator]() {
         for (const value of Object.values(this)) yield value;
     }
 
+    /** @internal */
     [filterAndMap]<U>(filter: (value: T) => boolean, map: (value: T) => U) {
         const accessor = new Accessor<U>();
         for (const [key, value] of Object.entries(this)) if (filter(value)) accessor[key] = map(value);
         return accessor;
     }
 
+    /**
+     * Index signature.
+     */
     [key: string]: T;
 }

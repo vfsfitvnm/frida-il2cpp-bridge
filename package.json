@@ -1,6 +1,6 @@
 {
   "name": "frida-il2cpp-bridge",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "[Frida](https://frida.re/) module to dump, manipulate and hijack any IL2CPP application at runtime with a high level of abstraction.",
   "keywords": [
     "frida", "il2cpp"
@@ -11,7 +11,7 @@
     "/dist/"
   ],
   "scripts": {
-    "docs": "typedoc --mode file --entryPoint '__global.Il2Cpp' --readme none --theme minimal && touch ./docs/.nojekyll && chromium ./docs/index.html",
+    "docs": "typedoc --mode file --readme none --theme minimal && touch ./docs/.nojekyll && chromium ./docs/index.html",
     "build": "tsc"
   },
   "author": "vfsfitvnm",

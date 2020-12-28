@@ -1,7 +1,7 @@
 # frida-il2cpp-bridge
 [Frida](https://frida.re/) module to dump, manipulate and hijack any IL2CPP application at runtime with a high level of abstraction.
 ```ts
-import "frida-il2cpp-bridge";
+import Il2Cpp from "frida-il2cpp-bridge";;
 
 async function main() {
     await Il2Cpp.initialize();
@@ -42,6 +42,7 @@ npm install --save-dev frida-il2cpp-bridge
 You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 
 ### Changelog
+- 0.1.9 A bit of refactoring: the object `Il2Cpp` is not global anymore. 
 - 0.1.8 `Il2Cpp.dump` is now sync, and its `CModule` implementation has been dropped. The dump will now include
  literal (constant) values.
 - 0.1.7 Added `Il2Cpp.choose2` and Windows(ish) support.
@@ -67,7 +68,7 @@ First things first: read the [docs](https://vfsfitvnm.github.io/frida-il2cpp-bri
 
 ##### Initialization
 ```ts
-import "frida-il2cpp-bridge";
+import Il2Cpp from "frida-il2cpp-bridge";;
 
 async function main() {
     await Il2Cpp.initialize();
