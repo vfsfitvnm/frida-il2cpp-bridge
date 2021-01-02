@@ -1,6 +1,6 @@
 {
   "name": "frida-il2cpp-bridge",
-  "version": "0.1.9",
+  "version": "0.1.11",
   "description": "[Frida](https://frida.re/) module to dump, manipulate and hijack any IL2CPP application at runtime with a high level of abstraction.",
   "keywords": [
     "frida", "il2cpp"

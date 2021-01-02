@@ -42,6 +42,7 @@ npm install --save-dev frida-il2cpp-bridge
 You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 
 ### Changelog
+- 0.1.11 Nothing.
 - 0.1.9 A bit of refactoring: the object `Il2Cpp` is not global anymore. 
 - 0.1.8 `Il2Cpp.dump` is now sync, and its `CModule` implementation has been dropped. The dump will now include
  literal (constant) values.
