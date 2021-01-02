@@ -531,7 +531,7 @@ il2cpp_field_is_instance (FieldInfo * field)
 uint8_t
 il2cpp_field_is_literal (FieldInfo * field)
 {
-    return (field->type->attrs & FIELD_ATTRIBUTE_LITERAL) == 0;
+    return field->type->attrs & FIELD_ATTRIBUTE_LITERAL;
 }
 #endif
 

@@ -41,21 +41,6 @@ npm install --save-dev frida-il2cpp-bridge
 ```
 You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 
-### Changelog
-- 0.1.11 Nothing.
-- 0.1.9 A bit of refactoring: the object `Il2Cpp` is not global anymore. 
-- 0.1.8 `Il2Cpp.dump` is now sync, and its `CModule` implementation has been dropped. The dump will now include
- literal (constant) values.
-- 0.1.7 Added `Il2Cpp.choose2` and Windows(ish) support.
-- 0.1.6 Few minor fixes. `Enums` are now read as 32-bit signed integers.
-- 0.1.5 Added `Il2Cpp.Class.interfaceCount` and `Il2Cpp.Class.interfaces`. The dump will now include parents and
- interfaces of each class.
-- 0.1.4 Added few snippets.
-- 0.1.3 `Il2Cpp.ValueType`, `Il2Cpp.Object` and `Il2Cpp.String` can now have a `NULL` handle.
-- 0.1.1 Added `Il2Cpp.choose`, `Il2Cpp.Image.getClassFromName`, `Il2Cpp.Class.arrayClass`.
-`Il2Cpp.Class.ensureInitialized` will now call the api `il2cpp_runtime_class_init`.
-- 0.1.0 Initial release.
-
 ### Snippets
 First things first: read the [docs](https://vfsfitvnm.github.io/frida-il2cpp-bridge/index.html).
 * [`Initialization`](#initialization)
