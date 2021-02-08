@@ -3,7 +3,7 @@
 
 ###### (repository has been recreated because of Google indexing issues)
 ```ts
-import Il2Cpp from "frida-il2cpp-bridge";
+import "frida-il2cpp-bridge";
 
 async function main() {
     await Il2Cpp.initialize();
