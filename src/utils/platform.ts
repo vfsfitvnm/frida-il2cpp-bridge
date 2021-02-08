@@ -1,6 +1,5 @@
 import { raise } from "./console";
 
-/** @internal */
 function platformNotSupported(): never {
     raise(`Platform "${Process.platform}" is not supported yet.`);
 }
@@ -25,7 +24,6 @@ export const unityLibraryName =
         ? platformNotSupported()
         : platformNotSupported();
 
-/** @internal */
 const loader =
     Process.platform == "linux"
         ? Module.getExportByName("libc.so", "dlopen")
