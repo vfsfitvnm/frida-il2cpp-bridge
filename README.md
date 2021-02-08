@@ -56,7 +56,7 @@ First things first: read the [docs](https://vfsfitvnm.github.io/frida-il2cpp-bri
 
 ##### Initialization
 ```ts
-import Il2Cpp from "frida-il2cpp-bridge";;
+import "frida-il2cpp-bridge";;
 
 async function main() {
     await Il2Cpp.initialize();
