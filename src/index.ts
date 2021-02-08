@@ -1,766 +1,15 @@
 import UnityVersion from "./utils/unity-version";
 import { forLibrary, il2CppLibraryName, unityLibraryName } from "./utils/platform";
-import { sources } from "./utils/api-factory";
 import { inform, ok, raise, warn } from "./utils/console";
-import { lazy } from "./utils/decorators";
+import { cache } from "decorator-cache-getter";
 import Api from "./api";
 import { Accessor, filterAndMap } from "./utils/accessor";
 import { getOrNull } from "./utils/helpers";
 
-/** @internal */
 const JSObject = Object;
 
-/** @internal */
 const JSArray = Array;
 
-/** @internal */
-function getMissingExports() {
-    return new CModule(`
-#include <stdint.h>
-
-#define FIELD_ATTRIBUTE_STATIC 0x0010
-#define FIELD_ATTRIBUTE_LITERAL 0x0040
-
-#define METHOD_ATTRIBUTE_STATIC 0x0010
-
-typedef struct _Il2CppObject Il2CppObject;
-typedef struct _Il2CppString Il2CppString;
-typedef struct _Il2CppArray Il2CppArray;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_3_3}
-typedef struct _Il2CppArraySize Il2CppArraySize;
-#endif
-typedef struct _Il2CppDomain Il2CppDomain;
-typedef struct _Il2CppAssemblyName Il2CppAssemblyName;
-typedef struct _Il2CppAssembly Il2CppAssembly;
-typedef struct _Il2CppImage Il2CppImage;
-typedef struct _Il2CppClass Il2CppClass;
-typedef struct _Il2CppType Il2CppType;
-typedef struct _FieldInfo FieldInfo;
-typedef struct _MethodInfo MethodInfo;
-typedef struct _ParameterInfo ParameterInfo;
-typedef enum _Il2CppTypeEnum Il2CppTypeEnum;
-typedef struct _VirtualInvokeData VirtualInvokeData;
-typedef struct _Il2CppGenericInst Il2CppGenericInst;
-typedef struct _Il2CppGenericClass Il2CppGenericClass;
-typedef struct _Il2CppGenericContext Il2CppGenericContext;
-typedef uint16_t Il2CppChar;
-typedef struct _Il2CppManagedMemorySnapshot Il2CppManagedMemorySnapshot;
-typedef struct _Il2CppMetadataSnapshot Il2CppMetadataSnapshot;
-typedef struct _Il2CppManagedMemorySection Il2CppManagedMemorySection;
-typedef struct _Il2CppManagedHeap Il2CppManagedHeap;
-typedef struct _Il2CppStacks Il2CppStacks;
-typedef struct _Il2CppGCHandles Il2CppGCHandles;
-typedef struct _Il2CppRuntimeInformation Il2CppRuntimeInformation;
-
-enum _Il2CppTypeEnum
-{
-    IL2CPP_TYPE_END = 0x00,
-    IL2CPP_TYPE_VOID = 0x01,
-    IL2CPP_TYPE_BOOLEAN = 0x02,
-    IL2CPP_TYPE_CHAR = 0x03,
-    IL2CPP_TYPE_I1 = 0x04,
-    IL2CPP_TYPE_U1 = 0x05,
-    IL2CPP_TYPE_I2 = 0x06,
-    IL2CPP_TYPE_U2 = 0x07,
-    IL2CPP_TYPE_I4 = 0x08,
-    IL2CPP_TYPE_U4 = 0x09,
-    IL2CPP_TYPE_I8 = 0x0a,
-    IL2CPP_TYPE_U8 = 0x0b,
-    IL2CPP_TYPE_R4 = 0x0c,
-    IL2CPP_TYPE_R8 = 0x0d,
-    IL2CPP_TYPE_STRING = 0x0e,
-    IL2CPP_TYPE_PTR = 0x0f,
-    IL2CPP_TYPE_BYREF = 0x10,
-    IL2CPP_TYPE_VALUETYPE = 0x11,
-    IL2CPP_TYPE_CLASS = 0x12,
-    IL2CPP_TYPE_VAR = 0x13,
-    IL2CPP_TYPE_ARRAY = 0x14,
-    IL2CPP_TYPE_GENERICINST = 0x15,
-    IL2CPP_TYPE_TYPEDBYREF = 0x16,
-    IL2CPP_TYPE_I = 0x18,
-    IL2CPP_TYPE_U = 0x19,
-    IL2CPP_TYPE_FNPTR = 0x1b,
-    IL2CPP_TYPE_OBJECT = 0x1c,
-    IL2CPP_TYPE_SZARRAY = 0x1d,
-    IL2CPP_TYPE_MVAR = 0x1e,
-    IL2CPP_TYPE_CMOD_REQD = 0x1f,
-    IL2CPP_TYPE_CMOD_OPT = 0x20,
-    IL2CPP_TYPE_INTERNAL = 0x21,
-    IL2CPP_TYPE_MODIFIER = 0x40,
-    IL2CPP_TYPE_SENTINEL = 0x41,
-    IL2CPP_TYPE_PINNED = 0x45,
-    IL2CPP_TYPE_ENUM = 0x55
-};
-
-struct _Il2CppObject
-{
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_1_0}
-    union
-    {
-        Il2CppClass * klass;
-        struct Il2CppVTable * vtable;
-    };
-#else
-    Il2CppClass * klass;
-#endif
-    struct MonitorData * monitor;
-};
-
-#if ${Il2Cpp.unityVersion.isBelow_2019_3_0}
-size_t
-il2cpp_object_header_size (void)
-{
-    return sizeof (Il2CppObject);
-}
-#endif
-
-struct _Il2CppDomain
-{
-    struct Il2CppAppDomain * domain;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_5_0}
-    struct Il2CppAppDomainSetup * setup;
-#else
-    Il2CppObject * setup;
-#endif
-    struct Il2CppAppContext * default_context;
-    const char * friendly_name;
-    uint32_t domain_id;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_5_0}
-    volatile int threadpool_jobs;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_1_0}
-    void * agent_info;
-#endif
-};
-
-const char *
-il2cpp_domain_get_name (const Il2CppDomain* domain)
-{
-    return domain->friendly_name;
-}
-
-struct _Il2CppAssemblyName
-{
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_1_0}
-    const char * name;
-    const char * culture;
-    const char * hash_value;
-    const char * public_key;
-#else
-    int32_t nameIndex;
-    int32_t cultureIndex;
-    int32_t hashValueIndex;
-    int32_t publicKeyIndex;
-#endif
-    uint32_t hash_alg;
-    int32_t hash_len;
-    uint32_t flags;
-    int32_t major;
-    int32_t minor;
-    int32_t build;
-    int32_t revision;
-    uint8_t publicKeyToken[8];
-};
-
-struct _Il2CppAssembly
-{
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_1_0}
-    Il2CppImage * image;
-#else
-    int32_t imageIndex;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_3_0}
-    uint32_t token;
-#else
-    int32_t customAttributeIndex;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_3_3}
-    int32_t referencedAssemblyStart;
-    int32_t referencedAssemblyCount;
-#endif
-    Il2CppAssemblyName aname;
-};
-
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_1_0}
-const char *
-il2cpp_assembly_get_name (const Il2CppAssembly * assembly)
-{
-    return assembly->aname.name;
-}
-#endif
-
-struct _Il2CppImage
-{
-    const char * name;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2017_1_3 && Il2Cpp.unityVersion.isNotEqual_2017_2_0}
-    const char * nameNoExt;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_1_0}
-    Il2CppAssembly * assembly;
-#else
-    int32_t assemblyIndex;
-#endif
-#if ${Il2Cpp.unityVersion.isBelow_2020_2_0}
-    int32_t typeStart;
-#endif
-    uint32_t typeCount;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2017_1_0}
-#if ${Il2Cpp.unityVersion.isBelow_2020_2_0}
-    int32_t exportedTypeStart;
-#endif
-    uint32_t exportedTypeCount;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_3_0}
-#if ${Il2Cpp.unityVersion.isBelow_2020_2_0}
-    int32_t customAttributeStart;
-#endif
-    uint32_t customAttributeCount;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2020_2_0}
-    const struct Il2CppMetadataImageHandle * metadataHandle;
-    struct Il2CppNameToTypeHandleHashTable * nameToClassHashTable;
-#else
-    int32_t entryPointIndex;
-    struct Il2CppNameToTypeDefinitionIndexHashTable * nameToClassHashTable;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2019_1_0}
-    const struct Il2CppCodeGenModule * codeGenModule;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_3_2}
-    uint32_t token;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_1_0}
-    uint8_t dynamic;
-#endif
-};
-
-#if ${Il2Cpp.unityVersion.isBelow_2020_2_0}
-uint32_t
-il2cpp_image_get_class_start (const Il2CppImage * image)
-{
-    return image->typeStart;
-}
-#endif
-
-#if ${Il2Cpp.unityVersion.isBelow_2018_3_0}
-uint32_t
-il2cpp_image_get_class_count (const Il2CppImage * image)
-{
-    return image->typeCount;
-}
-#endif
-
-struct _Il2CppType
-{
-    union
-    {
-        void * dummy;
-        int32_t klassIndex;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2020_2_0}
-        const struct Il2CppMetadataTypeHandle * typeHandle;
-#endif
-        const Il2CppType * type;
-        struct Il2CppArrayType * array;
-        int32_t genericParameterIndex;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2020_2_0}
-        const struct Il2CppMetadataGenericParameterHandle * genericParameterHandle;
-#endif
-        Il2CppGenericClass * generic_class;
-    } data;
-    unsigned int attrs: 16;
-    Il2CppTypeEnum type: 8;
-    unsigned int num_mods: 6;
-    unsigned int byref: 1;
-    unsigned int pinned: 1;
-};
-
-uint16_t
-il2cpp_type_offset_of_type (void)
-{
-    return (uint16_t) offsetof (Il2CppType, type);
-}
-
-const Il2CppType *
-il2cpp_type_get_data_type (const Il2CppType * type)
-{
-    return type->data.type;
-}
-
-Il2CppGenericClass *
-il2cpp_type_get_generic_class (const Il2CppType * type)
-{
-    return type->data.generic_class;
-}
-
-#if ${Il2Cpp.unityVersion.isBelow_2018_1_0}
-uint
-il2cpp_type_is_byref (const Il2CppType * type)
-{
-    return type->byref;
-}
-#endif
-
-struct _VirtualInvokeData
-{
-    void * methodPtr;
-    const MethodInfo * method;
-};
-
-struct _Il2CppClass
-{
-    const Il2CppImage * image;
-    void * gc_desc;
-    const char * name;
-    const char * namespaze;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_1_0}
-    Il2CppType byval_arg;
-    Il2CppType this_arg;
-#else
-    const Il2CppType* byval_arg;
-    const Il2CppType* this_arg;
-#endif
-    Il2CppClass * element_class;
-    Il2CppClass * castClass;
-    Il2CppClass * declaringType;
-    Il2CppClass * parent;
-    Il2CppGenericClass * generic_class;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2020_2_0}
-    const struct Il2CppMetadataTypeHandle * typeMetadataHandle;
-#else
-    const struct Il2CppTypeDefinition * typeDefinition;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_6_0}
-    const struct Il2CppInteropData * interopData;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_1_0}
-    Il2CppClass * klass;
-#endif
-    FieldInfo * fields;
-    const struct EventInfo* events;
-    const struct PropertyInfo * properties;
-    const MethodInfo ** methods;
-    Il2CppClass ** nestedTypes;
-    Il2CppClass ** implementedInterfaces;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_3_6 && Il2Cpp.unityVersion.isBelow_5_5_0}
-    VirtualInvokeData * vtable;
-#endif
-#if ${Il2Cpp.unityVersion.isBelow_5_3_6}
-    const MethodInfo ** vtable;
-#endif
-    struct Il2CppRuntimeInterfaceOffsetPair * interfaceOffsets;
-    void * static_fields;
-    const struct Il2CppRGCTXData * rgctx_data;
-    Il2CppClass ** typeHierarchy;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2019_1_0}
-    void * unity_user_data;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_2_0}
-    uint32_t initializationExceptionGCHandle;
-#endif
-    uint32_t cctor_started;
-    uint32_t cctor_finished;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2019_1_0}
-    __attribute__((aligned(8))) size_t cctor_thread;
-#else
-    __attribute__((aligned(8))) uint64_t cctor_thread;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2020_2_0}
-    const struct Il2CppMetadataGenericContainerHandle * genericContainerHandle;
-#else
-    int32_t genericContainerIndex;
-#endif
-#if ${Il2Cpp.unityVersion.isBelow_2018_3_0}
-    int32_t customAttributeIndex;
-#endif
-    uint32_t instance_size;
-    uint32_t actualSize;
-    uint32_t element_size;
-    int32_t native_size;
-    uint32_t static_fields_size;
-    uint32_t thread_static_fields_size;
-    int32_t thread_static_fields_offset;
-    uint32_t flags;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_3_2}
-    uint32_t token;
-#endif
-    uint16_t method_count;
-    uint16_t property_count;
-    uint16_t field_count;
-    uint16_t event_count;
-    uint16_t nested_type_count;
-    uint16_t vtable_count;
-    uint16_t interfaces_count;
-    uint16_t interface_offsets_count;
-    uint8_t typeHierarchyDepth;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_4_4 && Il2Cpp.unityVersion.isNotEqual_5_5_0}
-    uint8_t genericRecursionDepth;
-#endif
-    uint8_t rank;
-    uint8_t minimumAlignment;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_3_8}
-    uint8_t naturalAligment;
-#endif
-    uint8_t packingSize;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_3_0}
-    uint8_t initialized_and_no_error: 1;
-#endif
-    uint8_t valuetype: 1;
-    uint8_t initialized: 1;
-    uint8_t enumtype: 1;
-    uint8_t is_generic: 1;
-    uint8_t has_references: 1;
-    uint8_t init_pending: 1;
-    uint8_t size_inited: 1;
-    uint8_t has_finalize: 1;
-    uint8_t has_cctor: 1;
-    uint8_t is_blittable: 1;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_3_3}
-    uint8_t is_import_or_windows_runtime: 1;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_5_0}
-    uint8_t is_vtable_initialized: 1;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_2_0}
-    uint8_t has_initialization_error: 1;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_5_0}
-    VirtualInvokeData vtable[32];
-#endif
-};
-
-uint16_t
-il2cpp_class_get_interface_count (const Il2CppClass * klass)
-{
-    return klass->interfaces_count;
-}
-
-uint16_t
-il2cpp_class_get_method_count (const Il2CppClass * klass)
-{
-    return klass->method_count;
-}
-
-uint16_t
-il2cpp_class_get_field_count (const Il2CppClass * klass)
-{
-    return klass->field_count;
-}
-
-uint8_t
-il2cpp_class_has_static_constructor (const Il2CppClass * klass)
-{
-    return klass->has_cctor;
-}
-
-uint32_t
-il2cpp_class_is_static_constructor_finished (const Il2CppClass * klass)
-{
-    return klass->cctor_finished;
-}
-
-#if ${Il2Cpp.unityVersion.isBelow_2019_3_0}
-void *
-il2cpp_class_get_static_field_data (const Il2CppClass * klass)
-{
-    return klass->static_fields;
-}
-#endif
-
-struct _Il2CppGenericInst
-{
-    uint32_t type_argc;
-    const Il2CppType ** type_argv;
-};
-
-struct _Il2CppGenericContext
-{
-    const Il2CppGenericInst * class_inst;
-    const Il2CppGenericInst * method_inst;
-};
-
-struct _Il2CppGenericClass
-{
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2020_2_0}
-    const Il2CppType * type;
-#else
-    int32_t typeDefinitionIndex;
-#endif
-    Il2CppGenericContext context;
-    Il2CppClass * cached_class;
-};
-
-Il2CppClass *
-il2cpp_generic_class_get_cached_class (Il2CppGenericClass * class)
-{
-    return class->cached_class;
-}
-
-uint32_t
-il2cpp_generic_class_get_types_count (Il2CppGenericClass * class)
-{
-    return class->context.class_inst->type_argc;
-}
-
-const Il2CppType **
-il2cpp_generic_class_get_types (Il2CppGenericClass * class)
-{
-    return class->context.class_inst->type_argv;
-}
-
-struct _FieldInfo
-{
-    const char * name;
-    const Il2CppType * type;
-    Il2CppClass * parent;
-    int32_t offset;
-#if ${Il2Cpp.unityVersion.isBelow_2018_3_0}
-    int32_t customAttributeIndex;
-#endif
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_3_2}
-    uint32_t token;
-#endif
-};
-
-uint8_t
-il2cpp_field_is_instance (FieldInfo * field)
-{
-    return (field->type->attrs & FIELD_ATTRIBUTE_STATIC) == 0;
-}
-
-#if ${Il2Cpp.unityVersion.isBelow_2019_3_0}
-uint8_t
-il2cpp_field_is_literal (FieldInfo * field)
-{
-    return field->type->attrs & FIELD_ATTRIBUTE_LITERAL;
-}
-#endif
-
-struct _ParameterInfo
-{
-    const char * name;
-    int32_t position;
-    uint32_t token;
-#if ${Il2Cpp.unityVersion.isBelow_2018_3_0}
-    int32_t customAttributeIndex;
-#endif
-    const Il2CppType * parameter_type;
-};
-
-const char *
-il2cpp_parameter_get_name(const ParameterInfo * parameter)
-{
-    return parameter->name;
-}
-
-const Il2CppType *
-il2cpp_parameter_get_type (const ParameterInfo * parameter)
-{
-    return parameter->parameter_type;
-}
-
-int32_t
-il2cpp_parameter_get_position (const ParameterInfo * parameter)
-{
-    return parameter->position;
-}
-
-struct _MethodInfo
-{
-    void * methodPointer;
-    void * invoker_method;
-    const char * name;
-    Il2CppClass * klass;
-    const Il2CppType * return_type;
-    const ParameterInfo * parameters;
-    union
-    {
-        const struct Il2CppRGCTXData * rgctx_data;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2020_2_0}
-        const struct Il2CppMetadataMethodDefinitionHandle * methodMetadataHandle;
-#else
-        const struct Il2CppMethodDefinition * methodDefinition;
-#endif
-    };
-    union
-    {
-        const struct Il2CppGenericMethod * genericMethod;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2020_2_0}
-        const struct Il2CppMetadataGenericContainer nHandle * genericContainerHandle;
-#else
-        const struct Il2CppGenericContainer * genericContainer;
-#endif
-    };
-#if ${Il2Cpp.unityVersion.isBelow_2018_3_0}
-    int32_t customAttributeIndex;
-#endif
-    uint32_t token;
-    uint16_t flags;
-    uint16_t iflags;
-    uint16_t slot;
-    uint8_t parameters_count;
-    uint8_t is_generic: 1;
-    uint8_t is_inflated: 1;
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_1_0}
-    uint8_t wrapper_type: 1;
-    uint8_t is_marshaled_from_native: 1;
-#endif
-};
-
-void *
-il2cpp_method_get_pointer(const MethodInfo * method)
-{
-    return method->methodPointer;
-}
-
-const ParameterInfo *
-il2cpp_method_get_parameters (const MethodInfo * method,
-                              void ** iter)
-{
-    uint16_t parameters_count = method->parameters_count;
-
-    if (iter != 0 && parameters_count > 0)
-    {
-        void* temp = *iter;
-        if (temp == 0)
-        {
-            *iter = (void**) method->parameters;
-            return method->parameters;
-        }
-        else
-        {
-            const ParameterInfo * parameterInfo = (ParameterInfo*) *iter + 1;
-            if (parameterInfo < method->parameters + parameters_count)
-            {
-                *iter = (void*) parameterInfo;
-                return parameterInfo;
-            }
-        }
-    }
-    return 0;
-}
-
-
-struct _Il2CppString
-{
-    Il2CppObject object;
-    int32_t length;
-    Il2CppChar chars[32];
-};
-
-void
-il2cpp_string_set_length (Il2CppString * string,
-                          int32_t length)
-{
-    string->length = length;
-}
-
-struct _Il2CppArray
-{
-    Il2CppObject obj;
-    struct Il2CppArrayBounds * bounds;
-    uint32_t max_length;
-#if ${Il2Cpp.unityVersion.isBelow_5_3_3}
-    double vector[32];
-#endif
-};
-
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_3_3}
-struct _Il2CppArraySize
-{
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_1_0}
-    Il2CppObject obj;
-    struct Il2CppArrayBounds * bounds;
-    uint32_t max_length;
-    __attribute__((aligned(8))) void * vector[32];
-#else
-    Il2CppArray Array;
-    __attribute__((aligned(8))) void * vector;
-#endif
-};
-#endif
-
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_5_3_3}
-void *
-il2cpp_array_elements (Il2CppArraySize * array) {
-#if ${Il2Cpp.unityVersion.isEqualOrAbove_2018_1_0}
-    return array->vector;
-#else
-    return &array->vector;
-#endif
-}
-#else
-void *
-il2cpp_array_elements (Il2CppArray * array) {
-    return (void*) array->vector;
-}
-#endif
-
-struct _Il2CppMetadataSnapshot
-{
-    uint32_t typeCount;
-    struct Il2CppMetadataType * types;
-};
-
-struct _Il2CppManagedMemorySection
-{
-    uint64_t sectionStartAddress;
-    uint32_t sectionSize;
-    uint8_t * sectionBytes;
-};
-
-struct _Il2CppManagedHeap
-{
-    uint32_t sectionCount;
-    Il2CppManagedMemorySection * sections;
-};
-
-struct _Il2CppStacks
-{
-    uint32_t stackCount;
-    Il2CppManagedMemorySection * stacks;
-};
-
-struct _Il2CppGCHandles
-{
-    uint32_t trackedObjectCount;
-    Il2CppObject ** pointersToObjects;
-};
-
-struct _Il2CppRuntimeInformation
-{
-    uint32_t pointerSize;
-    uint32_t objectHeaderSize;
-    uint32_t arrayHeaderSize;
-    uint32_t arrayBoundsOffsetInHeader;
-    uint32_t arraySizeOffsetInHeader;
-    uint32_t allocationGranularity;
-};
-
-struct _Il2CppManagedMemorySnapshot
-{
-    Il2CppManagedHeap heap;
-    Il2CppStacks stacks;
-    Il2CppMetadataSnapshot metadata;
-    Il2CppGCHandles gcHandles;
-    Il2CppRuntimeInformation runtimeInformation;
-    void * additionalUserInformation;
-};
-
-uint32_t
-il2cpp_memory_snapshot_get_tracked_object_count (Il2CppManagedMemorySnapshot * snapshot)
-{
-    return snapshot->gcHandles.trackedObjectCount;
-}
-
-Il2CppObject **
-il2cpp_memory_snapshot_get_objects (Il2CppManagedMemorySnapshot * snapshot)
-{
-    return snapshot->gcHandles.pointersToObjects;
-}
-`);
-}
-
-/** @internal */
 async function getUnityVersion() {
     let unityVersion: UnityVersion | undefined;
     const searchStringHex = "45787065637465642076657273696f6e3a"; // "Expected version: "
@@ -782,17 +31,17 @@ async function getUnityVersion() {
 }
 
 /**
- * Everything is exposed through this object.\
+ * Everything is exposed through this global object.\
  * Every `Il2Cpp.${...}` class has a `handle` property, which is its `NativePointer`.
  */
 module Il2Cpp {
     /**
-     * The Unity version of the current application.
+     * The Il2Cpp library (`libil2cpp.so`, `GameAssembly.dll` ...).
      */
     export let library: Module;
 
     /**
-     * The Il2Cpp library (`libil2cpp.so`, `GameAssembly.dll` ...).
+     * The Unity version of the current application.
      */
     export let unityVersion: UnityVersion;
 
@@ -804,7 +53,7 @@ module Il2Cpp {
      * The current Unity version will also be
      * detected.
      * ```typescript
-     * import Il2Cpp from "frida-il2cpp-bridge";
+     * import "frida-il2cpp-bridge";
      * async function main() {
      *   await Il2Cpp.initialize();
      *   console.log(Il2Cpp.unityVersion);
@@ -815,8 +64,7 @@ module Il2Cpp {
     export async function initialize() {
         library = await forLibrary(il2CppLibraryName);
         unityVersion = await getUnityVersion();
-        sources.push(library);
-        sources.push(getMissingExports());
+        Api.initSources(library, unityVersion);
     }
 
     /**
@@ -976,7 +224,7 @@ module Il2Cpp {
         /**
          * @return Its name. Probably `IL2CPP Root Domain`.
          */
-        @lazy get name() {
+        @cache get name() {
             return Api._domainGetName(this.handle);
         }
 
@@ -990,7 +238,7 @@ module Il2Cpp {
          * ```
          * @return Its assemblies.
          */
-        @lazy get assemblies() {
+        @cache get assemblies() {
             const accessor = new Accessor<Assembly>();
 
             const sizePointer = Memory.alloc(Process.pointerSize);
@@ -1057,14 +305,14 @@ module Il2Cpp {
         /**
          * @return Its image.
          */
-        @lazy get image() {
+        @cache get image() {
             return new Image(Api._assemblyGetImage(this.handle));
         }
 
         /**
          * @return Its name.
          */
-        @lazy get name() {
+        @cache get name() {
             if (unityVersion.isEqualOrAbove_2018_1_0) {
                 return Api._assemblyGetName(this.handle)!;
             }
@@ -1099,7 +347,7 @@ module Il2Cpp {
         /**
          * @return The count of its classes.
          */
-        @lazy get classCount() {
+        @cache get classCount() {
             return Api._imageGetClassCount(this.handle);
         }
 
@@ -1108,7 +356,7 @@ module Il2Cpp {
          * @return The start index of its classes, `-1` if this information
          * is not available - since Unity version `2020.2.0`.
          */
-        @lazy get classStart() {
+        @cache get classStart() {
             return unityVersion.isBelow_2020_2_0 ? Api._imageGetClassStart(this.handle) : -1;
         }
 
@@ -1123,7 +371,7 @@ module Il2Cpp {
          * ```
          * @return Its classes.
          */
-        @lazy get classes() {
+        @cache get classes() {
             const accessor = new Accessor<Class>();
             const start = this.classStart;
             if (unityVersion.isEqualOrAbove_2018_3_0) {
@@ -1148,7 +396,7 @@ module Il2Cpp {
          * @return Its name, equals to the name of its assembly plus its
          * extension.
          */
-        @lazy get name() {
+        @cache get name() {
             return Api._imageGetName(this.handle)!;
         }
 
@@ -1232,21 +480,21 @@ module Il2Cpp {
          * The inverse of {@link Il2Cpp.Class.elementClass | elementClass}.
          * @return The array class which has the caller as element class.
          */
-        @lazy get arrayClass() {
+        @cache get arrayClass() {
             return new Class(Api._classGetArrayClass(this.handle, 1));
         }
 
         /**
          * @return The size as array element.
          */
-        @lazy get arrayElementSize() {
+        @cache get arrayElementSize() {
             return Api._classGetArrayElementSize(this.handle);
         }
 
         /**
          * @returns The name of the assembly it belongs to.
          */
-        @lazy get assemblyName() {
+        @cache get assemblyName() {
             return Api._classGetAssemblyName(this.handle)!;
         }
 
@@ -1264,21 +512,21 @@ module Il2Cpp {
          * ```
          * @return Its outer class if its a nested class, `null` otherwise.
          */
-        @lazy get declaringClass() {
+        @cache get declaringClass() {
             return getOrNull(Api._classGetDeclaringType(this.handle), Class);
         }
 
         /**
          * Its element class if it's an array.
          */
-        @lazy get elementClass() {
+        @cache get elementClass() {
             return getOrNull(Api._classGetElementClass(this.handle), Class);
         }
 
         /**
          * @return The count of its fields.
          */
-        @lazy get fieldCount() {
+        @cache get fieldCount() {
             return Api._classGetFieldCount(this.handle);
         }
 
@@ -1293,7 +541,7 @@ module Il2Cpp {
          * ```
          * @return Its fields.
          */
-        @lazy get fields() {
+        @cache get fields() {
             const iterator = Memory.alloc(Process.pointerSize);
             const accessor = new Accessor<Field>();
             let handle: NativePointer;
@@ -1308,35 +556,35 @@ module Il2Cpp {
         /**
          * @return `true` if it has a static constructor, `false` otherwise.
          */
-        @lazy get hasStaticConstructor() {
+        @cache get hasStaticConstructor() {
             return Api._classHasStaticConstructor(this.handle);
         }
 
         /**
          * @return The image it belongs to.
          */
-        @lazy get image() {
+        @cache get image() {
             return new Image(Api._classGetImage(this.handle));
         }
 
         /**
          * @return The size of its instance.
          */
-        @lazy get instanceSize() {
+        @cache get instanceSize() {
             return Api._classGetInstanceSize(this.handle);
         }
 
         /**
          * @return `true` if it's an `enum`, `false` otherwise.
          */
-        @lazy get isEnum() {
+        @cache get isEnum() {
             return Api._classIsEnum(this.handle);
         }
 
         /**
          * @return `true` if it's an `interface`, `false` otherwise.
          */
-        @lazy get isInterface() {
+        @cache get isInterface() {
             return Api._classIsInterface(this.handle);
         }
 
@@ -1351,14 +599,14 @@ module Il2Cpp {
         /**
          * @return `true` if it's a value type (aka struct), `false` otherwise.
          */
-        @lazy get isStruct() {
+        @cache get isStruct() {
             return Api._classIsStruct(this.handle) && !this.isEnum;
         }
 
         /**
          * @return The count of its implemented interfaces.
          */
-        @lazy get interfaceCount() {
+        @cache get interfaceCount() {
             return Api._classGetInterfaceCount(this.handle);
         }
 
@@ -1373,7 +621,7 @@ module Il2Cpp {
          * ```
          * @return Its interfaces.
          */
-        @lazy get interfaces() {
+        @cache get interfaces() {
             const iterator = Memory.alloc(Process.pointerSize);
             const accessor = new Accessor<Class>();
             let handle: NativePointer;
@@ -1388,7 +636,7 @@ module Il2Cpp {
         /**
          * @return The count of its methods.
          */
-        @lazy get methodCount() {
+        @cache get methodCount() {
             return Api._classGetMethodCount(this.handle);
         }
 
@@ -1403,7 +651,7 @@ module Il2Cpp {
          * ```
          * @return Its methods.
          */
-        @lazy get methods() {
+        @cache get methods() {
             const iterator = Memory.alloc(Process.pointerSize);
             const accessor = new Accessor<Method>(true);
             let handle: NativePointer;
@@ -1418,35 +666,35 @@ module Il2Cpp {
         /**
          * @return Its name.
          */
-        @lazy get name() {
+        @cache get name() {
             return Api._classGetName(this.handle)!;
         }
 
         /**
          * @return Its namespace.
          */
-        @lazy get namespace() {
+        @cache get namespace() {
             return Api._classGetNamespace(this.handle)!;
         }
 
         /**
          * @return Its parent if there is, `null.` otherwise.
          */
-        @lazy get parent() {
+        @cache get parent() {
             return getOrNull(Api._classGetParent(this.handle), Class);
         }
 
         /**
          * @return A pointer to its static fields.
          */
-        @lazy get staticFieldsData() {
+        @cache get staticFieldsData() {
             return Api._classGetStaticFieldData(this.handle);
         }
 
         /**
          * @return Its type.
          */
-        @lazy get type() {
+        @cache get type() {
             return new Type(Api._classGetType(this.handle));
         }
 
@@ -1520,7 +768,7 @@ module Il2Cpp {
         /**
          * @return Its class.
          */
-        @lazy get cachedClass() {
+        @cache get cachedClass() {
             return getOrNull(Api._genericClassGetCachedClass(this.handle), Class);
         }
     }
@@ -1571,35 +819,35 @@ module Il2Cpp {
         /**
          * @return The class it belongs to.
          */
-        @lazy get class() {
+        @cache get class() {
             return new Class(Api._fieldGetClass(this.handle));
         }
 
         /**
          * @return `true` if it's a instance field, `false` otherwise.
          */
-        @lazy get isInstance() {
+        @cache get isInstance() {
             return Api._fieldIsInstance(this.handle);
         }
 
         /**
          * @return `true` if it's literal field, `false` otherwise.
          */
-        @lazy get isLiteral() {
+        @cache get isLiteral() {
             return Api._fieldIsLiteral(this.handle);
         }
 
         /**
          * @return `true` if it's a thread  field, `false` otherwise.
          */
-        @lazy get isThreadStatic() {
+        @cache get isThreadStatic() {
             return this.offset == Field.THREAD_STATIC_FIELD_OFFSET;
         }
 
         /**
          * @return Its name.
          */
-        @lazy get name() {
+        @cache get name() {
             return Api._fieldGetName(this.handle)!;
         }
 
@@ -1610,14 +858,14 @@ module Il2Cpp {
          * {@link Object.handle | handle} and its location.
          * @return Its offset.
          */
-        @lazy get offset() {
+        @cache get offset() {
             return Api._fieldGetOffset(this.handle);
         }
 
         /**
          * @return Its type.
          */
-        @lazy get type() {
+        @cache get type() {
             return new Type(Api._fieldGetType(this.handle));
         }
 
@@ -1718,21 +966,21 @@ module Il2Cpp {
          * ```
          * @return Its actual pointer in memory.
          */
-        @lazy get actualPointer() {
+        @cache get actualPointer() {
             return Api._methodGetPointer(this.handle);
         }
 
         /**
          * @return The class it belongs to.
          */
-        @lazy get class() {
+        @cache get class() {
             return new Class(Api._methodGetClass(this.handle));
         }
 
         /**
          * @return `true` if it's generic, `false` otherwise.
          */
-        @lazy get isGeneric() {
+        @cache get isGeneric() {
             return Api._methodIsGeneric(this.handle);
         }
 
@@ -1740,28 +988,28 @@ module Il2Cpp {
          * @return `true` if it's inflated (a generic with a concrete type parameter),
          * false otherwise.
          */
-        @lazy get isInflated() {
+        @cache get isInflated() {
             return Api._methodIsInflated(this.handle);
         }
 
         /**
          *  @return `true` if it's an instance method, `false` otherwise.
          */
-        @lazy get isInstance() {
+        @cache get isInstance() {
             return Api._methodIsInstance(this.handle);
         }
 
         /**
          * @return Its name.
          */
-        @lazy get name() {
+        @cache get name() {
             return Api._methodGetName(this.handle)!;
         }
 
         /**
          * @return The count of its parameters.
          */
-        @lazy get parameterCount() {
+        @cache get parameterCount() {
             return Api._methodGetParamCount(this.handle);
         }
 
@@ -1776,7 +1024,7 @@ module Il2Cpp {
          * ```
          * @return Its parameters.
          */
-        @lazy get parameters() {
+        @cache get parameters() {
             const iterator = Memory.alloc(Process.pointerSize);
             const accessor = new Accessor<Parameter>();
             let handle: NativePointer;
@@ -1791,19 +1039,19 @@ module Il2Cpp {
         /**
          * @return Its static fixed offset, useful for static analysis.
          */
-        @lazy get relativePointerAsString() {
+        @cache get relativePointerAsString() {
             return `0x${this.actualPointer.sub(library.base).toString(16).padStart(8, "0")}`;
         }
 
         /**
          * @return Its return type.
          */
-        @lazy get returnType() {
+        @cache get returnType() {
             return new Type(Api._methodGetReturnType(this.handle));
         }
 
         /** @internal */
-        @lazy get nativeFunction() {
+        @cache get nativeFunction() {
             const parametersTypesAliasesForFrida = new JSArray(this.parameterCount).fill("pointer");
             if (this.isInstance || unityVersion.isBelow_2018_3_0) {
                 parametersTypesAliasesForFrida.push("pointer");
@@ -1860,7 +1108,7 @@ module Il2Cpp {
         }
 
         /** @internal */
-        @lazy get parametersTypesAliasesForFrida() {
+        @cache get parametersTypesAliasesForFrida() {
             const parametersTypesAliasesForFrida = new JSArray(this.parameterCount).fill("pointer");
             if (this.isInstance || unityVersion.isBelow_2018_3_0) {
                 parametersTypesAliasesForFrida.push("pointer");
@@ -2051,21 +1299,21 @@ module Il2Cpp {
         /**
          * @return Its name.
          */
-        @lazy get name() {
+        @cache get name() {
             return Api._parameterGetName(this.handle)!;
         }
 
         /**
          * @return Its position.
          */
-        @lazy get position() {
+        @cache get position() {
             return Api._parameterGetPosition(this.handle);
         }
 
         /**
          *  @return Its type.
          */
-        @lazy get type() {
+        @cache get type() {
             return new Type(Api._parameterGetType(this.handle));
         }
 
@@ -2116,7 +1364,7 @@ module Il2Cpp {
         /**
          * @return Its fields.
          */
-        @lazy get fields() {
+        @cache get fields() {
             return this.class.fields[filterAndMap](
                 field => field.isInstance,
                 field => field.asHeld(this.handle.add(field.offset).sub(Object.headerSize))
@@ -2163,7 +1411,7 @@ module Il2Cpp {
         constructor(readonly handle: NativePointer) {}
 
         /** @internal */
-        @lazy
+        @cache
         static get headerSize() {
             return Api._objectGetHeaderSize();
         }
@@ -2171,7 +1419,7 @@ module Il2Cpp {
         /**
          * @return The same object as an instance of its parent.
          */
-        @lazy get base() {
+        @cache get base() {
             if (this.class.parent == null) {
                 raise(`Class "${this.class.type.name}" has no parent.`);
             }
@@ -2184,7 +1432,7 @@ module Il2Cpp {
         /**
          * @return Its class.
          */
-        @lazy get class() {
+        @cache get class() {
             return new Class(Api._objectGetClass(this.handle));
         }
 
@@ -2192,7 +1440,7 @@ module Il2Cpp {
          * See {@link Class.fields} for an example.
          * @return Its fields.
          */
-        @lazy get fields() {
+        @cache get fields() {
             return this.class.fields[filterAndMap](
                 field => field.isInstance,
                 field => field.asHeld(this.handle.add(field.offset))
@@ -2203,7 +1451,7 @@ module Il2Cpp {
          * See {@link Il2Cpp.Class.methods} for an example.
          * @return Its methods.
          */
-        @lazy get methods() {
+        @cache get methods() {
             return this.class.methods[filterAndMap](
                 method => method.isInstance,
                 method => method.asHeld(this.handle)
@@ -2339,33 +1587,33 @@ module Il2Cpp {
         /**
          * @return The size of each element.
          */
-        @lazy get elementSize() {
+        @cache get elementSize() {
             return this.object.class.type.dataType!.class.arrayElementSize;
         }
 
         /**
          * @return The type of its elements.
          */
-        @lazy get elementType() {
+        @cache get elementType() {
             return this.object.class.type.dataType!;
         }
 
         /** @internal */
-        @lazy get elements() {
+        @cache get elements() {
             return Api._arrayGetElements(this.handle);
         }
 
         /**
          * @return Its length.
          */
-        @lazy get length() {
+        @cache get length() {
             return Api._arrayGetLength(this.handle);
         }
 
         /**
          * @return The same array as an object.
          */
-        @lazy get object() {
+        @cache get object() {
             return new Object(this.handle);
         }
 
@@ -2440,13 +1688,13 @@ module Il2Cpp {
         }
 
         /** @internal */
-        @lazy
+        @cache
         static get offsetOfTypeEnum() {
             return Api._typeOffsetOfTypeEnum();
         }
 
         /** @internal */
-        @lazy get aliasForFrida() {
+        @cache get aliasForFrida() {
             switch (this.typeEnum) {
                 case TypeEnum.VOID:
                     return "void";
@@ -2482,28 +1730,28 @@ module Il2Cpp {
         /**
          * @return Its class.
          */
-        @lazy get class() {
+        @cache get class() {
             return new Class(Api._classFromType(this.handle));
         }
 
         /**
          * @return If it's an array, the type of its elements, `null` otherwise.
          */
-        @lazy get dataType() {
+        @cache get dataType() {
             return getOrNull(Api._typeGetDataType(this.handle), Type);
         }
 
         /**
          * @returns If it's a generic type, its generic class, `null` otherwise.
          */
-        @lazy get genericClass() {
+        @cache get genericClass() {
             return getOrNull(Api._typeGetGenericClass(this.handle), GenericClass);
         }
 
         /**
          *  @returns `true` if it's passed by reference, `false` otherwise.
          */
-        @lazy get isByReference() {
+        @cache get isByReference() {
             return Api._typeIsByReference(this.handle);
         }
 
@@ -2511,14 +1759,14 @@ module Il2Cpp {
          * @returns Its name, namespace included and declaring class excluded. If its class is nested,
          * it corresponds to the class name.
          */
-        @lazy get name() {
+        @cache get name() {
             return Api._typeGetName(this.handle)!;
         }
 
         /**
          * @returns Its corresponding type.
          */
-        @lazy get typeEnum() {
+        @cache get typeEnum() {
             return Api._typeGetTypeEnum(this.handle) as TypeEnum;
         }
     }
@@ -2627,11 +1875,11 @@ module Il2Cpp {
             if (handle.isNull()) raise(`Handle for "${this.constructor.name}" cannot be NULL.`);
         }
 
-        @lazy get trackedObjectCount() {
+        @cache get trackedObjectCount() {
             return this.isFreed ? -1 : Api._memorySnapshotGetTrackedObjectCount(this.handle).toNumber();
         }
 
-        @lazy get objectsPointer() {
+        @cache get objectsPointer() {
             return this.isFreed ? NULL : Api._memorySnapshotGetObjects(this.handle);
         }
 
@@ -2822,6 +2070,9 @@ module Il2Cpp {
             case TypeEnum.GENERICINST:
                 pointer.writePointer((value as Object).handle);
                 break;
+            case TypeEnum.SZARRAY:
+                pointer.writePointer((value as Array<AllowedType>).handle);
+                break;
             default:
                 raise(
                     `writeFieldValue: case for "${type.name}" (${TypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`
@@ -2931,6 +2182,8 @@ module Il2Cpp {
             case TypeEnum.OBJECT:
             case TypeEnum.GENERICINST:
                 return (value as Object).handle;
+            case TypeEnum.SZARRAY:
+                return (value as Array<AllowedType>).handle;
             default:
                 raise(
                     `allocRawValue: case for "${type.name}" (${TypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`
@@ -2939,4 +2192,10 @@ module Il2Cpp {
     }
 }
 
-export default Il2Cpp;
+type Il2Cpp = typeof Il2Cpp;
+
+declare global {
+    const Il2Cpp: Il2Cpp;
+}
+
+(global as any).Il2Cpp = Il2Cpp;

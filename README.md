@@ -1,7 +1,9 @@
 # frida-il2cpp-bridge
 [Frida](https://frida.re/) module to dump, manipulate and hijack any IL2CPP application at runtime with a high level of abstraction.
+
+###### (repository has been recreated because of Google indexing issues)
 ```ts
-import Il2Cpp from "frida-il2cpp-bridge";;
+import Il2Cpp from "frida-il2cpp-bridge";
 
 async function main() {
     await Il2Cpp.initialize();
@@ -66,7 +68,7 @@ main().catch(error => console.log(error.stack));
 
 ##### Dump
 ```ts
-Il2Cpp.dump(domain, `/full/path/to/file.cs`);
+Il2Cpp.dump(domain, "/full/path/to/file.cs");
 ```
 This will produce something like:
 ```cs

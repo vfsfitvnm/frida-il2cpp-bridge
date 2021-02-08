@@ -1,9 +1,7 @@
 import { raise } from "./console";
 
-/** @internal */
 const matchPattern = /(20\d{2}|\d)\.(\d)\.(\d{1,2})(?:([abcfp]|rc){0,2}\d?)/;
 
-/** @internal */
 interface IUnityVersion {
     readonly source: string;
     readonly major: number;
@@ -11,7 +9,6 @@ interface IUnityVersion {
     readonly revision: number;
 }
 
-/** @internal */
 function parse(source: string) {
     if (matchPattern.test(source)) {
         const matches = source.match(matchPattern)!;
