@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
-import { createNF } from "frida-typed-extensions";
 import { raise } from "./utils/console";
 import UnityVersion from "./utils/unity-version";
+import { createNF } from "./utils/extensions";
 
 /** @internal */
 export default class Api {
@@ -469,7 +469,7 @@ export default class Api {
             const result = source instanceof Module ? source.findExportByName(name) : source[name];
             if (result) return result as NativePointer;
         }
-        raise(`Couldn't resolve export "${exportName}".`);
+        raise(`Couldn't resolve export "${name}".`);
     }
 
     private static getMissingExports(unityVersion: UnityVersion) {

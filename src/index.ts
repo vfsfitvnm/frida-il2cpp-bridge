@@ -1,20 +1,23 @@
 import UnityVersion from "./utils/unity-version";
-import { forLibrary, il2CppLibraryName, unityLibraryName } from "./utils/platform";
+import { forModule, onModuleLoad } from "./utils/native-wait";
 import { inform, ok, raise, warn } from "./utils/console";
 import { cache } from "decorator-cache-getter";
 import Api from "./api";
 import { Accessor, filterAndMap } from "./utils/accessor";
-import { getOrNull } from "./utils/helpers";
+import { getOrNull, platformNotSupported } from "./utils/helpers";
 
 const JSObject = Object;
 
 const JSArray = Array;
 
 async function getUnityVersion() {
+    const unityLibraryName =
+        Process.platform == "linux" ? "libunity.so" : Process.platform == "windows" ? "UnityPlayer.dll" : platformNotSupported();
+
     let unityVersion: UnityVersion | undefined;
     const searchStringHex = "45787065637465642076657273696f6e3a"; // "Expected version: "
     try {
-        const unityLibrary = await forLibrary(unityLibraryName);
+        const unityLibrary = await forModule(unityLibraryName);
         for (const range of unityLibrary.enumerateRanges("r--")) {
             const result = Memory.scanSync(range.base, range.size, searchStringHex)[0];
             if (result !== undefined) {
@@ -62,7 +65,10 @@ module Il2Cpp {
      ```
      */
     export async function initialize() {
-        library = await forLibrary(il2CppLibraryName);
+        const il2CppLibraryName =
+            Process.platform == "linux" ? "libil2cpp.so" : Process.platform == "windows" ? "GameAssembly.dll" : platformNotSupported();
+
+        library = await forModule(il2CppLibraryName);
         unityVersion = await getUnityVersion();
         Api.initSources(library, unityVersion);
     }

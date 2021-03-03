@@ -1,7 +1,6 @@
 # frida-il2cpp-bridge
 [Frida](https://frida.re/) module to dump, manipulate and hijack any IL2CPP application at runtime with a high level of abstraction.
 
-###### (repository has been recreated because of Google indexing issues)
 ```ts
 import "frida-il2cpp-bridge";
 
@@ -34,8 +33,8 @@ for providing the headers.
 ### Platform support
 - [x] Linux _(not tested)_
 - [x] Android
-- [x] Windows _(may need a revision, I just hook `LoadLibraryW` for now)_
-- [ ] iOS _(missing test device and [early instrumentation](src/utils/platform.ts) knowledge)_
+- [x] Windows _(not tested)_
+- [ ] iOS _(missing test device)_
 
 ### Installation
 ```shell script
