@@ -1,9 +1,9 @@
 import { platformNotSupported } from "./helpers";
+import { cache } from "decorator-cache-getter";
 
 /**
  * @internal
- * It waits for a `Module` to be loaded, if necessary.
- * (e.g. before `DT_INIT` and `DT_INIT_ARRAY` on Android).
+ * It waits for a `Module` to be loaded.
  * @param moduleName The name of the target module.
  */
 export function forModule(moduleName: string) {
@@ -11,95 +11,66 @@ export function forModule(moduleName: string) {
         const module = Process.findModuleByName(moduleName);
         if (module) {
             resolve(module);
-            return;
-        }
-
-        let targets = getTargets();
-        getTargets = () => targets;
-
-        if (isAndroidAbove6_0) {
-            const interceptor = Interceptor.attach(targets[0].address, {
-                onLeave(returnValue) {
-                    if (!returnValue.readUtf8String()?.endsWith(moduleName)) return;
-                    setTimeout(() => {
-                        interceptor.detach();
-                        // bionic/linker/linker_phdr.cpp:170: Load CHECK 'did_read_' failed
-                    });
-                    resolve(Process.getModuleByName(moduleName));
-                }
-            });
-        } else if (isAndroidAbove4_4) {
-            const interceptor = Interceptor.attach(targets[0].address, {
-                onEnter(args) {
-                    this.modulePath = args[0].readPointer().add(0).readUtf8String();
-                },
-                onLeave() {
-                    if (!this.modulePath.endsWith(moduleName)) return;
-                    setTimeout(() => {
-                        interceptor.detach();
-                    });
-                    resolve(Process.getModuleByName(moduleName));
-                }
-            });
-        } else if (isWindows) {
-            const interceptors = targets.map(target =>
+        } else {
+            const interceptors = Target.targets.map(target =>
                 Interceptor.attach(target.address, {
                     onEnter(args) {
-                        this.modulePath = target.name.endsWith("A") ? args[0].readAnsiString() : args[0].readUtf16String();
+                        this.modulePath = target.readString(args[0]);
                     },
-                    onLeave() {
-                        if (!this.modulePath.endsWith(moduleName)) return;
+                    onLeave(returnValue) {
+                        if (returnValue.isNull() || !this.modulePath || !this.modulePath.endsWith(moduleName)) return;
                         setTimeout(() => interceptors.forEach(i => i.detach()));
                         resolve(Process.getModuleByName(moduleName));
                     }
                 })
             );
-        } else if (isDarwin) {
-            const interceptor = Interceptor.attach(targets[0].address, {
-                onEnter(args) {
-                    this.modulePath = args[0].readUtf8String();
-                },
-                onLeave(returnValue) {
-                    if (returnValue.isNull() || !this.modulePath || this.modulePath != moduleName) return;
-                    setTimeout(() => interceptor.detach());
-                    resolve(Process.getModuleByName(moduleName));
-                }
-            });
         }
     });
 }
 
-const isAndroid = (() => {
-    try {
-        const _ = Java.androidVersion;
-        return true;
-    } catch (e) {
-        return false;
+type StringEncoding = "utf8" | "utf16" | "ansi";
+
+class Target {
+    readonly address: NativePointer;
+
+    private constructor(responsible: string | null, name: string, readonly stringEncoding: StringEncoding) {
+        this.address = Module.findExportByName(responsible, name) ?? NULL;
     }
-})();
-const isAndroidAbove6_0 = isAndroid && ["11", "10", "9", "8.1", "8.0", "7.1", "7.0", "6.0"].includes(Java.androidVersion);
-const isAndroidAbove5_1 = isAndroid && ["5.1.1", "5.1"].includes(Java.androidVersion);
-const isAndroidAbove4_4 = isAndroid && ["5.0.2", "5.0.1", "4.4.4", "4.4.3", "4.4.2", "4.4.1", "4.4"].includes(Java.androidVersion);
 
-const isWindows = Process.platform == "windows";
-const isDarwin = Process.platform == "darwin";
-
-let getTargets = (): (ModuleExportDetails | ModuleSymbolDetails)[] => {
-    if (isAndroid) {
-        if (!isAndroidAbove6_0 && !isAndroidAbove5_1 && !isAndroidAbove4_4) {
-            throw new Error(`Android version ${Java.androidVersion} is not supported.`);
+    @cache
+    static get targets() {
+        function info(): [string | null, ...[string, StringEncoding][]] {
+            switch (Process.platform) {
+                case "linux":
+                    try {
+                        const _ = Java.androidVersion;
+                        return ["libdl.so", ["dlopen", "utf8"], ["android_dlopen_ext", "utf8"]];
+                    } catch (e) {
+                        return [null, ["dlopen", "utf8"]];
+                    }
+                case "darwin":
+                    return ["libdyld.dylib", ["dlopen", "utf8"]];
+                case "windows":
+                    const ll = "LoadLibrary";
+                    return ["kernel32.dll", [`${ll}W`, "utf16"], [`${ll}ExW`, "utf16"], [`${ll}A`, "ansi"], [`${ll}ExA`, "ansi"]];
+                case "qnx":
+                default:
+                    platformNotSupported();
+            }
         }
-        const responsible = Process.getModuleByName(Process.pointerSize == 4 ? "linker" : "linker64");
-        const targetName = isAndroidAbove6_0 ? "get_realpath" : isAndroidAbove5_1 ? "PrelinkImage" : "soinfo_link_image";
-        return [responsible.enumerateSymbols().find(e => e.name.includes(targetName))!];
-    } else if (isWindows) {
-        const responsible = Process.getModuleByName("kernel32.dll");
-        const targets = ["LoadLibraryA", "LoadLibraryExA", "LoadLibraryW", "LoadLibraryExW"];
-        return responsible.enumerateExports().filter(e => targets.includes(e.name));
-    } else if (isDarwin) {
-        const responsible = Process.getModuleByName("libdyld.dylib");
-        return [responsible.enumerateExports().find(e => e.name == "dlopen")!];
+
+        const [responsible, ...targets] = info();
+        return targets.map(([name, encoding]) => new Target(responsible, name, encoding)).filter(target => !target.address.isNull());
     }
 
-    platformNotSupported();
-};
+    readString(pointer: NativePointer) {
+        switch (this.stringEncoding) {
+            case "utf8":
+                return pointer.readUtf8String();
+            case "utf16":
+                return pointer.readUtf16String();
+            case "ansi":
+                return pointer.readAnsiString();
+        }
+    }
+}

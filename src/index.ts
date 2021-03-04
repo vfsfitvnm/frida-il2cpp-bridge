@@ -1,5 +1,5 @@
 import UnityVersion from "./utils/unity-version";
-import { forModule, onModuleLoad } from "./utils/native-wait";
+import { forModule } from "./utils/native-wait";
 import { inform, ok, raise, warn } from "./utils/console";
 import { cache } from "decorator-cache-getter";
 import Api from "./api";
@@ -92,14 +92,15 @@ module Il2Cpp {
      *
      */
     export function dump(domain: Domain, filename: string) {
-        let content = "";
+        const file = new File(filename, "w");
+
+        // let content = "";
         for (const assembly of domain.assemblies) {
             inform(`Dumping ${assembly.name}...`);
-            for (const klass of assembly.image.classes) content += klass.toString();
+            for (const klass of assembly.image.classes) file.write(klass.toString());
         }
 
-        const file = new File(filename, "w");
-        file.write(content);
+        // file.write(content);
         file.flush();
         file.close();
         ok(`Dump saved to ${filename}.`);
@@ -755,7 +756,7 @@ module Il2Cpp {
                     text += parameter.type.name + " " + parameter.name;
                 }
                 text += ");";
-                if (!method.actualPointer.isNull()) text += "// " + method.relativePointerAsString + ";";
+                if (!method.actualPointer.isNull()) text += " // " + method.relativePointerAsString + ";";
             }
             text += "\n}\n\n";
             return text;
@@ -1951,7 +1952,7 @@ module Il2Cpp {
             case TypeEnum.SZARRAY:
                 return value instanceof Array;
             default:
-                raise(`isCoherent: case for "${type.name}" (${TypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`);
+                raise(`isCoherent: "${type.name}" (${TypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!`);
         }
     }
 
@@ -2002,9 +2003,7 @@ module Il2Cpp {
             case TypeEnum.SZARRAY:
                 return new Array(pointer.readPointer());
             default:
-                raise(
-                    `readFieldValue: case for "${type.name}" (${TypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`
-                );
+                raise(`readFieldValue: "${type.name}" (${TypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!`);
         }
     }
 
@@ -2080,9 +2079,7 @@ module Il2Cpp {
                 pointer.writePointer((value as Array<AllowedType>).handle);
                 break;
             default:
-                raise(
-                    `writeFieldValue: case for "${type.name}" (${TypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`
-                );
+                raise(`writeFieldValue: "${type.name}" (${TypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!`);
         }
     }
 
@@ -2133,9 +2130,7 @@ module Il2Cpp {
             case TypeEnum.SZARRAY:
                 return new Array(pointer);
             default:
-                raise(
-                    `readRawValue: case for "${type.name}" (${TypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`
-                );
+                raise(`readRawValue: "${type.name}" (${TypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!`);
         }
     }
 
@@ -2191,9 +2186,7 @@ module Il2Cpp {
             case TypeEnum.SZARRAY:
                 return (value as Array<AllowedType>).handle;
             default:
-                raise(
-                    `allocRawValue: case for "${type.name}" (${TypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!)`
-                );
+                raise(`allocRawValue: "${type.name}" (${TypeEnum[type.typeEnum]}) has not been handled yet. Please file an issue!`);
         }
     }
 }

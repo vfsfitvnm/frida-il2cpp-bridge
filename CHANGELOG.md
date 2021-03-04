@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.15]
+
+### Fixed
+- A couple of typos.
+
+### Changed
+- License (now is MIT).
+- Dependencies refactoring.
+
 ## [0.1.13]
 
 ### Added
@@ -74,7 +83,8 @@
   constructor explicitly.
 
 
-[0.1.13]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/fe8e02a..HEAD
+[0.1.15]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/60c4ac7..HEAD
+[0.1.13]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/fe8e02a..60c4ac7
 [0.1.12]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/a6a202a..fe8e02a
 [0.1.9]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/4d1a678..a6a202a
 [0.1.8]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/667237d..4d1a678

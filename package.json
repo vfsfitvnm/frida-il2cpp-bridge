@@ -16,7 +16,7 @@
     "build": "tsc"
   },
   "author": "vfsfitvnm",
-  "license": "LICENSE",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "https://github.com/vfsfitvnm/frida-il2cpp-bridge.git"
