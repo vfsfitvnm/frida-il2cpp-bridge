@@ -406,6 +406,7 @@ export default class Api {
 
     @cache
     static get _stringNew() {
+        console.warn("_stringNew!!");
         return createNF(this.r`string_new`, "pointer", ["utf8string"]);
     }
 
