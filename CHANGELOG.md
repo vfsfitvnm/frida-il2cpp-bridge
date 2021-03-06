@@ -97,8 +97,8 @@
   constructor explicitly.
 
 
-[0.2.0]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/60c4ac7..HEAD
-[0.1.15]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/60c4ac7..HEAD
+[0.2.0]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/76f0451..HEAD
+[0.1.15]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/60c4ac7..76f0451
 [0.1.13]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/fe8e02a..60c4ac7
 [0.1.12]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/a6a202a..fe8e02a
 [0.1.9]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/4d1a678..a6a202a
