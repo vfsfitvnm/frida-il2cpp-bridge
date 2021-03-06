@@ -1,32 +1,5 @@
-import { platformNotSupported } from "./helpers";
 import { cache } from "decorator-cache-getter";
-
-/**
- * @internal
- * It waits for a `Module` to be loaded.
- * @param moduleName The name of the target module.
- */
-export function forModule(moduleName: string) {
-    return new Promise<Module>(resolve => {
-        const module = Process.findModuleByName(moduleName);
-        if (module) {
-            resolve(module);
-        } else {
-            const interceptors = Target.targets.map(target =>
-                Interceptor.attach(target.address, {
-                    onEnter(args) {
-                        this.modulePath = target.readString(args[0]);
-                    },
-                    onLeave(returnValue) {
-                        if (returnValue.isNull() || !this.modulePath || !this.modulePath.endsWith(moduleName)) return;
-                        setTimeout(() => interceptors.forEach(i => i.detach()));
-                        resolve(Process.getModuleByName(moduleName));
-                    }
-                })
-            );
-        }
-    });
-}
+import { platformNotSupported } from "./console";
 
 type StringEncoding = "utf8" | "utf16" | "ansi";
 
@@ -73,4 +46,31 @@ class Target {
                 return pointer.readAnsiString();
         }
     }
+}
+
+/**
+ * @internal
+ * It waits for a `Module` to be loaded.
+ * @param moduleName The name of the target module.
+ */
+export function forModule(moduleName: string) {
+    return new Promise<Module>(resolve => {
+        const module = Process.findModuleByName(moduleName);
+        if (module) {
+            resolve(module);
+        } else {
+            const interceptors = Target.targets.map(target =>
+                Interceptor.attach(target.address, {
+                    onEnter(args) {
+                        this.modulePath = target.readString(args[0]);
+                    },
+                    onLeave(returnValue) {
+                        if (returnValue.isNull() || !this.modulePath || !this.modulePath.endsWith(moduleName)) return;
+                        setTimeout(() => interceptors.forEach(i => i.detach()));
+                        resolve(Process.getModuleByName(moduleName));
+                    }
+                })
+            );
+        }
+    });
 }

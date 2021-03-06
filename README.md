@@ -1,15 +1,14 @@
 # frida-il2cpp-bridge
-[Frida](https://frida.re/) module to dump, manipulate and hijack any IL2CPP application at runtime with a high level of abstraction.
+[Frida](https://frida.re/) module to dump, manipulate and hijack any IL2CPP application at runtime with a high level
+ of abstraction, without needing the `global-metadata.dat` file.
 
 ```ts
-import "frida-il2cpp-bridge";
+import { Il2Cpp } from "frida-il2cpp-bridge";
 
 async function main() {
     await Il2Cpp.initialize();
-
-    const domain = await Il2Cpp.Domain.get();
     
-    const TestAssembly = domain.assemblies["Test.Assembly"].image;
+    const TestAssembly = Il2Cpp.domain.assemblies["Test.Assembly"].image;
     
     TestAssembly.classes.TestClass.methods.testMethod.intercept({
         onLeave(returnValue) { 
@@ -55,11 +54,12 @@ First things first: read the [docs](https://vfsfitvnm.github.io/frida-il2cpp-bri
 
 ##### Initialization
 ```ts
-import "frida-il2cpp-bridge";;
+import { Il2Cpp } from "frida-il2cpp-bridge";
 
 async function main() {
     await Il2Cpp.initialize();
-    const domain = await Il2Cpp.Domain.get();
+    // For REPL:
+    // (global as any).Il2Cpp = Il2Cpp;
 }
 
 main().catch(error => console.log(error.stack));

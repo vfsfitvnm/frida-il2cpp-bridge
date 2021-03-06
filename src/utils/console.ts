@@ -31,3 +31,8 @@ export function warn(message: string) {
 export function inform(message: string) {
     console.log(BLUE + " " + message);
 }
+
+/** @internal */
+export function platformNotSupported(): never {
+    raise(`Platform "${Process.platform}" is not supported yet.`);
+}
