@@ -67,7 +67,7 @@ main().catch(error => console.log(error.stack));
 
 ##### Dump
 ```ts
-Il2Cpp.dump(domain, "/full/path/to/file.cs");
+Il2Cpp.dump("/full/path/to/file.cs");
 ```
 This will produce something like:
 ```cs
@@ -99,7 +99,7 @@ Il2Cpp.choose2<Il2Cpp.Array<Il2Cpp.Object>>(YourArrayClass).forEach(instance => 
 
 ##### Print all strings
 ```ts
-const corlib = domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
 const StringClass = corlib.classes["System.String"];
 
 Il2Cpp.choose<Il2Cpp.String>(StringClass).forEach(str => {
@@ -119,7 +119,7 @@ console.log(str, str.length); // Goodbye 7
 ##### Array manipulation
 It's not possible to add or remove an array element at the moment.
 ```ts
-const corlib = domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
 const StringClass = corlib.classes["System.String"];
 
 const arr = Il2Cpp.Array.from<Il2Cpp.String>(StringClass, [
@@ -137,7 +137,7 @@ console.log(arr.get(0)); // Zero
 
 ##### Class tracing
 ```ts
-const corlib = domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
 const StringClass = corlib.classes["System.String"];
 
 StringClass.trace();
@@ -156,7 +156,7 @@ You can trace single methods as well.
 ##### Method interception
 You can replace any of the parameters and the return value by reassigning them.
 ```ts
-const corlib = domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
 const StringClass = corlib.classes["System.String"];
 
 StringClass.methods.IsNullOrEmpty.intercept({
