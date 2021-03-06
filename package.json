@@ -1,6 +1,6 @@
 {
   "name": "frida-il2cpp-bridge",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Frida module to dump, manipulate and hijack any IL2CPP application at runtime with a high level of abstraction.",
   "keywords": [
     "frida",
@@ -10,7 +10,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "/dist/index.js"
+    "/dist/*"
   ],
   "scripts": {
     "docs": "typedoc --mode file --readme none --theme minimal --excludeNotDocumented && touch ./docs/.nojekyll && chromium ./docs/index.html",
