@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.0]
+
+### Added
+- The app `Il2Cpp.Domain` is now directly exposed as a property (`Il2Cpp.domain`). No more need of doing `await
+ Il2Cpp.Domain.get()`.
+
+### Removed
+- TypeDoc documentation.
+
+### Changed
+- Huge module refactoring.
+- `Il2Cpp` is not global anymore (lol). Use `import { Il2Cpp } from "frida-il2cpp-bridge"`;
+- `Il2Cpp.choose` and `Il2Cpp.choose2` are now static methods of `Il2Cpp.GC`.
+
 ## [0.1.15]
 
 ### Fixed
@@ -83,6 +97,7 @@
   constructor explicitly.
 
 
+[0.2.0]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/60c4ac7..HEAD
 [0.1.15]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/60c4ac7..HEAD
 [0.1.13]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/fe8e02a..60c4ac7
 [0.1.12]: https://github.com/vfsfitvnm/frida-il2cpp-bridge/compare/a6a202a..fe8e02a
