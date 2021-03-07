@@ -1,11 +1,13 @@
 import { cache } from "decorator-cache-getter";
-import { Api } from "../api";
-import { Il2CppObject } from "./object";
-import { Il2CppClass } from "./class";
-import { readFieldValue, writeFieldValue } from "../utils";
-import { AllowedType } from "../types";
-import { NativeStruct } from "../native-struct";
-import { checkOutOfBounds, nonNullHandle } from "../decorators";
+
+import { Api } from "il2cpp/api";
+import { checkOutOfBounds, nonNullHandle } from "il2cpp/decorators";
+import { NativeStruct } from "il2cpp/native-struct";
+import { AllowedType } from "il2cpp/types";
+import { readFieldValue, writeFieldValue } from "il2cpp/utils";
+
+import { _Il2CppClass } from "./class";
+import { _Il2CppObject } from "./object";
 
 /**
  * Represents a `Il2CppArraySize`.
@@ -39,7 +41,7 @@ import { checkOutOfBounds, nonNullHandle } from "../decorators";
  * ```
  */
 @nonNullHandle
-export class Il2CppArray<T extends AllowedType> extends NativeStruct implements Iterable<T> {
+export class _Il2CppArray<T extends AllowedType> extends NativeStruct implements Iterable<T> {
     /**
      * @return The size of each element.
      */
@@ -70,7 +72,7 @@ export class Il2CppArray<T extends AllowedType> extends NativeStruct implements 
      * @return The same array as an object.
      */
     @cache get object() {
-        return new Il2CppObject(this.handle);
+        return new _Il2CppObject(this.handle);
     }
 
     /**
@@ -79,9 +81,9 @@ export class Il2CppArray<T extends AllowedType> extends NativeStruct implements 
      * @param elements The elements.
      * @return A new array.
      */
-    static from<T extends AllowedType>(klass: Il2CppClass, elements: T[]) {
+    static from<T extends AllowedType>(klass: _Il2CppClass, elements: T[]) {
         const handle = Api._arrayNew(klass.handle, elements.length);
-        const array = new Il2CppArray<T>(handle);
+        const array = new _Il2CppArray<T>(handle);
         elements.forEach((e, i) => array.set(i, e));
         return array;
     }

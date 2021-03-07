@@ -1,10 +1,13 @@
 import { cache } from "decorator-cache-getter";
-import { Il2CppClass } from "./class";
-import { Api } from "../api";
-import { raise } from "../../utils/console";
-import { filterAndMap } from "../../utils/accessor";
-import { Il2CppValueType } from "./value-type";
-import { NativeStruct } from "../native-struct";
+
+import { filterAndMap } from "utils/accessor";
+import { raise } from "utils/logger";
+
+import { Api } from "il2cpp/api";
+import { NativeStruct } from "il2cpp/native-struct";
+
+import { _Il2CppClass } from "./class";
+import { _Il2CppValueType } from "./value-type";
 
 /**
  * Represents a `Il2CppObject`.
@@ -30,7 +33,7 @@ import { NativeStruct } from "../native-struct";
  * assert(!vecBoxed.handle.equals(vec.handle));
  * ```
  */
-export class Il2CppObject extends NativeStruct {
+export class _Il2CppObject extends NativeStruct {
     /** @internal */
     @cache
     static get headerSize() {
@@ -45,7 +48,7 @@ export class Il2CppObject extends NativeStruct {
             raise(`Class "${this.class.type.name}" has no parent.`);
         }
 
-        const object = new Il2CppObject(this.handle);
+        const object = new _Il2CppObject(this.handle);
         Reflect.defineProperty(object, "class", { get: () => this.class.parent! });
         return object;
     }
@@ -54,11 +57,11 @@ export class Il2CppObject extends NativeStruct {
      * @return Its class.
      */
     @cache get class() {
-        return new Il2CppClass(Api._objectGetClass(this.handle));
+        return new _Il2CppClass(Api._objectGetClass(this.handle));
     }
 
     /**
-     * See {@link Il2CppClass.fields} for an example.
+     * See {@link _Il2CppClass.fields} for an example.
      * @return Its fields.
      */
     @cache get fields() {
@@ -69,7 +72,7 @@ export class Il2CppObject extends NativeStruct {
     }
 
     /**
-     * See {@link Il2CppClass.methods} for an example.
+     * See {@link _Il2CppClass.methods} for an example.
      * @return Its methods.
      */
     @cache get methods() {
@@ -84,8 +87,8 @@ export class Il2CppObject extends NativeStruct {
      * @param klass The class of the object to allocate.
      * @return A new object.
      */
-    static from(klass: Il2CppClass) {
-        return new Il2CppObject(Api._objectNew(klass.handle));
+    static from(klass: _Il2CppClass) {
+        return new _Il2CppObject(Api._objectNew(klass.handle));
     }
 
     /**
@@ -93,6 +96,6 @@ export class Il2CppObject extends NativeStruct {
      */
     unbox() {
         if (!this.class.isStruct) raise(`Cannot unbox a non value type object of class "${this.class.type.name}"`);
-        return new Il2CppValueType(Api._objectUnbox(this.handle), this.class);
+        return new _Il2CppValueType(Api._objectUnbox(this.handle), this.class);
     }
 }

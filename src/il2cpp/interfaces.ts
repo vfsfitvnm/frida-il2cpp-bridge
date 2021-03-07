@@ -19,7 +19,7 @@ export interface Valuable {
  */
 export interface Invokable {
     /**
-     * See {@link Il2CppMethod.invoke}.
+     * See {@link _Il2CppMethod.invoke}.
      */
     invoke<T extends AllowedType>(...parameters: AllowedType[]): T;
 }

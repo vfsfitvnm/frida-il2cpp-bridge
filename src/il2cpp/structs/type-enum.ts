@@ -1,7 +1,7 @@
 /**
  * Represents the enum `Il2CppTypeEnum`.
  */
-export enum Il2CppTypeEnum {
+export enum _Il2CppTypeEnum {
     END = 0x00,
     VOID = 0x01,
     BOOLEAN = 0x02,

@@ -1,8 +1,10 @@
 import { cache } from "decorator-cache-getter";
-import { Api } from "../api";
-import { Il2CppImage } from "./image";
-import { nonNullHandle, since } from "../decorators";
-import { NativeStruct } from "../native-struct";
+
+import { Api } from "il2cpp/api";
+import { nonNullHandle, since } from "il2cpp/decorators";
+import { NativeStruct } from "il2cpp/native-struct";
+
+import { _Il2CppImage } from "./image";
 
 /**
  * Represents a `Il2CppAssembly`.
@@ -12,12 +14,12 @@ import { NativeStruct } from "../native-struct";
  * ```
  */
 @nonNullHandle
-export class Il2CppAssembly extends NativeStruct {
+export class _Il2CppAssembly extends NativeStruct {
     /**
      * @return Its image.
      */
     @cache get image() {
-        return new Il2CppImage(Api._assemblyGetImage(this.handle));
+        return new _Il2CppImage(Api._assemblyGetImage(this.handle));
     }
 
     /**

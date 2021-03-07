@@ -1,13 +1,15 @@
-import { raise } from "../utils/console";
-import { unityVersion } from "./variables";
-import { Il2CppMethod } from "./structs/method";
-import { Il2CppField } from "./structs/field";
+import { raise } from "utils/logger";
+
 import { AllowedType } from "./types";
-import { Il2CppArray } from "./structs/array";
 import { NativeStruct } from "./native-struct";
+import { unityVersion } from "./variables";
+
+import { _Il2CppArray } from "./structs/array";
+import { _Il2CppField } from "./structs/field";
+import { _Il2CppMethod } from "./structs/method";
 
 /** @internal */
-export function shouldBeInstance<T extends Il2CppField | Il2CppMethod>(shouldBeInstance: boolean): MethodDecorator {
+export function shouldBeInstance<T extends _Il2CppField | _Il2CppMethod>(shouldBeInstance: boolean): MethodDecorator {
     return function (_: Object, __: PropertyKey, descriptor: PropertyDescriptor) {
         const fn = descriptor.value ?? descriptor.get ?? descriptor.set;
         const key = descriptor.value ? "value" : descriptor.get ? "get" : "set";
@@ -35,7 +37,7 @@ export function since(version: string): MethodDecorator {
 }
 
 /** @internal */
-export function nonNullMethodPointer<T extends Il2CppMethod>(_: T, propertyKey: PropertyKey, descriptor: PropertyDescriptor) {
+export function nonNullMethodPointer<T extends _Il2CppMethod>(_: T, propertyKey: PropertyKey, descriptor: PropertyDescriptor) {
     const fn = descriptor.value ?? descriptor.get ?? descriptor.set;
     const key = descriptor.value ? "value" : descriptor.get ? "get" : "set";
     descriptor[key] = function (this: T, ...args: any[]) {
@@ -47,7 +49,7 @@ export function nonNullMethodPointer<T extends Il2CppMethod>(_: T, propertyKey: 
 }
 
 /** @internal */
-export function checkOutOfBounds<T extends Il2CppArray<AllowedType>>(_: T, __: PropertyKey, descriptor: PropertyDescriptor) {
+export function checkOutOfBounds<T extends _Il2CppArray<AllowedType>>(_: T, __: PropertyKey, descriptor: PropertyDescriptor) {
     const fn = descriptor.value;
     descriptor.value = function (this: T, ...args: any[]) {
         const index = args[0];

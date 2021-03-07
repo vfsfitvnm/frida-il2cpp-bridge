@@ -1,17 +1,20 @@
 import { cache } from "decorator-cache-getter";
-import { inform, raise, warn } from "../../utils/console";
-import { Api } from "../api";
-import { Il2CppClass } from "./class";
-import { Accessor, filterAndMap } from "../../utils/accessor";
-import { Il2CppObject } from "./object";
-import { Il2CppParameter } from "./parameter";
-import { Il2CppType } from "./type";
-import { allocRawValue, readRawValue } from "../utils";
-import { library, unityVersion } from "../variables";
-import { AllowedType, ImplementationCallback, OnEnterCallback, OnLeaveCallback } from "../types";
-import { Invokable, Valuable } from "../interfaces";
-import { nonNullHandle, shouldBeInstance } from "../decorators";
-import { NativeStruct } from "../native-struct";
+
+import { Accessor, filterAndMap } from "utils/accessor";
+import { inform, raise, warn } from "utils/logger";
+
+import { Api } from "il2cpp/api";
+import { nonNullHandle, shouldBeInstance } from "il2cpp/decorators";
+import { Invokable, Valuable } from "il2cpp/interfaces";
+import { NativeStruct } from "il2cpp/native-struct";
+import { library, unityVersion } from "il2cpp/variables";
+import { allocRawValue, readRawValue } from "il2cpp/utils";
+import { AllowedType, ImplementationCallback, OnEnterCallback, OnLeaveCallback } from "il2cpp/types";
+
+import { _Il2CppClass } from "./class";
+import { _Il2CppObject } from "./object";
+import { _Il2CppType } from "./type";
+import { _Il2CppParameter } from "./parameter";
 
 /**
  * Represents a `MethodInfo`.
@@ -43,7 +46,7 @@ import { NativeStruct } from "../native-struct";
  * ```
  */
 @nonNullHandle
-export class Il2CppMethod extends NativeStruct {
+export class _Il2CppMethod extends NativeStruct {
     /**
      * ```typescript
      * const MathClass = mscorlib.classes["System.Math"];
@@ -61,7 +64,7 @@ export class Il2CppMethod extends NativeStruct {
      * @return The class it belongs to.
      */
     @cache get class() {
-        return new Il2CppClass(Api._methodGetClass(this.handle));
+        return new _Il2CppClass(Api._methodGetClass(this.handle));
     }
 
     /**
@@ -113,11 +116,11 @@ export class Il2CppMethod extends NativeStruct {
      */
     @cache get parameters() {
         const iterator = Memory.alloc(Process.pointerSize);
-        const accessor = new Accessor<Il2CppParameter>();
+        const accessor = new Accessor<_Il2CppParameter>();
         let handle: NativePointer;
-        let parameter: Il2CppParameter;
+        let parameter: _Il2CppParameter;
         while (!(handle = Api._methodGetParameters(this.handle, iterator)).isNull()) {
-            parameter = new Il2CppParameter(handle);
+            parameter = new _Il2CppParameter(handle);
             accessor[parameter.name!] = parameter;
         }
         return accessor;
@@ -134,7 +137,7 @@ export class Il2CppMethod extends NativeStruct {
      * @return Its return type.
      */
     @cache get returnType() {
-        return new Il2CppType(Api._methodGetReturnType(this.handle));
+        return new _Il2CppType(Api._methodGetReturnType(this.handle));
     }
 
     /** @internal */
@@ -180,7 +183,7 @@ export class Il2CppMethod extends NativeStruct {
         const methodInfo = this;
 
         const replaceCallback: NativeCallbackImplementation = function (...invocationArguments: any[]) {
-            const instance = methodInfo.isInstance ? new Il2CppObject(invocationArguments[0]) : null;
+            const instance = methodInfo.isInstance ? new _Il2CppObject(invocationArguments[0]) : null;
             const startIndex = +methodInfo.isInstance | +unityVersion.isLegacy;
             const args = methodInfo.parameters[filterAndMap](
                 () => true,
@@ -254,7 +257,7 @@ export class Il2CppMethod extends NativeStruct {
         if (onEnter != undefined) {
             const methodInfo = this;
             interceptorCallbacks.onEnter = function (invocationArguments) {
-                const instance = methodInfo.isInstance ? new Il2CppObject(invocationArguments[0]) : null;
+                const instance = methodInfo.isInstance ? new _Il2CppObject(invocationArguments[0]) : null;
                 const startIndex = +methodInfo.isInstance | +unityVersion.isLegacy;
                 const args = methodInfo.parameters[filterAndMap](
                     () => true,

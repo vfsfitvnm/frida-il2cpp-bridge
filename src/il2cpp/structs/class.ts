@@ -1,15 +1,18 @@
 import { cache } from "decorator-cache-getter";
-import { Api } from "../api";
-import { getOrNull } from "../utils";
-import { Accessor } from "../../utils/accessor";
-import { Il2CppType } from "./type";
-import { Il2CppField } from "./field";
-import { Il2CppGenericClass } from "./generic-class";
-import { Il2CppImage } from "./image";
-import { Il2CppMethod } from "./method";
-import { Il2CppTypeEnum } from "./type-enum";
-import { NativeStruct } from "../native-struct";
-import { nonNullHandle } from "../decorators";
+
+import { Accessor } from "utils/accessor";
+
+import { Api } from "il2cpp/api";
+import { nonNullHandle } from "il2cpp/decorators";
+import { NativeStruct } from "il2cpp/native-struct";
+import { getOrNull } from "il2cpp/utils";
+
+import { _Il2CppField } from "./field";
+import { _Il2CppGenericClass } from "./generic-class";
+import { _Il2CppImage } from "./image";
+import { _Il2CppMethod } from "./method";
+import { _Il2CppType } from "./type";
+import { _Il2CppTypeEnum } from "./type-enum";
 
 /**
  * Represents a `Il2CppClass`.
@@ -71,13 +74,13 @@ import { nonNullHandle } from "../decorators";
  * ```
  */
 @nonNullHandle
-export class Il2CppClass extends NativeStruct {
+export class _Il2CppClass extends NativeStruct {
     /**
-     * The inverse of {@link Il2CppClass.elementClass}.
+     * The inverse of {@link _Il2CppClass.elementClass}.
      * @return The array class which has the caller as element class.
      */
     @cache get arrayClass() {
-        return new Il2CppClass(Api._classGetArrayClass(this.handle, 1));
+        return new _Il2CppClass(Api._classGetArrayClass(this.handle, 1));
     }
 
     /**
@@ -109,14 +112,14 @@ export class Il2CppClass extends NativeStruct {
      * @return Its outer class if its a nested class, `null` otherwise.
      */
     @cache get declaringClass() {
-        return getOrNull(Api._classGetDeclaringType(this.handle), Il2CppClass);
+        return getOrNull(Api._classGetDeclaringType(this.handle), _Il2CppClass);
     }
 
     /**
      * Its element class if it's an array.
      */
     @cache get elementClass() {
-        return getOrNull(Api._classGetElementClass(this.handle), Il2CppClass);
+        return getOrNull(Api._classGetElementClass(this.handle), _Il2CppClass);
     }
 
     /**
@@ -139,11 +142,11 @@ export class Il2CppClass extends NativeStruct {
      */
     @cache get fields() {
         const iterator = Memory.alloc(Process.pointerSize);
-        const accessor = new Accessor<Il2CppField>();
+        const accessor = new Accessor<_Il2CppField>();
         let handle: NativePointer;
-        let field: Il2CppField;
+        let field: _Il2CppField;
         while (!(handle = Api._classGetFields(this.handle, iterator)).isNull()) {
-            field = new Il2CppField(handle);
+            field = new _Il2CppField(handle);
             accessor[field.name!] = field;
         }
         return accessor;
@@ -153,7 +156,7 @@ export class Il2CppClass extends NativeStruct {
      * @returns If it's a generic class, its generic class, `null` otherwise.
      */
     @cache get genericClass() {
-        return getOrNull(Api._classGetGenericClass(this.handle), Il2CppGenericClass);
+        return getOrNull(Api._classGetGenericClass(this.handle), _Il2CppGenericClass);
     }
 
     /**
@@ -167,7 +170,7 @@ export class Il2CppClass extends NativeStruct {
      * @return The image it belongs to.
      */
     @cache get image() {
-        return new Il2CppImage(Api._classGetImage(this.handle));
+        return new _Il2CppImage(Api._classGetImage(this.handle));
     }
 
     /**
@@ -226,11 +229,11 @@ export class Il2CppClass extends NativeStruct {
      */
     @cache get interfaces() {
         const iterator = Memory.alloc(Process.pointerSize);
-        const accessor = new Accessor<Il2CppClass>();
+        const accessor = new Accessor<_Il2CppClass>();
         let handle: NativePointer;
-        let klass: Il2CppClass;
+        let klass: _Il2CppClass;
         while (!(handle = Api._classGetInterfaces(this.handle, iterator)).isNull()) {
-            klass = new Il2CppClass(handle);
+            klass = new _Il2CppClass(handle);
             accessor[klass.type.name] = klass;
         }
         return accessor;
@@ -256,11 +259,11 @@ export class Il2CppClass extends NativeStruct {
      */
     @cache get methods() {
         const iterator = Memory.alloc(Process.pointerSize);
-        const accessor = new Accessor<Il2CppMethod>(true);
+        const accessor = new Accessor<_Il2CppMethod>(true);
         let handle: NativePointer;
-        let method: Il2CppMethod;
+        let method: _Il2CppMethod;
         while (!(handle = Api._classGetMethods(this.handle, iterator)).isNull()) {
-            method = new Il2CppMethod(handle);
+            method = new _Il2CppMethod(handle);
             accessor[method.name] = method;
         }
         return accessor;
@@ -284,7 +287,7 @@ export class Il2CppClass extends NativeStruct {
      * @return Its parent if there is, `null.` otherwise.
      */
     @cache get parent() {
-        return getOrNull(Api._classGetParent(this.handle), Il2CppClass);
+        return getOrNull(Api._classGetParent(this.handle), _Il2CppClass);
     }
 
     /**
@@ -298,7 +301,7 @@ export class Il2CppClass extends NativeStruct {
      * @return Its type.
      */
     @cache get type() {
-        return new Il2CppType(Api._classGetType(this.handle));
+        return new _Il2CppType(Api._classGetType(this.handle));
     }
 
     /**
@@ -336,9 +339,9 @@ export class Il2CppClass extends NativeStruct {
             text += spacer + (this.isEnum && field.name != "value__" ? "" : field.type.name + " ") + field.name;
             if (field.isLiteral) {
                 text += " = ";
-                if (field.type.typeEnum == Il2CppTypeEnum.STRING) text += '"';
+                if (field.type.typeEnum == _Il2CppTypeEnum.STRING) text += '"';
                 text += field.value;
-                if (field.type.typeEnum == Il2CppTypeEnum.STRING) text += '"';
+                if (field.type.typeEnum == _Il2CppTypeEnum.STRING) text += '"';
             }
             text += this.isEnum && field.name != "value__" ? "," : "; // 0x" + field.offset.toString(16);
         }

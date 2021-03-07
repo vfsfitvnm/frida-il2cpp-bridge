@@ -1,10 +1,12 @@
 import { cache } from "decorator-cache-getter";
-import { Api } from "../api";
-import { Il2CppType } from "./type";
-import { allocRawValue, readRawValue } from "../utils";
-import { Valuable } from "../interfaces";
-import { NativeStruct } from "../native-struct";
-import { nonNullHandle } from "../decorators";
+
+import { Api } from "il2cpp/api";
+import { nonNullHandle } from "il2cpp/decorators";
+import { Valuable } from "il2cpp/interfaces";
+import { NativeStruct } from "il2cpp/native-struct";
+import { allocRawValue, readRawValue } from "il2cpp/utils";
+
+import { _Il2CppType } from "./type";
 
 /**
  * Represents a `ParameterInfo`.
@@ -21,7 +23,7 @@ import { nonNullHandle } from "../decorators";
  * ```
  */
 @nonNullHandle
-export class Il2CppParameter extends NativeStruct {
+export class _Il2CppParameter extends NativeStruct {
     /**
      * @return Its name.
      */
@@ -40,7 +42,7 @@ export class Il2CppParameter extends NativeStruct {
      *  @return Its type.
      */
     @cache get type() {
-        return new Il2CppType(Api._parameterGetType(this.handle));
+        return new _Il2CppType(Api._parameterGetType(this.handle));
     }
 
     /** @internal */

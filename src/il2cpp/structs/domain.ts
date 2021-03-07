@@ -1,10 +1,13 @@
-import { raise } from "../../utils/console";
 import { cache } from "decorator-cache-getter";
-import { Api } from "../api";
-import { Accessor } from "../../utils/accessor";
-import { Il2CppAssembly } from "./assembly";
-import { NativeStruct } from "../native-struct";
-import { nonNullHandle } from "../decorators";
+
+import { Accessor } from "utils/accessor";
+import { raise } from "utils/logger";
+
+import { Api } from "il2cpp/api";
+import { NativeStruct } from "il2cpp/native-struct";
+import { nonNullHandle } from "il2cpp/decorators";
+
+import { _Il2CppAssembly } from "./assembly";
 
 /**
  * Represents a `Il2CppDomain`.
@@ -13,7 +16,7 @@ import { nonNullHandle } from "../decorators";
  * ```
  */
 @nonNullHandle
-export class Il2CppDomain extends NativeStruct {
+export class _Il2CppDomain extends NativeStruct {
     /**
      * @return Its name. Probably `IL2CPP Root Domain`.
      */
@@ -32,7 +35,7 @@ export class Il2CppDomain extends NativeStruct {
      * @return Its assemblies.
      */
     @cache get assemblies() {
-        const accessor = new Accessor<Il2CppAssembly>();
+        const accessor = new Accessor<_Il2CppAssembly>();
 
         const sizePointer = Memory.alloc(Process.pointerSize);
         const startPointer = Api._domainGetAssemblies(NULL, sizePointer);
@@ -44,7 +47,7 @@ export class Il2CppDomain extends NativeStruct {
         const count = sizePointer.readInt();
 
         for (let i = 0; i < count; i++) {
-            const assembly = new Il2CppAssembly(startPointer.add(i * Process.pointerSize).readPointer());
+            const assembly = new _Il2CppAssembly(startPointer.add(i * Process.pointerSize).readPointer());
             accessor[assembly.name!] = assembly;
         }
         return accessor;
@@ -78,7 +81,7 @@ export class Il2CppDomain extends NativeStruct {
                 }
             });
             Api._threadAttach(domainPointer);
-            return new Il2CppDomain(domainPointer);
+            return new _Il2CppDomain(domainPointer);
         })();
     }
 }

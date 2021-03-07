@@ -1,7 +1,9 @@
+import { platformNotSupported, raise } from "utils/logger";
+import { forModule } from "utils/native-wait";
+
 import { UnityVersion } from "./version";
-import { forModule } from "../utils/native-wait";
-import { platformNotSupported, raise } from "../utils/console";
-import { Il2CppDomain } from "./structs/domain";
+
+import { _Il2CppDomain } from "./structs/domain";
 
 /**
  * The Il2Cpp library (`libil2cpp.so`, `GameAssembly.dll` ...).
@@ -19,7 +21,7 @@ export let unityVersion: UnityVersion;
  * Il2Cpp.domain.(...)
  * ```
  */
-export let domain: Il2CppDomain;
+export let domain: _Il2CppDomain;
 
 /**
  * The whole thing must be initialized first.
@@ -43,7 +45,7 @@ export async function initialize() {
 
     library = await forModule(il2CppLibraryName);
     unityVersion = await getUnityVersion();
-    domain = await Il2CppDomain.reference;
+    domain = await _Il2CppDomain.reference;
 }
 
 async function getUnityVersion() {
