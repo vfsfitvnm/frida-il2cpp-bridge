@@ -1,11 +1,11 @@
 import { cache } from "decorator-cache-getter";
 
-import { Accessor } from "utils/accessor";
-import { raise } from "utils/logger";
+import { Accessor } from "../../utils/accessor";
+import { raise } from "../../utils/console";
 
-import { Api } from "il2cpp/api";
-import { NativeStruct } from "il2cpp/native-struct";
-import { nonNullHandle } from "il2cpp/decorators";
+import { Api } from "../api";
+import { NativeStruct } from "../native-struct";
+import { nonNullHandle } from "../decorators";
 
 import { _Il2CppAssembly } from "./assembly";
 

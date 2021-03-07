@@ -14,12 +14,6 @@
     "declarationMap": false,
     "stripInternal": true,
     "removeComments": true,
-    "outDir": "dist",
-    "baseUrl": "src",
-    "paths": {
-      "utils": [
-        "utils/accessor"
-      ]
-    }
+    "outDir": "dist"
   }
 }

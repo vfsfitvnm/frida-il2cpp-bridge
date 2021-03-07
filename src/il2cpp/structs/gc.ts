@@ -1,6 +1,6 @@
-import { Api } from "il2cpp/api";
-import { since } from "il2cpp/decorators";
-import { AllowedType } from "il2cpp/types";
+import { Api } from "../api";
+import { since } from "../decorators";
+import { AllowedType } from "../types";
 
 import { _Il2CppArray } from "./array";
 import { _Il2CppClass } from "./class";

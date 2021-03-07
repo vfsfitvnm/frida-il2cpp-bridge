@@ -1,5 +1,5 @@
-import { platformNotSupported, raise } from "utils/logger";
-import { forModule } from "utils/native-wait";
+import { platformNotSupported, raise } from "../utils/console";
+import { forModule } from "../utils/native-wait";
 
 import { UnityVersion } from "./version";
 

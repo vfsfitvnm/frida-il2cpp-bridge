@@ -1,6 +1,6 @@
 import { cache } from "decorator-cache-getter";
 
-import { platformNotSupported } from "./logger";
+import { platformNotSupported } from "./console";
 
 type StringEncoding = "utf8" | "utf16" | "ansi";
 

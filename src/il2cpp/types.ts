@@ -1,4 +1,4 @@
-import { Accessor } from "utils";
+import { Accessor } from "../utils/accessor";
 
 import { Valuable } from "./interfaces";
 

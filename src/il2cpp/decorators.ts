@@ -1,4 +1,4 @@
-import { raise } from "utils/logger";
+import { raise } from "../utils/console";
 
 import { AllowedType } from "./types";
 import { NativeStruct } from "./native-struct";

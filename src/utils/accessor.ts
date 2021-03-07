@@ -1,5 +1,5 @@
 import { closest } from "fastest-levenshtein";
-import { raise } from "./logger";
+import { raise } from "./console";
 
 /** @internal */
 export const filterAndMap = Symbol();

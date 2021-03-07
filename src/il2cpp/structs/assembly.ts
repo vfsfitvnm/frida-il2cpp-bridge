@@ -1,8 +1,8 @@
 import { cache } from "decorator-cache-getter";
 
-import { Api } from "il2cpp/api";
-import { nonNullHandle, since } from "il2cpp/decorators";
-import { NativeStruct } from "il2cpp/native-struct";
+import { Api } from "../api";
+import { nonNullHandle, since } from "../decorators";
+import { NativeStruct } from "../native-struct";
 
 import { _Il2CppImage } from "./image";
 

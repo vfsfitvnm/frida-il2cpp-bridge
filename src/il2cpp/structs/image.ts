@@ -1,12 +1,12 @@
 import { cache } from "decorator-cache-getter";
 
-import { Accessor } from "utils/accessor";
+import { Accessor } from "../../utils/accessor";
 
-import { Api } from "il2cpp/api";
-import { nonNullHandle } from "il2cpp/decorators";
-import { NativeStruct } from "il2cpp/native-struct";
-import { getOrNull } from "il2cpp/utils";
-import { unityVersion } from "il2cpp/variables";
+import { Api } from "../api";
+import { nonNullHandle } from "../decorators";
+import { NativeStruct } from "../native-struct";
+import { getOrNull } from "../utils";
+import { unityVersion } from "../variables";
 
 import { _Il2CppClass } from "./class";
 import { _Il2CppType } from "./type";
