@@ -1,6 +1,7 @@
-import { Api } from "../api";
-import { Il2CppObject } from "./object";
-import { NativeStruct } from "../native-struct";
+import { Api } from "il2cpp/api";
+import { NativeStruct } from "il2cpp/native-struct";
+
+import { _Il2CppObject } from "./object";
 
 /**
  * Represents a `Il2CppString`.
@@ -19,7 +20,7 @@ import { NativeStruct } from "../native-struct";
  * assert(str.object.class.type.typeEnum == Il2Cpp.TypeEnum.STRING);
  * ```
  */
-export class Il2CppString extends NativeStruct {
+export class _Il2CppString extends NativeStruct {
     /**
      * @return Its actual content.
      */
@@ -48,7 +49,7 @@ export class Il2CppString extends NativeStruct {
      * @return The same string as an object.
      */
     get object() {
-        return new Il2CppObject(this.handle);
+        return new _Il2CppObject(this.handle);
     }
 
     /**
@@ -57,7 +58,7 @@ export class Il2CppString extends NativeStruct {
      * @return A new string.
      */
     static from(content: string) {
-        return new Il2CppString(Api._stringNew(content));
+        return new _Il2CppString(Api._stringNew(content));
     }
 
     /**

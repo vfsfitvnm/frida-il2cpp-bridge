@@ -1,20 +1,22 @@
 import { cache } from "decorator-cache-getter";
-import { Api } from "../api";
-import { getOrNull } from "../utils";
-import { Il2CppClass } from "./class";
-import { NativeStruct } from "../native-struct";
-import { nonNullHandle } from "../decorators";
+
+import { Api } from "il2cpp/api";
+import { nonNullHandle } from "il2cpp/decorators";
+import { NativeStruct } from "il2cpp/native-struct";
+import { getOrNull } from "il2cpp/utils";
+
+import { _Il2CppClass } from "./class";
 
 /**
  * Represents a `Il2CppGenericClass`.
  */
 @nonNullHandle
-export class Il2CppGenericClass extends NativeStruct {
+export class _Il2CppGenericClass extends NativeStruct {
     /**
      * @return Its class.
      */
     @cache get cachedClass() {
-        return getOrNull(Api._genericClassGetCachedClass(this.handle), Il2CppClass);
+        return getOrNull(Api._genericClassGetCachedClass(this.handle), _Il2CppClass);
     }
 
     // /**

@@ -1,12 +1,15 @@
 import { cache } from "decorator-cache-getter";
-import { Api } from "../api";
-import { Il2CppClass } from "./class";
-import { getOrNull } from "../utils";
-import { Accessor } from "../../utils/accessor";
-import { Il2CppType } from "./type";
-import { unityVersion } from "../variables";
-import { NativeStruct } from "../native-struct";
-import { nonNullHandle } from "../decorators";
+
+import { Accessor } from "utils/accessor";
+
+import { Api } from "il2cpp/api";
+import { nonNullHandle } from "il2cpp/decorators";
+import { NativeStruct } from "il2cpp/native-struct";
+import { getOrNull } from "il2cpp/utils";
+import { unityVersion } from "il2cpp/variables";
+
+import { _Il2CppClass } from "./class";
+import { _Il2CppType } from "./type";
 
 /**
  * Represents a `Il2CppImage`.
@@ -27,7 +30,7 @@ import { nonNullHandle } from "../decorators";
  * ```
  */
 @nonNullHandle
-export class Il2CppImage extends NativeStruct {
+export class _Il2CppImage extends NativeStruct {
     /**
      * @return The count of its classes.
      */
@@ -56,20 +59,20 @@ export class Il2CppImage extends NativeStruct {
      * @return Its classes.
      */
     @cache get classes() {
-        const accessor = new Accessor<Il2CppClass>();
+        const accessor = new Accessor<_Il2CppClass>();
         if (unityVersion.isLegacy) {
             const start = this.classStart;
             const end = start + this.classCount;
             const globalIndex = Memory.alloc(Process.pointerSize);
-            globalIndex.add(Il2CppType.offsetOfTypeEnum).writeInt(0x20);
+            globalIndex.add(_Il2CppType.offsetOfTypeEnum).writeInt(0x20);
             for (let i = start; i < end; i++) {
-                const klass = new Il2CppClass(Api._typeGetClassOrElementClass(globalIndex.writeInt(i)));
+                const klass = new _Il2CppClass(Api._typeGetClassOrElementClass(globalIndex.writeInt(i)));
                 accessor[klass.type!.name!] = klass;
             }
         } else {
             const end = this.classCount;
             for (let i = 0; i < end; i++) {
-                const klass = new Il2CppClass(Api._imageGetClass(this.handle, i));
+                const klass = new _Il2CppClass(Api._imageGetClass(this.handle, i));
                 accessor[klass.type.name] = klass;
             }
         }
@@ -91,6 +94,6 @@ export class Il2CppImage extends NativeStruct {
      * not found.
      */
     getClassFromName(namespace: string, name: string) {
-        return getOrNull(Api._classFromName(this.handle, namespace, name), Il2CppClass);
+        return getOrNull(Api._classFromName(this.handle, namespace, name), _Il2CppClass);
     }
 }

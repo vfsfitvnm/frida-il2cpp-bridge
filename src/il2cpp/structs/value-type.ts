@@ -1,9 +1,12 @@
 import { cache } from "decorator-cache-getter";
-import { Api } from "../api";
-import { filterAndMap } from "../../utils/accessor";
-import { Il2CppClass } from "./class";
-import { Il2CppObject } from "./object";
-import { NativeStruct } from "../native-struct";
+
+import { filterAndMap } from "utils/accessor";
+
+import { Api } from "il2cpp/api";
+import { NativeStruct } from "il2cpp/native-struct";
+
+import { _Il2CppClass } from "./class";
+import { _Il2CppObject } from "./object";
 
 /**
  * Abstraction over the a value type (`struct`).
@@ -20,8 +23,8 @@ import { NativeStruct } from "../native-struct";
  * assert(vec.fields.y.value == Infinity);
  * ```
  */
-export class Il2CppValueType extends NativeStruct {
-    constructor(handle: NativePointer, readonly klass: Il2CppClass) {
+export class _Il2CppValueType extends NativeStruct {
+    constructor(handle: NativePointer, readonly klass: _Il2CppClass) {
         super(handle);
     }
 
@@ -40,15 +43,15 @@ export class Il2CppValueType extends NativeStruct {
     @cache get fields() {
         return this.class.fields[filterAndMap](
             field => field.isInstance,
-            field => field.asHeld(this.handle.add(field.offset).sub(Il2CppObject.headerSize))
+            field => field.asHeld(this.handle.add(field.offset).sub(_Il2CppObject.headerSize))
         );
     }
 
     /**
-     * See {@link Il2CppObject.unbox} for an example.
+     * See {@link _Il2CppObject.unbox} for an example.
      * @return The boxed value type.
      */
     box() {
-        return new Il2CppObject(Api._valueBox(this.klass.handle, this.handle));
+        return new _Il2CppObject(Api._valueBox(this.klass.handle, this.handle));
     }
 }

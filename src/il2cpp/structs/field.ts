@@ -1,12 +1,15 @@
 import { cache } from "decorator-cache-getter";
-import { raise } from "../../utils/console";
-import { Api } from "../api";
-import { Il2CppClass } from "./class";
-import { Il2CppType } from "./type";
-import { readFieldValue, writeFieldValue } from "../utils";
-import { Valuable } from "../interfaces";
-import { nonNullHandle, shouldBeInstance } from "../decorators";
-import { NativeStruct } from "../native-struct";
+
+import { raise } from "utils/logger";
+
+import { Api } from "il2cpp/api";
+import { nonNullHandle, shouldBeInstance } from "il2cpp/decorators";
+import { Valuable } from "il2cpp/interfaces";
+import { NativeStruct } from "il2cpp/native-struct";
+import { readFieldValue, writeFieldValue } from "il2cpp/utils";
+
+import { _Il2CppClass } from "./class";
+import { _Il2CppType } from "./type";
 
 /**
  * Represents a `FieldInfo`.
@@ -43,12 +46,12 @@ import { NativeStruct } from "../native-struct";
  * ```
  */
 @nonNullHandle
-export class Il2CppField extends NativeStruct implements Valuable {
+export class _Il2CppField extends NativeStruct implements Valuable {
     /**
      * @return The class it belongs to.
      */
     @cache get class() {
-        return new Il2CppClass(Api._fieldGetClass(this.handle));
+        return new _Il2CppClass(Api._fieldGetClass(this.handle));
     }
 
     /**
@@ -81,7 +84,7 @@ export class Il2CppField extends NativeStruct implements Valuable {
 
     /**
      * A static field offsets is meant as the offset between it's class
-     * {@link Il2CppClass.staticFieldsData} and its location.
+     * {@link _Il2CppClass.staticFieldsData} and its location.
      * A static field offsets is meant as the offset between it's object
      * {@link Object.handle | handle} and its location.
      * @return Its offset.
@@ -94,7 +97,7 @@ export class Il2CppField extends NativeStruct implements Valuable {
      * @return Its type.
      */
     @cache get type() {
-        return new Il2CppType(Api._fieldGetType(this.handle));
+        return new _Il2CppType(Api._fieldGetType(this.handle));
     }
 
     /**

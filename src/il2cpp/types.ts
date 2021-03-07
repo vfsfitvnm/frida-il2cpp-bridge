@@ -1,9 +1,11 @@
-import { Il2CppValueType } from "./structs/value-type";
-import { Il2CppObject } from "./structs/object";
-import { Il2CppString } from "./structs/string";
-import { Il2CppArray } from "./structs/array";
-import { Accessor } from "../utils/accessor";
+import { Accessor } from "utils";
+
 import { Valuable } from "./interfaces";
+
+import { _Il2CppArray } from "./structs/array";
+import { _Il2CppObject } from "./structs/object";
+import { _Il2CppString } from "./structs/string";
+import { _Il2CppValueType } from "./structs/value-type";
 
 /**
  * Types this module is familiar with.
@@ -15,10 +17,10 @@ export type AllowedType =
     | Int64
     | UInt64
     | NativePointer
-    | Il2CppValueType
-    | Il2CppObject
-    | Il2CppString
-    | Il2CppArray<AllowedType>;
+    | _Il2CppValueType
+    | _Il2CppObject
+    | _Il2CppString
+    | _Il2CppArray<AllowedType>;
 
 /**
  * Callback of a method implementation.
@@ -31,7 +33,7 @@ export type ImplementationCallback =
      * @param parameters Invocation parameters.
      * @return The value that should be returned - mandatory.
      */
-    (this: InvocationContext, instance: Il2CppObject | null, parameters: Accessor<Valuable>) => AllowedType;
+    (this: InvocationContext, instance: _Il2CppObject | null, parameters: Accessor<Valuable>) => AllowedType;
 
 /**
  * Callback of a method `onEnter` interception.
@@ -43,7 +45,7 @@ export type OnEnterCallback =
      * method is static.
      * @param parameters Invocation parameters.
      */
-    (this: InvocationContext, instance: Il2CppObject | null, parameters: Accessor<Valuable>) => void;
+    (this: InvocationContext, instance: _Il2CppObject | null, parameters: Accessor<Valuable>) => void;
 
 /**
  * Callback of a method `onLeave` interception.

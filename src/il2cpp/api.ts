@@ -1,6 +1,8 @@
 import { cache } from "decorator-cache-getter";
-import { raise } from "../utils/console";
-import { createNF } from "../utils/extensions";
+
+import { createNF } from "utils/extensions";
+import { raise } from "utils/logger";
+
 import { library, unityVersion } from "./variables";
 
 /** @internal */

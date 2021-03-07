@@ -1,13 +1,14 @@
 import { cache } from "decorator-cache-getter";
-import { Api } from "../api";
-import { NativeStruct } from "../native-struct";
-import { nonNullHandle } from "../decorators";
+
+import { Api } from "il2cpp/api";
+import { nonNullHandle } from "il2cpp/decorators";
+import { NativeStruct } from "il2cpp/native-struct";
 
 /**
  * Represents a `Il2CppMemorySnapshot`.
  */
 @nonNullHandle
-export class Il2CppMemorySnapshot extends NativeStruct {
+export class _Il2CppMemorySnapshot extends NativeStruct {
     constructor() {
         super(Api._memorySnapshotCapture());
     }

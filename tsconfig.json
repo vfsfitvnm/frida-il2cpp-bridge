@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": ["es2020"],
+    "lib": [
+      "es2020"
+    ],
     "module": "commonjs",
     "moduleResolution": "node",
     "experimentalDecorators": true,
@@ -12,6 +14,12 @@
     "declarationMap": false,
     "stripInternal": true,
     "removeComments": true,
-    "outDir": "./dist"
+    "outDir": "dist",
+    "baseUrl": "src",
+    "paths": {
+      "utils": [
+        "utils/accessor"
+      ]
+    }
   }
 }

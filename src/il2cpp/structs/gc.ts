@@ -1,17 +1,18 @@
-import { Api } from "../api";
-import { since } from "../decorators";
-import { Il2CppObject } from "./object";
-import { Il2CppString } from "./string";
-import { Il2CppArray } from "./array";
-import { AllowedType } from "../types";
-import { Il2CppClass } from "./class";
-import { Il2CppTypeEnum } from "./type-enum";
-import { Il2CppMemorySnapshot } from "./memory-snapshot";
+import { Api } from "il2cpp/api";
+import { since } from "il2cpp/decorators";
+import { AllowedType } from "il2cpp/types";
+
+import { _Il2CppArray } from "./array";
+import { _Il2CppClass } from "./class";
+import { _Il2CppMemorySnapshot } from "./memory-snapshot";
+import { _Il2CppObject } from "./object";
+import { _Il2CppString } from "./string";
+import { _Il2CppTypeEnum } from "./type-enum";
 
 /**
  * Garbage collector utility functions.
  */
-export class Il2CppGC {
+export class _Il2CppGC {
     /**
      * Forces the GC to collect object from the given
      * [generation](https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/fundamentals#generations).
@@ -22,7 +23,7 @@ export class Il2CppGC {
     }
 
     /**
-     * Like {@link Il2CppGC.collect | collect}, but I don't know which
+     * Like {@link _Il2CppGC.collect | collect}, but I don't know which
      * generation it collects.
      */
     @since("5.3.5")
@@ -73,13 +74,13 @@ export class Il2CppGC {
      * }
      * ```
      * @template T Type parameter to automatically cast the objects to other object-like
-     * entities, like string and arrays. Default is {@link Il2CppObject}.
+     * entities, like string and arrays. Default is {@link _Il2CppObject}.
      * @param klass The class of the objects you are looking for.
      * @return An array of ready-to-use objects, strings or arrays. Value types are boxed.
      */
-    static choose<T extends Il2CppObject | Il2CppString | Il2CppArray<AllowedType> = Il2CppObject>(klass: Il2CppClass): T[] {
-        const isString = klass.type.typeEnum == Il2CppTypeEnum.STRING;
-        const isArray = klass.type.typeEnum == Il2CppTypeEnum.SZARRAY;
+    static choose<T extends _Il2CppObject | _Il2CppString | _Il2CppArray<AllowedType> = _Il2CppObject>(klass: _Il2CppClass): T[] {
+        const isString = klass.type.typeEnum == _Il2CppTypeEnum.STRING;
+        const isArray = klass.type.typeEnum == _Il2CppTypeEnum.SZARRAY;
 
         const matches: T[] = [];
 
@@ -87,8 +88,8 @@ export class Il2CppGC {
             for (let i = 0; i < size; i++) {
                 const pointer = objects.add(i * Process.pointerSize).readPointer();
 
-                if (isString) matches.push(new Il2CppString(pointer) as T);
-                else if (isArray) matches.push(new Il2CppArray(pointer) as T);
+                if (isString) matches.push(new _Il2CppString(pointer) as T);
+                else if (isArray) matches.push(new _Il2CppArray(pointer) as T);
                 else matches.push(new Object(pointer) as T);
             }
         };
@@ -105,29 +106,29 @@ export class Il2CppGC {
 
     /**
      * It takes a memory snapshot and scans the current tracked objects of the given class.\
-     * It leads to different results if compared to {@link Il2CppGC.choose}.
+     * It leads to different results if compared to {@link _Il2CppGC.choose}.
      * @template T Type parameter to automatically cast the objects to other object-like
-     * entities, like string and arrays. Default is {@link Il2CppObject}.
+     * entities, like string and arrays. Default is {@link _Il2CppObject}.
      * @param klass The class of the objects you are looking for.
      * @return An array of ready-to-use objects, strings or arrays. Value types are boxed.
      */
-    static choose2<T extends Il2CppObject | Il2CppString | Il2CppArray<AllowedType> = Il2CppObject>(klass: Il2CppClass): T[] {
-        const isString = klass.type.typeEnum == Il2CppTypeEnum.STRING;
-        const isArray = klass.type.typeEnum == Il2CppTypeEnum.SZARRAY;
+    static choose2<T extends _Il2CppObject | _Il2CppString | _Il2CppArray<AllowedType> = _Il2CppObject>(klass: _Il2CppClass): T[] {
+        const isString = klass.type.typeEnum == _Il2CppTypeEnum.STRING;
+        const isArray = klass.type.typeEnum == _Il2CppTypeEnum.SZARRAY;
 
         const matches: T[] = [];
 
-        const snapshot = new Il2CppMemorySnapshot();
+        const snapshot = new _Il2CppMemorySnapshot();
         const count = snapshot.trackedObjectCount.toNumber();
         const start = snapshot.objectsPointer;
 
         for (let i = 0; i < count; i++) {
             const pointer = start.add(i * Process.pointerSize).readPointer();
-            const object = new Il2CppObject(pointer);
+            const object = new _Il2CppObject(pointer);
 
             if (object.class.handle.equals(klass.handle)) {
-                if (isString) matches.push(new Il2CppString(pointer) as T);
-                else if (isArray) matches.push(new Il2CppArray(pointer) as T);
+                if (isString) matches.push(new _Il2CppString(pointer) as T);
+                else if (isArray) matches.push(new _Il2CppArray(pointer) as T);
                 else matches.push(object as T);
             }
         }
