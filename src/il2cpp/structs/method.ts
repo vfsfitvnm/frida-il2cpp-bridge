@@ -1,15 +1,15 @@
 import { cache } from "decorator-cache-getter";
 
-import { Accessor, filterAndMap } from "utils/accessor";
-import { inform, raise, warn } from "utils/logger";
+import { Accessor, filterAndMap } from "../../utils/accessor";
+import { inform, raise, warn } from "../../utils/console";
 
-import { Api } from "il2cpp/api";
-import { nonNullHandle, shouldBeInstance } from "il2cpp/decorators";
-import { Invokable, Valuable } from "il2cpp/interfaces";
-import { NativeStruct } from "il2cpp/native-struct";
-import { library, unityVersion } from "il2cpp/variables";
-import { allocRawValue, readRawValue } from "il2cpp/utils";
-import { AllowedType, ImplementationCallback, OnEnterCallback, OnLeaveCallback } from "il2cpp/types";
+import { Api } from "../api";
+import { nonNullHandle, shouldBeInstance } from "../decorators";
+import { Invokable, Valuable } from "../interfaces";
+import { NativeStruct } from "../native-struct";
+import { library, unityVersion } from "../variables";
+import { allocRawValue, readRawValue } from "../utils";
+import { AllowedType, ImplementationCallback, OnEnterCallback, OnLeaveCallback } from "../types";
 
 import { _Il2CppClass } from "./class";
 import { _Il2CppObject } from "./object";

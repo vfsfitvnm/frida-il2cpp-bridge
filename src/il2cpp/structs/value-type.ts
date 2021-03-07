@@ -1,9 +1,9 @@
 import { cache } from "decorator-cache-getter";
 
-import { filterAndMap } from "utils/accessor";
+import { filterAndMap } from "../../utils/accessor";
 
-import { Api } from "il2cpp/api";
-import { NativeStruct } from "il2cpp/native-struct";
+import { Api } from "../api";
+import { NativeStruct } from "../native-struct";
 
 import { _Il2CppClass } from "./class";
 import { _Il2CppObject } from "./object";

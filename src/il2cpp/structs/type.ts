@@ -1,9 +1,9 @@
 import { cache } from "decorator-cache-getter";
 
-import { Api } from "il2cpp/api";
-import { nonNullHandle } from "il2cpp/decorators";
-import { NativeStruct } from "il2cpp/native-struct";
-import { getOrNull } from "il2cpp/utils";
+import { Api } from "../api";
+import { nonNullHandle } from "../decorators";
+import { NativeStruct } from "../native-struct";
+import { getOrNull } from "../utils";
 
 import { _Il2CppClass } from "./class";
 import { _Il2CppGenericClass } from "./generic-class";

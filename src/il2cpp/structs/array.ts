@@ -1,10 +1,10 @@
 import { cache } from "decorator-cache-getter";
 
-import { Api } from "il2cpp/api";
-import { checkOutOfBounds, nonNullHandle } from "il2cpp/decorators";
-import { NativeStruct } from "il2cpp/native-struct";
-import { AllowedType } from "il2cpp/types";
-import { readFieldValue, writeFieldValue } from "il2cpp/utils";
+import { Api } from "../api";
+import { checkOutOfBounds, nonNullHandle } from "../decorators";
+import { NativeStruct } from "../native-struct";
+import { AllowedType } from "../types";
+import { readFieldValue, writeFieldValue } from "../utils";
 
 import { _Il2CppClass } from "./class";
 import { _Il2CppObject } from "./object";

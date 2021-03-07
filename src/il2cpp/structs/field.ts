@@ -1,12 +1,12 @@
 import { cache } from "decorator-cache-getter";
 
-import { raise } from "utils/logger";
+import { raise } from "../../utils/console";
 
-import { Api } from "il2cpp/api";
-import { nonNullHandle, shouldBeInstance } from "il2cpp/decorators";
-import { Valuable } from "il2cpp/interfaces";
-import { NativeStruct } from "il2cpp/native-struct";
-import { readFieldValue, writeFieldValue } from "il2cpp/utils";
+import { Api } from "../api";
+import { nonNullHandle, shouldBeInstance } from "../decorators";
+import { Valuable } from "../interfaces";
+import { NativeStruct } from "../native-struct";
+import { readFieldValue, writeFieldValue } from "../utils";
 
 import { _Il2CppClass } from "./class";
 import { _Il2CppType } from "./type";

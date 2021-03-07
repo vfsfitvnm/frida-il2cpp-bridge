@@ -1,4 +1,4 @@
-import { inform, ok, raise } from "utils/logger";
+import { inform, ok, raise } from "../utils/console";
 
 import { domain } from "./variables";
 import { NativeStruct } from "./native-struct";
