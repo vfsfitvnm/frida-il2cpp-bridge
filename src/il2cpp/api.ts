@@ -1096,7 +1096,7 @@ struct _MethodInfo
     {
         const struct Il2CppGenericMethod * genericMethod;
 #if ${isEqualOrAbove_2020_2_0}
-        const struct Il2CppMetadataGenericContainer nHandle * genericContainerHandle;
+        const struct Il2CppMetadataMethodDefinitionHandle * genericContainerHandle;
 #else
         const struct Il2CppGenericContainer * genericContainer;
 #endif
