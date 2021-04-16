@@ -222,8 +222,8 @@ export class _Il2CppMethod extends NativeStruct {
      * @return A value, if any.
      */
     @shouldBeInstance(false)
-    invoke<T extends AllowedType>(...parameters: AllowedType[]) {
-        return this._invoke(NULL, ...parameters);
+    invoke<T extends AllowedType>(...parameters: AllowedType[]): T {
+        return this._invoke(NULL, ...parameters) as T;
     }
 
     /**
@@ -311,7 +311,7 @@ export class _Il2CppMethod extends NativeStruct {
     }
 
     /** @internal */
-    private _invoke(instance: NativePointer, ...parameters: AllowedType[]) {
+    private _invoke(instance: NativePointer, ...parameters: AllowedType[]): AllowedType {
         if (this.parameterCount != parameters.length) {
             raise(`This method takes ${this.parameterCount} parameters, but ${parameters.length} were supplied.`);
         }

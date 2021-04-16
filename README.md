@@ -42,7 +42,6 @@ npm install --save-dev frida-il2cpp-bridge
 You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 
 ### Snippets
-First things first: read the [docs](https://vfsfitvnm.github.io/frida-il2cpp-bridge/index.html).
 * [`Initialization`](#initialization)
 * [`Dump`](#dump)
 * [`Print all the strings on the heap`](#print-all-strings)
@@ -67,6 +66,9 @@ main().catch(error => console.log(error.stack));
 
 ##### Dump
 ```ts
+// Path will be automatically detected
+Il2Cpp.dump(); 
+// Alternatively
 Il2Cpp.dump("/full/path/to/file.cs");
 ```
 This will produce something like:
@@ -79,7 +81,6 @@ class <Module>
 // mscorlib.dll
 class Locale : System.Object
 {
-
     static System.String GetText(System.String msg); // 0x01fbb020
     static System.String GetText(System.String fmt, System.Object[] args); // 0x01803a38
 }
