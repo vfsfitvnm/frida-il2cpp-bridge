@@ -798,7 +798,7 @@ il2cpp_type_get_generic_class (const Il2CppType * type)
 }
 
 #if ${isBelow_2018_1_0}
-uint
+unsigned int
 il2cpp_type_is_byref (const Il2CppType * type)
 {
     return type->byref;

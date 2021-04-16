@@ -48,7 +48,7 @@ export class _Il2CppDomain extends NativeStruct {
 
         for (let i = 0; i < count; i++) {
             const assembly = new _Il2CppAssembly(startPointer.add(i * Process.pointerSize).readPointer());
-            accessor[assembly.name!] = assembly;
+            accessor[assembly.name] = assembly;
         }
         return accessor;
     }

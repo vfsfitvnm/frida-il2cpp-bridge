@@ -299,29 +299,43 @@ export function allocRawValue(value: AllowedType, type: _Il2CppType) {
  * remember to pick `V8` instead.
  * ```typescript
  * await Il2Cpp.initialize();
- * const Application = Il2Cpp.domain.assemblies["UnityEngine.CoreModule"].image.classes["UnityEngine.Application"];
- * const version = Application.methods.get_version.invoke();
- * const identifier = Application.methods.get_identifier.invoke();
- * const persistentDataPath = Application.methods.get_persistentDataPath.invoke();
- * Il2Cpp.dump(`${persistentDataPath}/${identifier}_${version}.cs`);
+ * Il2Cpp.dump();
+ * // Alternatively, providing a custom path
+ * Il2Cpp.dump("/path/to/file.cs");
  * ```
- * @param filename Where to save the dump. The caller has to
+ * @param filePath Where to save the dump. The caller has to
  * make sure the application has a write permission for that location.
- *
+ * If undefined, it will be automatically calculated. For instance, this will be
+ * /storage/emulated/0/Android/data/com.example.application/files/com.example.application_1.2.3.cs.
  */
-export function dump(filename: string) {
+export function dump(filePath?: string) {
     if (domain == undefined) {
         raise("Not yet initialized!");
     }
 
-    const file = new File(filename, "w");
+    if (filePath == undefined) {
+        const coreModuleName = "UnityEngine.CoreModule" in domain.assemblies ? "UnityEngine.CoreModule" : "UnityEngine";
+        const applicationMethods = domain.assemblies[coreModuleName].image.classes["UnityEngine.Application"].methods;
+
+        const persistentDataPath = applicationMethods.get_persistentDataPath.invoke<_Il2CppString>().content;
+
+        const getIdentifierName = "get_identifier" in applicationMethods ? "get_identifier" : "get_bundleIdentifier";
+        const identifier = applicationMethods[getIdentifierName].invoke<_Il2CppString>().content;
+        const version = applicationMethods.get_version.invoke<_Il2CppString>().content;
+
+        filePath = `${persistentDataPath}/${identifier}_${version}.cs`;
+    }
+
+    const file = new File(filePath, "w");
 
     for (const assembly of domain.assemblies) {
         inform(`Dumping ${assembly.name}...`);
-        for (const klass of assembly.image.classes) file.write(klass.toString());
+        for (const klass of assembly.image.classes) {
+            file.write(klass.toString());
+        }
     }
 
     file.flush();
     file.close();
-    ok(`Dump saved to ${filename}.`);
+    ok(`Dump saved to ${filePath}.`);
 }

@@ -3,6 +3,7 @@ import { cache } from "decorator-cache-getter";
 import { Api } from "../api";
 import { nonNullHandle, since } from "../decorators";
 import { NativeStruct } from "../native-struct";
+import { unityVersion } from "../variables";
 
 import { _Il2CppImage } from "./image";
 
@@ -26,8 +27,11 @@ export class _Il2CppAssembly extends NativeStruct {
      * @return Its name.
      */
     @cache
-    @since("2018.1.0")
     get name() {
-        return Api._assemblyGetName(this.handle)!;
+        if (unityVersion.isLegacy) {
+            return this.image.name.replace(".dll", "");
+        } else {
+            return Api._assemblyGetName(this.handle)!;
+        }
     }
 }
