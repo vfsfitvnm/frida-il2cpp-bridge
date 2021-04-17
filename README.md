@@ -35,7 +35,11 @@ for providing the headers.
 - [x] Windows _(not tested)_
 - [ ] iOS _(missing test device)_
 
-### Installation
+### Project setup
+Please take a look at the `example` folder.
+You can download it [here](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/vfsfitvnm/frida-il2cpp-bridge/tree/master/example).
+
+### Add to an existing project
 ```shell script
 npm install --save-dev frida-il2cpp-bridge
 ```
