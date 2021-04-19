@@ -18,32 +18,6 @@ import { _Il2CppParameter } from "./parameter";
 
 /**
  * Represents a `MethodInfo`.
- * ```typescript
- * const mscorlib = Il2Cpp.domain.assemblies.mscorlib.image;
- * //
- * const BooleanClass = mscorlib.classes["System.Boolean"];
- * const Int32Class = mscorlib.classes["System.Int32"];
- * const TupleClass = mscorlib.classes["System.Tuple"];
- * const MathClass = mscorlib.classes["System.Math"];
- * const ArrayClass = mscorlib.classes["System.Array"];
- * //
- * assert(MathClass.methods.Sqrt.class.handle.equals(MathClass.handle));
- * //
- * assert(ArrayClass.methods.Empty.isGeneric);
- * //
- * assert(BooleanClass.methods.ToString.isInstance);
- * assert(!BooleanClass.methods.Parse.isInstance);
- * //
- * assert(MathClass.methods.Sqrt.name == "Sqrt");
- * //
- * assert(MathClass.methods[".cctor"].parameterCount == 0);
- * assert(MathClass.methods.Abs.parameterCount == 1);
- * assert(MathClass.methods.Max.parameterCount == 2);
- * //
- * assert(TupleClass.methods.CombineHashCodes.returnType.class.handle.equals(Int32Class.handle));
- * //
- * assert(BooleanClass.methods.Parse.invoke<boolean>(Il2Cpp.String.from("true")));
- * ```
  */
 @nonNullHandle
 export class _Il2CppMethod extends NativeStruct {
@@ -106,12 +80,6 @@ export class _Il2CppMethod extends NativeStruct {
     /**
      * We can iterate over the parameters using a `for..of` loop,
      * or access a specific parameter using its name.
-     * ```typescript
-     * const Compare = mscorlib.classes["System.String"].methods.Compare;
-     * for (const parameter of Compare.parameters) {
-     * }
-     * const strA = Compare.strA;
-     * ```
      * @return Its parameters.
      */
     @cache get parameters() {
@@ -154,13 +122,6 @@ export class _Il2CppMethod extends NativeStruct {
 
     /**
      * Abstraction over `Interceptor.replace`.
-     * ```typescript
-     * const MathClass = mscorlib.classes["System.Math"];
-     * MathClass.methods.Max.implementation = (instance, parameters) => {
-     *     const realMax = Math.max(parameters.val1.value, parameters.val2.value);
-     *     return !realMax;
-     * }
-     * ```
      * @param callback The new method implementation. `null` if you want to
      * revert it.
      */
@@ -195,6 +156,7 @@ export class _Il2CppMethod extends NativeStruct {
         const nativeCallback = new NativeCallback(replaceCallback, this.returnType.aliasForFrida, parametersTypesAliasesForFrida);
 
         Interceptor.replace(this.actualPointer, nativeCallback);
+        Interceptor.flush();
     }
 
     /** @internal */
@@ -211,13 +173,6 @@ export class _Il2CppMethod extends NativeStruct {
 
     /**
      * Invokes the method.
-     * ```typescript
-     * const CoreModule = domain.assemblies["UnityEngine.CoreModule"].image;
-     * const Application = CoreModule.classes["UnityEngine.Application"];
-     * const get_identifier = ApplicationC.methods.get_identifier;
-     * const result = get_identifier.invoke<Il2Cpp.String>();
-     * assert(result.content == "com.example.application");
-     * ```
      * @param parameters The parameters required by the method.
      * @return A value, if any.
      */
@@ -228,21 +183,6 @@ export class _Il2CppMethod extends NativeStruct {
 
     /**
      * Abstraction over `Interceptor.attach`.
-     * ```typescript
-     * const StringComparer = mscorlib.classes["System.StringComparer"];
-     * StringComparer.methods.Compare_1.intercept({
-     *     onEnter(instance, parameters) {
-     *         assert(instance == null);
-     *         assert(parameters.x.type.name == "System.String");
-     *         assert(parameters.y.type.name == "System.String");
-     *         (parameters.y.value as Il2Cpp.String).content = "same instance, new content";
-     *         parameters.y.value = Il2Cpp.String("new instance, new content");
-     *     },
-     *     onLeave(returnValue) {
-     *         returnValue.value = returnValue.value * -1;
-     *     }
-     * });
-     * ```
      * @param onEnter The callback to execute when the method is invoked.
      * @param onLeave The callback to execute when the method is about to return.
      * @return Frida's `InvocationListener`.

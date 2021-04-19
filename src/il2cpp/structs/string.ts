@@ -5,20 +5,6 @@ import { _Il2CppObject } from "./object";
 
 /**
  * Represents a `Il2CppString`.
- * ```typescript
- * const str = Il2Cpp.String.from("Hello!");
- * //
- * assert(str.content == "Hello!");
- * //
- * str.content = "Bye";
- * assert(str.content == "Bye");
- * //
- * assert(str.length == 3);
- * assert(str.content?.length == 3);
- * //
- * assert(str.object.class.type.name == "System.String");
- * assert(str.object.class.type.typeEnum == Il2Cpp.TypeEnum.STRING);
- * ```
  */
 export class _Il2CppString extends NativeStruct {
     /**

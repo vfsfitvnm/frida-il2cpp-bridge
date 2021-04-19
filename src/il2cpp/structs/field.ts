@@ -13,37 +13,6 @@ import { _Il2CppType } from "./type";
 
 /**
  * Represents a `FieldInfo`.
- * ```typescript
- * const mscorlib = domain.assemblies.mscorlib.image;
- * //
- * const BooleanClass = mscorlib.classes["System.Boolean"];
- * const MathClass = mscorlib.classes["System.Math"];
- * const ThreadClass = mscorlib.classes["System.Threading.Thread"];
- * //
- * const CoreModule = domain.assemblies["UnityEngine.CoreModule"].image;
- * const Vector2 = CoreModule.classes["UnityEngine.Vector2"];
- * //
- * assert(MathClass.fields.PI.class.handle.equals(MathClass.handle));
- * //
- * assert(Vector2.fields.x.isInstance);
- * assert(!Vector2.fields.oneVector.isInstance);
- * //
- * assert(MathClass.fields.PI.isLiteral);
- * //
- * assert(ThreadClass.fields.current_thread.isThreadStatic);
- * assert(!ThreadClass.fields.m_Delegate.isThreadStatic);
- * //
- * assert(BooleanClass.fields.TrueLiteral.name == "TrueLiteral");
- * //
- * assert(MathClass.fields.PI.type.name == "System.Double");
- * //
- * const vec = Vector2.fields.oneVector.value as Il2Cpp.ValueType;
- * assert(vec.fields.x.value == 1);
- * assert(vec.fields.y.value == 1);
- * //
- * vec.fields.x.value = 42;
- * assert(vec.fields.x.value == 42);
- * ```
  */
 @nonNullHandle
 export class _Il2CppField extends NativeStruct implements Valuable {

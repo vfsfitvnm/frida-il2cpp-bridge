@@ -11,27 +11,6 @@ import { _Il2CppValueType } from "./value-type";
 
 /**
  * Represents a `Il2CppObject`.
- * ```typescript
- * const mscorlib = Il2Cpp.domain.assemblies.mscorlib.image;
- * const CoreModule = Il2Cpp.domain.assemblies["UnityEngine.CoreModule"].image;
- * //
- * const OrdinalComparerClass = mscorlib.classes["System.OrdinalComparer"];
- * const Vector2Class = CoreModule.classes["UnityEngine.Vector2"];
- * //
- * const ordinalComparer = Il2Cpp.Object.from(OrdinalComparerClass);
- * assert(ordinalComparer.class.name == "OrdinalComparer");
- * assert(ordinalComparer.base.class.name == "StringComparer");
- * //
- * const vec = Il2Cpp.Object.from(Vector2Class);
- * vec.methods[".ctor"].invoke(36, 4);
- * const vecUnboxed = vec.unbox();
- * assert(vec.fields.x.value == vecUnboxed.fields.x.value);
- * assert(vec.fields.y.value == vecUnboxed.fields.y.value);
- * const vecBoxed = vecUnboxed.box();
- * assert(vecBoxed.fields.x.value == vecUnboxed.fields.x.value);
- * assert(vecBoxed.fields.y.value == vecUnboxed.fields.y.value);
- * assert(!vecBoxed.handle.equals(vec.handle));
- * ```
  */
 export class _Il2CppObject extends NativeStruct {
     /** @internal */

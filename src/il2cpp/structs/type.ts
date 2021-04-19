@@ -11,24 +11,6 @@ import { _Il2CppTypeEnum } from "./type-enum";
 
 /**
  * Represents a `Il2CppType`.
- * ```typescript
- * const mscorlib = Il2Cpp.domain.assemblies.mscorlib.image;
- * //
- * const StringClass = mscorlib.classes["System.String"];
- * const Int32Class = mscorlib.classes["System.Int32"];
- * const ObjectClass = mscorlib.classes["System.Object"];
- * //
- * assert(StringClass.type.class.handle.equals(StringClass.handle));
- * //
- * const array = Il2Cpp.Array.from<number>(Int32Class, [0, 1, 2, 3, 4]);
- * assert(array.object.class.type.name == "System.Int32[]");
- * assert(array.object.class.type.dataType?.name == "System.Int32");
- * //
- * assert(StringClass.type.name == "System.String");
- * //
- * assert(Int32Class.type.typeEnum == Il2Cpp.TypeEnum.I4);
- * assert(ObjectClass.type.typeEnum == Il2Cpp.TypeEnum.OBJECT);
- * ```
  */
 @nonNullHandle
 export class _Il2CppType extends NativeStruct {

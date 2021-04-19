@@ -15,5 +15,11 @@
     "stripInternal": true,
     "removeComments": true,
     "outDir": "dist"
-  }
+  },
+  "files": [
+    "src/index.ts"
+  ],
+  "exclude": [
+    "example"
+  ]
 }
