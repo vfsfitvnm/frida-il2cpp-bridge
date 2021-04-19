@@ -11,9 +11,6 @@ import { _Il2CppAssembly } from "./assembly";
 
 /**
  * Represents a `Il2CppDomain`.
- * ```typescript
- * assert(Il2Cpp.domain.name == "IL2CPP Root Domain");
- * ```
  */
 @nonNullHandle
 export class _Il2CppDomain extends NativeStruct {
@@ -27,11 +24,6 @@ export class _Il2CppDomain extends NativeStruct {
     /**
      * We can iterate over the assemblies using a `for..of` loop,
      * or access a specific assembly using its name, extension omitted.
-     * ```typescript
-     * for (const assembly of Il2Cpp.domain.assemblies) {
-     * }
-     * const mscorlib = assemblies.mscorlib;
-     * ```
      * @return Its assemblies.
      */
     @cache get assemblies() {
@@ -59,10 +51,6 @@ export class _Il2CppDomain extends NativeStruct {
      * being called.\
      * The domain will already be attached to the caller thread.
      * You don't actually need to call this.
-     * ```typescript
-     * const domain = await Il2Cpp.Domain.reference;
-     * const domain = Il2Cpp.domain;
-     * ```
      * @return The current application domain.
      */
     @cache static get reference() {

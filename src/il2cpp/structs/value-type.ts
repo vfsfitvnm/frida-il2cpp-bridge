@@ -11,17 +11,6 @@ import { _Il2CppObject } from "./object";
 /**
  * Abstraction over the a value type (`struct`).
  * NOTE: you may experience few problems with value types.
- * ```typescript
- * const engine = Il2Cpp.domain.assemblies["UnityEngine.CoreModule"].image;
- * const Vector2 = engine.classes["UnityEngine.Vector2"];
- * //
- * const vec = Vector2.fields.positiveInfinityVector.value as Il2Cpp.ValueType;
- * //
- * assert(vec.class.type.name == "UnityEngine.Vector2");
- * //
- * assert(vec.fields.x.value == Infinity);
- * assert(vec.fields.y.value == Infinity);
- * ```
  */
 export class _Il2CppValueType extends NativeStruct {
     constructor(handle: NativePointer, readonly klass: _Il2CppClass) {

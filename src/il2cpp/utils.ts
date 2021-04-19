@@ -297,16 +297,10 @@ export function allocRawValue(value: AllowedType, type: _Il2CppType) {
  * implementation).
  * Since `QuickJS` is not mature yet (and not ready for string concatenation),
  * remember to pick `V8` instead.
- * ```typescript
- * await Il2Cpp.initialize();
- * Il2Cpp.dump();
- * // Alternatively, providing a custom path
- * Il2Cpp.dump("/path/to/file.cs");
- * ```
  * @param filePath Where to save the dump. The caller has to
  * make sure the application has a write permission for that location.
  * If undefined, it will be automatically calculated. For instance, this will be
- * /storage/emulated/0/Android/data/com.example.application/files/com.example.application_1.2.3.cs.
+ * `/storage/emulated/0/Android/data/com.example.application/files/com.example.application_1.2.3.cs` on Android.
  */
 export function dump(filePath?: string) {
     if (domain == undefined) {

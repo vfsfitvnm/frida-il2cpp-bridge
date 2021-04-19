@@ -16,62 +16,6 @@ import { _Il2CppTypeEnum } from "./type-enum";
 
 /**
  * Represents a `Il2CppClass`.
- * ```typescript
- * const mscorlib = Il2Cpp.domain.assemblies.mscorlib.image;
- * //
- * const BooleanClass = mscorlib.classes["System.Boolean"];
- * const Int32Class = mscorlib.classes["System.Int32"];
- * const Int64Class = mscorlib.classes["System.Int64"];
- * const ObjectClass = mscorlib.classes["System.Object"];
- * const StringClass = mscorlib.classes["System.String"];
- * const DateTimeFormatInfoClass = mscorlib.classes["System.Globalization.DateTimeFormatInfo"];
- * const DayOfWeekClass = mscorlib.classes["System.DayOfWeek"];
- * const MathClass = mscorlib.classes["System.Math"];
- * const IFormattableClass = mscorlib.classes["System.IFormattable"];
- * //
- * assert(BooleanClass.arrayClass.name == "Boolean[]");
- * //
- * assert(Int32Class.arrayElementSize == 4);
- * assert(Int64Class.arrayElementSize == 8);
- * assert(ObjectClass.arrayElementSize == Process.pointerSize);
- * //
- * assert(Int32Class.assemblyName == "mscorlib");
- * //
- * const ExecutionContext = mscorlib.classes["System.Threading.ExecutionContext"];
- * const Flags = mscorlib.classes["System.Threading.ExecutionContext.Flags"];
- * assert(ExecutionContext.handle.equals(Flags.declaringClass!.handle));
- * //
- * const dayNames = DateTimeFormatInfoClass.fields.dayNames;
- * assert(dayNames.type.name == "System.String[]");
- * assert(dayNames.type.class.elementClass!.type.name == "System.String");
- * //
- * assert(StringClass.hasStaticConstructor == (".cctor" in StringClass.methods));
- * assert(DateTimeFormatInfoClass.hasStaticConstructor == (".cctor" in DateTimeFormatInfoClass.methods));
- * //
- * assert(Int32Class.image.name == "mscorlib.dll");
- * //
- * assert(DayOfWeekClass.isEnum);
- * assert(!Int32Class.isEnum);
- * //
- * assert(IFormattableClass.isInterface);
- * //
- * if (!MathClass.isStaticConstructorFinished) {
- *     MathClass.ensureInitialized();
- *     assert(MathClass.isStaticConstructorFinished);
- * }
- * //
- * assert(Int32Class.isStruct);
- * assert(!StringClass.isStruct);
- * //
- * assert(BooleanClass.name == "Boolean");
- * //
- * assert(BooleanClass.namespace == "System");
- * //
- * assert(BooleanClass.parent!.type.name == "System.ValueType");
- * assert(ObjectClass.parent == null);
- * //
- * assert(BooleanClass.type.name == "System.Boolean");
- * ```
  */
 @nonNullHandle
 export class _Il2CppClass extends NativeStruct {

@@ -10,17 +10,6 @@ import { _Il2CppType } from "./type";
 
 /**
  * Represents a `ParameterInfo`.
- * ```typescript
- * const mscorlib = Il2Cpp.domain.assemblies.mscorlib.image;
- * //
- * const MathClass = mscorlib.classes["System.Math"];
- * //
- * assert(MathClass.methods.Sqrt.parameters.d.name == "d");
- * //
- * assert(MathClass.methods.Sqrt.parameters.d.position == 0);
- * //
- * assert(MathClass.methods.Sqrt.parameters.d.type.name == "System.Double");
- * ```
  */
 @nonNullHandle
 export class _Il2CppParameter extends NativeStruct {

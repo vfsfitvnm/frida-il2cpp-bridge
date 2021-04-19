@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
 
 import { Api } from "../api";
-import { nonNullHandle, since } from "../decorators";
+import { nonNullHandle } from "../decorators";
 import { NativeStruct } from "../native-struct";
 import { unityVersion } from "../variables";
 
@@ -9,10 +9,6 @@ import { _Il2CppImage } from "./image";
 
 /**
  * Represents a `Il2CppAssembly`.
- * ```typescript
- * const mscorlibAssembly = Il2Cpp.domain.assemblies.mscorlib;
- * assert(mscorlibAssembly.name == "mscorlib");
- * ```
  */
 @nonNullHandle
 export class _Il2CppAssembly extends NativeStruct {

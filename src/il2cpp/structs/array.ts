@@ -11,34 +11,6 @@ import { _Il2CppObject } from "./object";
 
 /**
  * Represents a `Il2CppArraySize`.
- * ```typescript
- * const mscorlib = Il2Cpp.domain.assemblies.mscorlib.image;
- * //
- * const SingleClass = mscorlib.classes["System.Single"];
- * //
- * const array = Il2Cpp.Array.from<number>(SingleClass, [21.5, 55.3, 31.4, 33]);
- * //
- * assert(array.elementSize == SingleClass.arrayElementSize);
- * //
- * assert(array.length == 4);
- * //
- * assert(array.object.class.type.name == "System.Single[]");
- * //
- * assert(array.elementType.name == "System.Single");
- * //
- * assert(array.object.class.type.typeEnum == Il2Cpp.TypeEnum.SZARRAY);
- * //
- * assert(array.get(0) == 21.5);
- * //
- * array.set(0, 5);
- * assert(array.get(0) == 5);
- * //
- * let str = "";
- * for (const e of array) {
- *     str += Math.ceil(e) + ",";
- * }
- * assert(str == "5,56,32,33,");
- * ```
  */
 @nonNullHandle
 export class _Il2CppArray<T extends AllowedType> extends NativeStruct implements Iterable<T> {

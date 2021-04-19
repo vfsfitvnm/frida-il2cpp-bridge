@@ -13,21 +13,6 @@ import { _Il2CppType } from "./type";
 
 /**
  * Represents a `Il2CppImage`.
- * ```typescript
- * let count = 0;
- * let prev: Il2Cpp.Image | undefined = undefined;
- * for (const assembly of Il2Cpp.domain.assemblies) {
- *     const current = assembly.image;
- *     if (prev != undefined && prev.classStart != -1) {
- *         assert(current.classStart == count);
- *     }
- *     count += current.classCount;
- *     prev = assembly.image;
- * }
- * //
- * const mscorlib = Il2Cpp.domain.assemblies.mscorlib.image;
- * assert(mscorlib.name == "mscorlib.dll");
- * ```
  */
 @nonNullHandle
 export class _Il2CppImage extends NativeStruct {
