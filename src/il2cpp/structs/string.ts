@@ -11,6 +11,9 @@ export class _Il2CppString extends NativeStruct {
      * @return Its actual content.
      */
     get content() {
+        if (this.handle.isNull()) {
+            return null;
+        }
         return Api._stringChars(this.handle).readUtf16String(this.length);
     }
 
@@ -18,7 +21,7 @@ export class _Il2CppString extends NativeStruct {
      * @param value The new content.
      */
     set content(value) {
-        if (value != null) {
+        if (value != null && !this.handle.isNull()) {
             Api._stringChars(this.handle).writeUtf16String(value);
             Api._stringSetLength(this.handle, value.length);
         }
@@ -28,6 +31,9 @@ export class _Il2CppString extends NativeStruct {
      * @return Its length.
      */
     get length() {
+        if (this.handle.isNull()) {
+            return 0;
+        }
         return Api._stringLength(this.handle);
     }
 
