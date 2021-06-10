@@ -100,7 +100,7 @@ class Locale : System.Object
 const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
 const TypeClass = corlib.classes["System.Type"];
 
-Il2Cpp.choose(TypeClass).forEach(instance => {
+Il2Cpp.GC.choose(TypeClass).forEach(instance => {
     // Do whatever you want
     assert(instance.class.type.name == "System.Type");
 });
@@ -109,8 +109,8 @@ Alternatively
 ```ts
 const TypeArrayClass = corlib.classes["System.Type"].arrayClass;
 
-Il2Cpp.choose2<Il2Cpp.Array<Il2Cpp.Object>>(TypeArrayClass).forEach(instance => {
-    // Do whatever you want 2
+Il2Cpp.GC.choose2<Il2Cpp.Array<Il2Cpp.Object>>(TypeArrayClass).forEach(instance => {
+    // Do whatever you want
     assert(instance.class.type.name == "System.Type[]");
 });
 ```
@@ -120,7 +120,7 @@ Il2Cpp.choose2<Il2Cpp.Array<Il2Cpp.Object>>(TypeArrayClass).forEach(instance => 
 const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
 const StringClass = corlib.classes["System.String"];
 
-Il2Cpp.choose<Il2Cpp.String>(StringClass).forEach(str => {
+Il2Cpp.GC.choose<Il2Cpp.String>(StringClass).forEach(str => {
     console.log(str.handle, str.content);
 });
 ```
@@ -153,7 +153,7 @@ It will log something like:
 ```coffeescriptliterate
 [il2cpp] 0x01a62bc0 IsNullOrEmpty
 [il2cpp] 0x01a62bc0 IsNullOrEmpty
-[il2cpp] 0x01a62bc0 IsNullOrEmptt
+[il2cpp] 0x01a62bc0 IsNullOrEmpty
 ````
 
 ##### Method replacement
