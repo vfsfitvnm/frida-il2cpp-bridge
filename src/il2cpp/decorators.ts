@@ -37,7 +37,7 @@ export function since(version: string): MethodDecorator {
 }
 
 /** @internal */
-export function nonNullMethodPointer<T extends _Il2CppMethod>(_: T, propertyKey: PropertyKey, descriptor: PropertyDescriptor) {
+export function nonNullMethodPointer<T extends _Il2CppMethod>(_: T, propertyKey: PropertyKey, descriptor: PropertyDescriptor): void {
     const fn = descriptor.value ?? descriptor.get ?? descriptor.set;
     const key = descriptor.value ? "value" : descriptor.get ? "get" : "set";
     descriptor[key] = function (this: T, ...args: any[]) {
@@ -49,7 +49,7 @@ export function nonNullMethodPointer<T extends _Il2CppMethod>(_: T, propertyKey:
 }
 
 /** @internal */
-export function checkOutOfBounds<T extends _Il2CppArray<AllowedType>>(_: T, __: PropertyKey, descriptor: PropertyDescriptor) {
+export function checkOutOfBounds<T extends _Il2CppArray<AllowedType>>(_: T, __: PropertyKey, descriptor: PropertyDescriptor): void {
     const fn = descriptor.value;
     descriptor.value = function (this: T, ...args: any[]) {
         const index = args[0];
@@ -61,7 +61,7 @@ export function checkOutOfBounds<T extends _Il2CppArray<AllowedType>>(_: T, __: 
 }
 
 /** @internal */
-export function nonNullHandle<T extends { new (...args: any[]): NativeStruct }>(Class: T) {
+export function nonNullHandle<T extends { new (...args: any[]): NativeStruct }>(Class: T): T {
     return new Proxy(Class, {
         construct(Class, args: any[]) {
             const constructed = new Class(...args);
@@ -73,7 +73,7 @@ export function nonNullHandle<T extends { new (...args: any[]): NativeStruct }>(
     });
 }
 
-// export function nonNullHandle<T extends { new (...args: any[]): { handle: NativePointer } }>(Class: T) {
+// export function nonNullHandle<T extends { new (...args: any[]): { handle: NativePointer } }>(Class: T): T {
 //     const NewClass = class extends Class {
 //         constructor(...args: any[]) {
 //             super(...args);

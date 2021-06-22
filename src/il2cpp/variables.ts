@@ -39,7 +39,7 @@ export let domain: _Il2CppDomain;
  * main().catch(error => console.log(error.stack));
  ```
  */
-export async function initialize() {
+export async function initialize(): Promise<void> {
     const il2CppLibraryName =
         Process.platform == "linux" ? "libil2cpp.so" : Process.platform == "windows" ? "GameAssembly.dll" : platformNotSupported();
 
@@ -48,15 +48,16 @@ export async function initialize() {
     domain = await _Il2CppDomain.reference;
 }
 
-async function getUnityVersion() {
+async function getUnityVersion(): Promise<UnityVersion> {
     const unityLibraryName =
         Process.platform == "linux" ? "libunity.so" : Process.platform == "windows" ? "UnityPlayer.dll" : platformNotSupported();
 
     let unityVersion: UnityVersion | undefined;
     const searchStringHex = "45787065637465642076657273696f6e3a"; // "Expected version: "
+
     try {
         const unityLibrary = await forModule(unityLibraryName);
-        for (const range of unityLibrary.enumerateRanges("r--")) {
+        for (const range of unityLibrary.enumerateRanges("r--").concat(Process.getRangeByAddress(unityLibrary.base))) {
             const result = Memory.scanSync(range.base, range.size, searchStringHex)[0];
             if (result !== undefined) {
                 unityVersion = new UnityVersion(result.address.readUtf8String()!);
@@ -66,6 +67,7 @@ async function getUnityVersion() {
     } catch (e) {
         raise("Couldn't obtain the Unity version: " + e);
     }
+
     if (unityVersion == undefined) {
         raise("Couldn't obtain the Unity version.");
     } else if (unityVersion.isBelow("5.3.0") || unityVersion.isEqualOrAbove("2021.1.0")) {

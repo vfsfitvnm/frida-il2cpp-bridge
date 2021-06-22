@@ -1,8 +1,9 @@
 import { cache } from "decorator-cache-getter";
 
-import { filterAndMap } from "../../utils/accessor";
+import { Accessor, filterAndMap} from "../../utils/accessor";
 
 import { Api } from "../api";
+import { Valuable } from "../interfaces";
 import { NativeStruct } from "../native-struct";
 
 import { _Il2CppClass } from "./class";
@@ -22,14 +23,15 @@ export class _Il2CppValueType extends NativeStruct {
      * It's not completely reliable.
      * @return Its class.
      */
-    get class() {
+    get class(): _Il2CppClass {
         return this.klass;
     }
 
     /**
      * @return Its fields.
      */
-    @cache get fields() {
+    @cache
+    get fields(): Accessor<Valuable> {
         return this.class.fields[filterAndMap](
             field => field.isInstance,
             field => field.asHeld(this.handle.add(field.offset).sub(_Il2CppObject.headerSize))
@@ -40,7 +42,7 @@ export class _Il2CppValueType extends NativeStruct {
      * See {@link _Il2CppObject.unbox} for an example.
      * @return The boxed value type.
      */
-    box() {
+    box(): _Il2CppObject {
         return new _Il2CppObject(Api._valueBox(this.klass.handle, this.handle));
     }
 }

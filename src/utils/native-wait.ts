@@ -12,7 +12,7 @@ class Target {
     }
 
     @cache
-    static get targets() {
+    static get targets(): Target[] {
         function info(): [string | null, ...[string, StringEncoding][]] {
             switch (Process.platform) {
                 case "linux":
@@ -37,7 +37,7 @@ class Target {
         return targets.map(([name, encoding]) => new Target(responsible, name, encoding)).filter(target => !target.address.isNull());
     }
 
-    readString(pointer: NativePointer) {
+    readString(pointer: NativePointer): string | null {
         switch (this.stringEncoding) {
             case "utf8":
                 return pointer.readUtf8String();
@@ -54,7 +54,7 @@ class Target {
  * It waits for a `Module` to be loaded.
  * @param moduleName The name of the target module.
  */
-export function forModule(moduleName: string) {
+export function forModule(moduleName: string): Promise<Module> {
     return new Promise<Module>(resolve => {
         const module = Process.findModuleByName(moduleName);
         if (module) {

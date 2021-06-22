@@ -15,7 +15,8 @@ export class _Il2CppGenericClass extends NativeStruct {
     /**
      * @return Its class.
      */
-    @cache get cachedClass() {
+    @cache
+    get cachedClass(): _Il2CppClass | null {
         return getOrNull(Api._genericClassGetCachedClass(this.handle), _Il2CppClass);
     }
 

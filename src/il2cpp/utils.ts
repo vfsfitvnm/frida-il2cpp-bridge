@@ -12,12 +12,12 @@ import { _Il2CppType } from "./structs/type";
 import { _Il2CppTypeEnum } from "./structs/type-enum";
 
 /** @internal */
-export function getOrNull<T extends NativeStruct>(handle: NativePointer, Class: new (...args: any[]) => T) {
+export function getOrNull<T extends NativeStruct>(handle: NativePointer, Class: new (...args: any[]) => T): T | null {
     return handle.isNull() ? null : new Class(handle);
 }
 
 /** @internal */
-function isCoherent(value: AllowedType, type: _Il2CppType) {
+function isCoherent(value: AllowedType, type: _Il2CppType): boolean {
     switch (type.typeEnum) {
         case _Il2CppTypeEnum.VOID:
             return value == undefined;
@@ -109,7 +109,7 @@ export function readFieldValue(pointer: NativePointer, type: _Il2CppType): Allow
 }
 
 /** @internal */
-export function writeFieldValue(pointer: NativePointer, value: AllowedType, type: _Il2CppType) {
+export function writeFieldValue(pointer: NativePointer, value: AllowedType, type: _Il2CppType): void {
     if (!isCoherent(value, type)) {
         raise(`A "${type.name}" is required, but a "${Object.getPrototypeOf(value).constructor.name}" was supplied.`);
     }
@@ -236,7 +236,7 @@ export function readRawValue(pointer: NativePointer, type: _Il2CppType): Allowed
 }
 
 /** @internal */
-export function allocRawValue(value: AllowedType, type: _Il2CppType) {
+export function allocRawValue(value: AllowedType, type: _Il2CppType): NativePointer {
     if (!isCoherent(value, type)) {
         raise(`A "${type.name}" is required, but a "${Object.getPrototypeOf(value).constructor.name}" was supplied.`);
     }
@@ -302,7 +302,7 @@ export function allocRawValue(value: AllowedType, type: _Il2CppType) {
  * If undefined, it will be automatically calculated. For instance, this will be
  * `/storage/emulated/0/Android/data/com.example.application/files/com.example.application_1.2.3.cs` on Android.
  */
-export function dump(filePath?: string) {
+export function dump(filePath?: string): void {
     if (domain == undefined) {
         raise("Not yet initialized!");
     }

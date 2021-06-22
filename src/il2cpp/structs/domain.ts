@@ -17,7 +17,8 @@ export class _Il2CppDomain extends NativeStruct {
     /**
      * @return Its name. Probably `IL2CPP Root Domain`.
      */
-    @cache get name() {
+    @cache
+    get name(): string | null {
         return Api._domainGetName(this.handle);
     }
 
@@ -26,7 +27,8 @@ export class _Il2CppDomain extends NativeStruct {
      * or access a specific assembly using its name, extension omitted.
      * @return Its assemblies.
      */
-    @cache get assemblies() {
+    @cache
+    get assemblies(): Accessor<_Il2CppAssembly> {
         const accessor = new Accessor<_Il2CppAssembly>();
 
         const sizePointer = Memory.alloc(Process.pointerSize);
@@ -53,7 +55,7 @@ export class _Il2CppDomain extends NativeStruct {
      * You don't actually need to call this.
      * @return The current application domain.
      */
-    @cache static get reference() {
+    @cache static get reference(): Promise<_Il2CppDomain> {
         return (async () => {
             const domainPointer = await new Promise<NativePointer>(resolve => {
                 const start = Api._domainGetAssemblies(NULL, Memory.alloc(Process.pointerSize));

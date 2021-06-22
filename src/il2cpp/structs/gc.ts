@@ -18,7 +18,7 @@ export class _Il2CppGC {
      * [generation](https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/fundamentals#generations).
      * @param generation The category of objects to collect.
      */
-    static collect(generation: 0 | 1 | 2) {
+    static collect(generation: 0 | 1 | 2): void {
         Api._gcCollect(generation);
     }
 
@@ -27,7 +27,7 @@ export class _Il2CppGC {
      * generation it collects.
      */
     @since("5.3.5")
-    static collectALittle() {
+    static collectALittle(): void {
         Api._gcCollectALittle();
     }
 
@@ -35,7 +35,7 @@ export class _Il2CppGC {
      * Disables the GC.
      */
     @since("5.3.5")
-    static disable() {
+    static disable(): void {
         Api._gcDisable();
     }
 
@@ -43,7 +43,7 @@ export class _Il2CppGC {
      * Enables the GC.
      */
     @since("5.3.5")
-    static enable() {
+    static enable(): void {
         Api._gcEnable();
     }
 
@@ -51,7 +51,7 @@ export class _Il2CppGC {
      * @return `true` if the GC is disabled, `false` otherwise.
      */
     @since("2018.3.0")
-    static isDisabled() {
+    static isDisabled(): boolean {
         return Api._gcIsDisabled();
     }
 

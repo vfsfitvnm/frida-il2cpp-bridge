@@ -30,21 +30,24 @@ export class _Il2CppMethod extends NativeStruct {
      * ```
      * @return Its actual pointer in memory.
      */
-    @cache get actualPointer() {
+    @cache
+    get actualPointer(): NativePointer {
         return Api._methodGetPointer(this.handle);
     }
 
     /**
      * @return The class it belongs to.
      */
-    @cache get class() {
+    @cache
+    get class(): _Il2CppClass {
         return new _Il2CppClass(Api._methodGetClass(this.handle));
     }
 
     /**
      * @return `true` if it's generic, `false` otherwise.
      */
-    @cache get isGeneric() {
+    @cache
+    get isGeneric(): boolean {
         return Api._methodIsGeneric(this.handle);
     }
 
@@ -52,28 +55,32 @@ export class _Il2CppMethod extends NativeStruct {
      * @return `true` if it's inflated (a generic with a concrete type parameter),
      * false otherwise.
      */
-    @cache get isInflated() {
+    @cache
+    get isInflated(): boolean {
         return Api._methodIsInflated(this.handle);
     }
 
     /**
      *  @return `true` if it's an instance method, `false` otherwise.
      */
-    @cache get isInstance() {
+    @cache
+    get isInstance(): boolean {
         return Api._methodIsInstance(this.handle);
     }
 
     /**
      * @return Its name.
      */
-    @cache get name() {
+    @cache
+    get name(): string {
         return Api._methodGetName(this.handle)!;
     }
 
     /**
      * @return The count of its parameters.
      */
-    @cache get parameterCount() {
+    @cache
+    get parameterCount(): number {
         return Api._methodGetParamCount(this.handle);
     }
 
@@ -82,7 +89,8 @@ export class _Il2CppMethod extends NativeStruct {
      * or access a specific parameter using its name.
      * @return Its parameters.
      */
-    @cache get parameters() {
+    @cache
+    get parameters(): Accessor<_Il2CppParameter> {
         const iterator = Memory.alloc(Process.pointerSize);
         const accessor = new Accessor<_Il2CppParameter>();
         let handle: NativePointer;
@@ -97,19 +105,22 @@ export class _Il2CppMethod extends NativeStruct {
     /**
      * @return Its static fixed offset, useful for static analysis.
      */
-    @cache get relativePointerAsString() {
+    @cache
+    get relativePointerAsString(): string {
         return `0x${this.actualPointer.sub(library.base).toString(16).padStart(8, "0")}`;
     }
 
     /**
      * @return Its return type.
      */
-    @cache get returnType() {
+    @cache
+    get returnType(): _Il2CppType {
         return new _Il2CppType(Api._methodGetReturnType(this.handle));
     }
 
     /** @internal */
-    @cache get nativeFunction() {
+    @cache
+    get nativeFunction(): NativeFunction {
         const parametersTypesAliasesForFrida = Array(this.parameterCount).fill("pointer");
         if (this.isInstance || unityVersion.isLegacy) {
             parametersTypesAliasesForFrida.push("pointer");
@@ -160,7 +171,8 @@ export class _Il2CppMethod extends NativeStruct {
     }
 
     /** @internal */
-    @cache get parametersTypesAliasesForFrida() {
+    @cache
+    get parametersTypesAliasesForFrida(): string[] {
         const parametersTypesAliasesForFrida = new Array(this.parameterCount).fill("pointer");
         if (this.isInstance || unityVersion.isLegacy) {
             parametersTypesAliasesForFrida.push("pointer");
@@ -187,7 +199,7 @@ export class _Il2CppMethod extends NativeStruct {
      * @param onLeave The callback to execute when the method is about to return.
      * @return Frida's `InvocationListener`.
      */
-    intercept({ onEnter, onLeave }: { onEnter?: OnEnterCallback; onLeave?: OnLeaveCallback }) {
+    intercept({ onEnter, onLeave }: { onEnter?: OnEnterCallback; onLeave?: OnLeaveCallback }): InvocationListener {
         if (this.actualPointer.isNull()) {
             raise(`Can't intercept method ${this.name} from ${this.class.type.name}: pointer is NULL.`);
         }
@@ -228,7 +240,7 @@ export class _Il2CppMethod extends NativeStruct {
     /**
      * Prints a message when the method is invoked.
      */
-    trace() {
+    trace(): void {
         if (this.actualPointer.isNull()) {
             warn(`Can't trace method ${this.name} from ${this.class.type.name}: pointer is NULL.`);
         }
@@ -241,10 +253,10 @@ export class _Il2CppMethod extends NativeStruct {
 
     /** @internal */
     @shouldBeInstance(true)
-    asHeld(holder: NativePointer) {
+    asHeld(holder: NativePointer): Invokable {
         const invoke = this._invoke.bind(this, holder);
         return {
-            invoke<T extends AllowedType>(...parameters: AllowedType[]) {
+            invoke<T extends AllowedType>(...parameters: AllowedType[]): T {
                 return invoke(...parameters) as T;
             }
         } as Invokable;

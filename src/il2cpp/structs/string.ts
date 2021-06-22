@@ -10,7 +10,7 @@ export class _Il2CppString extends NativeStruct {
     /**
      * @return Its actual content.
      */
-    get content() {
+    get content(): string | null {
         if (this.handle.isNull()) {
             return null;
         }
@@ -20,7 +20,7 @@ export class _Il2CppString extends NativeStruct {
     /**
      * @param value The new content.
      */
-    set content(value) {
+    set content(value: string | null) {
         if (value != null && !this.handle.isNull()) {
             Api._stringChars(this.handle).writeUtf16String(value);
             Api._stringSetLength(this.handle, value.length);
@@ -30,7 +30,7 @@ export class _Il2CppString extends NativeStruct {
     /**
      * @return Its length.
      */
-    get length() {
+    get length(): number {
         if (this.handle.isNull()) {
             return 0;
         }
@@ -40,7 +40,7 @@ export class _Il2CppString extends NativeStruct {
     /**
      * @return The same string as an object.
      */
-    get object() {
+    get object(): _Il2CppObject {
         return new _Il2CppObject(this.handle);
     }
 
@@ -49,14 +49,14 @@ export class _Il2CppString extends NativeStruct {
      * @param content The string content.
      * @return A new string.
      */
-    static from(content: string) {
+    static from(content: string): _Il2CppString {
         return new _Il2CppString(Api._stringNew(content));
     }
 
     /**
      * @return The string content.
      */
-    toString() {
+    toString(): string | null {
         return this.content;
     }
 }

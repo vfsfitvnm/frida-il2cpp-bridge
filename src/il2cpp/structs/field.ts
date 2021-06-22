@@ -6,6 +6,7 @@ import { Api } from "../api";
 import { nonNullHandle, shouldBeInstance } from "../decorators";
 import { Valuable } from "../interfaces";
 import { NativeStruct } from "../native-struct";
+import { AllowedType } from "../types";
 import { readFieldValue, writeFieldValue } from "../utils";
 
 import { _Il2CppClass } from "./class";
@@ -19,35 +20,40 @@ export class _Il2CppField extends NativeStruct implements Valuable {
     /**
      * @return The class it belongs to.
      */
-    @cache get class() {
+    @cache
+    get class(): _Il2CppClass {
         return new _Il2CppClass(Api._fieldGetClass(this.handle));
     }
 
     /**
      * @return `true` if it's a instance field, `false` otherwise.
      */
-    @cache get isInstance() {
+    @cache
+    get isInstance(): boolean {
         return Api._fieldIsInstance(this.handle);
     }
 
     /**
      * @return `true` if it's literal field, `false` otherwise.
      */
-    @cache get isLiteral() {
+    @cache
+    get isLiteral(): boolean {
         return Api._fieldIsLiteral(this.handle);
     }
 
     /**
      * @return `true` if it's a thread  field, `false` otherwise.
      */
-    @cache get isThreadStatic() {
+    @cache
+    get isThreadStatic(): boolean {
         return this.offset == -1;
     }
 
     /**
      * @return Its name.
      */
-    @cache get name() {
+    @cache
+    get name(): string {
         return Api._fieldGetName(this.handle)!;
     }
 
@@ -58,21 +64,23 @@ export class _Il2CppField extends NativeStruct implements Valuable {
      * {@link Object.handle | handle} and its location.
      * @return Its offset.
      */
-    @cache get offset() {
+    @cache
+    get offset(): number {
         return Api._fieldGetOffset(this.handle);
     }
 
     /**
      * @return Its type.
      */
-    @cache get type() {
+    @cache
+    get type(): _Il2CppType {
         return new _Il2CppType(Api._fieldGetType(this.handle));
     }
 
     /**
      * @return Its value.
      */
-    get value() {
+    get value(): AllowedType {
         return readFieldValue(this.valueHandle, this.type!);
     }
 
@@ -92,7 +100,7 @@ export class _Il2CppField extends NativeStruct implements Valuable {
      * @return The actual location of its value.
      */
     @shouldBeInstance(false)
-    get valueHandle() {
+    get valueHandle(): NativePointer {
         let handle: NativePointer;
         if (this.isThreadStatic || this.isLiteral) {
             handle = Memory.alloc(Process.pointerSize);
@@ -104,14 +112,14 @@ export class _Il2CppField extends NativeStruct implements Valuable {
     }
 
     @shouldBeInstance(true)
-    asHeld(handle: NativePointer) {
+    asHeld(handle: NativePointer): Valuable {
         const type = this.type;
         return {
             valueHandle: handle,
-            get value() {
+            get value(): AllowedType {
                 return readFieldValue(handle, type);
             },
-            set value(value) {
+            set value(value: AllowedType) {
                 writeFieldValue(handle, value, type);
             }
         } as Valuable;

@@ -20,7 +20,8 @@ export class _Il2CppType extends NativeStruct {
     }
 
     /** @internal */
-    @cache get aliasForFrida() {
+    @cache
+    get aliasForFrida() {
         switch (this.typeEnum) {
             case _Il2CppTypeEnum.VOID:
                 return "void";
@@ -56,28 +57,32 @@ export class _Il2CppType extends NativeStruct {
     /**
      * @return Its class.
      */
-    @cache get class() {
+    @cache
+    get class(): _Il2CppClass {
         return new _Il2CppClass(Api._classFromType(this.handle));
     }
 
     /**
      * @return If it's an array, the type of its elements, `null` otherwise.
      */
-    @cache get dataType() {
+    @cache
+    get dataType(): _Il2CppType | null {
         return getOrNull(Api._typeGetDataType(this.handle), _Il2CppType);
     }
 
     /**
      * @returns If it's a generic type, its generic class, `null` otherwise.
      */
-    @cache get genericClass() {
+    @cache
+    get genericClass(): _Il2CppGenericClass | null {
         return getOrNull(Api._typeGetGenericClass(this.handle), _Il2CppGenericClass);
     }
 
     /**
      *  @returns `true` if it's passed by reference, `false` otherwise.
      */
-    @cache get isByReference() {
+    @cache
+    get isByReference(): boolean {
         return Api._typeIsByReference(this.handle);
     }
 
@@ -85,14 +90,16 @@ export class _Il2CppType extends NativeStruct {
      * @returns Its name, namespace included and declaring class excluded. If its class is nested,
      * it corresponds to the class name.
      */
-    @cache get name() {
+    @cache
+    get name(): string {
         return Api._typeGetName(this.handle)!;
     }
 
     /**
      * @returns Its corresponding type.
      */
-    @cache get typeEnum() {
+    @cache
+    get typeEnum(): _Il2CppTypeEnum {
         return Api._typeGetTypeEnum(this.handle) as _Il2CppTypeEnum;
     }
 }
