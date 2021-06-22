@@ -3,7 +3,6 @@ import { cache } from "decorator-cache-getter";
 import { warn } from "../utils/console";
 
 const matchPattern = /(20\d{2}|\d)\.(\d)\.(\d{1,2})([abcfp]|rc){0,2}\d?/;
-// const matchPattern = /(20\d{2}|\d)\.(\d)\.(\d{1,2})(?:([abcfp]|rc){0,2}\d?)/;
 
 /**
  * Represent the Unity version of the current application.
