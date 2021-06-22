@@ -2,7 +2,8 @@ import { cache } from "decorator-cache-getter";
 
 import { warn } from "../utils/console";
 
-const matchPattern = /(20\d{2}|\d)\.(\d)\.(\d{1,2})(?:([abcfp]|rc){0,2}\d?)/;
+const matchPattern = /(20\d{2}|\d)\.(\d)\.(\d{1,2})([abcfp]|rc){0,2}\d?/;
+// const matchPattern = /(20\d{2}|\d)\.(\d)\.(\d{1,2})(?:([abcfp]|rc){0,2}\d?)/;
 
 /**
  * Represent the Unity version of the current application.
@@ -10,10 +11,13 @@ const matchPattern = /(20\d{2}|\d)\.(\d)\.(\d{1,2})(?:([abcfp]|rc){0,2}\d?)/;
 export class UnityVersion {
     /** @internal */
     private readonly source: string;
+
     /** @internal */
     private readonly major: number;
+
     /** @internal */
     private readonly minor: number;
+
     /** @internal */
     private readonly revision: number;
 
@@ -34,20 +38,42 @@ export class UnityVersion {
      *  @internal
      * `true` if the current version is older than 2018.3.0.
      */
-    @cache get isLegacy() {
+    @cache
+    get isLegacy(): boolean {
         return this.isBelow("2018.3.0");
     }
 
-    readonly toString = () => this.source;
-
-    /** @internal */ readonly isEqual = (other: string) => this.compare(other) == 0;
-    /** @internal */ readonly isAbove = (other: string) => this.compare(other) == 1;
-    /** @internal */ readonly isBelow = (other: string) => this.compare(other) == -1;
-    /** @internal */ readonly isEqualOrAbove = (other: string) => this.compare(other) >= 0;
-    /** @internal */ readonly isEqualOrBelow = (other: string) => this.compare(other) <= 0;
+    toString(): string {
+        return this.source;
+    }
 
     /** @internal */
-    private compare(otherSource: string) {
+    isEqual(other: string): boolean {
+        return this.compare(other) == 0;
+    }
+
+    /** @internal */
+    isAbove(other: string): boolean {
+        return this.compare(other) == 1;
+    }
+
+    /** @internal */
+    isBelow(other: string): boolean {
+        return this.compare(other) == -1;
+    }
+
+    /** @internal */
+    isEqualOrAbove(other: string): boolean {
+        return this.compare(other) >= 0;
+    }
+
+    /** @internal */
+    isEqualOrBelow(other: string): boolean {
+        return this.compare(other) <= 0;
+    }
+
+    /** @internal */
+    private compare(otherSource: string): -1 | 0 | 1 {
         const other = new UnityVersion(otherSource);
 
         if (this.major > other.major) return 1;

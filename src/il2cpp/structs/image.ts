@@ -19,7 +19,8 @@ export class _Il2CppImage extends NativeStruct {
     /**
      * @return The count of its classes.
      */
-    @cache get classCount() {
+    @cache
+    get classCount(): number {
         return Api._imageGetClassCount(this.handle);
     }
 
@@ -28,7 +29,8 @@ export class _Il2CppImage extends NativeStruct {
      * @return The start index of its classes, `0` if this information
      * is not available (since Unity version `2020.2.0`).
      */
-    @cache get classStart() {
+    @cache
+    get classStart(): number {
         return Api._imageGetClassStart(this.handle);
     }
 
@@ -43,7 +45,8 @@ export class _Il2CppImage extends NativeStruct {
      * ```
      * @return Its classes.
      */
-    @cache get classes() {
+    @cache
+    get classes(): Accessor<_Il2CppClass> {
         const accessor = new Accessor<_Il2CppClass>();
         if (unityVersion.isLegacy) {
             const start = this.classStart;
@@ -68,7 +71,8 @@ export class _Il2CppImage extends NativeStruct {
      * @return Its name, equals to the name of its assembly plus its
      * extension.
      */
-    @cache get name() {
+    @cache
+    get name(): string {
         return Api._imageGetName(this.handle)!;
     }
 
@@ -78,7 +82,7 @@ export class _Il2CppImage extends NativeStruct {
      * @return The class for the given namespace and name or `null` if
      * not found.
      */
-    getClassFromName(namespace: string, name: string) {
+    getClassFromName(namespace: string, name: string): _Il2CppClass | null {
         return getOrNull(Api._classFromName(this.handle, namespace, name), _Il2CppClass);
     }
 }

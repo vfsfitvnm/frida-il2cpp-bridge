@@ -13,15 +13,19 @@ export class _Il2CppMemorySnapshot extends NativeStruct {
         super(Api._memorySnapshotCapture());
     }
 
-    @cache get trackedObjectCount() {
+    @cache
+
+    get trackedObjectCount(): UInt64 {
         return Api._memorySnapshotGetTrackedObjectCount(this.handle);
     }
 
-    @cache get objectsPointer() {
+    @cache
+
+    get objectsPointer(): NativePointer {
         return Api._memorySnapshotGetObjects(this.handle);
     }
 
-    free() {
+    free(): void {
         Api._memorySnapshotFree(this.handle);
     }
 }

@@ -23,21 +23,24 @@ export class _Il2CppClass extends NativeStruct {
      * The inverse of {@link _Il2CppClass.elementClass}.
      * @return The array class which has the caller as element class.
      */
-    @cache get arrayClass() {
+    @cache
+    get arrayClass(): _Il2CppClass {
         return new _Il2CppClass(Api._classGetArrayClass(this.handle, 1));
     }
 
     /**
      * @return The size as array element.
      */
-    @cache get arrayElementSize() {
+    @cache
+    get arrayElementSize(): number {
         return Api._classGetArrayElementSize(this.handle);
     }
 
     /**
      * @returns The name of the assembly it belongs to.
      */
-    @cache get assemblyName() {
+    @cache
+    get assemblyName(): string {
         return Api._classGetAssemblyName(this.handle)!;
     }
 
@@ -55,21 +58,24 @@ export class _Il2CppClass extends NativeStruct {
      * ```
      * @return Its outer class if its a nested class, `null` otherwise.
      */
-    @cache get declaringClass() {
+    @cache
+    get declaringClass(): _Il2CppClass | null {
         return getOrNull(Api._classGetDeclaringType(this.handle), _Il2CppClass);
     }
 
     /**
      * Its element class if it's an array.
      */
-    @cache get elementClass() {
+    @cache
+    get elementClass(): _Il2CppClass | null {
         return getOrNull(Api._classGetElementClass(this.handle), _Il2CppClass);
     }
 
     /**
      * @return The count of its fields.
      */
-    @cache get fieldCount() {
+    @cache
+    get fieldCount(): number {
         return Api._classGetFieldCount(this.handle);
     }
 
@@ -84,7 +90,8 @@ export class _Il2CppClass extends NativeStruct {
      * ```
      * @return Its fields.
      */
-    @cache get fields() {
+    @cache
+    get fields(): Accessor<_Il2CppField> {
         const iterator = Memory.alloc(Process.pointerSize);
         const accessor = new Accessor<_Il2CppField>();
         let handle: NativePointer;
@@ -99,42 +106,48 @@ export class _Il2CppClass extends NativeStruct {
     /**
      * @returns If it's a generic class, its generic class, `null` otherwise.
      */
-    @cache get genericClass() {
+    @cache
+    get genericClass(): _Il2CppGenericClass | null {
         return getOrNull(Api._classGetGenericClass(this.handle), _Il2CppGenericClass);
     }
 
     /**
      * @return `true` if it has a static constructor, `false` otherwise.
      */
-    @cache get hasStaticConstructor() {
+    @cache
+    get hasStaticConstructor(): boolean {
         return Api._classHasStaticConstructor(this.handle);
     }
 
     /**
      * @return The image it belongs to.
      */
-    @cache get image() {
+    @cache
+    get image(): _Il2CppImage {
         return new _Il2CppImage(Api._classGetImage(this.handle));
     }
 
     /**
      * @return The size of its instance.
      */
-    @cache get instanceSize() {
+    @cache
+    get instanceSize(): number {
         return Api._classGetInstanceSize(this.handle);
     }
 
     /**
      * @return `true` if it's an `enum`, `false` otherwise.
      */
-    @cache get isEnum() {
+    @cache
+    get isEnum(): boolean {
         return Api._classIsEnum(this.handle);
     }
 
     /**
      * @return `true` if it's an `interface`, `false` otherwise.
      */
-    @cache get isInterface() {
+    @cache
+    get isInterface(): boolean {
         return Api._classIsInterface(this.handle);
     }
 
@@ -142,21 +155,23 @@ export class _Il2CppClass extends NativeStruct {
      * @return `true` If its static constructor has been already called,
      * so if its static data has been initialized, `false` otherwise.
      */
-    get isStaticConstructorFinished() {
+    get isStaticConstructorFinished(): boolean {
         return Api._classIsStaticConstructorFinished(this.handle);
     }
 
     /**
      * @return `true` if it's a value type (aka struct), `false` otherwise.
      */
-    @cache get isStruct() {
+    @cache
+    get isStruct(): boolean {
         return Api._classIsStruct(this.handle) && !this.isEnum;
     }
 
     /**
      * @return The count of its implemented interfaces.
      */
-    @cache get interfaceCount() {
+    @cache
+    get interfaceCount(): number {
         return Api._classGetInterfaceCount(this.handle);
     }
 
@@ -171,7 +186,8 @@ export class _Il2CppClass extends NativeStruct {
      * ```
      * @return Its interfaces.
      */
-    @cache get interfaces() {
+    @cache
+    get interfaces(): Accessor<_Il2CppClass> {
         const iterator = Memory.alloc(Process.pointerSize);
         const accessor = new Accessor<_Il2CppClass>();
         let handle: NativePointer;
@@ -186,7 +202,8 @@ export class _Il2CppClass extends NativeStruct {
     /**
      * @return The count of its methods.
      */
-    @cache get methodCount() {
+    @cache
+    get methodCount(): number {
         return Api._classGetMethodCount(this.handle);
     }
 
@@ -201,7 +218,8 @@ export class _Il2CppClass extends NativeStruct {
      * ```
      * @return Its methods.
      */
-    @cache get methods() {
+    @cache
+    get methods(): Accessor<_Il2CppMethod> {
         const iterator = Memory.alloc(Process.pointerSize);
         const accessor = new Accessor<_Il2CppMethod>(true);
         let handle: NativePointer;
@@ -216,35 +234,40 @@ export class _Il2CppClass extends NativeStruct {
     /**
      * @return Its name.
      */
-    @cache get name() {
+    @cache
+    get name(): string {
         return Api._classGetName(this.handle)!;
     }
 
     /**
      * @return Its namespace.
      */
-    @cache get namespace() {
+    @cache
+    get namespace(): string {
         return Api._classGetNamespace(this.handle)!;
     }
 
     /**
      * @return Its parent if there is, `null.` otherwise.
      */
-    @cache get parent() {
+    @cache
+    get parent(): _Il2CppClass | null {
         return getOrNull(Api._classGetParent(this.handle), _Il2CppClass);
     }
 
     /**
      * @return A pointer to its static fields.
      */
-    @cache get staticFieldsData() {
+    @cache
+    get staticFieldsData(): NativePointer {
         return Api._classGetStaticFieldData(this.handle);
     }
 
     /**
      * @return Its type.
      */
-    @cache get type() {
+    @cache
+    get type(): _Il2CppType {
         return new _Il2CppType(Api._classGetType(this.handle));
     }
 
@@ -252,7 +275,7 @@ export class _Il2CppClass extends NativeStruct {
      * It makes sure its static data has been initialized.\
      * See {@link isStaticConstructorFinished} for an example.
      */
-    ensureInitialized() {
+    ensureInitialized(): void {
         Api._classInit(this.handle);
     }
 
@@ -260,14 +283,14 @@ export class _Il2CppClass extends NativeStruct {
      * It traces all its methods.\
      * See {@link Method.trace | trace} for more details.
      */
-    trace() {
+    trace(): void {
         for (const method of this.methods) method.trace();
     }
 
     /**
      * @return The class dump.
      */
-    toString() {
+    toString(): string {
         const spacer = "\n    ";
         let text = "// " + this.image.name + "\n";
         text += this.isEnum ? "enum" : this.isStruct ? "struct" : this.isInterface ? "interface" : "class";

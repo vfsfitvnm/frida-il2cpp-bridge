@@ -46,7 +46,7 @@ type NCO = {
 
 type Extract<T, V extends (keyof T)[]> = { [P in keyof V]: V[P] extends keyof T ? T[V[P]] : never };
 
-function getTypeAliasForFrida(type: keyof NFI | keyof NFO | keyof NCI | keyof NCO) {
+function getTypeAliasForFrida(type: keyof NFI | keyof NFO | keyof NCI | keyof NCO): keyof Base | "void" {
     switch (type) {
         case "ansistring":
         case "utf8string":
@@ -114,7 +114,7 @@ export function createNF<R extends keyof NFO, P extends (keyof NFI)[]>(
     retType: R,
     argTypes: [...P],
     options?: NativeFunctionOptions
-) {
+): (...args: Extract<NFI, P>) => NFO[R] {
     const fn = new NativeFunction(address, getTypeAliasForFrida(retType), argTypes.map(getTypeAliasForFrida), options);
     return (...args: Extract<NFI, P>): NFO[R] => rawToRefined(fn(...args.map((v, i) => refinedToRaw(v, argTypes[i]))), retType);
 }
@@ -132,7 +132,7 @@ export function createNC<R extends keyof NCO, P extends (keyof NCI)[]>(
     retType: R,
     argTypes: [...P],
     abi?: NativeABI
-) {
+): NativeCallback {
     const cb = (...params: any[]) => refinedToRaw(callback(...(params.map((v, i) => rawToRefined(v, argTypes[i])) as any)), retType);
     return new NativeCallback(cb, getTypeAliasForFrida(retType), argTypes.map(getTypeAliasForFrida), abi);
 }

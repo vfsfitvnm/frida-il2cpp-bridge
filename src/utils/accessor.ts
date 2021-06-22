@@ -19,7 +19,7 @@ export class Accessor<T> implements Iterable<T> {
     /** @internal */
     constructor(keyClashProtection = false) {
         return new Proxy(this, {
-            set(target: Accessor<T>, key: PropertyKey, value: T) {
+            set(target: Accessor<T>, key: PropertyKey, value: T): boolean {
                 if (typeof key == "string") {
                     // const basename = key.replace(/^[^a-zA-Z$_]|[^a-zA-Z0-9$_]/g, "_");
                     let name = key;
@@ -33,7 +33,7 @@ export class Accessor<T> implements Iterable<T> {
                 }
                 return true;
             },
-            get(target: Accessor<T>, key: PropertyKey) {
+            get(target: Accessor<T>, key: PropertyKey): T {
                 if (typeof key != "string" || Reflect.has(target, key)) return Reflect.get(target, key);
                 const closestMatch = closest(key, Object.keys(target));
                 if (closestMatch) raise(`Couldn't find property "${key}", did you mean "${closestMatch}"?`);
@@ -45,12 +45,12 @@ export class Accessor<T> implements Iterable<T> {
     /**
      * Iterable.
      */
-    *[Symbol.iterator]() {
+    *[Symbol.iterator](): IterableIterator<T> {
         for (const value of Object.values(this)) yield value;
     }
 
     /** @internal */
-    [filterAndMap]<U>(filter: (value: T) => boolean, map: (value: T) => U) {
+    [filterAndMap]<U>(filter: (value: T) => boolean, map: (value: T) => U): Accessor<U> {
         const accessor = new Accessor<U>();
         for (const [key, value] of Object.entries(this)) if (filter(value)) accessor[key] = map(value);
         return accessor;

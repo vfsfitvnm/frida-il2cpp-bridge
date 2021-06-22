@@ -18,17 +18,17 @@ export function raise(message: string): never {
 }
 
 /** @internal */
-export function ok(message: string) {
+export function ok(message: string): void {
     console.log(GREEN + " " + message);
 }
 
 /** @internal */
-export function warn(message: string) {
+export function warn(message: string): void {
     console.log(YELLOW + " " + message);
 }
 
 /** @internal */
-export function inform(message: string) {
+export function inform(message: string): void {
     console.log(BLUE + " " + message);
 }
 
