@@ -148,6 +148,11 @@ export class Api {
     }
 
     @cache
+    static get _classIsAssignableFrom(): (klass: NativePointer, otherKlass: NativePointer) => boolean {
+        return createNF(this.r`class_is_assignable_from`, "bool", ["pointer", "pointer"])
+    }
+
+    @cache
     static get _classIsEnum(): (klass: NativePointer) => boolean {
         return createNF(this.r`class_is_enum`, "bool", ["pointer"]);
     }
@@ -163,7 +168,12 @@ export class Api {
     }
 
     @cache
-    static get _classIsStruct(): (klass: NativePointer) => boolean {
+    static get _classIsSubclassOf(): (klass: NativePointer, otherKlass: NativePointer, checkInterfaces: boolean) => boolean {
+        return createNF(this.r`class_is_subclass_of`, "bool", ["pointer", "pointer", "bool"])
+    }
+
+    @cache
+    static get _classIsValueType(): (klass: NativePointer) => boolean {
         return createNF(this.r`class_is_valuetype`, "bool", ["pointer"]);
     }
 
@@ -235,6 +245,26 @@ export class Api {
     @cache
     static get _gcEnable(): () => void {
         return createNF(this.r`gc_enable`, "void", []);
+    }
+
+    @cache
+    static get _gcHandleGetTarget(): (gcHandle: number) => NativePointer {
+        return createNF(this.r`gchandle_get_target`, "pointer", ["uint32"]);
+    }
+
+    @cache
+    static get _gcHandleFree(): (gcHandle: number) => void {
+        return createNF(this.r`gchandle_free`, "void", ["uint32"]);
+    }
+
+    @cache
+    static get _gcHandleNew(): (object: NativePointer, pinned: boolean) => number {
+        return createNF(this.r`gchandle_new`, "uint32", ["pointer", "bool"]);
+    }
+
+    @cache
+    static get _gcHandleNewWeakRef(): (object: NativePointer, trackResurrection: boolean) => number {
+        return createNF(this.r`gchandle_new_weakref`, "uint32", ["pointer", "bool"]);
     }
 
     @cache

@@ -28,7 +28,7 @@ type NFI = {
 } & Base;
 
 type NFO = {
-    void: undefined;
+    void: void;
 } & Base &
     NCI;
 

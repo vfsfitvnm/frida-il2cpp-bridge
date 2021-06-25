@@ -1,4 +1,4 @@
-export { library, unityVersion, domain, initialize } from "./variables";
+export { library, unityVersion, initialize } from "./variables";
 export { dump } from "./utils";
 export { _Il2CppArray as Array } from "./structs/array";
 export { _Il2CppAssembly as Assembly } from "./structs/assembly";
@@ -6,6 +6,7 @@ export { _Il2CppClass as Class } from "./structs/class";
 export { _Il2CppDomain as Domain } from "./structs/domain";
 export { _Il2CppField as Field } from "./structs/field";
 export { _Il2CppGC as GC } from "./structs/gc";
+export { _Il2CppGCHandle as GCHandle } from "./structs/gchandle";
 export { _Il2CppGenericClass as GenericClass } from "./structs/generic-class";
 export { _Il2CppImage as Image } from "./structs/image";
 export { _Il2CppMemorySnapshot as MemorySnapshot } from "./structs/memory-snapshot";

@@ -1,15 +1,15 @@
 import { inform, ok, raise } from "../utils/console";
 
-import { domain } from "./variables";
 import { NativeStruct } from "./native-struct";
 import { AllowedType } from "./types";
 
 import { _Il2CppArray } from "./structs/array";
+import { _Il2CppDomain } from "./structs/domain";
 import { _Il2CppObject } from "./structs/object";
 import { _Il2CppString } from "./structs/string";
-import { _Il2CppValueType } from "./structs/value-type";
 import { _Il2CppType } from "./structs/type";
 import { _Il2CppTypeEnum } from "./structs/type-enum";
+import { _Il2CppValueType } from "./structs/value-type";
 
 /** @internal */
 export function getOrNull<T extends NativeStruct>(handle: NativePointer, Class: new (...args: any[]) => T): T | null {
@@ -303,13 +303,13 @@ export function allocRawValue(value: AllowedType, type: _Il2CppType): NativePoin
  * `/storage/emulated/0/Android/data/com.example.application/files/com.example.application_1.2.3.cs` on Android.
  */
 export function dump(filePath?: string): void {
-    if (domain == undefined) {
+    if (_Il2CppDomain.reference == undefined) {
         raise("Not yet initialized!");
     }
 
     if (filePath == undefined) {
-        const coreModuleName = "UnityEngine.CoreModule" in domain.assemblies ? "UnityEngine.CoreModule" : "UnityEngine";
-        const applicationMethods = domain.assemblies[coreModuleName].image.classes["UnityEngine.Application"].methods;
+        const coreModuleName = "UnityEngine.CoreModule" in _Il2CppDomain.reference.assemblies ? "UnityEngine.CoreModule" : "UnityEngine";
+        const applicationMethods = _Il2CppDomain.reference.assemblies[coreModuleName].image.classes["UnityEngine.Application"].methods;
 
         const persistentDataPath = applicationMethods.get_persistentDataPath.invoke<_Il2CppString>().content;
 
@@ -322,7 +322,7 @@ export function dump(filePath?: string): void {
 
     const file = new File(filePath, "w");
 
-    for (const assembly of domain.assemblies) {
+    for (const assembly of _Il2CppDomain.reference.assemblies) {
         inform(`Dumping ${assembly.name}...`);
         for (const klass of assembly.image.classes) {
             file.write(klass.toString());
