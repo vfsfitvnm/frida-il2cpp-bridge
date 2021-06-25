@@ -79,6 +79,7 @@ export class _Il2CppGC {
      * @return An array of ready-to-use objects, strings or arrays. Value types are boxed.
      */
     static choose<T extends _Il2CppObject | _Il2CppString | _Il2CppArray<AllowedType> = _Il2CppObject>(klass: _Il2CppClass): T[] {
+        // TODO: check is assignable from!!!!
         const isString = klass.type.typeEnum == _Il2CppTypeEnum.STRING;
         const isArray = klass.type.typeEnum == _Il2CppTypeEnum.SZARRAY;
 
@@ -90,7 +91,7 @@ export class _Il2CppGC {
 
                 if (isString) matches.push(new _Il2CppString(pointer) as T);
                 else if (isArray) matches.push(new _Il2CppArray(pointer) as T);
-                else matches.push(new Object(pointer) as T);
+                else matches.push(new _Il2CppObject(pointer) as T);
             }
         };
 
@@ -113,6 +114,7 @@ export class _Il2CppGC {
      * @return An array of ready-to-use objects, strings or arrays. Value types are boxed.
      */
     static choose2<T extends _Il2CppObject | _Il2CppString | _Il2CppArray<AllowedType> = _Il2CppObject>(klass: _Il2CppClass): T[] {
+        // TODO: check is assignable from!!!!
         const isString = klass.type.typeEnum == _Il2CppTypeEnum.STRING;
         const isArray = klass.type.typeEnum == _Il2CppTypeEnum.SZARRAY;
 
@@ -138,3 +140,4 @@ export class _Il2CppGC {
         return matches;
     }
 }
+

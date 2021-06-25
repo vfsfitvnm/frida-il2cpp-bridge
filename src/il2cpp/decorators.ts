@@ -10,10 +10,11 @@ import { _Il2CppMethod } from "./structs/method";
 
 /** @internal */
 export function shouldBeInstance<T extends _Il2CppField | _Il2CppMethod>(shouldBeInstance: boolean): MethodDecorator {
-    return function (_: Object, __: PropertyKey, descriptor: PropertyDescriptor) {
+    return function (_: Object, __: PropertyKey, descriptor: PropertyDescriptor): void {
         const fn = descriptor.value ?? descriptor.get ?? descriptor.set;
         const key = descriptor.value ? "value" : descriptor.get ? "get" : "set";
-        descriptor[key] = function (this: T, ...args: any[]) {
+
+        descriptor[key] = function (this: T, ...args: any[]): any {
             if (this.isInstance != shouldBeInstance) {
                 raise(`${this.constructor.name} ("${this.name}") is ${shouldBeInstance ? "" : "not "}static.`);
             }
@@ -24,10 +25,11 @@ export function shouldBeInstance<T extends _Il2CppField | _Il2CppMethod>(shouldB
 
 /** @internal */
 export function since(version: string): MethodDecorator {
-    return function (_: Object, propertyKey: PropertyKey, descriptor: PropertyDescriptor) {
+    return function (_: Object, propertyKey: PropertyKey, descriptor: PropertyDescriptor): void {
         const fn = descriptor.value ?? descriptor.get ?? descriptor.set;
         const key = descriptor.value ? "value" : descriptor.get ? "get" : "set";
-        descriptor[key] = function (...args: any[]) {
+
+        descriptor[key] = function (...args: any[]): any {
             if (unityVersion.isBelow(version)) {
                 raise(`${this.constructor.name}.${propertyKey.toString()} is available from version ${version} onwards.`);
             }
@@ -40,7 +42,8 @@ export function since(version: string): MethodDecorator {
 export function nonNullMethodPointer<T extends _Il2CppMethod>(_: T, propertyKey: PropertyKey, descriptor: PropertyDescriptor): void {
     const fn = descriptor.value ?? descriptor.get ?? descriptor.set;
     const key = descriptor.value ? "value" : descriptor.get ? "get" : "set";
-    descriptor[key] = function (this: T, ...args: any[]) {
+
+    descriptor[key] = function (this: T, ...args: any[]): any {
         if (this.actualPointer.isNull()) {
             raise(`Can't ${propertyKey.toString()} method ${this.name} from ${this.class.type.name}: pointer is NULL.`);
         }
@@ -63,7 +66,7 @@ export function checkOutOfBounds<T extends _Il2CppArray<AllowedType>>(_: T, __: 
 /** @internal */
 export function nonNullHandle<T extends { new (...args: any[]): NativeStruct }>(Class: T): T {
     return new Proxy(Class, {
-        construct(Class, args: any[]) {
+        construct(Class, args: any[]): NativeStruct {
             const constructed = new Class(...args);
             if (constructed.handle.isNull()) {
                 raise(`Handle for "${Class.name}" cannot be NULL.`);

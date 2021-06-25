@@ -17,6 +17,7 @@ import { _Il2CppType } from "./type";
  */
 @nonNullHandle
 export class _Il2CppField extends NativeStruct implements Valuable {
+
     /**
      * @return The class it belongs to.
      */
@@ -50,7 +51,7 @@ export class _Il2CppField extends NativeStruct implements Valuable {
     }
 
     /**
-     * @return Its name.
+     * Gets the name of this field.
      */
     @cache
     get name(): string {
@@ -70,7 +71,7 @@ export class _Il2CppField extends NativeStruct implements Valuable {
     }
 
     /**
-     * @return Its type.
+     * Gets the type of this field.
      */
     @cache
     get type(): _Il2CppType {
@@ -93,6 +94,7 @@ export class _Il2CppField extends NativeStruct implements Valuable {
         if (this.isThreadStatic || this.isLiteral) {
             raise(`Cannot edit the thread static or literal field "${this.name}".`);
         }
+
         writeFieldValue(this.valueHandle, value, this.type!);
     }
 
@@ -102,12 +104,14 @@ export class _Il2CppField extends NativeStruct implements Valuable {
     @shouldBeInstance(false)
     get valueHandle(): NativePointer {
         let handle: NativePointer;
+
         if (this.isThreadStatic || this.isLiteral) {
             handle = Memory.alloc(Process.pointerSize);
             Api._fieldGetStaticValue(this.handle, handle);
         } else {
             handle = this.class.staticFieldsData.add(this.offset);
         }
+
         return handle;
     }
 

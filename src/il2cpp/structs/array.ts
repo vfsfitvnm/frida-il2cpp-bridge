@@ -14,8 +14,9 @@ import { _Il2CppType } from "./type";
  * Represents a `Il2CppArraySize`.
  */
 export class _Il2CppArray<T extends AllowedType> extends NativeStruct implements Iterable<T> {
+
     /**
-     * @return The size of each element.
+     * Gets the size of the object encompassed by the current array.
      */
     @cache
     get elementSize(): number {
@@ -26,14 +27,17 @@ export class _Il2CppArray<T extends AllowedType> extends NativeStruct implements
     }
 
     /**
-     * @return The type of its elements.
+     * Gets the type of the object encompassed by the current array.
      */
     @cache
     get elementType(): _Il2CppType {
         return this.object.class.type.dataType!;
     }
 
-    /** @internal */
+    /**
+     * Gets a pointer to the first element of the current array.
+     * @internal
+     */
     @cache
     get elements(): NativePointer {
         if (this.handle.isNull()) {
@@ -43,7 +47,7 @@ export class _Il2CppArray<T extends AllowedType> extends NativeStruct implements
     }
 
     /**
-     * @return Its length.
+     * Gets the total number of elements in all the dimensions of the current array.
      */
     @cache
     get length(): number {
@@ -54,7 +58,7 @@ export class _Il2CppArray<T extends AllowedType> extends NativeStruct implements
     }
 
     /**
-     * @return The same array as an object.
+     * Gets the object behind the current array.
      */
     @cache
     get object(): _Il2CppObject {
@@ -63,9 +67,6 @@ export class _Il2CppArray<T extends AllowedType> extends NativeStruct implements
 
     /**
      * Creates a new array.
-     * @param klass The class of the elements.
-     * @param elements The elements.
-     * @return A new array.
      */
     static from<T extends AllowedType>(klass: _Il2CppClass, elements: T[]): _Il2CppArray<T> {
         const handle = Api._arrayNew(klass.handle, elements.length);
@@ -75,8 +76,7 @@ export class _Il2CppArray<T extends AllowedType> extends NativeStruct implements
     }
 
     /**
-     * @param index The index of the element. It must be between the array bounds.
-     * @return The element at the given index.
+     * Gets the element at the specified index of the current array.
      */
     @checkOutOfBounds
     get(index: number): T {
@@ -84,8 +84,7 @@ export class _Il2CppArray<T extends AllowedType> extends NativeStruct implements
     }
 
     /**
-     * @param index The index of the element. It must be between the array bounds.
-     * @param value The value of the element.
+     * Sets the element at the specified index of the current array.
      */
     @checkOutOfBounds
     set(index: number, value: T) {
@@ -96,6 +95,8 @@ export class _Il2CppArray<T extends AllowedType> extends NativeStruct implements
      * Iterable.
      */
     *[Symbol.iterator](): IterableIterator<T> {
-        for (let i = 0; i < this.length; i++) yield this.get(i);
+        for (let i = 0; i < this.length; i++) {
+            yield this.get(i);
+        }
     }
 }

@@ -14,8 +14,9 @@ import { _Il2CppAssembly } from "./assembly";
  */
 @nonNullHandle
 export class _Il2CppDomain extends NativeStruct {
+
     /**
-     * @return Its name. Probably `IL2CPP Root Domain`.
+     * Gets the name of the current application domain.
      */
     @cache
     get name(): string | null {
@@ -23,9 +24,7 @@ export class _Il2CppDomain extends NativeStruct {
     }
 
     /**
-     * We can iterate over the assemblies using a `for..of` loop,
-     * or access a specific assembly using its name, extension omitted.
-     * @return Its assemblies.
+     * Gets the assemblies that have been loaded into the execution context of the current application domain.
      */
     @cache
     get assemblies(): Accessor<_Il2CppAssembly> {
@@ -44,34 +43,41 @@ export class _Il2CppDomain extends NativeStruct {
             const assembly = new _Il2CppAssembly(startPointer.add(i * Process.pointerSize).readPointer());
             accessor[assembly.name] = assembly;
         }
+
         return accessor;
     }
 
     /**
-     * This is potentially asynchronous because the domain could
-     * be initialized at any time, e.g. after `il2cpp_init` is
-     * being called.\
-     * The domain will already be attached to the caller thread.
-     * You don't actually need to call this.
-     * @return The current application domain.
+     * Gets the current application domain.
      */
-    @cache static get reference(): Promise<_Il2CppDomain> {
-        return (async () => {
-            const domainPointer = await new Promise<NativePointer>(resolve => {
-                const start = Api._domainGetAssemblies(NULL, Memory.alloc(Process.pointerSize));
-                if (!start.isNull()) {
-                    resolve(Api._domainGet());
-                } else {
-                    const interceptor = Interceptor.attach(Api._init, {
-                        onLeave() {
-                            setTimeout(() => interceptor.detach());
-                            resolve(Api._domainGet());
-                        }
-                    });
-                }
-            });
-            Api._threadAttach(domainPointer);
-            return new _Il2CppDomain(domainPointer);
-        })();
+    @cache
+    static get reference(): _Il2CppDomain {
+        const domainPointer = Api._domainGet();
+
+        Api._threadAttach(domainPointer);
+
+        return new _Il2CppDomain(domainPointer);
+
+        // async function execute(): Promise<_Il2CppDomain> {
+        //     const domainPointer = await domainPointerPromise;
+        //
+        //     Api._threadAttach(domainPointer);
+        //     return new _Il2CppDomain(domainPointer);
+        // }
+        //
+        // const domainPointerPromise = new Promise<NativePointer>(resolve => {
+        //     if (Api._domainGetAssemblies(NULL, Memory.alloc(Process.pointerSize)).isNull()) {
+        //         const interceptor = Interceptor.attach(Api._init, {
+        //             onLeave() {
+        //                 setTimeout(() => interceptor.detach());
+        //                 resolve(Api._domainGet());
+        //             }
+        //         });
+        //     } else {
+        //         resolve(Api._domainGet());
+        //     }
+        // });
+        //
+        // return execute();
     }
 }

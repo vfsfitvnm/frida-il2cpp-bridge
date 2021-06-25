@@ -19,9 +19,9 @@ import { _Il2CppTypeEnum } from "./type-enum";
  */
 @nonNullHandle
 export class _Il2CppClass extends NativeStruct {
+
     /**
-     * The inverse of {@link _Il2CppClass.elementClass}.
-     * @return The array class which has the caller as element class.
+     * Gets the array class which encompass the current class.
      */
     @cache
     get arrayClass(): _Il2CppClass {
@@ -29,7 +29,7 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * @return The size as array element.
+     * Gets the size of the object encompassed by the current array class.
      */
     @cache
     get arrayElementSize(): number {
@@ -37,7 +37,7 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * @returns The name of the assembly it belongs to.
+     * Gets the name of the assembly in which the current class is defined.
      */
     @cache
     get assemblyName(): string {
@@ -45,18 +45,7 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * ```csharp
-     * namespace System.Threading
-     * {
-     *     class ExecutionContext
-     *     {
-     *         class Flags
-     *         {
-     *         }
-     *     }
-     * }
-     * ```
-     * @return Its outer class if its a nested class, `null` otherwise.
+     * Gets the class that declares the current nested class.
      */
     @cache
     get declaringClass(): _Il2CppClass | null {
@@ -64,7 +53,7 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * Its element class if it's an array.
+     * Gets the class of the object encompassed or referred to by the current array, pointer or reference class.
      */
     @cache
     get elementClass(): _Il2CppClass | null {
@@ -72,7 +61,7 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * @return The count of its fields.
+     * Gets the amount of the fields of the current class.
      */
     @cache
     get fieldCount(): number {
@@ -80,31 +69,26 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * We can iterate over the fields a `for..of` loop, or access
-     * a specific field using its name.
-     * ```typescript
-     * const MathClass = mscorlib.classes["System.Math"];
-     * for (const fields of MathClass.fields) {
-     * }
-     * const PI = MathClass.fields.PI;
-     * ```
-     * @return Its fields.
+     * Gets the fields of the current class.
      */
     @cache
     get fields(): Accessor<_Il2CppField> {
         const iterator = Memory.alloc(Process.pointerSize);
         const accessor = new Accessor<_Il2CppField>();
+
         let handle: NativePointer;
         let field: _Il2CppField;
+
         while (!(handle = Api._classGetFields(this.handle, iterator)).isNull()) {
             field = new _Il2CppField(handle);
             accessor[field.name!] = field;
         }
+
         return accessor;
     }
 
     /**
-     * @returns If it's a generic class, its generic class, `null` otherwise.
+     * Gets the generic class from which the current generic class can be constructed.
      */
     @cache
     get genericClass(): _Il2CppGenericClass | null {
@@ -112,7 +96,7 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * @return `true` if it has a static constructor, `false` otherwise.
+     * Determines whether the current class has a static constructor.
      */
     @cache
     get hasStaticConstructor(): boolean {
@@ -120,7 +104,7 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * @return The image it belongs to.
+     * Gets the image in which the current class is defined.
      */
     @cache
     get image(): _Il2CppImage {
@@ -128,7 +112,7 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * @return The size of its instance.
+     * Gets the of the instances of the current class.
      */
     @cache
     get instanceSize(): number {
@@ -136,7 +120,14 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * @return `true` if it's an `enum`, `false` otherwise.
+     * Determines whether an instance of `other` class can be assigned to a variable of the current type.
+     */
+    isAssignableFrom(other: _Il2CppClass): boolean {
+        return Api._classIsAssignableFrom(this.handle, other.handle);
+    }
+
+    /**
+     * Determines whether the current class is an enumeration.
      */
     @cache
     get isEnum(): boolean {
@@ -144,7 +135,7 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * @return `true` if it's an `interface`, `false` otherwise.
+     * Determines whether the current class is an interface.
      */
     @cache
     get isInterface(): boolean {
@@ -152,23 +143,29 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * @return `true` If its static constructor has been already called,
-     * so if its static data has been initialized, `false` otherwise.
+     * Determines whether the static constructor of the current class has been invoked.
      */
     get isStaticConstructorFinished(): boolean {
         return Api._classIsStaticConstructorFinished(this.handle);
     }
 
     /**
-     * @return `true` if it's a value type (aka struct), `false` otherwise.
+     * Determines whether the current class derives from `other` class.
      */
-    @cache
-    get isStruct(): boolean {
-        return Api._classIsStruct(this.handle) && !this.isEnum;
+    isSubclassOf(other: _Il2CppClass, checkInterfaces: boolean): boolean {
+        return Api._classIsSubclassOf(this.handle, other.handle, checkInterfaces);
     }
 
     /**
-     * @return The count of its implemented interfaces.
+     * Determines whether the current class is an value type.
+     */
+    @cache
+    get isValueType(): boolean {
+        return Api._classIsValueType(this.handle) && !this.isEnum;
+    }
+
+    /**
+     * Gets the amount of the implemented or inherited interfaces by the current class.
      */
     @cache
     get interfaceCount(): number {
@@ -176,31 +173,26 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * We can iterate over the interfaces using a `for..of` loop,
-     * or access a specific method using its name.
-     * ```typescript
-     * const StringClass = mscorlib.classes["System.String"];
-     * for (const klass of StringClass.interfaces) {
-     * }
-     * const IComparable = StringClass.interfaces["System.IComparable"];
-     * ```
-     * @return Its interfaces.
+     * Gets the interfaces implemented or inherited by the current class.
      */
     @cache
     get interfaces(): Accessor<_Il2CppClass> {
         const iterator = Memory.alloc(Process.pointerSize);
         const accessor = new Accessor<_Il2CppClass>();
+
         let handle: NativePointer;
         let klass: _Il2CppClass;
+
         while (!(handle = Api._classGetInterfaces(this.handle, iterator)).isNull()) {
             klass = new _Il2CppClass(handle);
             accessor[klass.type.name] = klass;
         }
+
         return accessor;
     }
 
     /**
-     * @return The count of its methods.
+     * Gets the amount of the implemented methods by the current class.
      */
     @cache
     get methodCount(): number {
@@ -208,31 +200,26 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * We can iterate over the methods using a `for..of` loop,
-     * or access a specific method using its name.
-     * ```typescript
-     * const MathClass = mscorlib.classes["System.Math"];
-     * for (const method of MathClass.methods) {
-     * }
-     * const Log10 = MathClass.methods.Log10;
-     * ```
-     * @return Its methods.
+     * Gets the methods implemented by the current class.
      */
     @cache
     get methods(): Accessor<_Il2CppMethod> {
         const iterator = Memory.alloc(Process.pointerSize);
         const accessor = new Accessor<_Il2CppMethod>(true);
+
         let handle: NativePointer;
         let method: _Il2CppMethod;
+
         while (!(handle = Api._classGetMethods(this.handle, iterator)).isNull()) {
             method = new _Il2CppMethod(handle);
             accessor[method.name] = method;
         }
+
         return accessor;
     }
 
     /**
-     * @return Its name.
+     * Gets the name of the current class.
      */
     @cache
     get name(): string {
@@ -240,7 +227,7 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * @return Its namespace.
+     * Gets the namespace of the current class.
      */
     @cache
     get namespace(): string {
@@ -248,7 +235,7 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * @return Its parent if there is, `null.` otherwise.
+     * Gets the class from which the current class directly inherits.
      */
     @cache
     get parent(): _Il2CppClass | null {
@@ -256,7 +243,7 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * @return A pointer to its static fields.
+     * Gets a pointer to the static fields of the current class.
      */
     @cache
     get staticFieldsData(): NativePointer {
@@ -264,7 +251,7 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * @return Its type.
+     * Gets the type of the current class.
      */
     @cache
     get type(): _Il2CppType {
@@ -272,28 +259,25 @@ export class _Il2CppClass extends NativeStruct {
     }
 
     /**
-     * It makes sure its static data has been initialized.\
-     * See {@link isStaticConstructorFinished} for an example.
+     * Calls the static constructor of the current class.
      */
-    ensureInitialized(): void {
+    initialize(): void {
         Api._classInit(this.handle);
     }
 
     /**
-     * It traces all its methods.\
-     * See {@link Method.trace | trace} for more details.
+     * Traces every method invocation of the current class.
      */
     trace(): void {
-        for (const method of this.methods) method.trace();
+        for (const method of this.methods) {
+            method.trace();
+        }
     }
 
-    /**
-     * @return The class dump.
-     */
-    toString(): string {
+    override toString(): string {
         const spacer = "\n    ";
         let text = "// " + this.image.name + "\n";
-        text += this.isEnum ? "enum" : this.isStruct ? "struct" : this.isInterface ? "interface" : "class";
+        text += this.isEnum ? "enum" : this.isValueType ? "struct" : this.isInterface ? "interface" : "class";
         text += " " + this.type.name;
         if (this.parent != null || this.interfaceCount > 0) text += " : ";
         if (this.parent != null) {
