@@ -1,40 +1,26 @@
 import { platformNotSupported, raise } from "../utils/console";
+import { injectToIl2Cpp } from "./decorators";
 import { forModule } from "../utils/native-wait";
-
+import { Api } from "./api";
 import { UnityVersion } from "./version";
 
-/**
- * The Il2Cpp library (`libil2cpp.so`, `GameAssembly.dll` ...).
- */
-export let library: Module;
-
-/**
- * The Unity version of the current application.
- */
-export let unityVersion: UnityVersion;
-
-/**
- * The whole thing must be initialized first.
- * This is potentially asynchronous because
- * the `IL2CPP` library could be loaded at any
- * time, so we just make sure it's loaded.
- * The current Unity version will also be
- * detected.
- * ```typescript
- * import "frida-il2cpp-bridge";
- * async function main() {
- *   await Il2Cpp.initialize();
- *   console.log(Il2Cpp.unityVersion);
- * }
- * main().catch(error => console.log(error.stack));
- ```
- */
-export async function initialize(): Promise<void> {
+async function initialize(): Promise<void> {
     const il2CppLibraryName =
         Process.platform == "linux" ? "libil2cpp.so" : Process.platform == "windows" ? "GameAssembly.dll" : platformNotSupported();
 
-    library = await forModule(il2CppLibraryName);
-    unityVersion = await getUnityVersion();
+    injectToIl2Cpp("module")(await forModule(il2CppLibraryName));
+    injectToIl2Cpp("unityVersion")(await getUnityVersion());
+
+    if (!("mscorlib" in Il2Cpp.Domain.reference.assemblies)) {
+        await new Promise<void>(resolve => {
+            const interceptor = Interceptor.attach(Api._init, {
+                onLeave() {
+                    interceptor.detach();
+                    resolve();
+                }
+            });
+        });
+    }
 }
 
 async function getUnityVersion(): Promise<UnityVersion> {
@@ -65,3 +51,5 @@ async function getUnityVersion(): Promise<UnityVersion> {
 
     return unityVersion;
 }
+
+injectToIl2Cpp("initialize")(initialize);

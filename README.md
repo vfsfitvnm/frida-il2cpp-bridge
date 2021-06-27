@@ -7,12 +7,12 @@ Frida module to dump, manipulate and hijack any IL2CPP application at runtime wi
  of abstraction, without needing the `global-metadata.dat` file.
 
 ```ts
-import { Il2Cpp } from "frida-il2cpp-bridge";
+import "frida-il2cpp-bridge";
 
 async function main() {
     await Il2Cpp.initialize();
     
-    const TestAssembly = Il2Cpp.domain.assemblies["Test.Assembly"].image;
+    const TestAssembly = Il2Cpp.Domain.reference.assemblies["Test.Assembly"].image;
     
     TestAssembly.classes.TestClass.methods.testMethod.intercept({
         onLeave(returnValue) { 
@@ -64,13 +64,10 @@ You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 
 ##### Initialization
 ```ts
-import { Il2Cpp } from "frida-il2cpp-bridge";
+import "frida-il2cpp-bridge";
 
 async function main() {
     await Il2Cpp.initialize();
-    
-    // Uncomment for REPL access
-    // (global as any).Il2Cpp = Il2Cpp;
 }
 
 main().catch(error => console.log(error.stack));
@@ -104,7 +101,7 @@ class Locale : System.Object
 
 ##### Find instances
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 const TypeClass = corlib.classes["System.Type"];
 
 Il2Cpp.GC.choose(TypeClass).forEach(instance => {
@@ -124,7 +121,7 @@ Il2Cpp.GC.choose2<Il2Cpp.Array<Il2Cpp.Object>>(TypeArrayClass).forEach(instance 
 
 ##### Print all strings
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 const StringClass = corlib.classes["System.String"];
 
 Il2Cpp.GC.choose<Il2Cpp.String>(StringClass).forEach(str => {
@@ -134,7 +131,7 @@ Il2Cpp.GC.choose<Il2Cpp.String>(StringClass).forEach(str => {
 
 ##### Class tracing
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 const StringClass = corlib.classes["System.String"];
 
 StringClass.trace();
@@ -151,7 +148,7 @@ It will log something like:
 
 ##### Method tracing
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 const IsNullOrEmpty = corlib.classes["System.String"].methods.IsNullOrEmpty;
 
 IsNullOrEmpty.trace();
@@ -165,7 +162,7 @@ It will log something like:
 
 ##### Method replacement
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 const IsNullOrEmpty = corlib.classes["System.String"].methods.IsNullOrEmpty;
 
 IsNullOrEmpty.implementation = (instance, parameters) => {
@@ -183,7 +180,7 @@ IsNullOrEmpty.implementation = null;
 ##### Method interception
 You can replace any of the parameters and the return value by reassigning them.
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 const StringClass = corlib.classes["System.String"];
 
 StringClass.methods.IsNullOrEmpty.intercept({
@@ -214,7 +211,7 @@ StringClass.methods.IsNullOrEmpty.intercept({
 ##### `Il2Cpp.Array`
 It's not possible to add or remove an array element at the moment.
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 const StringClass = corlib.classes["System.String"];
 
 const arr = Il2Cpp.Array.from<Il2Cpp.String>(StringClass, [
@@ -238,14 +235,14 @@ assert(arr.get(0).content == "Replaced");
 
 ##### `Il2Cpp.Assembly`
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib;
 
 assert(corlib.name == "mscorlib");
 ```
 
 ##### `Il2Cpp.Class`
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 
 const BooleanClass = corlib.classes["System.Boolean"];
 const Int32Class = corlib.classes["System.Int32"];
@@ -297,13 +294,13 @@ assert(BooleanClass.type.name == "System.Boolean");
 
 #### `Il2Cpp.Domain`
 ```ts
-assert(Il2Cpp.domain.name == "IL2CPP Root Domain");
+assert(Il2Cpp.Domain.reference.name == "IL2CPP Root Domain");
 ```
 
 #### `Il2Cpp.Field`
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
-const coreModule = Il2Cpp.domain.assemblies["UnityEngine.CoreModule"].image;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const coreModule = Il2Cpp.Domain.reference.assemblies["UnityEngine.CoreModule"].image;
 
 const BooleanClass = corlib.classes["System.Boolean"];
 const MathClass = corlib.classes["System.Math"];
@@ -324,7 +321,7 @@ assert(BooleanClass.fields.TrueLiteral.name == "TrueLiteral");
 
 assert(MathClass.fields.PI.type.name == "System.Double");
 
-const vec = Vector2Class.fields.oneVector.value as _Il2CppValueType;
+const vec = Vector2Class.fields.oneVector.value as Il2Cpp.ValueType;
 assert(vec.fields.x.value == 1);
 assert(vec.fields.y.value == 1);
 
@@ -334,14 +331,14 @@ assert(vec.fields.x.value == 42);
 
 #### `Il2Cpp.Image`
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 
 assert(corlib.name == "mscorlib.dll");
 ```
 
 #### `Il2Cpp.Method`
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 
 const BooleanClass = corlib.classes["System.Boolean"];
 const ArrayClass = corlib.classes["System.Array"];
@@ -360,7 +357,7 @@ assert(MathClass.methods[".cctor"].parameterCount == 0);
 assert(MathClass.methods.Abs.parameterCount == 1);
 assert(MathClass.methods.Max.parameterCount == 2);
 
-assert(BooleanClass.methods.Parse.invoke<boolean>(_Il2CppString.from("true")));
+assert(BooleanClass.methods.Parse.invoke<boolean>(Il2Cpp.String.from("true")));
 
 MathClass.methods.Max.implementation = (_instance, parameters) => {
  const val1 = parameters.val1.value as number;
@@ -382,8 +379,8 @@ assert(MathClass.methods.Max.invoke<number>(1, 2) == 10);
 
 #### `Il2Cpp.Object`
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
-const coreModule = Il2Cpp.domain.assemblies["UnityEngine.CoreModule"].image;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const coreModule = Il2Cpp.Domain.reference.assemblies["UnityEngine.CoreModule"].image;
 
 const OrdinalComparerClass = corlib.classes["System.OrdinalComparer"];
 const Vector2Class = coreModule.classes["UnityEngine.Vector2"];
@@ -408,7 +405,7 @@ assert(!vecBoxed.handle.equals(vec.handle));
 
 #### `Il2Cpp.Parameter`
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 
 const dParameter = corlib.classes["System.Math"].methods.Sqrt.parameters.d;
 
@@ -432,12 +429,12 @@ assert(str.length == 3);
 assert(str.content?.length == 3);
 
 assert(str.object.class.type.name == "System.String");
-assert(str.object.class.type.typeEnum == Il2Cpp.TypeEnum.STRING);
+assert(str.object.class.type.typeEnum == "string");
 ```
 
 #### `Il2Cpp.Type`
 ```ts
-const corlib = Il2Cpp.domain.assemblies.mscorlib.image;
+const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 
 const Int32Class = corlib.classes["System.Int32"];
 const StringClass = corlib.classes["System.String"];
@@ -451,13 +448,13 @@ assert(array.object.class.type.dataType?.name == "System.Int32");
 
 assert(StringClass.type.name == "System.String");
 
-assert(Int32Class.type.typeEnum == Il2Cpp.TypeEnum.I4);
-assert(ObjectClass.type.typeEnum == Il2Cpp.TypeEnum.OBJECT);
+assert(Int32Class.type.typeEnum == "i4");
+assert(ObjectClass.type.typeEnum == "object");
 ```
 
 #### `Il2Cpp.ValueType`
 ```ts
-const coreModule = Il2Cpp.domain.assemblies["UnityEngine.CoreModule"].image;
+const coreModule = Il2Cpp.Domain.reference.assemblies["UnityEngine.CoreModule"].image;
 
 const Vector2Class = coreModule.classes["UnityEngine.Vector2"];
 
