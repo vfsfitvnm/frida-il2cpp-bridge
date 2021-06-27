@@ -1,26 +1,20 @@
 import { Api } from "../api";
+import { injectToIl2Cpp } from "../decorators";
+import { getOrNull } from "../../utils/native-struct";
 
-import { _Il2CppObject } from "./object";
+@injectToIl2Cpp("GCHandle")
+class Il2CppGCHandle {
+    readonly weakRefId: WeakRefId;
 
-/**
- * Represents a GCHandle.
- */
-export class _Il2CppGCHandle {
-
-    /** @internal */
-    constructor(readonly handle: number) {}
-
-    /**
-     * Return the object associated to the handle.
-     */
-    get target(): _Il2CppObject  {
-        return new _Il2CppObject(Api._gcHandleGetTarget(this.handle));
+    constructor(readonly handle: number) {
+        this.weakRefId = WeakRef.bind(this, Api._gcHandleFree.bind(this, this.handle));
     }
 
-    /**
-     * Frees the handle.
-     */
+    get target(): Il2Cpp.Object | null {
+        return getOrNull(Api._gcHandleGetTarget(this.handle), Il2Cpp.Object);
+    }
+
     free(): void {
-        return Api._gcHandleFree(this.handle);
+        return WeakRef.unbind(this.weakRefId);
     }
 }

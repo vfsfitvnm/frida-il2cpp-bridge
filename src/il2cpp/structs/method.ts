@@ -1,128 +1,81 @@
 import { cache } from "decorator-cache-getter";
 
+import { Api } from "../api";
+import { injectToIl2Cpp, shouldBeInstance } from "../decorators";
+import { allocRawValue, readRawValue } from "../utils";
+
 import { Accessor, filterAndMap } from "../../utils/accessor";
 import { inform, raise, warn } from "../../utils/console";
+import { NativeStructNotNull } from "../../utils/native-struct";
 
-import { Api } from "../api";
-import { nonNullHandle, shouldBeInstance } from "../decorators";
-import { Invokable, Valuable } from "../interfaces";
-import { NativeStruct } from "../native-struct";
-import { library, unityVersion } from "../variables";
-import { allocRawValue, readRawValue } from "../utils";
-import { AllowedType, ImplementationCallback, OnEnterCallback, OnLeaveCallback } from "../types";
-
-import { _Il2CppClass } from "./class";
-import { _Il2CppObject } from "./object";
-import { _Il2CppType } from "./type";
-import { _Il2CppParameter } from "./parameter";
-
-/**
- * Represents a `MethodInfo`.
- */
-@nonNullHandle
-export class _Il2CppMethod extends NativeStruct {
-    /**
-     * ```typescript
-     * const MathClass = mscorlib.classes["System.Math"];
-     * Interceptor.attach(MathClass.actualPointer, {
-     *     // ...
-     * });
-     * ```
-     * @return Its actual pointer in memory.
-     */
+@injectToIl2Cpp("Method")
+class Il2CppMethod extends NativeStructNotNull {
     @cache
     get actualPointer(): NativePointer {
         return Api._methodGetPointer(this.handle);
     }
 
-    /**
-     * @return The class it belongs to.
-     */
     @cache
-    get class(): _Il2CppClass {
-        return new _Il2CppClass(Api._methodGetClass(this.handle));
+    get class(): Il2Cpp.Class {
+        return new Il2Cpp.Class(Api._methodGetClass(this.handle));
     }
 
-    /**
-     * @return `true` if it's generic, `false` otherwise.
-     */
     @cache
     get isGeneric(): boolean {
         return Api._methodIsGeneric(this.handle);
     }
 
-    /**
-     * @return `true` if it's inflated (a generic with a concrete type parameter),
-     * false otherwise.
-     */
     @cache
     get isInflated(): boolean {
         return Api._methodIsInflated(this.handle);
     }
 
-    /**
-     *  @return `true` if it's an instance method, `false` otherwise.
-     */
     @cache
-    get isInstance(): boolean {
-        return Api._methodIsInstance(this.handle);
+    get isStatic(): boolean {
+        return !Api._methodIsInstance(this.handle);
     }
 
-    /**
-     * @return Its name.
-     */
     @cache
     get name(): string {
         return Api._methodGetName(this.handle)!;
     }
 
-    /**
-     * @return The count of its parameters.
-     */
     @cache
     get parameterCount(): number {
         return Api._methodGetParamCount(this.handle);
     }
 
-    /**
-     * We can iterate over the parameters using a `for..of` loop,
-     * or access a specific parameter using its name.
-     * @return Its parameters.
-     */
     @cache
-    get parameters(): Accessor<_Il2CppParameter> {
+    get parameters(): Accessor<Il2Cpp.Parameter> {
         const iterator = Memory.alloc(Process.pointerSize);
-        const accessor = new Accessor<_Il2CppParameter>();
+        const accessor = new Accessor<Il2Cpp.Parameter>();
+
         let handle: NativePointer;
-        let parameter: _Il2CppParameter;
+        let parameter: Il2Cpp.Parameter;
+
         while (!(handle = Api._methodGetParameters(this.handle, iterator)).isNull()) {
-            parameter = new _Il2CppParameter(handle);
+            parameter = new Il2Cpp.Parameter(handle);
             accessor[parameter.name!] = parameter;
         }
+
         return accessor;
     }
 
-    /**
-     * @return Its static fixed offset, useful for static analysis.
-     */
     @cache
     get relativePointerAsString(): string {
-        return `0x${this.actualPointer.sub(library.base).toString(16).padStart(8, "0")}`;
+        return `0x${this.actualPointer.sub(Il2Cpp.module.base).toString(16).padStart(8, "0")}`;
     }
 
-    /**
-     * @return Its return type.
-     */
     @cache
-    get returnType(): _Il2CppType {
-        return new _Il2CppType(Api._methodGetReturnType(this.handle));
+    get returnType(): Il2Cpp.Type {
+        return new Il2Cpp.Type(Api._methodGetReturnType(this.handle));
     }
 
     /** @internal */
     @cache
     get nativeFunction(): NativeFunction {
         const parametersTypesAliasesForFrida = Array(this.parameterCount).fill("pointer");
-        if (this.isInstance || unityVersion.isLegacy) {
+        if (!this.isStatic || Il2Cpp.unityVersion.isLegacy) {
             parametersTypesAliasesForFrida.push("pointer");
         }
         if (this.isInflated) {
@@ -131,22 +84,19 @@ export class _Il2CppMethod extends NativeStruct {
         return new NativeFunction(this.actualPointer, this.returnType.aliasForFrida, parametersTypesAliasesForFrida);
     }
 
-    /**
-     * Abstraction over `Interceptor.replace`.
-     * @param callback The new method implementation. `null` if you want to
-     * revert it.
-     */
-    set implementation(callback: ImplementationCallback | null) {
+    set implementation(callback: Il2Cpp.Method.ImplementationCallback | null) {
         Interceptor.revert(this.actualPointer);
 
-        if (callback == null) return;
+        if (callback == null) {
+            return;
+        }
 
         if (this.actualPointer.isNull()) {
             raise(`Can't replace method ${this.name} from ${this.class.type.name}: pointer is NULL.`);
         }
 
         const parametersTypesAliasesForFrida = [];
-        if (this.isInstance) {
+        if (!this.isStatic) {
             parametersTypesAliasesForFrida.push(this.class.type.aliasForFrida);
         }
         for (const parameterInfo of this.parameters) {
@@ -155,8 +105,8 @@ export class _Il2CppMethod extends NativeStruct {
         const methodInfo = this;
 
         const replaceCallback: NativeCallbackImplementation = function (...invocationArguments: any[]) {
-            const instance = methodInfo.isInstance ? new _Il2CppObject(invocationArguments[0]) : null;
-            const startIndex = +methodInfo.isInstance | +unityVersion.isLegacy;
+            const instance = methodInfo.isStatic ? null : new Il2Cpp.Object(invocationArguments[0]);
+            const startIndex = +!methodInfo.isStatic | +Il2Cpp.unityVersion.isLegacy;
             const args = methodInfo.parameters[filterAndMap](
                 () => true,
                 parameter => parameter.asHeld(invocationArguments, startIndex)
@@ -174,7 +124,7 @@ export class _Il2CppMethod extends NativeStruct {
     @cache
     get parametersTypesAliasesForFrida(): string[] {
         const parametersTypesAliasesForFrida = new Array(this.parameterCount).fill("pointer");
-        if (this.isInstance || unityVersion.isLegacy) {
+        if (!this.isStatic || Il2Cpp.unityVersion.isLegacy) {
             parametersTypesAliasesForFrida.push("pointer");
         }
         if (this.isInflated) {
@@ -183,46 +133,51 @@ export class _Il2CppMethod extends NativeStruct {
         return parametersTypesAliasesForFrida;
     }
 
-    /**
-     * Invokes the method.
-     * @param parameters The parameters required by the method.
-     * @return A value, if any.
-     */
     @shouldBeInstance(false)
-    invoke<T extends AllowedType>(...parameters: AllowedType[]): T {
-        return this._invoke(NULL, ...parameters) as T;
+    invoke<T extends Il2Cpp.AllowedType>(...parameters: Il2Cpp.AllowedType[]): T {
+        return this.invokeRaw(NULL, ...parameters) as T;
     }
 
-    /**
-     * Abstraction over `Interceptor.attach`.
-     * @param onEnter The callback to execute when the method is invoked.
-     * @param onLeave The callback to execute when the method is about to return.
-     * @return Frida's `InvocationListener`.
-     */
-    intercept({ onEnter, onLeave }: { onEnter?: OnEnterCallback; onLeave?: OnLeaveCallback }): InvocationListener {
+    invokeRaw(instance: NativePointer, ...parameters: Il2Cpp.AllowedType[]): Il2Cpp.AllowedType {
+        if (this.parameterCount != parameters.length) {
+            raise(`This method takes ${this.parameterCount} parameters, but ${parameters.length} were supplied.`);
+        }
+        const allocatedParameters = Array.from(this.parameters).map((parameter, i) => allocRawValue(parameters[i], parameter.type));
+
+        if (!this.isStatic || Il2Cpp.unityVersion.isLegacy) {
+            allocatedParameters.unshift(instance);
+        }
+        if (this.isInflated) {
+            allocatedParameters.push(this.handle);
+        }
+
+        return readRawValue(this.nativeFunction(...allocatedParameters) as NativePointer, this.returnType);
+    }
+
+    intercept(callbacks: { onEnter?: Il2Cpp.Method.OnEnterCallback; onLeave?: Il2Cpp.Method.OnLeaveCallback }): InvocationListener {
         if (this.actualPointer.isNull()) {
             raise(`Can't intercept method ${this.name} from ${this.class.type.name}: pointer is NULL.`);
         }
 
         const interceptorCallbacks: ScriptInvocationListenerCallbacks = {};
 
-        if (onEnter != undefined) {
+        if (callbacks.onEnter != undefined) {
             const methodInfo = this;
             interceptorCallbacks.onEnter = function (invocationArguments) {
-                const instance = methodInfo.isInstance ? new _Il2CppObject(invocationArguments[0]) : null;
-                const startIndex = +methodInfo.isInstance | +unityVersion.isLegacy;
+                const instance = methodInfo.isStatic ? null : new Il2Cpp.Object(invocationArguments[0]);
+                const startIndex = +!methodInfo.isStatic | +Il2Cpp.unityVersion.isLegacy;
                 const args = methodInfo.parameters[filterAndMap](
                     () => true,
                     parameter => parameter.asHeld(invocationArguments, startIndex)
                 );
-                onEnter.call(this, instance, args);
+                callbacks.onEnter!.call(this, instance, args);
             };
         }
 
-        if (onLeave != undefined) {
+        if (callbacks.onLeave != undefined) {
             const methodInfo = this;
             interceptorCallbacks.onLeave = function (invocationReturnValue) {
-                onLeave.call(this, {
+                callbacks.onLeave!.call(this, {
                     valueHandle: invocationReturnValue.add(0),
                     get value() {
                         return readRawValue(invocationReturnValue, methodInfo.returnType);
@@ -230,16 +185,13 @@ export class _Il2CppMethod extends NativeStruct {
                     set value(v) {
                         invocationReturnValue.replace(allocRawValue(v, methodInfo.returnType));
                     }
-                } as Valuable);
+                } as Il2Cpp.Valuable);
             };
         }
 
         return Interceptor.attach(this.actualPointer, interceptorCallbacks);
     }
 
-    /**
-     * Prints a message when the method is invoked.
-     */
     trace(): void {
         if (this.actualPointer.isNull()) {
             warn(`Can't trace method ${this.name} from ${this.class.type.name}: pointer is NULL.`);
@@ -251,27 +203,13 @@ export class _Il2CppMethod extends NativeStruct {
         }
     }
 
-    /** @internal */
     @shouldBeInstance(true)
-    asHeld(holder: NativePointer): Invokable {
-        const invoke = this._invoke.bind(this, holder);
+    asHeld(holder: NativePointer): Il2Cpp.Invokable {
+        const invoke = this.invokeRaw.bind(this, holder);
         return {
-            invoke<T extends AllowedType>(...parameters: AllowedType[]): T {
+            invoke<T extends Il2Cpp.AllowedType>(...parameters: Il2Cpp.AllowedType[]): T {
                 return invoke(...parameters) as T;
             }
-        } as Invokable;
-    }
-
-    /** @internal */
-    private _invoke(instance: NativePointer, ...parameters: AllowedType[]): AllowedType {
-        if (this.parameterCount != parameters.length) {
-            raise(`This method takes ${this.parameterCount} parameters, but ${parameters.length} were supplied.`);
-        }
-        const allocatedParameters = Array.from(this.parameters).map((parameter, i) => allocRawValue(parameters[i], parameter.type));
-
-        if (this.isInstance || unityVersion.isLegacy) allocatedParameters.unshift(instance);
-        if (this.isInflated) allocatedParameters.push(this.handle);
-
-        return readRawValue(this.nativeFunction(...allocatedParameters) as NativePointer, this.returnType);
+        } as Il2Cpp.Invokable;
     }
 }

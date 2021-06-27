@@ -3,8 +3,6 @@ import { cache } from "decorator-cache-getter";
 import { createNF } from "../utils/extensions";
 import { raise } from "../utils/console";
 
-import { library, unityVersion } from "./variables";
-
 /** @internal */
 export class Api {
     @cache
@@ -149,7 +147,7 @@ export class Api {
 
     @cache
     static get _classIsAssignableFrom(): (klass: NativePointer, otherKlass: NativePointer) => boolean {
-        return createNF(this.r`class_is_assignable_from`, "bool", ["pointer", "pointer"])
+        return createNF(this.r`class_is_assignable_from`, "bool", ["pointer", "pointer"]);
     }
 
     @cache
@@ -169,7 +167,7 @@ export class Api {
 
     @cache
     static get _classIsSubclassOf(): (klass: NativePointer, otherKlass: NativePointer, checkInterfaces: boolean) => boolean {
-        return createNF(this.r`class_is_subclass_of`, "bool", ["pointer", "pointer", "bool"])
+        return createNF(this.r`class_is_subclass_of`, "bool", ["pointer", "pointer", "bool"]);
     }
 
     @cache
@@ -508,7 +506,7 @@ export class Api {
 
     @cache
     static get sources(): (Module | CModule)[] {
-        return [library, createMissingApi()];
+        return [Il2Cpp.module, createMissingApi()];
     }
 
     private static r(exportName: readonly string[]): NativePointer {
@@ -522,31 +520,31 @@ export class Api {
 }
 
 function createMissingApi(): CModule {
-    const isEqualOrAbove_5_3_2 = +unityVersion.isEqualOrAbove("5.3.2");
-    const isEqualOrAbove_5_3_3 = +unityVersion.isEqualOrAbove("5.3.3");
-    const isEqualOrAbove_5_3_6 = +unityVersion.isEqualOrAbove("5.3.6");
-    const isEqualOrAbove_5_4_4 = +unityVersion.isEqualOrAbove("5.4.4");
-    const isEqualOrAbove_5_5_0 = +unityVersion.isEqualOrAbove("5.5.0");
-    const isEqualOrAbove_5_6_0 = +unityVersion.isEqualOrAbove("5.6.0");
-    const isEqualOrAbove_2017_1_0 = +unityVersion.isEqualOrAbove("2017.1.0");
-    const isEqualOrAbove_2017_1_3 = +unityVersion.isEqualOrAbove("2017.1.3");
-    const isEqualOrAbove_2018_1_0 = +unityVersion.isEqualOrAbove("2018.1.0");
-    const isEqualOrAbove_2018_2_0 = +unityVersion.isEqualOrAbove("2018.2.0");
-    const isEqualOrAbove_2018_3_0 = +unityVersion.isEqualOrAbove("2018.3.0");
-    const isEqualOrAbove_2018_3_8 = +unityVersion.isEqualOrAbove("2018.3.8");
-    const isEqualOrAbove_2019_1_0 = +unityVersion.isEqualOrAbove("2019.1.0");
-    const isEqualOrAbove_2020_2_0 = +unityVersion.isEqualOrAbove("2020.2.0");
+    const isEqualOrAbove_5_3_2 = +Il2Cpp.unityVersion.isEqualOrAbove("5.3.2");
+    const isEqualOrAbove_5_3_3 = +Il2Cpp.unityVersion.isEqualOrAbove("5.3.3");
+    const isEqualOrAbove_5_3_6 = +Il2Cpp.unityVersion.isEqualOrAbove("5.3.6");
+    const isEqualOrAbove_5_4_4 = +Il2Cpp.unityVersion.isEqualOrAbove("5.4.4");
+    const isEqualOrAbove_5_5_0 = +Il2Cpp.unityVersion.isEqualOrAbove("5.5.0");
+    const isEqualOrAbove_5_6_0 = +Il2Cpp.unityVersion.isEqualOrAbove("5.6.0");
+    const isEqualOrAbove_2017_1_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2017.1.0");
+    const isEqualOrAbove_2017_1_3 = +Il2Cpp.unityVersion.isEqualOrAbove("2017.1.3");
+    const isEqualOrAbove_2018_1_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2018.1.0");
+    const isEqualOrAbove_2018_2_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2018.2.0");
+    const isEqualOrAbove_2018_3_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2018.3.0");
+    const isEqualOrAbove_2018_3_8 = +Il2Cpp.unityVersion.isEqualOrAbove("2018.3.8");
+    const isEqualOrAbove_2019_1_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2019.1.0");
+    const isEqualOrAbove_2020_2_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2020.2.0");
 
     const isBelow_5_3_3 = +!isEqualOrAbove_5_3_3;
     const isBelow_5_3_6 = +!isEqualOrAbove_5_3_6;
     const isBelow_5_5_0 = +!isEqualOrAbove_5_5_0;
     const isBelow_2018_1_0 = +!isEqualOrAbove_2018_1_0;
     const isBelow_2018_3_0 = +!isEqualOrAbove_2018_3_0;
-    const isBelow_2019_3_0 = +unityVersion.isBelow("2019.3.0");
+    const isBelow_2019_3_0 = +Il2Cpp.unityVersion.isBelow("2019.3.0");
     const isBelow_2020_2_0 = +!isEqualOrAbove_2020_2_0;
 
-    const isNotEqual_2017_2_0 = +!unityVersion.isEqual("2017.2.0");
-    const isNotEqual_5_5_0 = +!unityVersion.isEqual("5.5.0");
+    const isNotEqual_2017_2_0 = +!Il2Cpp.unityVersion.isEqual("2017.2.0");
+    const isNotEqual_5_5_0 = +!Il2Cpp.unityVersion.isEqual("5.5.0");
 
     return new CModule(`
 #include <stdint.h>

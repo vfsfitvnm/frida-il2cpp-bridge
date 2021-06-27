@@ -1,35 +1,23 @@
-const NAME = "il2cpp";
-
-const RED = `\x1b[31m[${NAME}]\x1b[0m`;
-
-const GREEN = `\x1b[32m[${NAME}]\x1b[0m`;
-
-const YELLOW = `\x1b[33m[${NAME}]\x1b[0m`;
-
-const BLUE = `\x1b[34m[${NAME}]\x1b[0m`;
-
-const MAGENTA = `\x1b[35m[${NAME}]\x1b[0m`;
-
 /** @internal */
 export function raise(message: string): never {
     const error = new Error(message);
-    error.stack = error.stack?.replace("Error:", RED);
+    error.stack = error.stack?.replace("Error:", "\x1b[31m[il2cpp]\x1b[0m");
     throw error;
 }
 
 /** @internal */
 export function ok(message: string): void {
-    console.log(GREEN + " " + message);
+    console.log(`\x1b[32m[il2cpp]\x1b[0m ${message}`);
 }
 
 /** @internal */
 export function warn(message: string): void {
-    console.log(YELLOW + " " + message);
+    console.log(`\x1b[33m[il2cpp]\x1b[0m ${message}`);
 }
 
 /** @internal */
 export function inform(message: string): void {
-    console.log(BLUE + " " + message);
+    console.log(`\x1b[34m[il2cpp]\x1b[0m ${message}`);
 }
 
 /** @internal */

@@ -1,105 +1,152 @@
 import { cache } from "decorator-cache-getter";
 
 import { Api } from "../api";
-import { nonNullHandle } from "../decorators";
-import { NativeStruct } from "../native-struct";
-import { getOrNull } from "../utils";
+import { getOrNull, NativeStructNotNull } from "../../utils/native-struct";
+import { injectToIl2Cpp } from "../decorators";
 
-import { _Il2CppClass } from "./class";
-import { _Il2CppGenericClass } from "./generic-class";
-import { _Il2CppTypeEnum } from "./type-enum";
-
-/**
- * Represents a `Il2CppType`.
- */
-@nonNullHandle
-export class _Il2CppType extends NativeStruct {
-    /** @internal */
-    @cache static get offsetOfTypeEnum() {
+@injectToIl2Cpp("Type")
+class Il2CppType extends NativeStructNotNull {
+    @cache
+    static get offsetOfTypeEnum() {
         return Api._typeOffsetOfTypeEnum();
     }
 
-    /** @internal */
     @cache
     get aliasForFrida() {
         switch (this.typeEnum) {
-            case _Il2CppTypeEnum.VOID:
+            case "void":
                 return "void";
-            case _Il2CppTypeEnum.BOOLEAN:
+            case "boolean":
                 return "bool";
-            case _Il2CppTypeEnum.CHAR:
+            case "char":
                 return "char";
-            case _Il2CppTypeEnum.I1:
+            case "i1":
                 return "int8";
-            case _Il2CppTypeEnum.U1:
+            case "u1":
                 return "uint8";
-            case _Il2CppTypeEnum.I2:
+            case "i2":
                 return "int16";
-            case _Il2CppTypeEnum.U2:
+            case "u2":
                 return "uint16";
-            case _Il2CppTypeEnum.I4:
+            case "i4":
                 return "int32";
-            case _Il2CppTypeEnum.U4:
+            case "u4":
                 return "uint32";
-            case _Il2CppTypeEnum.I8:
+            case "i8":
                 return "int64";
-            case _Il2CppTypeEnum.U8:
+            case "u8":
                 return "uint64";
-            case _Il2CppTypeEnum.R4:
+            case "r4":
                 return "float";
-            case _Il2CppTypeEnum.R8:
+            case "r8":
                 return "double";
             default:
                 return "pointer";
         }
     }
 
-    /**
-     * @return Its class.
-     */
     @cache
-    get class(): _Il2CppClass {
-        return new _Il2CppClass(Api._classFromType(this.handle));
+    get class(): Il2Cpp.Class {
+        return new Il2Cpp.Class(Api._classFromType(this.handle));
     }
 
-    /**
-     * @return If it's an array, the type of its elements, `null` otherwise.
-     */
     @cache
-    get dataType(): _Il2CppType | null {
-        return getOrNull(Api._typeGetDataType(this.handle), _Il2CppType);
+    get dataType(): Il2Cpp.Type | null {
+        return getOrNull(Api._typeGetDataType(this.handle), Il2Cpp.Type);
     }
 
-    /**
-     * @returns If it's a generic type, its generic class, `null` otherwise.
-     */
-    @cache
-    get genericClass(): _Il2CppGenericClass | null {
-        return getOrNull(Api._typeGetGenericClass(this.handle), _Il2CppGenericClass);
-    }
+    // @cache
+    // get genericClass(): Il2Cpp.GenericClass | null {
+    //     return getOrNull(Api._typeGetGenericClass(this.handle), Il2Cpp.GenericClass);
+    // }
 
-    /**
-     *  @returns `true` if it's passed by reference, `false` otherwise.
-     */
     @cache
     get isByReference(): boolean {
         return Api._typeIsByReference(this.handle);
     }
 
-    /**
-     * @returns Its name, namespace included and declaring class excluded. If its class is nested,
-     * it corresponds to the class name.
-     */
     @cache
     get name(): string {
         return Api._typeGetName(this.handle)!;
     }
 
-    /**
-     * @returns Its corresponding type.
-     */
     @cache
-    get typeEnum(): _Il2CppTypeEnum {
-        return Api._typeGetTypeEnum(this.handle) as _Il2CppTypeEnum;
+    get typeEnum(): Il2Cpp.TypeEnum {
+        switch (Api._typeGetTypeEnum(this.handle)) {
+            case 0x00:
+                return "end";
+            case 0x01:
+                return "void";
+            case 0x02:
+                return "boolean";
+            case 0x03:
+                return "char";
+            case 0x04:
+                return "i1";
+            case 0x05:
+                return "u1";
+            case 0x06:
+                return "i2";
+            case 0x07:
+                return "u2";
+            case 0x08:
+                return "i4";
+            case 0x09:
+                return "u4";
+            case 0x0a:
+                return "i8";
+            case 0x0b:
+                return "u8";
+            case 0x0c:
+                return "r4";
+            case 0x0d:
+                return "r8";
+            case 0x0e:
+                return "string";
+            case 0x0f:
+                return "ptr";
+            case 0x10:
+                return "byref";
+            case 0x11:
+                return "valuetype";
+            case 0x12:
+                return "class";
+            case 0x13:
+                return "var";
+            case 0x14:
+                return "array";
+            case 0x15:
+                return "genericinst";
+            case 0x16:
+                return "typedbyref";
+            case 0x18:
+                return "i";
+            case 0x19:
+                return "u";
+            case 0x1b:
+                return "fnptr";
+            case 0x1c:
+                return "object";
+            case 0x1d:
+                return "szarray";
+            case 0x1e:
+                return "mvar";
+            case 0x1f:
+                return "cmod_reqd";
+            case 0x20:
+                return "cmod_opt";
+            case 0x21:
+                return "internal";
+            case 0x40:
+                return "modifier";
+            case 0x41:
+                return "sentinel";
+            case 0x45:
+                return "pinned";
+            case 0x55:
+                return "enum";
+            default:
+                return "end";
+        }
     }
 }

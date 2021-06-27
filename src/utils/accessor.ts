@@ -25,7 +25,10 @@ export class Accessor<T> implements Iterable<T> {
                     let name = key;
                     if (keyClashProtection) {
                         let count = 0;
-                        while (Reflect.has(target, name)) name = key + "_" + ++count;
+                        while (Reflect.has(target, name)) {
+                            count += 1;
+                            name = key + "_" + count;
+                        }
                     }
                     Reflect.set(target, name, value);
                 } else {
@@ -34,10 +37,16 @@ export class Accessor<T> implements Iterable<T> {
                 return true;
             },
             get(target: Accessor<T>, key: PropertyKey): T {
-                if (typeof key != "string" || Reflect.has(target, key)) return Reflect.get(target, key);
+                if (typeof key != "string" || Reflect.has(target, key)) {
+                    return Reflect.get(target, key);
+                }
+
                 const closestMatch = closest(key, Object.keys(target));
-                if (closestMatch) raise(`Couldn't find property "${key}", did you mean "${closestMatch}"?`);
-                else raise(`Couldn't find property "${key}"`);
+                if (closestMatch) {
+                    raise(`Couldn't find property "${key}", did you mean "${closestMatch}"?`);
+                } else {
+                    raise(`Couldn't find property "${key}".`);
+                }
             }
         });
     }
@@ -46,13 +55,21 @@ export class Accessor<T> implements Iterable<T> {
      * Iterable.
      */
     *[Symbol.iterator](): IterableIterator<T> {
-        for (const value of Object.values(this)) yield value;
+        for (const value of Object.values(this)) {
+            yield value;
+        }
     }
 
     /** @internal */
     [filterAndMap]<U>(filter: (value: T) => boolean, map: (value: T) => U): Accessor<U> {
         const accessor = new Accessor<U>();
-        for (const [key, value] of Object.entries(this)) if (filter(value)) accessor[key] = map(value);
+
+        for (const [key, value] of Object.entries(this)) {
+            if (filter(value)) {
+                accessor[key] = map(value);
+            }
+        }
+
         return accessor;
     }
 
