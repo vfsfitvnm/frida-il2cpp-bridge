@@ -8,7 +8,7 @@ import { NativeStructNotNull } from "../../utils/native-struct";
 import { readFieldValue, writeFieldValue } from "../utils";
 
 @injectToIl2Cpp("Field")
-class Il2CppField extends NativeStructNotNull implements Il2Cpp.Valuable {
+class Il2CppField extends NativeStructNotNull implements Il2Cpp.WithValue {
     @cache
     get class(): Il2Cpp.Class {
         return new Il2Cpp.Class(Api._fieldGetClass(this.handle));
@@ -72,7 +72,7 @@ class Il2CppField extends NativeStructNotNull implements Il2Cpp.Valuable {
     }
 
     @shouldBeInstance(true)
-    asHeld(handle: NativePointer): Il2Cpp.Valuable {
+    asHeld(handle: NativePointer): Il2Cpp.WithValue {
         const type = this.type;
         return {
             valueHandle: handle,
@@ -82,6 +82,6 @@ class Il2CppField extends NativeStructNotNull implements Il2Cpp.Valuable {
             set value(value: Il2Cpp.AllowedType) {
                 writeFieldValue(handle, value, type);
             }
-        } as Il2Cpp.Valuable;
+        } as Il2Cpp.WithValue;
     }
 }

@@ -51,9 +51,6 @@ export class Accessor<T> implements Iterable<T> {
         });
     }
 
-    /**
-     * Iterable.
-     */
     *[Symbol.iterator](): IterableIterator<T> {
         for (const value of Object.values(this)) {
             yield value;
@@ -73,8 +70,5 @@ export class Accessor<T> implements Iterable<T> {
         return accessor;
     }
 
-    /**
-     * Index signature.
-     */
     [key: string]: T;
 }

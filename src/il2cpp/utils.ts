@@ -1,6 +1,10 @@
 import { raise } from "../utils/console";
 
 function isCoherent(value: Il2Cpp.AllowedType, type: Il2Cpp.Type): boolean {
+    if (type.isByReference) {
+        return value instanceof NativePointer;
+    }
+
     switch (type.typeEnum) {
         case "void":
             return value == undefined;
@@ -168,6 +172,10 @@ export function readRawValue(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.
         return;
     }
 
+    // if (type.isByReference) {
+    //     return readRawValue(pointer.readPointer(), type.class.type);
+    // }
+
     switch (type.typeEnum) {
         case "void":
             return;
@@ -219,6 +227,10 @@ export function allocRawValue(value: Il2Cpp.AllowedType, type: Il2Cpp.Type): Nat
     if (!isCoherent(value, type)) {
         raise(`A "${type.name}" is required, but a "${Object.getPrototypeOf(value).constructor.name}" was supplied.`);
     }
+
+    // if (type.isByReference) {
+    //     return Memory.alloc(Process.pointerSize).writePointer(allocRawValue(value, type.class.type));
+    // }
 
     switch (type.typeEnum) {
         case "void":

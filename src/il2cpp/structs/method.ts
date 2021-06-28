@@ -7,6 +7,7 @@ import { allocRawValue, readRawValue } from "../utils";
 import { Accessor, filterAndMap } from "../../utils/accessor";
 import { inform, raise, warn } from "../../utils/console";
 import { NativeStructNotNull } from "../../utils/native-struct";
+import { createNC } from "../../utils/extensions";
 
 @injectToIl2Cpp("Method")
 class Il2CppMethod extends NativeStructNotNull {
@@ -163,7 +164,7 @@ class Il2CppMethod extends NativeStructNotNull {
 
         if (callbacks.onEnter != undefined) {
             const methodInfo = this;
-            interceptorCallbacks.onEnter = function (invocationArguments) {
+            interceptorCallbacks.onEnter = function (invocationArguments: InvocationArguments) {
                 const instance = methodInfo.isStatic ? null : new Il2Cpp.Object(invocationArguments[0]);
                 const startIndex = +!methodInfo.isStatic | +Il2Cpp.unityVersion.isLegacy;
                 const args = methodInfo.parameters[filterAndMap](
@@ -176,7 +177,7 @@ class Il2CppMethod extends NativeStructNotNull {
 
         if (callbacks.onLeave != undefined) {
             const methodInfo = this;
-            interceptorCallbacks.onLeave = function (invocationReturnValue) {
+            interceptorCallbacks.onLeave = function (invocationReturnValue: InvocationReturnValue) {
                 callbacks.onLeave!.call(this, {
                     valueHandle: invocationReturnValue.add(0),
                     get value() {
@@ -185,7 +186,7 @@ class Il2CppMethod extends NativeStructNotNull {
                     set value(v) {
                         invocationReturnValue.replace(allocRawValue(v, methodInfo.returnType));
                     }
-                } as Il2Cpp.Valuable);
+                });
             };
         }
 
@@ -210,6 +211,6 @@ class Il2CppMethod extends NativeStructNotNull {
             invoke<T extends Il2Cpp.AllowedType>(...parameters: Il2Cpp.AllowedType[]): T {
                 return invoke(...parameters) as T;
             }
-        } as Il2Cpp.Invokable;
+        };
     }
 }
