@@ -7,7 +7,6 @@ import { allocRawValue, readRawValue } from "../utils";
 import { Accessor, filterAndMap } from "../../utils/accessor";
 import { inform, raise, warn } from "../../utils/console";
 import { NativeStructNotNull } from "../../utils/native-struct";
-import { createNC } from "../../utils/extensions";
 
 @injectToIl2Cpp("Method")
 class Il2CppMethod extends NativeStructNotNull {
