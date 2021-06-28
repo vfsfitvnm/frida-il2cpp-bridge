@@ -159,7 +159,7 @@ declare global {
         }
 
         /** Represents a `FieldInfo`. */
-        class Field extends NativeStruct implements Valuable {
+        class Field extends NativeStruct implements WithValue {
             /** Gets the class in which this field is defined. */
             get class(): Il2Cpp.Class;
 
@@ -194,7 +194,7 @@ declare global {
             get valueHandle(): NativePointer;
 
             /** @internal */
-            asHeld(handle: NativePointer): Valuable;
+            asHeld(handle: NativePointer): WithValue;
         }
 
         /** Garbage collector utility functions. */
@@ -351,7 +351,7 @@ declare global {
             get class(): Il2Cpp.Class;
 
             /** Gets the fields of this object. */
-            get fields(): Accessor<Valuable>;
+            get fields(): Accessor<WithValue>;
 
             /** Gets the methods of this object. */
             get methods(): Accessor<Invokable>;
@@ -381,7 +381,7 @@ declare global {
             get type(): Il2Cpp.Type;
 
             /** @internal */
-            asHeld(holder: InvocationArguments, startIndex: number): Valuable;
+            asHeld(holder: InvocationArguments, startIndex: number): WithValue;
         }
 
         /** Represents a `Il2CppString`. */
@@ -458,7 +458,7 @@ declare global {
             get class(): Il2Cpp.Class;
 
             /** Gets the fields of this value type. */
-            get fields(): Accessor<Valuable>;
+            get fields(): Accessor<WithValue>;
 
             /** Boxed this value type into a object. */
             box(): Il2Cpp.Object;
@@ -482,14 +482,18 @@ declare global {
             type ImplementationCallback = (
                 this: InvocationContext,
                 instance: Il2Cpp.Object | null,
-                parameters: Accessor<Il2Cpp.Valuable>
-            ) => Il2Cpp.AllowedType;
+                parameters: Accessor<Il2Cpp.WithValue>
+            ) => any;
 
             /** Callback of a method `onEnter` interception. */
-            type OnEnterCallback = (this: InvocationContext, instance: Il2Cpp.Object | null, parameters: Accessor<Il2Cpp.Valuable>) => void;
+            type OnEnterCallback = (
+                this: InvocationContext,
+                instance: Il2Cpp.Object | null,
+                parameters: Accessor<Il2Cpp.WithValue>
+            ) => void;
 
             /** Callback of a method `onLeave` interception. */
-            type OnLeaveCallback = (this: InvocationContext, returnValue: Il2Cpp.Valuable) => void;
+            type OnLeaveCallback = (this: InvocationContext, returnValue: Il2Cpp.WithValue) => void;
         }
 
         /** Represents an invokable method. */
@@ -498,7 +502,7 @@ declare global {
         }
 
         /** Represents something which has an accessible value. */
-        interface Valuable {
+        interface WithValue {
             /** The actual "pretty" value. */
             value: Il2Cpp.AllowedType;
 

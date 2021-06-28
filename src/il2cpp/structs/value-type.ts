@@ -17,7 +17,7 @@ class Il2CppValueType extends NativeStruct {
     }
 
     @cache
-    get fields(): Accessor<Il2Cpp.Valuable> {
+    get fields(): Accessor<Il2Cpp.WithValue> {
         return this.class.fields[filterAndMap](
             field => !field.isStatic,
             field => field.asHeld(this.handle.add(field.offset).sub(Il2Cpp.Object.headerSize))

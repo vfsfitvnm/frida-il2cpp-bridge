@@ -52,10 +52,14 @@ npm install --save-dev frida-il2cpp-bridge
 ```
 You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 
+### Known limitations
+- Lack of support for reference types (e.g. `System.Boolean&`)
+- Absent generic classes or methods utilities
+- Probably a lot more
+
 ### Snippets
 * [`Initialization`](#initialization)
 * [`Dump`](#dump)
-* [`Print all the strings on the heap`](#print-all-strings)
 * [`Find every instance of a certain class`](#find-instances)
 * [`Class tracing`](#class-tracing)
 * [`Method tracing`](#method-tracing)
@@ -74,7 +78,7 @@ main().catch(error => console.log(error.stack));
 ```
 
 ##### Dump
-Make sure the target has write permissions to the destination.
+Make sure the target has write-permissions to the destination.
 ```ts
 Il2Cpp.dump("/full/path/to/file.cs");
 ```
@@ -101,43 +105,34 @@ class Locale : System.Object
 
 ##### Find instances
 ```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-const TypeClass = corlib.classes["System.Type"];
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const SystemType = msmscorlib.classes["System.Type"];
 
-Il2Cpp.GC.choose(TypeClass).forEach(instance => {
+Il2Cpp.GC.choose(SystemType).forEach(instance => {
     // Do whatever you want
     assert(instance.class.type.name == "System.Type");
 });
 ```
 Alternatively
 ```ts
-const TypeArrayClass = corlib.classes["System.Type"].arrayClass;
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const SystemString = msmscorlib.classes["System.String"];
 
-Il2Cpp.GC.choose2<Il2Cpp.Array<Il2Cpp.Object>>(TypeArrayClass).forEach(instance => {
-    // Do whatever you want
-    assert(instance.class.type.name == "System.Type[]");
-});
-```
-
-##### Print all strings
-```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-const StringClass = corlib.classes["System.String"];
-
-Il2Cpp.GC.choose<Il2Cpp.String>(StringClass).forEach(str => {
-    console.log(str.handle, str.content);
+new Il2Cpp.MemorySnapshot().objects.filter(Il2Cpp.Filtering.IsExactly(SystemString)).forEach(instance => {
+   // Do whatever you want
+   assert(instance.class.type.name == "System.Type[]");
 });
 ```
 
 ##### Class tracing
 ```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-const StringClass = corlib.classes["System.String"];
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const SystemString = msmscorlib.classes["System.String"];
 
-StringClass.trace();
+SystemString.trace();
 ```
 It will log something like:
-```coffeescriptliterate
+```
 [il2cpp] 0x015ed550 get_Chars
 [il2cpp] 0x005602f0 FastAllocateString
 [il2cpp] 0x00ab497c wstrcpy
@@ -148,8 +143,8 @@ It will log something like:
 
 ##### Method tracing
 ```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-const IsNullOrEmpty = corlib.classes["System.String"].methods.IsNullOrEmpty;
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const IsNullOrEmpty = msmscorlib.classes["System.String"].methods.IsNullOrEmpty;
 
 IsNullOrEmpty.trace();
 ```
@@ -162,16 +157,16 @@ It will log something like:
 
 ##### Method replacement
 ```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-const IsNullOrEmpty = corlib.classes["System.String"].methods.IsNullOrEmpty;
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const IsNullOrEmpty = msmscorlib.classes["System.String"].methods.IsNullOrEmpty;
 
 IsNullOrEmpty.implementation = (instance, parameters) => {
     parameters.value.value = Il2Cpp.String.from("Hello!");
-    return false;
+    return 0;
 };
 ```
 
-Later on, to revert the replacement
+Later on, to revert the replacement:
 ```ts
 IsNullOrEmpty.implementation = null;
 ```
@@ -180,15 +175,16 @@ IsNullOrEmpty.implementation = null;
 ##### Method interception
 You can replace any of the parameters and the return value by reassigning them.
 ```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-const StringClass = corlib.classes["System.String"];
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const SystemString = msmscorlib.classes["System.String"];
 
-StringClass.methods.IsNullOrEmpty.intercept({
+SystemString.methods.IsNullOrEmpty.intercept({
     onEnter(instance, parameters) {
-        console.log(parameters.value.value);
+        parameters.value = Il2Cpp.String.from("Replaced!");
+        assert((parameters.value.value as Il2Cpp.String).content == "Replaced!");
     },
     onLeave(returnValue) {
-        returnValue.value = !(returnValue.value as boolean);
+        returnValue.value = true;
     }
 });
 ```
@@ -211,10 +207,10 @@ StringClass.methods.IsNullOrEmpty.intercept({
 ##### `Il2Cpp.Array`
 It's not possible to add or remove an array element at the moment.
 ```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-const StringClass = corlib.classes["System.String"];
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const SystemString = msmscorlib.classes["System.String"];
 
-const arr = Il2Cpp.Array.from<Il2Cpp.String>(StringClass, [
+const arr = Il2Cpp.Array.from<Il2Cpp.String>(SystemString, [
     Il2Cpp.String.from("One"), Il2Cpp.String.from("Two"), Il2Cpp.String.from("Three")
 ]);
 
@@ -235,19 +231,19 @@ assert(arr.get(0).content == "Replaced");
 
 ##### `Il2Cpp.Assembly`
 ```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib;
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 
-assert(corlib.name == "mscorlib");
+assert(mscorlib.name == "mscorlib");
 ```
 
 ##### `Il2Cpp.Class`
 ```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 
-const BooleanClass = corlib.classes["System.Boolean"];
-const Int32Class = corlib.classes["System.Int32"];
-const Int64Class = corlib.classes["System.Int64"];
-const ObjectClass = corlib.classes["System.Object"];
+const BooleanClass = mscorlib.classes["System.Boolean"];
+const Int32Class = mscorlib.classes["System.Int32"];
+const Int64Class = mscorlib.classes["System.Int64"];
+const ObjectClass = mscorlib.classes["System.Object"];
 const DayOfWeekClass = mscorlib.classes["System.DayOfWeek"];
 const MathClass = mscorlib.classes["System.Math"];
 const IFormattableClass = mscorlib.classes["System.IFormattable"];
@@ -260,7 +256,7 @@ assert(Int32Class.arrayElementSize == 4);
 assert(Int64Class.arrayElementSize == 8);
 assert(ObjectClass.arrayElementSize == Process.pointerSize);
 
-assert(BooleanClass.arrayClass.elementClass.name == "Boolean");
+assert(BooleanClass.arrayClass.elementClass?.name == "Boolean");
 
 assert(ExecutionContextFlagsClass.declaringClass!.handle.equals(ExecutionContextClass.handle));
 
@@ -275,12 +271,12 @@ assert(IFormattableClass.isInterface);
 assert(!ObjectClass.isInterface);
 
 if (!MathClass.isStaticConstructorFinished) {
- MathClass.ensureInitialized();
+ MathClass.initialize();
  assert(MathClass.isStaticConstructorFinished);
 }
 
-assert(Int32Class.isStruct);
-assert(!ObjectClass.isStruct);
+assert(Int32Class.isValueType);
+assert(!ObjectClass.isValueType);
 
 assert(BooleanClass.name == "Boolean");
 
@@ -299,18 +295,18 @@ assert(Il2Cpp.Domain.reference.name == "IL2CPP Root Domain");
 
 #### `Il2Cpp.Field`
 ```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 const coreModule = Il2Cpp.Domain.reference.assemblies["UnityEngine.CoreModule"].image;
 
-const BooleanClass = corlib.classes["System.Boolean"];
-const MathClass = corlib.classes["System.Math"];
-const ThreadClass = corlib.classes["System.Threading.Thread"];
+const BooleanClass = mscorlib.classes["System.Boolean"];
+const MathClass = mscorlib.classes["System.Math"];
+const ThreadClass = mscorlib.classes["System.Threading.Thread"];
 const Vector2Class = coreModule.classes["UnityEngine.Vector2"];
 
 assert(MathClass.fields.PI.class.handle.equals(MathClass.handle));
 
-assert(Vector2Class.fields.x.isInstance);
-assert(!Vector2Class.fields.oneVector.isInstance);
+assert(!Vector2Class.fields.x.isStatic);
+assert(Vector2Class.fields.oneVector.isStatic);
 
 assert(MathClass.fields.PI.isLiteral);
 
@@ -331,25 +327,25 @@ assert(vec.fields.x.value == 42);
 
 #### `Il2Cpp.Image`
 ```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 
-assert(corlib.name == "mscorlib.dll");
+assert(mscorlib.name == "mscorlib.dll");
 ```
 
 #### `Il2Cpp.Method`
 ```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 
-const BooleanClass = corlib.classes["System.Boolean"];
-const ArrayClass = corlib.classes["System.Array"];
-const MathClass = corlib.classes["System.Math"];
+const BooleanClass = mscorlib.classes["System.Boolean"];
+const ArrayClass = mscorlib.classes["System.Array"];
+const MathClass = mscorlib.classes["System.Math"];
 
 assert(MathClass.methods.Sqrt.class.handle.equals(MathClass.handle));
 
 assert(ArrayClass.methods.Empty.isGeneric);
 
-assert(BooleanClass.methods.ToString.isInstance);
-assert(!BooleanClass.methods.Parse.isInstance);
+assert(!BooleanClass.methods.ToString.isStatic);
+assert(!BooleanClass.methods.Parse.isStatic);
 
 assert(MathClass.methods.Sqrt.name == "Sqrt");
 
@@ -379,10 +375,10 @@ assert(MathClass.methods.Max.invoke<number>(1, 2) == 10);
 
 #### `Il2Cpp.Object`
 ```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 const coreModule = Il2Cpp.Domain.reference.assemblies["UnityEngine.CoreModule"].image;
 
-const OrdinalComparerClass = corlib.classes["System.OrdinalComparer"];
+const OrdinalComparerClass = mscorlib.classes["System.OrdinalComparer"];
 const Vector2Class = coreModule.classes["UnityEngine.Vector2"];
 
 const ordinalComparer = Il2Cpp.Object.from(OrdinalComparerClass);
@@ -405,9 +401,9 @@ assert(!vecBoxed.handle.equals(vec.handle));
 
 #### `Il2Cpp.Parameter`
 ```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 
-const dParameter = corlib.classes["System.Math"].methods.Sqrt.parameters.d;
+const dParameter = mscorlib.classes["System.Math"].methods.Sqrt.parameters.d;
 
 assert(dParameter.name == "d");
 
@@ -434,11 +430,11 @@ assert(str.object.class.type.typeEnum == "string");
 
 #### `Il2Cpp.Type`
 ```ts
-const corlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
 
-const Int32Class = corlib.classes["System.Int32"];
-const StringClass = corlib.classes["System.String"];
-const ObjectClass = corlib.classes["System.Object"];
+const Int32Class = mscorlib.classes["System.Int32"];
+const StringClass = mscorlib.classes["System.String"];
+const ObjectClass = mscorlib.classes["System.Object"];
 
 assert(StringClass.type.class.handle.equals(StringClass.handle));
 

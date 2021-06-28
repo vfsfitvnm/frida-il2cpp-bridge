@@ -22,8 +22,7 @@ class Il2CppParameter extends NativeStructNotNull {
         return new Il2Cpp.Type(Api._parameterGetType(this.handle));
     }
 
-    /** @internal */
-    asHeld(holder: InvocationArguments, startIndex: number): Il2Cpp.Valuable {
+    asHeld(holder: InvocationArguments, startIndex: number): Il2Cpp.WithValue {
         const position = this.position;
         const type = this.type;
         return {
@@ -34,6 +33,6 @@ class Il2CppParameter extends NativeStructNotNull {
             set value(v: Il2Cpp.AllowedType) {
                 holder[startIndex + position] = allocRawValue(v, type);
             }
-        } as Il2Cpp.Valuable;
+        } as Il2Cpp.WithValue;
     }
 }
