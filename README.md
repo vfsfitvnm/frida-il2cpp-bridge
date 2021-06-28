@@ -106,7 +106,7 @@ class Locale : System.Object
 ##### Find instances
 ```ts
 const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-const SystemType = msmscorlib.classes["System.Type"];
+const SystemType = mscorlib.classes["System.Type"];
 
 Il2Cpp.GC.choose(SystemType).forEach(instance => {
     // Do whatever you want
@@ -116,7 +116,7 @@ Il2Cpp.GC.choose(SystemType).forEach(instance => {
 Alternatively
 ```ts
 const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-const SystemString = msmscorlib.classes["System.String"];
+const SystemString = mscorlib.classes["System.String"];
 
 new Il2Cpp.MemorySnapshot().objects.filter(Il2Cpp.Filtering.IsExactly(SystemString)).forEach(instance => {
    // Do whatever you want
@@ -127,7 +127,7 @@ new Il2Cpp.MemorySnapshot().objects.filter(Il2Cpp.Filtering.IsExactly(SystemStri
 ##### Class tracing
 ```ts
 const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-const SystemString = msmscorlib.classes["System.String"];
+const SystemString = mscorlib.classes["System.String"];
 
 SystemString.trace();
 ```
@@ -144,7 +144,7 @@ It will log something like:
 ##### Method tracing
 ```ts
 const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-const IsNullOrEmpty = msmscorlib.classes["System.String"].methods.IsNullOrEmpty;
+const IsNullOrEmpty = mscorlib.classes["System.String"].methods.IsNullOrEmpty;
 
 IsNullOrEmpty.trace();
 ```
@@ -158,7 +158,7 @@ It will log something like:
 ##### Method replacement
 ```ts
 const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-const IsNullOrEmpty = msmscorlib.classes["System.String"].methods.IsNullOrEmpty;
+const IsNullOrEmpty = mscorlib.classes["System.String"].methods.IsNullOrEmpty;
 
 IsNullOrEmpty.implementation = (instance, parameters) => {
     parameters.value.value = Il2Cpp.String.from("Hello!");
@@ -176,7 +176,7 @@ IsNullOrEmpty.implementation = null;
 You can replace any of the parameters and the return value by reassigning them.
 ```ts
 const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-const SystemString = msmscorlib.classes["System.String"];
+const SystemString = mscorlib.classes["System.String"];
 
 SystemString.methods.IsNullOrEmpty.intercept({
     onEnter(instance, parameters) {
@@ -208,7 +208,7 @@ SystemString.methods.IsNullOrEmpty.intercept({
 It's not possible to add or remove an array element at the moment.
 ```ts
 const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-const SystemString = msmscorlib.classes["System.String"];
+const SystemString = mscorlib.classes["System.String"];
 
 const arr = Il2Cpp.Array.from<Il2Cpp.String>(SystemString, [
     Il2Cpp.String.from("One"), Il2Cpp.String.from("Two"), Il2Cpp.String.from("Three")
