@@ -55,6 +55,7 @@ You _may_ need to include `"moduleResolution": "node"` in your `tsconfig.json`.
 ### Known limitations
 - Lack of support for reference types (e.g. `System.Boolean&`)
 - Absent generic classes or methods utilities
+- Missing traceback system
 - Probably a lot more
 
 ### Snippets
