@@ -1,10 +1,10 @@
 import "./il2cpp/index";
 
-import { Accessor } from "./utils/accessor";
-import { NativeStruct } from "./utils/native-struct";
 import { UnityVersion } from "./il2cpp/version";
+import { NativeStruct } from "./utils/native-struct";
 
 declare global {
+    /** */
     namespace Il2Cpp {
         /** The Il2Cpp module. */
         const module: Module;
@@ -78,7 +78,7 @@ declare global {
             get fieldCount(): number;
 
             /** Gets the fields of the current class. */
-            get fields(): Accessor<Il2Cpp.Field>;
+            get fields(): Readonly<Record<string, Il2Cpp.Field>>;
 
             /** Gets the generic class from which the current generic class can be constructed. */
             get genericClass(): Il2Cpp.GenericClass | null;
@@ -108,13 +108,13 @@ declare global {
             get interfaceCount(): number;
 
             /** Gets the interfaces implemented or inherited by the current class. */
-            get interfaces(): Accessor<Il2Cpp.Class>;
+            get interfaces(): Readonly<Record<string, Il2Cpp.Class>>;
 
             /** Gets the amount of the implemented methods by the current class. */
             get methodCount(): number;
 
             /** Gets the methods implemented by the current class. */
-            get methods(): Accessor<Il2Cpp.Method>;
+            get methods(): Readonly<Record<string, Il2Cpp.Method>>;
 
             /** Gets the name of the current class. */
             get name(): string;
@@ -140,9 +140,6 @@ declare global {
             /** Calls the static constructor of the current class. */
             initialize(): void;
 
-            /** Traces every method invocation of the current class. */
-            trace(): void;
-
             toString(): string;
         }
 
@@ -155,7 +152,7 @@ declare global {
             get name(): string | null;
 
             /** Gets the assemblies that have been loaded into the execution context of this domain. */
-            get assemblies(): Accessor<Il2Cpp.Assembly>;
+            get assemblies(): Readonly<Record<string, Il2Cpp.Assembly>>;
         }
 
         /** Represents a `FieldInfo`. */
@@ -176,8 +173,8 @@ declare global {
             get name(): string;
 
             /**
-             * Gets the offset of this field, calculated from its class static fields data if this
-             * field is static, or from its object location otherwise.
+             * Gets the offset of this field, calculated from its class static fields data if this field is static, or
+             * from its object location otherwise.
              */
             get offset(): number;
 
@@ -252,7 +249,7 @@ declare global {
             get classStart(): number;
 
             /** Gets the classes defined in this image. */
-            get classes(): Accessor<Il2Cpp.Class>;
+            get classes(): Readonly<Record<string, Il2Cpp.Class>>;
 
             /** Gets the name of this image. */
             get name(): string;
@@ -306,7 +303,7 @@ declare global {
             get parameterCount(): number;
 
             /** Gets the parameters of this method. */
-            get parameters(): Accessor<Il2Cpp.Parameter>;
+            get parameters(): Readonly<Record<string, Il2Cpp.Parameter>>;
 
             /** Gets the static offset of this method, calculated from Il2Cpp module base. */
             get relativePointerAsString(): string;
@@ -318,7 +315,7 @@ declare global {
             get nativeFunction(): NativeFunction;
 
             /** Replaces the body of this method (abstraction over `Interceptor.replace`). */
-            set implementation(callback: Il2Cpp.Method.ImplementationCallback | null);
+            set implementation(callback: Il2Cpp.Method.Implementation | null);
 
             /** @internal */
             get parametersTypesAliasesForFrida(): string[];
@@ -330,13 +327,16 @@ declare global {
             invokeRaw(instance: NativePointer, ...parameters: Il2Cpp.AllowedType[]): Il2Cpp.AllowedType;
 
             /** Intercept every invocations of this method (abstraction over `Interceptor.attach`). */
-            intercept(callbacks: { onEnter?: Il2Cpp.Method.OnEnterCallback; onLeave?: Il2Cpp.Method.OnLeaveCallback }): InvocationListener;
-
-            /** Prints a message when this method is invoked. */
-            trace(): void;
+            intercept(callbacks: { onEnter?: Il2Cpp.Method.OnEnter; onLeave?: Il2Cpp.Method.OnLeave }): InvocationListener;
 
             /** @internal */
             asHeld(holder: NativePointer): Invokable;
+
+            /** */
+            createFridaInterceptCallbacks(callbacks: {
+                onEnter?: Il2Cpp.Method.OnEnter;
+                onLeave?: Il2Cpp.Method.OnLeave;
+            }): ScriptInvocationListenerCallbacks;
         }
 
         /** Represents a `Il2CppObject`. */
@@ -351,10 +351,10 @@ declare global {
             get class(): Il2Cpp.Class;
 
             /** Gets the fields of this object. */
-            get fields(): Accessor<WithValue>;
+            get fields(): Readonly<Record<string, Il2Cpp.WithValue>>;
 
             /** Gets the methods of this object. */
-            get methods(): Accessor<Invokable>;
+            get methods(): Readonly<Record<string, Il2Cpp.Invokable>>;
 
             /** Allocates a new object of the specified class. */
             static from(klass: Il2Cpp.Class): Il2Cpp.Object;
@@ -382,6 +382,11 @@ declare global {
 
             /** @internal */
             asHeld(holder: InvocationArguments, startIndex: number): WithValue;
+        }
+
+        /** */
+        class Reference<T extends Il2Cpp.AllowedType = Il2Cpp.AllowedType> extends NativeStruct {
+            readonly type: Il2Cpp.Type;
         }
 
         /** Represents a `Il2CppString`. */
@@ -458,7 +463,7 @@ declare global {
             get class(): Il2Cpp.Class;
 
             /** Gets the fields of this value type. */
-            get fields(): Accessor<WithValue>;
+            get fields(): Readonly<Record<string, Il2Cpp.WithValue>>;
 
             /** Boxed this value type into a object. */
             box(): Il2Cpp.Object;
@@ -466,34 +471,73 @@ declare global {
 
         /** Filtering utilities. */
         class Filtering {
-            /** @private */
+            /** @internal */
             private constructor();
 
-            /** */
+            /** Creates a filter which includes `element`s whose type can be assigned to `klass` variables. */
             static Is<T extends Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.Type>(klass: Il2Cpp.Class): (element: T) => boolean;
 
-            /**  */
+            /** Creates a filter which includes `element`s whose type corresponds to `klass` type. */
             static IsExactly<T extends Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.Type>(klass: Il2Cpp.Class): (element: T) => boolean;
+        }
+
+        /** Tracing utilities. */
+        class Tracer {
+            /** @internal */
+            counter: number;
+
+            /** @internal */
+            readonly invocationListeners: InvocationListener[];
+
+            /** @internal */
+            readonly logging: Il2Cpp.Tracer.Logging;
+
+            /** @internal */
+            constructor(logger: Il2Cpp.Tracer.Logging, ...targets: (Il2Cpp.Class | Il2Cpp.Method)[]);
+
+            /** Creates a tracer with a custom behaviour. */
+            static Custom(logger: Il2Cpp.Tracer.Logging, ...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer;
+
+            /** Creates a tracer of onEnter invocations. */
+            static Simple(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer;
+
+            /** Creates a tracer of onEnter and onLeave invocations. */
+            static Full(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer;
+
+            /** Creates a tracer of onEnter and onLeave invocations, including parameters and return values. */
+            static FullWithValues(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer;
+
+            /** Starts tracing the given targets. */
+            add(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): void;
+
+            /** Stops tracing. */
+            clear(): void;
         }
 
         /** */
         namespace Method {
             /** Callback of a method implementation. */
-            type ImplementationCallback = (
-                this: InvocationContext,
+            type Implementation = (
+                this: CallbackContext | InvocationContext,
                 instance: Il2Cpp.Object | null,
-                parameters: Accessor<Il2Cpp.WithValue>
+                parameters: Readonly<Record<string, Il2Cpp.WithValue>>
             ) => any;
 
             /** Callback of a method `onEnter` interception. */
-            type OnEnterCallback = (
-                this: InvocationContext,
+            type OnEnter = (
+                this: CallbackContext | InvocationContext,
                 instance: Il2Cpp.Object | null,
-                parameters: Accessor<Il2Cpp.WithValue>
+                parameters: Readonly<Record<string, Il2Cpp.WithValue>>
             ) => void;
 
             /** Callback of a method `onLeave` interception. */
-            type OnLeaveCallback = (this: InvocationContext, returnValue: Il2Cpp.WithValue) => void;
+            type OnLeave = (this: InvocationContext, returnValue: Il2Cpp.WithValue) => void;
+        }
+
+        /** */
+        namespace Tracer {
+            /** */
+            type Logging = (this: Il2Cpp.Tracer, method: Il2Cpp.Method) => InvocationListenerCallbacks;
         }
 
         /** Represents an invokable method. */
@@ -561,5 +605,10 @@ declare global {
             | Il2Cpp.Object
             | Il2Cpp.String
             | Il2Cpp.Array<AllowedType>;
+    }
+
+    /** @internal */
+    namespace console {
+        function log(message?: any, ...optionalParams: any[]): void;
     }
 }

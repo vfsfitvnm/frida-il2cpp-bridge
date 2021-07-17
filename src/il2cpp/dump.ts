@@ -21,9 +21,9 @@ function dump(filePath?: string): void {
 
     const file = new File(filePath, "w");
 
-    for (const assembly of Il2Cpp.Domain.reference.assemblies) {
+    for (const assembly of Object.values(Il2Cpp.Domain.reference.assemblies)) {
         inform(`Dumping ${assembly.name}...`);
-        for (const klass of assembly.image.classes) {
+        for (const klass of Object.values(assembly.image.classes)) {
             file.write(klass.toString());
         }
     }

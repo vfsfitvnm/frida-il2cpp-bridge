@@ -62,6 +62,10 @@ class Il2CppArray<T extends Il2Cpp.AllowedType> extends NativeStruct implements 
         writeFieldValue(this.elements.add(index * this.elementSize), value, this.elementType);
     }
 
+    override toString(): string {
+        return `[${Array.from(this).join(", ")}]`;
+    }
+
     *[Symbol.iterator](): IterableIterator<T> {
         for (let i = 0; i < this.length; i++) {
             yield this.get(i);

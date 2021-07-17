@@ -74,6 +74,7 @@ class Il2CppField extends NativeStructNotNull implements Il2Cpp.WithValue {
     @shouldBeInstance(true)
     asHeld(handle: NativePointer): Il2Cpp.WithValue {
         const type = this.type;
+
         return {
             valueHandle: handle,
             get value(): Il2Cpp.AllowedType {

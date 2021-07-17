@@ -25,6 +25,7 @@ class Il2CppParameter extends NativeStructNotNull {
     asHeld(holder: InvocationArguments, startIndex: number): Il2Cpp.WithValue {
         const position = this.position;
         const type = this.type;
+
         return {
             valueHandle: holder[startIndex + position],
             get value(): Il2Cpp.AllowedType {

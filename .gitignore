@@ -2,5 +2,3 @@
 dist
 node_modules
 package-lock.json
-example/node_modules
-example/package-lock.json

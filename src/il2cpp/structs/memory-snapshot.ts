@@ -11,7 +11,7 @@ class Il2CppMemorySnapshot extends NativeStructNotNull {
 
     constructor() {
         super(Api._memorySnapshotCapture());
-        this.weakRefId = WeakRef.bind(this, Api._memorySnapshotFree.bind(this, this.handle));
+        this.weakRefId = Script.bindWeak(this, Api._memorySnapshotFree.bind(this, this.handle));
     }
 
     @cache
@@ -39,6 +39,6 @@ class Il2CppMemorySnapshot extends NativeStructNotNull {
     }
 
     free(): void {
-        WeakRef.unbind(this.weakRefId);
+        Script.unbindWeak(this.weakRefId);
     }
 }

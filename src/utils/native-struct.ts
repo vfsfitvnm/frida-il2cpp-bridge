@@ -1,8 +1,12 @@
-import {raise} from "./console";
+import { raise } from "./console";
 
 /** Scaffold class. */
 export class NativeStruct {
     constructor(readonly handle: NativePointer) {}
+
+    equals(other: NativeStruct) {
+        return this.handle.equals(other.handle);
+    }
 }
 
 /** Scaffold class whom pointer cannot be null.. */

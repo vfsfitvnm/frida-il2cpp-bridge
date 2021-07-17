@@ -3,7 +3,7 @@ import { cache } from "decorator-cache-getter";
 import { Api } from "../api";
 import { injectToIl2Cpp } from "../decorators";
 
-import { Accessor } from "../../utils/accessor";
+import { addLevenshtein, preventKeyClash } from "../../utils/record";
 import { getOrNull, NativeStructNotNull } from "../../utils/native-struct";
 
 @injectToIl2Cpp("Class")
@@ -39,19 +39,19 @@ class Il2CppClass extends NativeStructNotNull {
     }
 
     @cache
-    get fields(): Accessor<Il2Cpp.Field> {
+    get fields(): Readonly<Record<string, Il2Cpp.Field>> {
         const iterator = Memory.alloc(Process.pointerSize);
-        const accessor = new Accessor<Il2Cpp.Field>();
+        const record: Record<string, Il2Cpp.Field> = {};
 
         let handle: NativePointer;
         let field: Il2Cpp.Field;
 
         while (!(handle = Api._classGetFields(this.handle, iterator)).isNull()) {
             field = new Il2Cpp.Field(handle);
-            accessor[field.name!] = field;
+            record[field.name!] = field;
         }
 
-        return accessor;
+        return addLevenshtein(record);
     }
 
     @cache
@@ -99,19 +99,19 @@ class Il2CppClass extends NativeStructNotNull {
     }
 
     @cache
-    get interfaces(): Accessor<Il2Cpp.Class> {
+    get interfaces(): Readonly<Record<string, Il2Cpp.Class>> {
         const iterator = Memory.alloc(Process.pointerSize);
-        const accessor = new Accessor<Il2Cpp.Class>();
+        const record: Record<string, Il2Cpp.Class> = {};
 
         let handle: NativePointer;
         let klass: Il2Cpp.Class;
 
         while (!(handle = Api._classGetInterfaces(this.handle, iterator)).isNull()) {
             klass = new Il2Cpp.Class(handle);
-            accessor[klass.type.name] = klass;
+            record[klass.type.name] = klass;
         }
 
-        return accessor;
+        return addLevenshtein(record);
     }
 
     @cache
@@ -120,19 +120,19 @@ class Il2CppClass extends NativeStructNotNull {
     }
 
     @cache
-    get methods(): Accessor<Il2Cpp.Method> {
+    get methods(): Readonly<Record<string, Il2Cpp.Method>> {
         const iterator = Memory.alloc(Process.pointerSize);
-        const accessor = new Accessor<Il2Cpp.Method>(true);
+        const record: Record<string, Il2Cpp.Method> = preventKeyClash({});
 
         let handle: NativePointer;
         let method: Il2Cpp.Method;
 
         while (!(handle = Api._classGetMethods(this.handle, iterator)).isNull()) {
             method = new Il2Cpp.Method(handle);
-            accessor[method.name] = method;
+            record[method.name] = method;
         }
 
-        return accessor;
+        return addLevenshtein(record);
     }
 
     @cache
@@ -172,12 +172,6 @@ class Il2CppClass extends NativeStructNotNull {
         Api._classInit(this.handle);
     }
 
-    trace(): void {
-        for (const method of this.methods) {
-            method.trace();
-        }
-    }
-
     override toString(): string {
         const spacer = "\n    ";
         let text = "// " + this.image.name + "\n";
@@ -190,8 +184,10 @@ class Il2CppClass extends NativeStructNotNull {
         }
         if (this.interfaceCount > 0) text += Object.keys(this.interfaces).join(", ");
         text += "\n{";
-        for (const field of this.fields) {
-            text += spacer + (this.isEnum && field.name != "value__" ? "" : field.type.name + " ") + field.name;
+        for (const field of Object.values(this.fields)) {
+            text += spacer;
+            if (field.isStatic && !this.isEnum) text += "static ";
+            text += (this.isEnum && field.name != "value__" ? "" : field.type.name + " ") + field.name;
             if (field.isLiteral) {
                 text += " = ";
                 if (field.type.typeEnum == "string") text += '"';
@@ -201,11 +197,11 @@ class Il2CppClass extends NativeStructNotNull {
             text += this.isEnum && field.name != "value__" ? "," : "; // 0x" + field.offset.toString(16);
         }
         if (this.fieldCount + this.methodCount > 0) text += "\n";
-        for (const method of this.methods) {
+        for (const method of Object.values(this.methods)) {
             text += spacer;
             if (method.isStatic) text += "static ";
             text += method.returnType.name + " " + method.name + "(";
-            for (const parameter of method.parameters) {
+            for (const parameter of Object.values(method.parameters)) {
                 if (parameter.position > 0) text += ", ";
                 text += parameter.type.name + " " + parameter.name;
             }

@@ -1,6 +1,6 @@
 import { cache } from "decorator-cache-getter";
 
-import { Accessor, filterAndMap } from "../../utils/accessor";
+import { addLevenshtein, filterMap } from "../../utils/record";
 
 import { Api } from "../api";
 import { NativeStruct } from "../../utils/native-struct";
@@ -17,10 +17,13 @@ class Il2CppValueType extends NativeStruct {
     }
 
     @cache
-    get fields(): Accessor<Il2Cpp.WithValue> {
-        return this.class.fields[filterAndMap](
-            field => !field.isStatic,
-            field => field.asHeld(this.handle.add(field.offset).sub(Il2Cpp.Object.headerSize))
+    get fields(): Readonly<Record<string, Il2Cpp.WithValue>> {
+        return addLevenshtein(
+            filterMap(
+                this.class.fields,
+                (field: Il2Cpp.Field) => !field.isStatic,
+                (field: Il2Cpp.Field) => field.asHeld(this.handle.add(field.offset).sub(Il2Cpp.Object.headerSize))
+            )
         );
     }
 
