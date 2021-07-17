@@ -7,7 +7,7 @@ class Il2CppGCHandle {
     readonly weakRefId: WeakRefId;
 
     constructor(readonly handle: number) {
-        this.weakRefId = WeakRef.bind(this, Api._gcHandleFree.bind(this, this.handle));
+        this.weakRefId = Script.bindWeak(this, Api._gcHandleFree.bind(this, this.handle));
     }
 
     get target(): Il2Cpp.Object | null {
@@ -15,6 +15,6 @@ class Il2CppGCHandle {
     }
 
     free(): void {
-        return WeakRef.unbind(this.weakRefId);
+        return Script.unbindWeak(this.weakRefId);
     }
 }

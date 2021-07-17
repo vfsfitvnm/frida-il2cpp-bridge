@@ -1,5 +1,6 @@
 import "./dump";
 import "./filtering";
+import "./tracer";
 import "./initialize";
 import "./structs/array";
 import "./structs/assembly";

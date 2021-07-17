@@ -6,11 +6,6 @@ import { raise } from "../utils/console";
 /** @internal */
 export class Api {
     @cache
-    static get _registerLogCallback(): (method: NativePointer) => void {
-        return createNF(this.r`register_log_callback`, "void", ["pointer"]);
-    }
-
-    @cache
     static get _arrayGetElements(): (array: NativePointer) => NativePointer {
         return createNF(this.r`array_elements`, "pointer", ["pointer"]);
     }

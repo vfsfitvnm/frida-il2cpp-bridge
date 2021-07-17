@@ -30,7 +30,10 @@ class Il2CppString extends NativeStruct {
         return new Il2Cpp.Object(this.handle);
     }
 
-    static from(content: string): Il2Cpp.String {
+    static from(content: string | null): Il2Cpp.String {
+        if (content == null) {
+            return new Il2Cpp.String(NULL);
+        }
         return new Il2Cpp.String(Api._stringNew(content));
     }
 

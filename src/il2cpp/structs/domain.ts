@@ -1,6 +1,6 @@
 import { cache } from "decorator-cache-getter";
 
-import { Accessor } from "../../utils/accessor";
+import { addLevenshtein } from "../../utils/record";
 
 import { Api } from "../api";
 import { NativeStructNotNull } from "../../utils/native-struct";
@@ -18,8 +18,8 @@ class Il2CppDomain extends NativeStructNotNull {
         return Api._domainGetName(this.handle);
     }
 
-    get assemblies(): Accessor<Il2Cpp.Assembly> {
-        const accessor = new Accessor<Il2Cpp.Assembly>();
+    get assemblies(): Readonly<Record<string, Il2Cpp.Assembly>> {
+        const record: Record<string, Il2Cpp.Assembly> = {};
 
         const sizePointer = Memory.alloc(Process.pointerSize);
         const startPointer = Api._domainGetAssemblies(NULL, sizePointer);
@@ -28,9 +28,9 @@ class Il2CppDomain extends NativeStructNotNull {
 
         for (let i = 0; i < count; i++) {
             const assembly = new Il2Cpp.Assembly(startPointer.add(i * Process.pointerSize).readPointer());
-            accessor[assembly.name] = assembly;
+            record[assembly.name] = assembly;
         }
 
-        return accessor;
+        return addLevenshtein(record);
     }
 }

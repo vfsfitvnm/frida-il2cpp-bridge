@@ -1,6 +1,6 @@
 import { cache } from "decorator-cache-getter";
 
-import { Accessor } from "../../utils/accessor";
+import { addLevenshtein } from "../../utils/record";
 
 import { Api } from "../api";
 import { getOrNull, NativeStructNotNull } from "../../utils/native-struct";
@@ -19,8 +19,8 @@ class Il2CppImage extends NativeStructNotNull {
     }
 
     @cache
-    get classes(): Accessor<Il2Cpp.Class> {
-        const accessor = new Accessor<Il2Cpp.Class>();
+    get classes(): Readonly<Record<string, Il2Cpp.Class>> {
+        const record: Record<string, Il2Cpp.Class> = {};
 
         if (Il2Cpp.unityVersion.isLegacy) {
             const start = this.classStart;
@@ -31,18 +31,18 @@ class Il2CppImage extends NativeStructNotNull {
 
             for (let i = start; i < end; i++) {
                 const klass = new Il2Cpp.Class(Api._typeGetClassOrElementClass(globalIndex.writeInt(i)));
-                accessor[klass.type!.name!] = klass;
+                record[klass.type!.name!] = klass;
             }
         } else {
             const end = this.classCount;
 
             for (let i = 0; i < end; i++) {
                 const klass = new Il2Cpp.Class(Api._imageGetClass(this.handle, i));
-                accessor[klass.type.name] = klass;
+                record[klass.type.name] = klass;
             }
         }
 
-        return accessor;
+        return addLevenshtein(record);
     }
 
     @cache

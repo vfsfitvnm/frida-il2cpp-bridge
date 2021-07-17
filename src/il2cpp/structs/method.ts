@@ -4,8 +4,8 @@ import { Api } from "../api";
 import { injectToIl2Cpp, shouldBeInstance } from "../decorators";
 import { allocRawValue, readRawValue } from "../utils";
 
-import { Accessor, filterAndMap } from "../../utils/accessor";
-import { inform, raise, warn } from "../../utils/console";
+import { addLevenshtein, map } from "../../utils/record";
+import { raise } from "../../utils/console";
 import { NativeStructNotNull } from "../../utils/native-struct";
 
 @injectToIl2Cpp("Method")
@@ -46,9 +46,9 @@ class Il2CppMethod extends NativeStructNotNull {
     }
 
     @cache
-    get parameters(): Accessor<Il2Cpp.Parameter> {
+    get parameters(): Readonly<Record<string, Il2Cpp.Parameter>> {
         const iterator = Memory.alloc(Process.pointerSize);
-        const accessor = new Accessor<Il2Cpp.Parameter>();
+        const accessor: Record<string, Il2Cpp.Parameter> = {};
 
         let handle: NativePointer;
         let parameter: Il2Cpp.Parameter;
@@ -58,7 +58,7 @@ class Il2CppMethod extends NativeStructNotNull {
             accessor[parameter.name!] = parameter;
         }
 
-        return accessor;
+        return addLevenshtein(accessor);
     }
 
     @cache
@@ -76,15 +76,15 @@ class Il2CppMethod extends NativeStructNotNull {
     get nativeFunction(): NativeFunction {
         const parametersTypesAliasesForFrida = Array(this.parameterCount).fill("pointer");
         if (!this.isStatic || Il2Cpp.unityVersion.isLegacy) {
-            parametersTypesAliasesForFrida.push("pointer");
+            parametersTypesAliasesForFrida.unshift("pointer");
         }
         if (this.isInflated) {
-            parametersTypesAliasesForFrida.push("pointer");
+            parametersTypesAliasesForFrida.unshift("pointer");
         }
         return new NativeFunction(this.actualPointer, this.returnType.aliasForFrida, parametersTypesAliasesForFrida);
     }
 
-    set implementation(callback: Il2Cpp.Method.ImplementationCallback | null) {
+    set implementation(callback: Il2Cpp.Method.Implementation | null) {
         Interceptor.revert(this.actualPointer);
 
         if (callback == null) {
@@ -99,7 +99,7 @@ class Il2CppMethod extends NativeStructNotNull {
         if (!this.isStatic) {
             parametersTypesAliasesForFrida.push(this.class.type.aliasForFrida);
         }
-        for (const parameterInfo of this.parameters) {
+        for (const parameterInfo of Object.values(this.parameters)) {
             parametersTypesAliasesForFrida.push(parameterInfo.type.aliasForFrida);
         }
         const methodInfo = this;
@@ -107,9 +107,8 @@ class Il2CppMethod extends NativeStructNotNull {
         const replaceCallback: NativeCallbackImplementation = function (...invocationArguments: any[]) {
             const instance = methodInfo.isStatic ? null : new Il2Cpp.Object(invocationArguments[0]);
             const startIndex = +!methodInfo.isStatic | +Il2Cpp.unityVersion.isLegacy;
-            const args = methodInfo.parameters[filterAndMap](
-                () => true,
-                parameter => parameter.asHeld(invocationArguments, startIndex)
+            const args = addLevenshtein(
+                map(methodInfo.parameters, (parameter: Il2Cpp.Parameter) => parameter.asHeld(invocationArguments, startIndex))
             );
             return callback.call(this!, instance, args);
         };
@@ -142,7 +141,9 @@ class Il2CppMethod extends NativeStructNotNull {
         if (this.parameterCount != parameters.length) {
             raise(`This method takes ${this.parameterCount} parameters, but ${parameters.length} were supplied.`);
         }
-        const allocatedParameters = Array.from(this.parameters).map((parameter, i) => allocRawValue(parameters[i], parameter.type));
+        const allocatedParameters = Object.values(this.parameters).map((parameter: Il2Cpp.Parameter, i: number) =>
+            allocRawValue(parameters[i], parameter.type)
+        );
 
         if (!this.isStatic || Il2Cpp.unityVersion.isLegacy) {
             allocatedParameters.unshift(instance);
@@ -154,11 +155,27 @@ class Il2CppMethod extends NativeStructNotNull {
         return readRawValue(this.nativeFunction(...allocatedParameters) as NativePointer, this.returnType);
     }
 
-    intercept(callbacks: { onEnter?: Il2Cpp.Method.OnEnterCallback; onLeave?: Il2Cpp.Method.OnLeaveCallback }): InvocationListener {
+    intercept(callbacks: { onEnter?: Il2Cpp.Method.OnEnter; onLeave?: Il2Cpp.Method.OnLeave }): InvocationListener {
         if (this.actualPointer.isNull()) {
             raise(`Can't intercept method ${this.name} from ${this.class.type.name}: pointer is NULL.`);
         }
+        return Interceptor.attach(this.actualPointer, this.createFridaInterceptCallbacks(callbacks));
+    }
 
+    @shouldBeInstance(true)
+    asHeld(holder: NativePointer): Il2Cpp.Invokable {
+        const invoke = this.invokeRaw.bind(this, holder);
+        return {
+            invoke<T extends Il2Cpp.AllowedType>(...parameters: Il2Cpp.AllowedType[]): T {
+                return invoke(...parameters) as T;
+            }
+        } as Il2Cpp.Invokable;
+    }
+
+    createFridaInterceptCallbacks(callbacks: {
+        onEnter?: Il2Cpp.Method.OnEnter;
+        onLeave?: Il2Cpp.Method.OnLeave;
+    }): ScriptInvocationListenerCallbacks {
         const interceptorCallbacks: ScriptInvocationListenerCallbacks = {};
 
         if (callbacks.onEnter != undefined) {
@@ -166,9 +183,8 @@ class Il2CppMethod extends NativeStructNotNull {
             interceptorCallbacks.onEnter = function (invocationArguments: InvocationArguments) {
                 const instance = methodInfo.isStatic ? null : new Il2Cpp.Object(invocationArguments[0]);
                 const startIndex = +!methodInfo.isStatic | +Il2Cpp.unityVersion.isLegacy;
-                const args = methodInfo.parameters[filterAndMap](
-                    () => true,
-                    parameter => parameter.asHeld(invocationArguments, startIndex)
+                const args = addLevenshtein(
+                    map(methodInfo.parameters, (parameter: Il2Cpp.Parameter) => parameter.asHeld(invocationArguments, startIndex))
                 );
                 callbacks.onEnter!.call(this, instance, args);
             };
@@ -179,37 +195,16 @@ class Il2CppMethod extends NativeStructNotNull {
             interceptorCallbacks.onLeave = function (invocationReturnValue: InvocationReturnValue) {
                 callbacks.onLeave!.call(this, {
                     valueHandle: invocationReturnValue.add(0),
-                    get value() {
+                    get value(): Il2Cpp.AllowedType {
                         return readRawValue(invocationReturnValue, methodInfo.returnType);
                     },
-                    set value(v) {
+                    set value(v: Il2Cpp.AllowedType) {
                         invocationReturnValue.replace(allocRawValue(v, methodInfo.returnType));
                     }
                 });
             };
         }
 
-        return Interceptor.attach(this.actualPointer, interceptorCallbacks);
-    }
-
-    trace(): void {
-        if (this.actualPointer.isNull()) {
-            warn(`Can't trace method ${this.name} from ${this.class.type.name}: pointer is NULL.`);
-        }
-        try {
-            Interceptor.attach(this.actualPointer, () => inform(`${this.relativePointerAsString} ${this.name}`));
-        } catch (e) {
-            warn(`Can't trace method ${this.name} from ${this.class.type.name}: ${e.message}.`);
-        }
-    }
-
-    @shouldBeInstance(true)
-    asHeld(holder: NativePointer): Il2Cpp.Invokable {
-        const invoke = this.invokeRaw.bind(this, holder);
-        return {
-            invoke<T extends Il2Cpp.AllowedType>(...parameters: Il2Cpp.AllowedType[]): T {
-                return invoke(...parameters) as T;
-            }
-        };
+        return interceptorCallbacks;
     }
 }
