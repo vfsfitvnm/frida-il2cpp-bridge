@@ -18,35 +18,43 @@ type Base = {
     uint64: UInt64;
     size_t: UInt64;
     ssize_t: Int64;
-    pointer: NativePointer;
 };
 
 type NFI = {
     utf8string: string;
     utf16string: string;
     ansistring: string;
+    pointer: NativePointer | ObjectWrapper;
 } & Base;
 
 type NFO = {
     void: void;
-} & Base &
-    NCI;
+    utf8string: string;
+    utf16string: string;
+    ansistring: string;
+    pointer: NativePointer;
+} & Base;
 
 type NCI = {
     cstring: string | null;
     utf8string: string | null;
     utf16string: string | null;
     ansistring: string | null;
+    pointer: NativePointer | ObjectWrapper;
 } & Base;
 
 type NCO = {
     void: void;
-} & Base &
-    NFI;
+    cstring: string | null;
+    utf8string: string | null;
+    utf16string: string | null;
+    ansistring: string | null;
+    pointer: NativePointer;
+} & Base;
 
 type Extract<T, V extends (keyof T)[]> = { [P in keyof V]: V[P] extends keyof T ? T[V[P]] : never };
 
-function getTypeAliasForFrida(type: keyof NFI | keyof NFO | keyof NCI | keyof NCO): keyof Base | "void" {
+function getTypeAliasForFrida(type: keyof NFI | keyof NFO | keyof NCI | keyof NCO) {
     switch (type) {
         case "ansistring":
         case "utf8string":
@@ -80,7 +88,9 @@ function refinedToRaw<T extends keyof NFI | keyof NCO>(value: any, type: T): any
 function rawToRefined<T extends keyof NFO | keyof NCI>(value: NativeReturnValue | any, type: T): any {
     switch (typeof value) {
         case "number":
-            if (type == "bool") return !!value;
+            if (type == "bool") {
+                return !!value;
+            }
             break;
         case "object": {
             if (value instanceof NativePointer) {

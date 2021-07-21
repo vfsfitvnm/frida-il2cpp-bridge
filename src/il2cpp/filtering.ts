@@ -15,9 +15,9 @@ class Filtering<T> {
     static IsExactly(klass: Il2Cpp.Class): (element: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.Type) => boolean {
         return (element: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.Type): boolean => {
             if (element instanceof Il2Cpp.Class) {
-                return element.handle.equals(klass.handle);
+                return element.equals(klass);
             } else {
-                return element.class.handle.equals(klass.handle);
+                return element.class.equals(klass);
             }
         };
     }

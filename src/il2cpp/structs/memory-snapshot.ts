@@ -1,17 +1,20 @@
 import { cache } from "decorator-cache-getter";
-
 import { Api } from "../api";
 import { injectToIl2Cpp } from "../decorators";
-
-import { NativeStructNotNull } from "../../utils/native-struct";
+import { NonNullNativeStruct } from "../../utils/native-struct";
 
 @injectToIl2Cpp("MemorySnapshot")
-class Il2CppMemorySnapshot extends NativeStructNotNull {
+class Il2CppMemorySnapshot extends NonNullNativeStruct {
     readonly weakRefId: WeakRefId;
 
     constructor() {
         super(Api._memorySnapshotCapture());
-        this.weakRefId = Script.bindWeak(this, Api._memorySnapshotFree.bind(this, this.handle));
+        this.weakRefId = Script.bindWeak(this, Api._memorySnapshotFree.bind(this, this));
+    }
+
+    @cache
+    get metadataSnapshot(): Il2Cpp.MetadataSnapshot {
+        return new Il2Cpp.MetadataSnapshot(Api._memorySnapshotGetMetadataSnapshot(this));
     }
 
     @cache
@@ -30,12 +33,12 @@ class Il2CppMemorySnapshot extends NativeStructNotNull {
 
     @cache
     get objectsPointer(): NativePointer {
-        return Api._memorySnapshotGetObjects(this.handle);
+        return Api._memorySnapshotGetObjects(this);
     }
 
     @cache
     get trackedObjectCount(): UInt64 {
-        return Api._memorySnapshotGetTrackedObjectCount(this.handle);
+        return Api._memorySnapshotGetTrackedObjectCount(this);
     }
 
     free(): void {

@@ -1,18 +1,22 @@
 import { cache } from "decorator-cache-getter";
 
 import { Api } from "../api";
-import { getOrNull, NativeStructNotNull } from "../../utils/native-struct";
+import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
 import { injectToIl2Cpp } from "../decorators";
 
 @injectToIl2Cpp("Type")
-class Il2CppType extends NativeStructNotNull {
+class Il2CppType extends NonNullNativeStruct {
     @cache
     static get offsetOfTypeEnum() {
         return Api._typeOffsetOfTypeEnum();
     }
 
     @cache
-    get aliasForFrida() {
+    get fridaAlias() {
+        if (this.isByReference) {
+            return "pointer";
+        }
+
         switch (this.typeEnum) {
             case "void":
                 return "void";
@@ -40,6 +44,8 @@ class Il2CppType extends NativeStructNotNull {
                 return "float";
             case "r8":
                 return "double";
+            case "valuetype":
+                return this.class.isEnum ? "int32" : "pointer";
             default:
                 return "pointer";
         }
@@ -47,32 +53,27 @@ class Il2CppType extends NativeStructNotNull {
 
     @cache
     get class(): Il2Cpp.Class {
-        return new Il2Cpp.Class(Api._classFromType(this.handle));
+        return new Il2Cpp.Class(Api._classFromType(this));
     }
 
     @cache
     get dataType(): Il2Cpp.Type | null {
-        return getOrNull(Api._typeGetDataType(this.handle), Il2Cpp.Type);
+        return getOrNull(Api._typeGetDataType(this), Il2Cpp.Type);
     }
-
-    // @cache
-    // get genericClass(): Il2Cpp.GenericClass | null {
-    //     return getOrNull(Api._typeGetGenericClass(this.handle), Il2Cpp.GenericClass);
-    // }
 
     @cache
     get isByReference(): boolean {
-        return Api._typeIsByReference(this.handle);
+        return Api._typeIsByReference(this);
     }
 
     @cache
     get name(): string {
-        return Api._typeGetName(this.handle)!;
+        return Api._typeGetName(this)!;
     }
 
     @cache
     get typeEnum(): Il2Cpp.TypeEnum {
-        switch (Api._typeGetTypeEnum(this.handle)) {
+        switch (Api._typeGetTypeEnum(this)) {
             case 0x00:
                 return "end";
             case 0x01:

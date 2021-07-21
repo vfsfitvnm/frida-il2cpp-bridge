@@ -6,319 +6,292 @@ import { raise } from "../utils/console";
 /** @internal */
 export class Api {
     @cache
-    static get _arrayGetElements(): (array: NativePointer) => NativePointer {
+    static get _arrayGetElements() {
         return createNF(this.r`array_elements`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _arrayGetLength(): (array: NativePointer) => number {
+    static get _arrayGetLength() {
         return createNF(this.r`array_length`, "uint32", ["pointer"]);
     }
 
     @cache
-    static get _arrayNew(): (klass: NativePointer, size: number) => NativePointer {
+    static get _arrayNew() {
         return createNF(this.r`array_new`, "pointer", ["pointer", "uint32"]);
     }
 
     @cache
-    static get _assemblyGetImage(): (assembly: NativePointer) => NativePointer {
+    static get _assemblyGetImage() {
         return createNF(this.r`assembly_get_image`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _assemblyGetName(): (assembly: NativePointer) => string | null {
+    static get _assemblyGetName() {
         return createNF(this.r`assembly_get_name`, "utf8string", ["pointer"]);
     }
 
     @cache
-    static get _classFromName(): (image: NativePointer, namespace: string, name: string) => NativePointer {
+    static get _classFromName() {
         return createNF(this.r`class_from_name`, "pointer", ["pointer", "utf8string", "utf8string"]);
     }
 
     @cache
-    static get _classFromType(): (type: NativePointer) => NativePointer {
+    static get _classFromType() {
         return createNF(this.r`class_from_type`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _classGetArrayClass(): (klass: NativePointer, rank: number) => NativePointer {
+    static get _classGetArrayClass() {
         return createNF(this.r`array_class_get`, "pointer", ["pointer", "uint32"]);
     }
 
     @cache
-    static get _classGetArrayElementSize(): (klass: NativePointer) => number {
+    static get _classGetArrayElementSize() {
         return createNF(this.r`class_array_element_size`, "int", ["pointer"]);
     }
 
     @cache
-    static get _classGetAssemblyName(): (klass: NativePointer) => string | null {
+    static get _classGetAssemblyName() {
         return createNF(this.r`class_get_assemblyname`, "utf8string", ["pointer"]);
     }
 
     @cache
-    static get _classGetDeclaringType(): (klass: NativePointer) => NativePointer {
+    static get _classGetDeclaringType() {
         return createNF(this.r`class_get_declaring_type`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _classGetElementClass(): (klass: NativePointer) => NativePointer {
+    static get _classGetElementClass() {
         return createNF(this.r`class_get_element_class`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _classGetFieldCount(): (klass: NativePointer) => number {
+    static get _classGetFieldCount() {
         return createNF(this.r`class_get_field_count`, "uint16", ["pointer"]);
     }
 
     @cache
-    static get _classGetFields(): (klass: NativePointer, iter: NativePointer) => NativePointer {
+    static get _classGetFields() {
         return createNF(this.r`class_get_fields`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
-    static get _classGetGenericClass(): (klass: NativePointer) => NativePointer {
-        return createNF(this.r`class_get_generic_class`, "pointer", ["pointer"]);
-    }
-
-    @cache
-    static get _classGetImage(): (klass: NativePointer) => NativePointer {
+    static get _classGetImage() {
         return createNF(this.r`class_get_image`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _classGetInstanceSize(): (klass: NativePointer) => number {
+    static get _classGetInstanceSize() {
         return createNF(this.r`class_instance_size`, "uint32", ["pointer"]);
     }
 
     @cache
-    static get _classGetInterfaceCount(): (klass: NativePointer) => number {
+    static get _classGetInterfaceCount() {
         return createNF(this.r`class_get_interface_count`, "uint16", ["pointer"]);
     }
 
     @cache
-    static get _classGetInterfaces(): (klass: NativePointer, iter: NativePointer) => NativePointer {
+    static get _classGetInterfaces() {
         return createNF(this.r`class_get_interfaces`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
-    static get _classGetMethodCount(): (klass: NativePointer) => number {
+    static get _classGetMethodCount() {
         return createNF(this.r`class_get_method_count`, "uint16", ["pointer"]);
     }
 
     @cache
-    static get _classGetMethods(): (klass: NativePointer, iter: NativePointer) => NativePointer {
+    static get _classGetMethods() {
         return createNF(this.r`class_get_methods`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
-    static get _classGetName(): (klass: NativePointer) => string | null {
+    static get _classGetName() {
         return createNF(this.r`class_get_name`, "utf8string", ["pointer"]);
     }
 
     @cache
-    static get _classGetNamespace(): (klass: NativePointer) => string | null {
+    static get _classGetNamespace() {
         return createNF(this.r`class_get_namespace`, "utf8string", ["pointer"]);
     }
 
     @cache
-    static get _classGetParent(): (klass: NativePointer) => NativePointer {
+    static get _classGetParent() {
         return createNF(this.r`class_get_parent`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _classGetStaticFieldData(): (klass: NativePointer) => NativePointer {
+    static get _classGetStaticFieldData() {
         return createNF(this.r`class_get_static_field_data`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _classGetType(): (klass: NativePointer) => NativePointer {
+    static get _classGetType() {
         return createNF(this.r`class_get_type`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _classHasStaticConstructor(): (klass: NativePointer) => boolean {
+    static get _classHasStaticConstructor() {
         return createNF(this.r`class_has_static_constructor`, "bool", ["pointer"]);
     }
 
     @cache
-    static get _classInit(): (klass: NativePointer) => void {
+    static get _classInit() {
         return createNF(this.r`runtime_class_init`, "void", ["pointer"]);
     }
 
     @cache
-    static get _classIsAssignableFrom(): (klass: NativePointer, otherKlass: NativePointer) => boolean {
+    static get _classIsAssignableFrom() {
         return createNF(this.r`class_is_assignable_from`, "bool", ["pointer", "pointer"]);
     }
 
     @cache
-    static get _classIsEnum(): (klass: NativePointer) => boolean {
+    static get _classIsEnum() {
         return createNF(this.r`class_is_enum`, "bool", ["pointer"]);
     }
 
     @cache
-    static get _classIsInterface(): (klass: NativePointer) => boolean {
+    static get _classIsInterface() {
         return createNF(this.r`class_is_interface`, "bool", ["pointer"]);
     }
 
     @cache
-    static get _classIsStaticConstructorFinished(): (klass: NativePointer) => boolean {
+    static get _classIsStaticConstructorFinished() {
         return createNF(this.r`class_is_static_constructor_finished`, "bool", ["pointer"]);
     }
 
     @cache
-    static get _classIsSubclassOf(): (klass: NativePointer, otherKlass: NativePointer, checkInterfaces: boolean) => boolean {
+    static get _classIsSubclassOf() {
         return createNF(this.r`class_is_subclass_of`, "bool", ["pointer", "pointer", "bool"]);
     }
 
     @cache
-    static get _classIsValueType(): (klass: NativePointer) => boolean {
+    static get _classIsValueType() {
         return createNF(this.r`class_is_valuetype`, "bool", ["pointer"]);
     }
 
     @cache
-    static get _domainGet(): () => NativePointer {
+    static get _domainGet() {
         return createNF(this.r`domain_get`, "pointer", []);
     }
 
     @cache
-    static get _domainGetAssemblies(): (domain: NativePointer, iter: NativePointer) => NativePointer {
+    static get _domainGetAssemblies() {
         return createNF(this.r`domain_get_assemblies`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
-    static get _domainGetName(): (domain: NativePointer) => string | null {
+    static get _domainGetName() {
         return createNF(this.r`domain_get_name`, "utf8string", ["pointer"]);
     }
 
     @cache
-    static get _fieldGetClass(): (domain: NativePointer) => NativePointer {
+    static get _fieldGetClass() {
         return createNF(this.r`field_get_parent`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _fieldGetName(): (domain: NativePointer) => string | null {
+    static get _fieldGetName() {
         return createNF(this.r`field_get_name`, "utf8string", ["pointer"]);
     }
 
     @cache
-    static get _fieldGetOffset(): (field: NativePointer) => number {
+    static get _fieldGetOffset() {
         return createNF(this.r`field_get_offset`, "int32", ["pointer"]);
     }
 
     @cache
-    static get _fieldGetStaticValue(): (field: NativePointer, value: NativePointer) => void {
+    static get _fieldGetStaticValue() {
         return createNF(this.r`field_static_get_value`, "void", ["pointer", "pointer"]);
     }
 
     @cache
-    static get _fieldGetType(): (field: NativePointer) => NativePointer {
+    static get _fieldGetType() {
         return createNF(this.r`field_get_type`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _fieldIsInstance(): (field: NativePointer) => boolean {
+    static get _fieldIsInstance() {
         return createNF(this.r`field_is_instance`, "bool", ["pointer"]);
     }
 
     @cache
-    static get _fieldIsLiteral(): (field: NativePointer) => boolean {
+    static get _fieldIsLiteral() {
         return createNF(this.r`field_is_literal`, "bool", ["pointer"]);
     }
 
     @cache
-    static get _gcCollect(): (maxGenerations: number) => void {
+    static get _gcCollect() {
         return createNF(this.r`gc_collect`, "void", ["int"]);
     }
 
     @cache
-    static get _gcCollectALittle(): () => void {
+    static get _gcCollectALittle() {
         return createNF(this.r`gc_collect_a_little`, "void", []);
     }
 
     @cache
-    static get _gcDisable(): () => void {
+    static get _gcDisable() {
         return createNF(this.r`gc_disable`, "void", []);
     }
 
     @cache
-    static get _gcEnable(): () => void {
+    static get _gcEnable() {
         return createNF(this.r`gc_enable`, "void", []);
     }
 
     @cache
-    static get _gcHandleGetTarget(): (gcHandle: number) => NativePointer {
+    static get _gcHandleGetTarget() {
         return createNF(this.r`gchandle_get_target`, "pointer", ["uint32"]);
     }
 
     @cache
-    static get _gcHandleFree(): (gcHandle: number) => void {
+    static get _gcHandleFree() {
         return createNF(this.r`gchandle_free`, "void", ["uint32"]);
     }
 
     @cache
-    static get _gcHandleNew(): (object: NativePointer, pinned: boolean) => number {
+    static get _gcHandleNew() {
         return createNF(this.r`gchandle_new`, "uint32", ["pointer", "bool"]);
     }
 
     @cache
-    static get _gcHandleNewWeakRef(): (object: NativePointer, trackResurrection: boolean) => number {
+    static get _gcHandleNewWeakRef() {
         return createNF(this.r`gchandle_new_weakref`, "uint32", ["pointer", "bool"]);
     }
 
     @cache
-    static get _gcIsDisabled(): () => boolean {
+    static get _gcIsDisabled() {
         return createNF(this.r`gc_is_disabled`, "bool", []);
     }
 
     @cache
-    static get _genericClassGetCachedClass(): (genericClass: NativePointer) => NativePointer {
-        return createNF(this.r`field_is_literal`, "pointer", ["pointer"]);
-    }
-
-    @cache
-    static get _genericClassGetTypesCount(): (genericClass: NativePointer) => number {
-        return createNF(this.r`generic_class_get_types_count`, "uint32", ["pointer"]);
-    }
-
-    @cache
-    static get _genericClassGetTypes(): (genericClass: NativePointer) => NativePointer {
-        return createNF(this.r`generic_class_get_types`, "pointer", ["pointer"]);
-    }
-
-    @cache
-    static get _imageGetClass(): (image: NativePointer, index: number) => NativePointer {
+    static get _imageGetClass() {
         return createNF(this.r`image_get_class`, "pointer", ["pointer", "uint"]);
     }
 
     @cache
-    static get _imageGetClassCount(): (image: NativePointer) => number {
+    static get _imageGetClassCount() {
         return createNF(this.r`image_get_class_count`, "uint32", ["pointer"]);
     }
 
     @cache
-    static get _imageGetClassStart(): (image: NativePointer) => number {
+    static get _imageGetClassStart() {
         return createNF(this.r`image_get_class_start`, "uint32", ["pointer"]);
     }
 
     @cache
-    static get _imageGetName(): (image: NativePointer) => string | null {
+    static get _imageGetName() {
         return createNF(this.r`image_get_name`, "utf8string", ["pointer"]);
     }
 
     @cache
-    static get _init(): NativePointer {
+    static get _init() {
         return this.r`init`;
     }
 
     @cache
-    static get _livenessCalculationBegin(): (
-        filter: NativePointer,
-        maxObjectCount: number,
-        callback: NativePointer,
-        userData: NativePointer,
-        onWorldStarted: NativePointer,
-        onWorldStopped: NativePointer
-    ) => NativePointer {
+    static get _livenessCalculationBegin() {
         return createNF(this.r`unity_liveness_calculation_begin`, "pointer", [
             "pointer",
             "int",
@@ -330,177 +303,207 @@ export class Api {
     }
 
     @cache
-    static get _livenessCalculationEnd(): (state: NativePointer) => void {
+    static get _livenessCalculationEnd() {
         return createNF(this.r`unity_liveness_calculation_end`, "void", ["pointer"]);
     }
 
     @cache
-    static get _livenessCalculationFromStatics(): (state: NativePointer) => void {
+    static get _livenessCalculationFromStatics() {
         return createNF(this.r`unity_liveness_calculation_from_statics`, "void", ["pointer"]);
     }
 
     @cache
-    static get _memorySnapshotCapture(): () => NativePointer {
+    static get _memorySnapshotCapture() {
         return createNF(this.r`capture_memory_snapshot`, "pointer", []);
     }
 
     @cache
-    static get _memorySnapshotFree(): (snapshot: NativePointer) => void {
+    static get _memorySnapshotFree() {
         return createNF(this.r`free_captured_memory_snapshot`, "void", ["pointer"]);
     }
 
     @cache
-    static get _memorySnapshotGetTrackedObjectCount(): (snapshot: NativePointer) => UInt64 {
-        return createNF(this.r`memory_snapshot_get_tracked_object_count`, "uint64", ["pointer"]);
+    static get _memorySnapshotGetMetadataSnapshot() {
+        return createNF(this.r`memory_snapshot_get_metadata_snapshot`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _memorySnapshotGetObjects(): (snapshot: NativePointer) => NativePointer {
+    static get _memorySnapshotGetObjects() {
         return createNF(this.r`memory_snapshot_get_objects`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _methodGetClass(): (method: NativePointer) => NativePointer {
+    static get _memorySnapshotGetTrackedObjectCount() {
+        return createNF(this.r`memory_snapshot_get_tracked_object_count`, "uint64", ["pointer"]);
+    }
+
+    @cache
+    static get _metadataSnapshotGetMetadataTypeCount() {
+        return createNF(this.r`metadata_snapshot_get_metadata_type_count`, "uint32", ["pointer"]);
+    }
+
+    @cache
+    static get _metadataSnapshotGetMetadataTypes() {
+        return createNF(this.r`metadata_snapshot_get_metadata_types`, "pointer", ["pointer", "pointer"]);
+    }
+
+    @cache
+    static get _metadataTypeGetAssemblyName() {
+        return createNF(this.r`metadata_type_get_assembly_name`, "utf8string", ["pointer"]);
+    }
+
+    @cache
+    static get _metadataTypeGetBaseOrElementTypeIndex() {
+        return createNF(this.r`metadata_type_get_base_or_element_type_index`, "uint32", ["pointer"]);
+    }
+
+    @cache
+    static get _metadataTypeGetName() {
+        return createNF(this.r`metadata_type_get_name`, "utf8string", ["pointer"]);
+    }
+
+    @cache
+    static get _metadataTypeGetClass() {
+        return createNF(this.r`metadata_type_get_class`, "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _methodGetClass() {
         return createNF(this.r`method_get_class`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _methodGetName(): (method: NativePointer) => string | null {
+    static get _methodGetName() {
         return createNF(this.r`method_get_name`, "utf8string", ["pointer"]);
     }
 
     @cache
-    static get _methodGetParamCount(): (method: NativePointer) => number {
+    static get _methodGetParamCount() {
         return createNF(this.r`method_get_param_count`, "uint8", ["pointer"]);
     }
 
     @cache
-    static get _methodGetParameters(): (method: NativePointer, iter: NativePointer) => NativePointer {
+    static get _methodGetParameters() {
         return createNF(this.r`method_get_parameters`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
-    static get _methodGetPointer(): (method: NativePointer) => NativePointer {
+    static get _methodGetPointer() {
         return createNF(this.r`method_get_pointer`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _methodGetReturnType(): (method: NativePointer) => NativePointer {
+    static get _methodGetReturnType() {
         return createNF(this.r`method_get_return_type`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _methodIsGeneric(): (method: NativePointer) => boolean {
+    static get _methodIsGeneric() {
         return createNF(this.r`method_is_generic`, "bool", ["pointer"]);
     }
 
     @cache
-    static get _methodIsInflated(): (method: NativePointer) => boolean {
+    static get _methodIsInflated() {
         return createNF(this.r`method_is_inflated`, "bool", ["pointer"]);
     }
 
     @cache
-    static get _methodIsInstance(): (method: NativePointer) => boolean {
+    static get _methodIsInstance() {
         return createNF(this.r`method_is_instance`, "bool", ["pointer"]);
     }
 
     @cache
-    static get _objectGetClass(): (method: NativePointer) => NativePointer {
+    static get _objectGetClass() {
         return createNF(this.r`object_get_class`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _objectGetHeaderSize(): () => number {
+    static get _objectGetHeaderSize() {
         return createNF(this.r`object_header_size`, "uint", []);
     }
 
     @cache
-    static get _objectNew(): (klass: NativePointer) => NativePointer {
+    static get _objectNew() {
         return createNF(this.r`object_new`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _objectUnbox(): (object: NativePointer) => NativePointer {
+    static get _objectUnbox() {
         return createNF(this.r`object_unbox`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _parameterGetName(): (parameter: NativePointer) => string | null {
+    static get _parameterGetName() {
         return createNF(this.r`parameter_get_name`, "utf8string", ["pointer"]);
     }
 
     @cache
-    static get _parameterGetPosition(): (parameter: NativePointer) => number {
+    static get _parameterGetPosition() {
         return createNF(this.r`parameter_get_position`, "int32", ["pointer"]);
     }
 
     @cache
-    static get _parameterGetType(): (parameter: NativePointer) => NativePointer {
+    static get _parameterGetType() {
         return createNF(this.r`parameter_get_type`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _stringChars(): (string: NativePointer) => NativePointer {
+    static get _stringChars() {
         return createNF(this.r`string_chars`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _stringLength(): (string: NativePointer) => number {
+    static get _stringLength() {
         return createNF(this.r`string_length`, "int32", ["pointer"]);
     }
 
     @cache
-    static get _stringNew(): (string: string) => NativePointer {
+    static get _stringNew() {
         return createNF(this.r`string_new`, "pointer", ["utf8string"]);
     }
 
     @cache
-    static get _stringSetLength(): (string: NativePointer, length: number) => void {
+    static get _stringSetLength() {
         return createNF(this.r`string_set_length`, "void", ["pointer", "int32"]);
     }
 
     @cache
-    static get _valueBox(): (klass: NativePointer, data: NativePointer) => NativePointer {
+    static get _valueBox() {
         return createNF(this.r`value_box`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
-    static get _threadAttach(): (domain: NativePointer) => void {
+    static get _threadAttach() {
         return createNF(this.r`thread_attach`, "void", ["pointer"]);
     }
 
     @cache
-    static get _typeGetClassOrElementClass(): (type: NativePointer) => NativePointer {
+    static get _typeGetClassOrElementClass() {
         return createNF(this.r`type_get_class_or_element_class`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _typeGetDataType(): (type: NativePointer) => NativePointer {
+    static get _typeGetDataType() {
         return createNF(this.r`type_get_data_type`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _typeGetGenericClass(): (type: NativePointer) => NativePointer {
-        return createNF(this.r`type_get_generic_class`, "pointer", ["pointer"]);
-    }
-
-    @cache
-    static get _typeGetName(): (type: NativePointer) => string | null {
+    static get _typeGetName() {
         return createNF(this.r`type_get_name`, "utf8string", ["pointer"]);
     }
 
     @cache
-    static get _typeGetTypeEnum(): (type: NativePointer) => number {
+    static get _typeGetTypeEnum() {
         return createNF(this.r`type_get_type`, "int", ["pointer"]);
     }
 
     @cache
-    static get _typeIsByReference(): (type: NativePointer) => boolean {
+    static get _typeIsByReference() {
         return createNF(this.r`type_is_byref`, "bool", ["pointer"]);
     }
 
     @cache
-    static get _typeOffsetOfTypeEnum(): () => number {
+    static get _typeOffsetOfTypeEnum() {
         return createNF(this.r`type_offset_of_type`, "uint16", []);
     }
 
@@ -571,9 +574,6 @@ typedef struct _MethodInfo MethodInfo;
 typedef struct _ParameterInfo ParameterInfo;
 typedef enum _Il2CppTypeEnum Il2CppTypeEnum;
 typedef struct _VirtualInvokeData VirtualInvokeData;
-typedef struct _Il2CppGenericInst Il2CppGenericInst;
-typedef struct _Il2CppGenericClass Il2CppGenericClass;
-typedef struct _Il2CppGenericContext Il2CppGenericContext;
 typedef uint16_t Il2CppChar;
 typedef struct _Il2CppManagedMemorySnapshot Il2CppManagedMemorySnapshot;
 typedef struct _Il2CppMetadataSnapshot Il2CppMetadataSnapshot;
@@ -582,6 +582,7 @@ typedef struct _Il2CppManagedHeap Il2CppManagedHeap;
 typedef struct _Il2CppStacks Il2CppStacks;
 typedef struct _Il2CppGCHandles Il2CppGCHandles;
 typedef struct _Il2CppRuntimeInformation Il2CppRuntimeInformation;
+typedef struct _Il2CppMetadataType Il2CppMetadataType;
 
 enum _Il2CppTypeEnum
 {
@@ -765,7 +766,6 @@ struct _Il2CppImage
 #endif
 };
 
-
 uint32_t
 il2cpp_image_get_class_start (const Il2CppImage * image)
 {
@@ -775,7 +775,6 @@ il2cpp_image_get_class_start (const Il2CppImage * image)
     return 0;
 #endif
 }
-
 
 #if ${isBelow_2018_3_0}
 uint32_t
@@ -800,7 +799,7 @@ struct _Il2CppType
 #if ${isEqualOrAbove_2020_2_0}
         const struct Il2CppMetadataGenericParameterHandle * genericParameterHandle;
 #endif
-        Il2CppGenericClass * generic_class;
+        struct Il2CppGenericClass * generic_class;
     } data;
     unsigned int attrs: 16;
     Il2CppTypeEnum type: 8;
@@ -819,12 +818,6 @@ const Il2CppType *
 il2cpp_type_get_data_type (const Il2CppType * type)
 {
     return type->data.type;
-}
-
-Il2CppGenericClass *
-il2cpp_type_get_generic_class (const Il2CppType * type)
-{
-    return type->data.generic_class;
 }
 
 #if ${isBelow_2018_1_0}
@@ -858,7 +851,7 @@ struct _Il2CppClass
     Il2CppClass * castClass;
     Il2CppClass * declaringType;
     Il2CppClass * parent;
-    Il2CppGenericClass * generic_class;
+    struct Il2CppGenericClass * generic_class;
 #if ${isEqualOrAbove_2020_2_0}
     const struct Il2CppMetadataTypeHandle * typeMetadataHandle;
 #else
@@ -1000,53 +993,6 @@ il2cpp_class_get_static_field_data (const Il2CppClass * klass)
     return klass->static_fields;
 }
 #endif
-
-Il2CppGenericClass *
-il2cpp_class_get_generic_class (const Il2CppClass * klass)
-{
-    return klass->generic_class;
-}
-
-struct _Il2CppGenericInst
-{
-    uint32_t type_argc;
-    const Il2CppType ** type_argv;
-};
-
-struct _Il2CppGenericContext
-{
-    const Il2CppGenericInst * class_inst;
-    const Il2CppGenericInst * method_inst;
-};
-
-struct _Il2CppGenericClass
-{
-#if ${isEqualOrAbove_2020_2_0}
-    const Il2CppType * type;
-#else
-    int32_t typeDefinitionIndex;
-#endif
-    Il2CppGenericContext context;
-    Il2CppClass * cached_class;
-};
-
-Il2CppClass *
-il2cpp_generic_class_get_cached_class (Il2CppGenericClass * class)
-{
-    return class->cached_class;
-}
-
-uint32_t
-il2cpp_generic_class_get_types_count (Il2CppGenericClass * class)
-{
-    return class->context.class_inst->type_argc;
-}
-
-const Il2CppType **
-il2cpp_generic_class_get_types (Il2CppGenericClass * class)
-{
-    return class->context.class_inst->type_argv;
-}
 
 struct _FieldInfo
 {
@@ -1237,11 +1183,83 @@ il2cpp_array_elements (Il2CppArray * array) {
 }
 #endif
 
+struct _Il2CppMetadataType
+{
+    uint32_t flags;
+    // Il2CppMetadataTypeFlags flags;
+    struct Il2CppMetadataField * fields;
+    uint32_t fieldCount;
+    uint32_t staticsSize;
+    uint8_t * statics;
+    uint32_t baseOrElementTypeIndex;
+    char * name;
+    const char * assemblyName;
+    uint64_t typeInfoAddress;
+    uint32_t size;
+};
+
+const char *
+il2cpp_metadata_type_get_assembly_name (Il2CppMetadataType * metadata_type)
+{
+    return metadata_type->assemblyName;
+}
+
+Il2CppClass *
+il2cpp_metadata_type_get_class (Il2CppMetadataType * metadata_type)
+{
+    return (Il2CppClass *) metadata_type->typeInfoAddress;
+}
+
+char *
+il2cpp_metadata_type_get_name (Il2CppMetadataType * metadata_type)
+{
+    return metadata_type->name;
+}
+
+uint32_t
+il2cpp_metadata_type_get_base_or_element_type_index (Il2CppMetadataType * metadata_type)
+{
+    return metadata_type->baseOrElementTypeIndex;
+}
+
 struct _Il2CppMetadataSnapshot
 {
     uint32_t typeCount;
-    struct Il2CppMetadataType * types;
+    Il2CppMetadataType * types;
 };
+
+uint32_t
+il2cpp_metadata_snapshot_get_metadata_type_count (Il2CppMetadataSnapshot * metadata_snapshot)
+{
+    return metadata_snapshot->typeCount;
+}
+
+Il2CppMetadataType *
+il2cpp_metadata_snapshot_get_metadata_types (Il2CppMetadataSnapshot * metadata_snapshot,
+                              void ** iter)
+{
+    uint32_t metadata_type_count = metadata_snapshot->typeCount;
+
+    if (iter != 0 && metadata_type_count > 0)
+    {
+        void * temp = *iter;
+        if (temp == 0)
+        {
+            *iter = (void**) metadata_snapshot->types;
+            return metadata_snapshot->types;
+        }
+        else
+        {
+            Il2CppMetadataType * metadata_type = (Il2CppMetadataType *) *iter + 1;
+            if (metadata_type < metadata_snapshot->types + metadata_type_count)
+            {
+                *iter = (void *) metadata_type;
+                return metadata_type;
+            }
+        }
+    }
+    return 0;
+}
 
 struct _Il2CppManagedMemorySection
 {
@@ -1288,16 +1306,22 @@ struct _Il2CppManagedMemorySnapshot
     void * additionalUserInformation;
 };
 
-uint32_t
-il2cpp_memory_snapshot_get_tracked_object_count (Il2CppManagedMemorySnapshot * snapshot)
+Il2CppMetadataSnapshot *
+il2cpp_memory_snapshot_get_metadata_snapshot (Il2CppManagedMemorySnapshot * snapshot)
 {
-    return snapshot->gcHandles.trackedObjectCount;
+    return &snapshot->metadata;
 }
 
 Il2CppObject **
 il2cpp_memory_snapshot_get_objects (Il2CppManagedMemorySnapshot * snapshot)
 {
     return snapshot->gcHandles.pointersToObjects;
+}
+
+uint32_t
+il2cpp_memory_snapshot_get_tracked_object_count (Il2CppManagedMemorySnapshot * snapshot)
+{
+    return snapshot->gcHandles.trackedObjectCount;
 }
 `);
 }

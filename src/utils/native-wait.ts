@@ -62,10 +62,10 @@ export function forModule(moduleName: string): Promise<Module> {
         } else {
             const interceptors = Target.targets.map(target =>
                 Interceptor.attach(target.address, {
-                    onEnter(args) {
+                    onEnter(args: InvocationArguments) {
                         this.modulePath = target.readString(args[0]);
                     },
-                    onLeave(returnValue) {
+                    onLeave(returnValue: InvocationReturnValue) {
                         if (returnValue.isNull() || !this.modulePath || !this.modulePath.endsWith(moduleName)) return;
                         setTimeout(() => interceptors.forEach(i => i.detach()));
                         resolve(Process.getModuleByName(moduleName));

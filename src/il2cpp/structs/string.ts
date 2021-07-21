@@ -9,13 +9,13 @@ class Il2CppString extends NativeStruct {
         if (this.handle.isNull()) {
             return null;
         }
-        return Api._stringChars(this.handle).readUtf16String(this.length);
+        return Api._stringChars(this).readUtf16String(this.length);
     }
 
     set content(value: string | null) {
         if (value != null && !this.handle.isNull()) {
-            Api._stringChars(this.handle).writeUtf16String(value);
-            Api._stringSetLength(this.handle, value.length);
+            Api._stringChars(this).writeUtf16String(value);
+            Api._stringSetLength(this, value.length);
         }
     }
 
@@ -23,11 +23,11 @@ class Il2CppString extends NativeStruct {
         if (this.handle.isNull()) {
             return 0;
         }
-        return Api._stringLength(this.handle);
+        return Api._stringLength(this);
     }
 
     get object(): Il2Cpp.Object {
-        return new Il2Cpp.Object(this.handle);
+        return new Il2Cpp.Object(this);
     }
 
     static from(content: string | null): Il2Cpp.String {

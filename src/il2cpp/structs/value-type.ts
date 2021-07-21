@@ -28,6 +28,6 @@ class Il2CppValueType extends NativeStruct {
     }
 
     box(): Il2Cpp.Object {
-        return new Il2Cpp.Object(Api._valueBox(this.class.handle, this.handle));
+        return new Il2Cpp.Object(Api._valueBox(this.class, this));
     }
 }

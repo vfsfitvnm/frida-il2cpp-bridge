@@ -44,27 +44,22 @@ export class UnityVersion {
         return this.source;
     }
 
-    /** @internal */
     isEqual(other: string): boolean {
         return this.compare(other) == 0;
     }
 
-    /** @internal */
     isAbove(other: string): boolean {
         return this.compare(other) == 1;
     }
 
-    /** @internal */
     isBelow(other: string): boolean {
         return this.compare(other) == -1;
     }
 
-    /** @internal */
     isEqualOrAbove(other: string): boolean {
         return this.compare(other) >= 0;
     }
 
-    /** @internal */
     isEqualOrBelow(other: string): boolean {
         return this.compare(other) <= 0;
     }

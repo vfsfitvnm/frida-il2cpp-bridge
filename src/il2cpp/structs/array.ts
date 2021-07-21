@@ -8,7 +8,7 @@ import { raise } from "../../utils/console";
 import { injectToIl2Cpp } from "../decorators";
 
 @injectToIl2Cpp("Array")
-class Il2CppArray<T extends Il2Cpp.AllowedType> extends NativeStruct implements Iterable<T> {
+class Il2CppArray<T extends Il2Cpp.AllowedType = Il2Cpp.AllowedType> extends NativeStruct implements Iterable<T> {
     @cache
     get elementSize(): number {
         if (this.handle.isNull()) {
@@ -27,7 +27,7 @@ class Il2CppArray<T extends Il2Cpp.AllowedType> extends NativeStruct implements 
         if (this.handle.isNull()) {
             return NULL;
         }
-        return Api._arrayGetElements(this.handle);
+        return Api._arrayGetElements(this);
     }
 
     @cache
@@ -35,16 +35,16 @@ class Il2CppArray<T extends Il2Cpp.AllowedType> extends NativeStruct implements 
         if (this.handle.isNull()) {
             return 0;
         }
-        return Api._arrayGetLength(this.handle);
+        return Api._arrayGetLength(this);
     }
 
     @cache
     get object(): Il2Cpp.Object {
-        return new Il2Cpp.Object(this.handle);
+        return new Il2Cpp.Object(this);
     }
 
-    static from<T extends Il2Cpp.AllowedType>(klass: Il2Cpp.Class, elements: T[]): Il2Cpp.Array<T> {
-        const handle = Api._arrayNew(klass.handle, elements.length);
+    static from<T extends Il2Cpp.AllowedType = Il2Cpp.AllowedType>(klass: Il2Cpp.Class, elements: T[]): Il2Cpp.Array<T> {
+        const handle = Api._arrayNew(klass, elements.length);
         const array = new Il2Cpp.Array<T>(handle);
 
         elements.forEach((e: T, i: number) => array.set(i, e));
@@ -73,7 +73,7 @@ class Il2CppArray<T extends Il2Cpp.AllowedType> extends NativeStruct implements 
     }
 }
 
-function checkIndexOutOfBounds(array: Il2CppArray<Il2Cpp.AllowedType>, index: number): void {
+function checkIndexOutOfBounds(array: Il2CppArray, index: number): void {
     if (index < 0 || index >= array.length) {
         raise(`${array.constructor.name} element index '${index}' out of bounds (length: ${array.length}).`);
     }
