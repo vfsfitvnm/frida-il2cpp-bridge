@@ -1,17 +1,22 @@
-import { platformNotSupported, raise } from "../utils/console";
+import { platformNotSupported, raise, warn } from "../utils/console";
 import { injectToIl2Cpp } from "./decorators";
 import { forModule } from "../utils/native-wait";
 import { Api } from "./api";
 import { UnityVersion } from "./version";
+import { isEmpty } from "../utils/record";
 
 async function initialize(): Promise<void> {
+    if (Script.runtime != "V8") {
+        warn("Frida's JavaScript runtime is not V8 (--runtime=v8). Proceed with caution.");
+    }
+
     const il2CppLibraryName =
         Process.platform == "linux" ? "libil2cpp.so" : Process.platform == "windows" ? "GameAssembly.dll" : platformNotSupported();
 
     injectToIl2Cpp("module")(await forModule(il2CppLibraryName));
     injectToIl2Cpp("unityVersion")(await getUnityVersion());
 
-    if (!("mscorlib" in Il2Cpp.Domain.reference.assemblies)) {
+    if (isEmpty(Il2Cpp.Domain.reference.assemblies)) {
         await new Promise<void>(resolve => {
             const interceptor = Interceptor.attach(Api._init, {
                 onLeave() {
@@ -21,6 +26,7 @@ async function initialize(): Promise<void> {
             });
         });
     }
+    Api._threadAttach(Il2Cpp.Domain.reference);
 }
 
 async function getUnityVersion(): Promise<UnityVersion> {

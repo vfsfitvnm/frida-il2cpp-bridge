@@ -58,3 +58,17 @@ export function filterMap<V, U>(source: Record<string, V>, filter: (value: V) =>
 
     return record;
 }
+
+/** @internal */
+export function isEmpty(source: Record<any, any>): boolean {
+    for (const _ in source) {
+        return false;
+    }
+    return true;
+}
+
+/** @internal */
+export function overridePropertyValue<T extends object, K extends keyof T>(target: T, property: K, value: T[K]): T {
+    Reflect.defineProperty(target, property, { get: () => value });
+    return target;
+}

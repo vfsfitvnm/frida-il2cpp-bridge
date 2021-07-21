@@ -3,19 +3,19 @@ import { cache } from "decorator-cache-getter";
 import { addLevenshtein } from "../../utils/record";
 
 import { Api } from "../api";
-import { getOrNull, NativeStructNotNull } from "../../utils/native-struct";
+import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
 import { injectToIl2Cpp } from "../decorators";
 
 @injectToIl2Cpp("Image")
-class Il2CppImage extends NativeStructNotNull {
+class Il2CppImage extends NonNullNativeStruct {
     @cache
     get classCount(): number {
-        return Api._imageGetClassCount(this.handle);
+        return Api._imageGetClassCount(this);
     }
 
     @cache
     get classStart(): number {
-        return Api._imageGetClassStart(this.handle);
+        return Api._imageGetClassStart(this);
     }
 
     @cache
@@ -29,15 +29,20 @@ class Il2CppImage extends NativeStructNotNull {
             const globalIndex = Memory.alloc(Process.pointerSize);
             globalIndex.add(Il2Cpp.Type.offsetOfTypeEnum).writeInt(0x20);
 
+            console.log(start, end, globalIndex);
+
             for (let i = start; i < end; i++) {
-                const klass = new Il2Cpp.Class(Api._typeGetClassOrElementClass(globalIndex.writeInt(i)));
-                record[klass.type!.name!] = klass;
+                try {
+                    const klass = new Il2Cpp.Class(Api._typeGetClassOrElementClass(globalIndex.writeInt(i)));
+                    console.log(klass.name);
+                    record[klass.type!.name!] = klass;
+                } catch (e) {}
             }
         } else {
             const end = this.classCount;
 
             for (let i = 0; i < end; i++) {
-                const klass = new Il2Cpp.Class(Api._imageGetClass(this.handle, i));
+                const klass = new Il2Cpp.Class(Api._imageGetClass(this, i));
                 record[klass.type.name] = klass;
             }
         }
@@ -47,10 +52,10 @@ class Il2CppImage extends NativeStructNotNull {
 
     @cache
     get name(): string {
-        return Api._imageGetName(this.handle)!;
+        return Api._imageGetName(this)!;
     }
 
     getClassFromName(namespace: string, name: string): Il2Cpp.Class | null {
-        return getOrNull(Api._classFromName(this.handle, namespace, name), Il2Cpp.Class);
+        return getOrNull(Api._classFromName(this, namespace, name), Il2Cpp.Class);
     }
 }
