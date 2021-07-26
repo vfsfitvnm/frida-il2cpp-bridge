@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
 
-import { createNF } from "../utils/extensions";
 import { raise } from "../utils/console";
+import { createNF } from "../utils/extensions";
 
 /** @internal */
 export class Api {
@@ -131,8 +131,8 @@ export class Api {
     }
 
     @cache
-    static get _classHasStaticConstructor() {
-        return createNF(this.r`class_has_static_constructor`, "bool", ["pointer"]);
+    static get _classHasClassConstructor() {
+        return createNF(this.r`class_has_class_constructor`, "bool", ["pointer"]);
     }
 
     @cache
@@ -151,13 +151,23 @@ export class Api {
     }
 
     @cache
+    static get _classIsGeneric() {
+        return createNF(this.r`class_is_generic`, "bool", ["pointer"]);
+    }
+
+    @cache
+    static get _classIsInflated() {
+        return createNF(this.r`class_is_inflated`, "bool", ["pointer"]);
+    }
+
+    @cache
     static get _classIsInterface() {
         return createNF(this.r`class_is_interface`, "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsStaticConstructorFinished() {
-        return createNF(this.r`class_is_static_constructor_finished`, "bool", ["pointer"]);
+        return createNF(this.r`class_is_class_constructor_finished`, "bool", ["pointer"]);
     }
 
     @cache
@@ -211,6 +221,11 @@ export class Api {
     }
 
     @cache
+    static get _fieldGetValue() {
+        return createNF(this.r`field_get_value`, "void", ["pointer", "pointer", "pointer"]);
+    }
+
+    @cache
     static get _fieldIsInstance() {
         return createNF(this.r`field_is_instance`, "bool", ["pointer"]);
     }
@@ -218,6 +233,11 @@ export class Api {
     @cache
     static get _fieldIsLiteral() {
         return createNF(this.r`field_is_literal`, "bool", ["pointer"]);
+    }
+
+    @cache
+    static get _fieldSetStaticValue() {
+        return createNF(this.r`field_static_set_value`, "void", ["pointer", "pointer"]);
     }
 
     @cache
@@ -238,6 +258,16 @@ export class Api {
     @cache
     static get _gcEnable() {
         return createNF(this.r`gc_enable`, "void", []);
+    }
+
+    @cache
+    static get _gcGetHeapSize() {
+        return createNF(this.r`gc_get_heap_size`, "int64", []);
+    }
+
+    @cache
+    static get _gcGetUsedSize() {
+        return createNF(this.r`gc_get_used_size`, "int64", []);
     }
 
     @cache
@@ -378,6 +408,11 @@ export class Api {
     }
 
     @cache
+    static get _methodGetObject() {
+        return createNF(this.r`method_get_object`, "pointer", ["pointer", "pointer"]);
+    }
+
+    @cache
     static get _methodGetParamCount() {
         return createNF(this.r`method_get_param_count`, "uint8", ["pointer"]);
     }
@@ -493,6 +528,11 @@ export class Api {
     }
 
     @cache
+    static get _typeGetObject() {
+        return createNF(this.r`type_get_object`, "pointer", ["pointer"]);
+    }
+
+    @cache
     static get _typeGetTypeEnum() {
         return createNF(this.r`type_get_type`, "int", ["pointer"]);
     }
@@ -520,6 +560,8 @@ export class Api {
         }
         raise(`Couldn't resolve export "${name}".`);
     }
+
+    private constructor() {}
 }
 
 function createMissingApi(): CModule {
@@ -666,7 +708,7 @@ struct _Il2CppDomain
 };
 
 const char *
-il2cpp_domain_get_name (const Il2CppDomain* domain)
+il2cpp_domain_get_name (const Il2CppDomain * domain)
 {
     return domain->friendly_name;
 }
@@ -975,13 +1017,13 @@ il2cpp_class_get_field_count (const Il2CppClass * klass)
 }
 
 uint8_t
-il2cpp_class_has_static_constructor (const Il2CppClass * klass)
+il2cpp_class_has_class_constructor (const Il2CppClass * klass)
 {
     return klass->has_cctor;
 }
 
 uint32_t
-il2cpp_class_is_static_constructor_finished (const Il2CppClass * klass)
+il2cpp_class_is_class_constructor_finished (const Il2CppClass * klass)
 {
     return klass->cctor_finished;
 }
@@ -1207,7 +1249,7 @@ il2cpp_metadata_type_get_assembly_name (Il2CppMetadataType * metadata_type)
 Il2CppClass *
 il2cpp_metadata_type_get_class (Il2CppMetadataType * metadata_type)
 {
-    return (Il2CppClass *) metadata_type->typeInfoAddress;
+    return (Il2CppClass *) (uintptr_t) metadata_type->typeInfoAddress;
 }
 
 char *

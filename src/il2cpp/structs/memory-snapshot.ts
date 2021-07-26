@@ -1,6 +1,8 @@
 import { cache } from "decorator-cache-getter";
+
 import { Api } from "../api";
 import { injectToIl2Cpp } from "../decorators";
+
 import { NonNullNativeStruct } from "../../utils/native-struct";
 
 @injectToIl2Cpp("MemorySnapshot")

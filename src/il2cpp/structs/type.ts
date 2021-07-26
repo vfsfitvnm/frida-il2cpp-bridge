@@ -1,8 +1,10 @@
 import { cache } from "decorator-cache-getter";
 
 import { Api } from "../api";
-import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
 import { injectToIl2Cpp } from "../decorators";
+
+import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
+import { filterMap, filterMapArray } from "../../utils/record";
 
 @injectToIl2Cpp("Type")
 class Il2CppType extends NonNullNativeStruct {
@@ -12,7 +14,17 @@ class Il2CppType extends NonNullNativeStruct {
     }
 
     @cache
-    get fridaAlias() {
+    get class(): Il2Cpp.Class {
+        return new Il2Cpp.Class(Api._classFromType(this));
+    }
+
+    @cache
+    get dataType(): Il2Cpp.Type | null {
+        return getOrNull(Api._typeGetDataType(this), Il2Cpp.Type);
+    }
+
+    @cache
+    get fridaAlias(): NativeType {
         if (this.isByReference) {
             return "pointer";
         }
@@ -45,20 +57,15 @@ class Il2CppType extends NonNullNativeStruct {
             case "r8":
                 return "double";
             case "valuetype":
-                return this.class.isEnum ? "int32" : "pointer";
+                return filterMapArray(
+                    this.class.fields,
+                    (field: Il2Cpp.Field) => !field.isStatic,
+                    (field: Il2Cpp.Field) => field.type.fridaAlias
+                );
+            // return this.class.isEnum ? "int32" : "pointer";
             default:
                 return "pointer";
         }
-    }
-
-    @cache
-    get class(): Il2Cpp.Class {
-        return new Il2Cpp.Class(Api._classFromType(this));
-    }
-
-    @cache
-    get dataType(): Il2Cpp.Type | null {
-        return getOrNull(Api._typeGetDataType(this), Il2Cpp.Type);
     }
 
     @cache
@@ -69,6 +76,11 @@ class Il2CppType extends NonNullNativeStruct {
     @cache
     get name(): string {
         return Api._typeGetName(this)!;
+    }
+
+    @cache
+    get object(): Il2Cpp.Object {
+        return new Il2Cpp.Object(Api._typeGetObject(this));
     }
 
     @cache

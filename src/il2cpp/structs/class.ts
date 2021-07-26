@@ -3,8 +3,8 @@ import { cache } from "decorator-cache-getter";
 import { Api } from "../api";
 import { injectToIl2Cpp } from "../decorators";
 
-import { addLevenshtein, preventKeyClash } from "../../utils/record";
 import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
+import { addLevenshtein, formatNativePointer, preventKeyClash } from "../../utils/record";
 
 @injectToIl2Cpp("Class")
 class Il2CppClass extends NonNullNativeStruct {
@@ -55,8 +55,8 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     @cache
-    get hasStaticConstructor(): boolean {
-        return Api._classHasStaticConstructor(this);
+    get hasClassConstructor(): boolean {
+        return Api._classHasClassConstructor(this);
     }
 
     @cache
@@ -75,6 +75,16 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     @cache
+    get isGeneric(): boolean {
+        return Api._classIsGeneric(this);
+    }
+
+    @cache
+    get isInflated(): boolean {
+        return Api._classIsInflated(this);
+    }
+
+    @cache
     get isInterface(): boolean {
         return Api._classIsInterface(this);
     }
@@ -85,7 +95,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
     @cache
     get isValueType(): boolean {
-        return Api._classIsValueType(this) && !this.isEnum;
+        return Api._classIsValueType(this);
     }
 
     @cache
@@ -155,16 +165,16 @@ class Il2CppClass extends NonNullNativeStruct {
         return new Il2Cpp.Type(Api._classGetType(this));
     }
 
+    initialize(): void {
+        Api._classInit(this);
+    }
+
     isAssignableFrom(other: Il2Cpp.Class): boolean {
         return Api._classIsAssignableFrom(this, other);
     }
 
     isSubclassOf(other: Il2Cpp.Class, checkInterfaces: boolean): boolean {
         return Api._classIsSubclassOf(this, other, checkInterfaces);
-    }
-
-    initialize(): void {
-        Api._classInit(this);
     }
 
     override toString(): string {
@@ -201,7 +211,7 @@ class Il2CppClass extends NonNullNativeStruct {
                 text += parameter.type.name + " " + parameter.name;
             }
             text += ");";
-            if (!method.pointer.isNull()) text += " // " + method.relativePointerAsString + ";";
+            if (!method.virtualAddress.isNull()) text += " // " + formatNativePointer(method.relativeVirtualAddress);
         }
         text += "\n}\n\n";
         return text;

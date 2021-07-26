@@ -1,5 +1,6 @@
 import { raise } from "../utils/console";
 import { injectToGlobal } from "../utils/decorators";
+import { NativeStruct } from "../utils/native-struct";
 
 /** @internal */
 export function shouldBeInstance<T extends Il2Cpp.Field | Il2Cpp.Method>(shouldBeInstance: boolean): MethodDecorator {
@@ -28,6 +29,14 @@ export function since(version: string): MethodDecorator {
             }
             return fn.apply(this, args);
         };
+    };
+}
+
+/** @internal */
+export function checkNull(target: NativeStruct, propertyKey: "toString", descriptor: PropertyDescriptor): void {
+    const original = descriptor.value;
+    descriptor.value = function (this: NativeStruct): string {
+        return this.isNull() ? "null" : original.apply(this);
     };
 }
 

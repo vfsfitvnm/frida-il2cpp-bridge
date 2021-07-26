@@ -1,36 +1,37 @@
 import { injectToIl2Cpp } from "./decorators";
-import { inform, warn } from "../utils/console";
+
+import { inform } from "../utils/console";
+import { formatNativePointer } from "../utils/record";
 
 @injectToIl2Cpp("Tracer")
-class Tracing {
-    counter: number = 0;
+class Tracer {
+    static fullWithValuesTrace(...targets: Il2Cpp.Tracer.Targets): void {
+        let counter = 0;
 
-    readonly invocationListeners: InvocationListener[] = [];
-
-    constructor(readonly logging: Il2Cpp.Tracer.Logging, ...targets: (Il2Cpp.Class | Il2Cpp.Method)[]) {
-        this.add(...targets);
-    }
-
-    static Custom(callbackGenerator: Il2Cpp.Tracer.Logging, ...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer {
-        return new Il2Cpp.Tracer(callbackGenerator, ...targets);
-    }
-
-    static Full(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer {
-        return new Il2Cpp.Tracer(function (method: Il2Cpp.Method) {
-            const tracer: Il2Cpp.Tracer = this;
-            const at = `\x1b[37m${method.relativePointerAsString}\x1b[0m`;
+        this.trace((method: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
+            const at = `\x1b[37m${formatNativePointer(method.relativeVirtualAddress)}\x1b[0m`;
             const sign = `${method.class.type.name}.\x1b[1m${method.name}\x1b[0m`;
+            const _parametersInfo = Object.values(method.parameters);
 
             return {
-                onEnter() {
-                    inform(`${at} ${"│ ".repeat(tracer.counter)}┌─\x1b[31m${sign}\x1b[0m`);
-                    tracer.counter += 1;
-                },
-                onLeave() {
-                    tracer.counter -= 1;
-                    inform(`${at} ${"│ ".repeat(tracer.counter)}└─\x1b[32m${sign}\x1b[0m`);
+                onEnter(...parameters: Il2Cpp.Parameter.Type[]): void {
+                    const parametersInfo = parameters
+                        .map((value: Il2Cpp.Parameter.Type, index: number) => {
+                            return `\x1b[34m${_parametersInfo[index].type.name}\x1b[0m \x1b[33m${_parametersInfo[index].name}\x1b[0m = \x1b[36m${value}\x1b[0m`;
+                        })
+                        .join(", ");
 
-                    if (tracer.counter == 0) {
+                    inform(`${at} ${"│ ".repeat(counter)}┌─\x1b[31m${sign}\x1b[0m\x1b[33m(\x1b[0m${parametersInfo}\x1b[33m)\x1b[0m`);
+                    counter += 1;
+                },
+                onLeave(returnValue: Il2Cpp.Method.ReturnType): void {
+                    counter -= 1;
+                    inform(
+                        `${at} ${"│ ".repeat(counter)}└─\x1b[32m${sign}\x1b[0m \x1b[35m${
+                            method.returnType.name
+                        }\x1b[0m = \x1b[36m${returnValue}\x1b[0m`
+                    );
+                    if (counter == 0) {
                         console.log();
                     }
                 }
@@ -38,102 +39,80 @@ class Tracing {
         }, ...targets);
     }
 
-    static Simple(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer {
-        return new Il2Cpp.Tracer(
-            method => ({
-                onEnter() {
-                    inform(`\x1b[37m${method.relativePointerAsString}\x1b[0m ${method.class.type.name}.\x1b[1m${method.name}\x1b[0m`);
-                }
-            }),
-            ...targets
-        );
-    }
+    static fullTrace(...targets: Il2Cpp.Tracer.Targets): void {
+        let counter = 0;
 
-    add(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): void {
-        const methods = targets
-            .flatMap(target => (target instanceof Il2Cpp.Class ? Object.values(target.methods) : target))
-            .filter(method => !method.pointer.isNull());
-
-        for (const method of methods) {
-            try {
-                this.invocationListeners.push(Interceptor.attach(method.pointer, this.logging.call(this, method)));
-            } catch (e) {
-                warn(`Can't trace method ${method.name} from ${method.class.type.name}: ${e.message}.`);
-            }
-        }
-    }
-
-    clear(): void {
-        let invocationListener: InvocationListener | undefined;
-
-        while ((invocationListener = this.invocationListeners.pop())) {
-            invocationListener.detach();
-        }
-    }
-}
-
-@injectToIl2Cpp("Tracer2")
-class Tracer {
-    counter: number = 0;
-
-    readonly methods: Il2Cpp.Method[];
-
-    constructor(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]) {
-        this.methods = targets
-            .flatMap(target => (target instanceof Il2Cpp.Class ? Object.values(target.methods) : target))
-            .filter(method => !method.pointer.isNull());
-
-        // for (const method of methods) {
-        //     try {
-        //         this.invocationListeners.push(Interceptor.replace(method.pointer, this.logging.call(this, method)));
-        //     } catch (e) {
-        //         warn(`Can't trace method ${method.name} from ${method.class.type.name}: ${e.message}.`);
-        //     }
-        // }
-    }
-
-    static FullWithValues(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer2 {
-        const tracer = new Il2Cpp.Tracer2(...targets);
-
-        for (const method of tracer.methods) {
-            const at = `\x1b[37m${method.relativePointerAsString}\x1b[0m`;
+        this.trace((method: Il2Cpp.Method) => {
+            const at = `\x1b[37m${formatNativePointer(method.relativeVirtualAddress)}\x1b[0m`;
             const sign = `${method.class.type.name}.\x1b[1m${method.name}\x1b[0m`;
 
-            method.implementation = function (...parameters: Il2Cpp.AllowedType[]): Il2Cpp.AllowedType {
-                const parametersInfo = parameters.join(", ");
+            return {
+                onEnter() {
+                    inform(`${at} ${"│ ".repeat(counter)}┌─\x1b[31m${sign}\x1b[0m`);
+                    counter += 1;
+                },
+                onLeave() {
+                    counter -= 1;
+                    inform(`${at} ${"│ ".repeat(counter)}└─\x1b[32m${sign}\x1b[0m`);
 
-                inform(`${at} ${"│ ".repeat(tracer.counter)}┌─\x1b[31m${sign}\x1b[0m\x1b[33m(\x1b[0m${parametersInfo}\x1b[33m)\x1b[0m`);
-                tracer.counter += 1;
+                    if (counter == 0) {
+                        console.log();
+                    }
+                }
+            };
+        }, ...targets);
+    }
 
-                let result: Il2Cpp.AllowedType;
+    static simpleTrace(...targets: Il2Cpp.Tracer.Targets): void {
+        this.trace((method: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
+            return {
+                onEnter() {
+                    inform(
+                        `\x1b[37m${formatNativePointer(method.relativeVirtualAddress)}\x1b[0m ${method.class.type.name}.\x1b[1m${
+                            method.name
+                        }\x1b[0m`
+                    );
+                }
+            };
+        }, ...targets);
+    }
+
+    static trace(callbacksGenerator: (method: Il2Cpp.Method) => Il2Cpp.Tracer.Callbacks, ...targets: Il2Cpp.Tracer.Targets): void {
+        function applyMethodImplementation(method: Il2Cpp.Method): void {
+            if (method.virtualAddress.isNull()) {
+                return;
+            }
+
+            const { onEnter, onLeave } = callbacksGenerator(method);
+
+            method.implementation = function (...parameters: Il2Cpp.Parameter.Type[]): Il2Cpp.Method.ReturnType {
+                if (onEnter != undefined) {
+                    onEnter(...parameters);
+                }
+
+                let returnValue: Il2Cpp.Method.ReturnType;
                 if (this instanceof Il2Cpp.Object) {
-                    result = method.asHeld(this.handle).invoke(...parameters);
+                    returnValue = method.withHolder(this).invoke(...parameters);
                 } else {
-                    result = method.invoke(...parameters);
+                    returnValue = method.invoke(...parameters);
                 }
 
-                tracer.counter -= 1;
-                inform(
-                    `${at} ${"│ ".repeat(tracer.counter)}└─\x1b[32m${sign}\x1b[0m \x1b[35m${
-                        method.returnType.name
-                    }\x1b[0m = \x1b[36m${result}\x1b[0m`
-                );
-                if (tracer.counter == 0) {
-                    console.log();
+                if (onLeave != undefined) {
+                    onLeave(returnValue);
                 }
 
-                return result;
+                return returnValue;
             };
         }
 
-        return tracer;
-    }
-
-    clear(): void {
-        let method: Il2Cpp.Method | undefined;
-
-        while ((method = this.methods.pop())) {
-            method.restoreImplementation();
+        for (const methodOrClass of targets) {
+            if (methodOrClass instanceof Il2Cpp.Class) {
+                for (const method of Object.values(methodOrClass.methods)) {
+                    applyMethodImplementation(method);
+                }
+            } else {
+                applyMethodImplementation(methodOrClass);
+            }
         }
     }
 }

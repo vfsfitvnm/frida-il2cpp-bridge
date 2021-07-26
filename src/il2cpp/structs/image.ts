@@ -1,21 +1,16 @@
 import { cache } from "decorator-cache-getter";
 
-import { addLevenshtein } from "../../utils/record";
-
 import { Api } from "../api";
-import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
 import { injectToIl2Cpp } from "../decorators";
+
+import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
+import { addLevenshtein } from "../../utils/record";
 
 @injectToIl2Cpp("Image")
 class Il2CppImage extends NonNullNativeStruct {
     @cache
     get classCount(): number {
         return Api._imageGetClassCount(this);
-    }
-
-    @cache
-    get classStart(): number {
-        return Api._imageGetClassStart(this);
     }
 
     @cache
@@ -29,14 +24,9 @@ class Il2CppImage extends NonNullNativeStruct {
             const globalIndex = Memory.alloc(Process.pointerSize);
             globalIndex.add(Il2Cpp.Type.offsetOfTypeEnum).writeInt(0x20);
 
-            console.log(start, end, globalIndex);
-
             for (let i = start; i < end; i++) {
-                try {
-                    const klass = new Il2Cpp.Class(Api._typeGetClassOrElementClass(globalIndex.writeInt(i)));
-                    console.log(klass.name);
-                    record[klass.type!.name!] = klass;
-                } catch (e) {}
+                const klass = new Il2Cpp.Class(Api._typeGetClassOrElementClass(globalIndex.writeInt(i)));
+                record[klass.type!.name!] = klass;
             }
         } else {
             const end = this.classCount;
@@ -48,6 +38,11 @@ class Il2CppImage extends NonNullNativeStruct {
         }
 
         return addLevenshtein(record);
+    }
+
+    @cache
+    get classStart(): number {
+        return Api._imageGetClassStart(this);
     }
 
     @cache

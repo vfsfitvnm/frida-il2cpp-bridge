@@ -17,6 +17,12 @@ export class NativeStruct implements ObjectWrapper {
     equals(other: NativeStruct) {
         return this.handle.equals(other.handle);
     }
+
+    isNull(): boolean {
+        return this.handle.isNull();
+    }
+
+    // safeToString<T>(): T {}
 }
 
 /** Scaffold class whom pointer cannot be null. */
@@ -31,6 +37,6 @@ export class NonNullNativeStruct extends NativeStruct {
 }
 
 /** @internal */
-export function getOrNull<T extends NativeStruct>(handle: NativePointer, Class: new (...args: any[]) => T): T | null {
+export function getOrNull<T extends ObjectWrapper>(handle: NativePointer, Class: new (handle: NativePointer) => T): T | null {
     return handle.isNull() ? null : new Class(handle);
 }
