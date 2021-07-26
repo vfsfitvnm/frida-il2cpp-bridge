@@ -1,11 +1,12 @@
 import { cache } from "decorator-cache-getter";
 
-import { raise } from "../../utils/console";
-
 import { Api } from "../api";
 import { injectToIl2Cpp, shouldBeInstance } from "../decorators";
-import { NonNullNativeStruct } from "../../utils/native-struct";
 import { readFieldValue, writeFieldValue } from "../utils";
+
+import { warn } from "../../utils/console";
+import { NonNullNativeStruct } from "../../utils/native-struct";
+import { redefineProperty } from "../../utils/record";
 
 @injectToIl2Cpp("Field")
 class Il2CppField extends NonNullNativeStruct {
@@ -44,38 +45,37 @@ class Il2CppField extends NonNullNativeStruct {
         return new Il2Cpp.Type(Api._fieldGetType(this));
     }
 
-    get value(): Il2Cpp.AllowedType {
-        return readFieldValue(this.valueHandle, this.type);
-    }
-
     @shouldBeInstance(false)
-    set value(value: Il2Cpp.AllowedType) {
-        if (this.isThreadStatic || this.isLiteral) {
-            raise(`Cannot edit the thread static or literal field "${this.name}".`);
-        }
-
-        writeFieldValue(this.valueHandle, value, this.type);
-    }
-
-    @shouldBeInstance(false)
-    get valueHandle(): NativePointer {
+    get value(): Il2Cpp.Field.Type {
         const value = Memory.alloc(Process.pointerSize);
         Api._fieldGetStaticValue(this, value);
-        return value;
+        return readFieldValue(value, this.type);
+    }
+
+    set value(value: Il2Cpp.Field.Type) {
+        if (this.isThreadStatic || this.isLiteral) {
+            warn(`${this.class.type.name}.\x1b[1m${this.name}\x1b[0m is a thread static or literal field, its value won't be modified.`);
+        }
+
+        const valueHandle = Memory.alloc(Process.pointerSize);
+        writeFieldValue(valueHandle, value, this.type);
+        Api._fieldSetStaticValue(this, valueHandle);
     }
 
     @shouldBeInstance(true)
-    asHeld(handle: NativePointer): Il2Cpp.WithValue {
-        const type = this.type;
+    withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Field {
+        let valueHandle = instance.handle.add(this.offset);
+        if (instance instanceof Il2Cpp.ValueType) {
+            valueHandle = valueHandle.sub(Il2Cpp.Object.headerSize);
+        }
 
-        return {
-            valueHandle: handle,
-            get value(): Il2Cpp.AllowedType {
-                return readFieldValue(handle, type);
+        return redefineProperty(new Il2Cpp.Field(this.handle), "value", {
+            get: (): Il2Cpp.Field.Type => {
+                return readFieldValue(valueHandle, this.type);
             },
-            set value(value: Il2Cpp.AllowedType) {
-                writeFieldValue(handle, value, type);
+            set: (value: Il2Cpp.Field.Type) => {
+                writeFieldValue(valueHandle, value, this.type);
             }
-        } as Il2Cpp.WithValue;
+        });
     }
 }

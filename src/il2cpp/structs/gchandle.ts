@@ -1,5 +1,6 @@
 import { Api } from "../api";
 import { injectToIl2Cpp } from "../decorators";
+
 import { getOrNull } from "../../utils/native-struct";
 
 @injectToIl2Cpp("GCHandle")

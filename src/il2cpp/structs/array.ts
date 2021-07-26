@@ -1,20 +1,28 @@
 import { cache } from "decorator-cache-getter";
 
 import { Api } from "../api";
+import { checkNull, injectToIl2Cpp } from "../decorators";
 import { readFieldValue, writeFieldValue } from "../utils";
 
-import { NativeStruct } from "../../utils/native-struct";
 import { raise } from "../../utils/console";
-import { injectToIl2Cpp } from "../decorators";
+import { NativeStruct } from "../../utils/native-struct";
 
 @injectToIl2Cpp("Array")
-class Il2CppArray<T extends Il2Cpp.AllowedType = Il2Cpp.AllowedType> extends NativeStruct implements Iterable<T> {
+class Il2CppArray<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends NativeStruct implements Iterable<T> {
+    static from<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type>(klass: Il2Cpp.Class, elements: T[]): Il2Cpp.Array<T> {
+        const array = new Il2Cpp.Array<T>(Api._arrayNew(klass, elements.length));
+        array.elements.values = elements;
+        return array;
+    }
+
+    @cache
+    get elements(): Il2Cpp.Pointer<T> {
+        return new Il2Cpp.Pointer(Api._arrayGetElements(this), this.elementType);
+    }
+
     @cache
     get elementSize(): number {
-        if (this.handle.isNull()) {
-            return 0;
-        }
-        return this.object.class.type.dataType!.class.arrayElementSize;
+        return this.elementType.class.arrayElementSize;
     }
 
     @cache
@@ -23,18 +31,10 @@ class Il2CppArray<T extends Il2Cpp.AllowedType = Il2Cpp.AllowedType> extends Nat
     }
 
     @cache
-    get elements(): NativePointer {
-        if (this.handle.isNull()) {
-            return NULL;
-        }
-        return Api._arrayGetElements(this);
-    }
-
-    @cache
     get length(): number {
-        if (this.handle.isNull()) {
-            return 0;
-        }
+        // if (this.handle.isNull()) {
+        //     return 0;
+        // }
         return Api._arrayGetLength(this);
     }
 
@@ -43,32 +43,24 @@ class Il2CppArray<T extends Il2Cpp.AllowedType = Il2Cpp.AllowedType> extends Nat
         return new Il2Cpp.Object(this);
     }
 
-    static from<T extends Il2Cpp.AllowedType = Il2Cpp.AllowedType>(klass: Il2Cpp.Class, elements: T[]): Il2Cpp.Array<T> {
-        const handle = Api._arrayNew(klass, elements.length);
-        const array = new Il2Cpp.Array<T>(handle);
-
-        elements.forEach((e: T, i: number) => array.set(i, e));
-
-        return array;
-    }
-
     get(index: number): T {
         checkIndexOutOfBounds(this, index);
-        return readFieldValue(this.elements.add(index * this.elementSize), this.elementType) as T;
+        return this.elements.get(index);
     }
 
     set(index: number, value: T) {
         checkIndexOutOfBounds(this, index);
-        writeFieldValue(this.elements.add(index * this.elementSize), value, this.elementType);
+        this.elements.set(index, value);
     }
 
+    @checkNull
     override toString(): string {
-        return `[${Array.from(this).join(", ")}]`;
+        return this.elements.toString();
     }
 
     *[Symbol.iterator](): IterableIterator<T> {
         for (let i = 0; i < this.length; i++) {
-            yield this.get(i);
+            yield this.elements.get(i);
         }
     }
 }

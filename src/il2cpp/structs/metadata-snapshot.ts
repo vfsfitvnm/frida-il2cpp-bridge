@@ -1,7 +1,9 @@
-import { injectToIl2Cpp } from "../decorators";
-import { NativeStruct, NonNullNativeStruct } from "../../utils/native-struct";
 import { cache } from "decorator-cache-getter";
+
 import { Api } from "../api";
+import { injectToIl2Cpp } from "../decorators";
+
+import { NonNullNativeStruct } from "../../utils/native-struct";
 
 @injectToIl2Cpp("MetadataSnapshot")
 class Il2CppMetadataSnapshot extends NonNullNativeStruct {

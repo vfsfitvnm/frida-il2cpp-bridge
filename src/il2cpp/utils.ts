@@ -1,6 +1,16 @@
-import { raise, warn } from "../utils/console";
+import { raise } from "../utils/console";
 
-function isCoherent(value: Il2Cpp.AllowedType, type: Il2Cpp.Type): boolean {
+function checkCoherence(value: Il2Cpp.Field.Type, type: Il2Cpp.Type) {
+    if (!isCoherent(value, type)) {
+        raise(`A "${type.name}" is required, but a "${Object.getPrototypeOf(value).constructor.name}" was supplied.`);
+    }
+}
+
+function isCoherent(value: Il2Cpp.Field.Type, type: Il2Cpp.Type): boolean {
+    if (type.isByReference) {
+        return value instanceof Il2Cpp.Reference;
+    }
+
     switch (type.typeEnum) {
         case "void":
             return value == undefined;
@@ -22,8 +32,9 @@ function isCoherent(value: Il2Cpp.AllowedType, type: Il2Cpp.Type): boolean {
             return typeof value == "number" || value instanceof UInt64;
         case "i":
         case "u":
-        case "ptr":
             return value instanceof NativePointer;
+        case "ptr":
+            return value instanceof Il2Cpp.Pointer;
         case "valuetype":
             if (type.class.isEnum) {
                 return typeof value == "number";
@@ -42,8 +53,59 @@ function isCoherent(value: Il2Cpp.AllowedType, type: Il2Cpp.Type): boolean {
     }
 }
 
+function isNativeReturnValueCoherent(value: NativeReturnValue, type: Il2Cpp.Type): boolean {
+    if (type.isByReference) {
+        return value instanceof NativePointer;
+    } else if (Array.isArray(value)) {
+        raise("This should not happen.");
+    }
+
+    switch (type.typeEnum) {
+        case "void":
+            return typeof value == "undefined";
+        case "boolean":
+        case "i1":
+        case "u1":
+        case "i2":
+        case "u2":
+        case "i4":
+        case "u4":
+        case "char":
+        case "r4":
+        case "r8":
+            return typeof value == "number";
+        case "i8":
+            return value instanceof Int64;
+        case "u8":
+            return value instanceof UInt64;
+        case "valuetype":
+            if (type.class.isEnum) {
+                return typeof value == "number";
+            }
+            return value instanceof NativePointer;
+        case "i":
+        case "u":
+        case "ptr":
+        case "class":
+        case "genericinst":
+        case "object":
+        case "string":
+        case "szarray":
+            return value instanceof NativePointer;
+        default:
+            raise(`isCoherent: "${type.name}" (${type.typeEnum}) has not been handled yet. Please file an issue!`);
+    }
+}
+
+function checkNativeReturnValueCoherence(value: NativeReturnValue, type: Il2Cpp.Type): value is NativePointer {
+    if (!isNativeReturnValueCoherent(value, type)) {
+        raise(`A "${type.name}" is required, but a "${Object.getPrototypeOf(value).constructor.name}" was supplied.`);
+    }
+    return true;
+}
+
 /** @internal */
-export function readFieldValue(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.AllowedType {
+export function readFieldValue(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Type {
     // if (pointer.isNull()) {
     //     return undefined;
     // }
@@ -76,8 +138,9 @@ export function readFieldValue(pointer: NativePointer, type: Il2Cpp.Type): Il2Cp
             return pointer.readDouble();
         case "i":
         case "u":
-        case "ptr":
             return pointer.readPointer();
+        case "ptr":
+            return new Il2Cpp.Pointer(pointer.readPointer(), type.dataType!);
         case "valuetype":
             return type.class.isEnum ? pointer.readS32() : new Il2Cpp.ValueType(pointer, type.class);
         case "class":
@@ -94,7 +157,7 @@ export function readFieldValue(pointer: NativePointer, type: Il2Cpp.Type): Il2Cp
 }
 
 /** @internal */
-export function writeFieldValue(pointer: NativePointer, value: Il2Cpp.AllowedType, type: Il2Cpp.Type): void {
+export function writeFieldValue(pointer: NativePointer, value: Il2Cpp.Field.Type, type: Il2Cpp.Type): void {
     if (!isCoherent(value, type)) {
         raise(`A "${type.name}" is required, but a "${Object.getPrototypeOf(value).constructor.name}" was supplied.`);
     }
@@ -141,44 +204,44 @@ export function writeFieldValue(pointer: NativePointer, value: Il2Cpp.AllowedTyp
             break;
         case "i":
         case "u":
-        case "ptr":
             pointer.writePointer(value as NativePointer);
+            break;
+        case "ptr":
+            pointer.writePointer(value as Il2Cpp.Pointer);
             break;
         case "valuetype":
             if (type.class.isEnum) pointer.writeS32(value as number);
-            else pointer.writePointer((value as Il2Cpp.ValueType).handle);
+            else pointer.writePointer(value as Il2Cpp.ValueType);
             break;
         case "string":
-            pointer.writePointer((value as Il2Cpp.String).handle);
+            pointer.writePointer(value as Il2Cpp.String);
             break;
         case "class":
         case "object":
         case "genericinst":
-            pointer.writePointer((value as Il2Cpp.Object).handle);
+            pointer.writePointer(value as Il2Cpp.Object);
             break;
         case "szarray":
-            pointer.writePointer((value as Il2Cpp.Array<Il2Cpp.AllowedType>).handle);
+            pointer.writePointer(value as Il2Cpp.Array);
             break;
         default:
             raise(`writeFieldValue: "${type.name}" (${type.typeEnum}) has not been handled yet. Please file an issue!`);
     }
 }
 
-export function fromFridaValue(value: NativeReturnValue, type: Il2Cpp.Type): Il2Cpp.AllowedType {
-    // if (!isCoherent(value, type)) {
-    //     raise(`A "${type.name}" was expected required, but a "${Object.getPrototypeOf(value).constructor.name}" was supplied.`);
-    // }
+export function fromFridaValue(value: NativeReturnValue, type: Il2Cpp.Type): Il2Cpp.Parameter.Type | Il2Cpp.Method.ReturnType {
+    // checkNativeReturnValueCoherence(value, type);
 
     if (Array.isArray(value)) {
-        raise("...........");
-    }
-
-    if (value instanceof NativePointer) {
+        return value as any;
+    } else if (value instanceof NativePointer) {
         if (type.isByReference) {
             return new Il2Cpp.Reference(value, type);
         }
 
         switch (type.typeEnum) {
+            case "ptr":
+                return new Il2Cpp.Pointer(value, type.dataType!);
             case "valuetype":
                 return new Il2Cpp.ValueType(value, type.class);
             case "string":
@@ -190,18 +253,18 @@ export function fromFridaValue(value: NativeReturnValue, type: Il2Cpp.Type): Il2
             case "szarray":
                 return new Il2Cpp.Array(value);
             default:
-                warn(`readRaw: "${type.name}" (${type.typeEnum}) has not been handled yet. Please file an issue!`);
                 return value;
         }
     } else if (type.typeEnum == "boolean") {
         return !!(value as number);
     } else {
-        return value;
+        return value as any;
     }
 }
 
-export function toFridaValue(value: Il2Cpp.AllowedType, type: Il2Cpp.Type): NativeArgumentValue {
+export function toFridaValue(value: Il2Cpp.Parameter.Type, type: Il2Cpp.Type): NativeArgumentValue {
     // TODO: check type against value
+    const j = type.typeEnum;
 
     if (typeof value == "boolean") {
         return +value;

@@ -19,7 +19,10 @@ declare global {
         function dump(filePath?: string): void;
 
         /** Represents a `Il2CppArraySize`. */
-        class Array<T extends Il2Cpp.AllowedType = Il2Cpp.AllowedType> extends NativeStruct implements Iterable<T> {
+        class Array<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends NativeStruct implements Iterable<T> {
+            /** Creates a new array. */
+            static from<T extends Il2Cpp.Field.Type>(klass: Il2Cpp.Class, elements: T[]): Il2Cpp.Array<T>;
+
             /** Gets the size of the object encompassed by the current array. */
             get elementSize(): number;
 
@@ -27,16 +30,13 @@ declare global {
             get elementType(): Il2Cpp.Type;
 
             /** @internal Gets a pointer to the first element of the current array. */
-            get elements(): NativePointer;
+            get elements(): Il2Cpp.Pointer<T>;
 
             /** Gets the total number of elements in all the dimensions of the current array. */
             get length(): number;
 
             /** Gets the object behind the current array. */
             get object(): Il2Cpp.Object;
-
-            /** Creates a new array. */
-            static from<T extends Il2Cpp.AllowedType>(klass: Il2Cpp.Class, elements: T[]): Il2Cpp.Array<T>;
 
             /** Gets the element at the specified index of the current array. */
             get(index: number): T;
@@ -80,8 +80,8 @@ declare global {
             /** Gets the fields of the current class. */
             get fields(): Readonly<Record<string, Il2Cpp.Field>>;
 
-            /** Determines whether the current class has a static constructor. */
-            get hasStaticConstructor(): boolean;
+            /** Determines whether the current class has a class constructor. */
+            get hasClassConstructor(): boolean;
 
             /** Gets the image in which the current class is defined. */
             get image(): Il2Cpp.Image;
@@ -91,6 +91,12 @@ declare global {
 
             /** Determines whether the current class is an enumeration. */
             get isEnum(): boolean;
+
+            /** */
+            get isGeneric(): boolean;
+
+            /** */
+            get isInflated(): boolean;
 
             /** Determines whether the current class is an interface. */
             get isInterface(): boolean;
@@ -128,28 +134,26 @@ declare global {
             /** Gets the type of the current class. */
             get type(): Il2Cpp.Type;
 
+            /** Calls the static constructor of the current class. */
+            initialize(): void;
+
             /** Determines whether an instance of `other` class can be assigned to a variable of the current type. */
             isAssignableFrom(other: Il2Cpp.Class): boolean;
 
             /** Determines whether the current class derives from `other` class. */
             isSubclassOf(other: Il2Cpp.Class, checkInterfaces: boolean): boolean;
-
-            /** Calls the static constructor of the current class. */
-            initialize(): void;
-
-            toString(): string;
         }
 
         /** Represents a `Il2CppDomain`. */
-        class Domain extends NonNullNativeStruct {
+        class Domain extends NativeStruct {
             /** Gets the current application domain. */
             static get reference(): Il2Cpp.Domain;
 
-            /** Gets the name of the current application domain. */
-            get name(): string | null;
-
             /** Gets the assemblies that have been loaded into the execution context of this domain. */
             get assemblies(): Readonly<Record<string, Il2Cpp.Assembly>>;
+
+            /** Gets the name of the current application domain. */
+            get name(): string;
         }
 
         /** Represents a `FieldInfo`. */
@@ -179,22 +183,41 @@ declare global {
             get type(): Il2Cpp.Type;
 
             /** Gets the value of this field. */
-            get value(): AllowedType;
+            get value(): Il2Cpp.Field.Type;
 
             /** Sets the value of this field. Thread static or literal values cannot be altered yet. */
-            set value(value: AllowedType);
-
-            /** Gets the handle of the value of this field. */
-            get valueHandle(): NativePointer;
+            set value(value: Il2Cpp.Field.Type);
 
             /** @internal */
-            asHeld(handle: NativePointer): WithValue;
+            withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Field;
+        }
+
+        /** */
+        namespace Field {
+            /** */
+            type Type =
+                | boolean
+                | number
+                | Int64
+                | UInt64
+                | NativePointer
+                | Il2Cpp.Pointer
+                | Il2Cpp.ValueType
+                | Il2Cpp.Object
+                | Il2Cpp.String
+                | Il2Cpp.Array;
         }
 
         /** Garbage collector utility functions. */
         class GC {
             /** */
             private constructor();
+
+            /** Gets the heap size in bytes. */
+            static get heapSize(): Int64;
+
+            /** Gets the used heap size in bytes. */
+            static get usedHeapSize(): Int64;
 
             /** Returns the heap allocated objects of the specified class. This variant reads GC descriptors. */
             static choose(klass: Il2Cpp.Class): Il2Cpp.Object[];
@@ -217,10 +240,11 @@ declare global {
 
         /** Represents a GCHandle. */
         class GCHandle {
+            /** */
+            readonly handle: number;
+
             /** @internal */
             readonly weakRefId: WeakRefId;
-
-            readonly handle: number;
 
             /** @internal */
             constructor(handle: number);
@@ -237,11 +261,11 @@ declare global {
             /** Gets the amount of classes defined in this image. */
             get classCount(): number;
 
-            /** Gets the index of the first class defined in this image. */
-            get classStart(): number;
-
             /** Gets the classes defined in this image. */
             get classes(): Readonly<Record<string, Il2Cpp.Class>>;
+
+            /** Gets the index of the first class defined in this image. */
+            get classStart(): number;
 
             /** Gets the name of this image. */
             get name(): string;
@@ -258,17 +282,17 @@ declare global {
             /** Captures a memory snapshot. */
             constructor();
 
+            /** */
+            get metadataSnapshot(): Il2Cpp.MetadataSnapshot;
+
             /** Gets the objects tracked by this memory snapshot. */
             get objects(): Il2Cpp.Object[];
-
-            /** Gets the amount of objects tracked in this memory snapshot. */
-            get trackedObjectCount(): UInt64;
 
             /** Gets a pointer to the first object tracked in this memory snapshot. */
             get objectsPointer(): NativePointer;
 
-            /** */
-            get metadataSnapshot(): Il2Cpp.MetadataSnapshot;
+            /** Gets the amount of objects tracked in this memory snapshot. */
+            get trackedObjectCount(): UInt64;
 
             /** Frees this memory snapshot. */
             free(): void;
@@ -288,6 +312,7 @@ declare global {
             /** */
             get assemblyName(): string;
 
+            /** */
             get baseOrElementTypeIndex(): number;
 
             /** */
@@ -299,11 +324,10 @@ declare global {
 
         /** Represents a `MethodInfo`. */
         class Method extends NonNullNativeStruct {
-            /** Gets the raw pointer to this method. */
-            get pointer(): NativePointer;
-
             /** Gets the class in which this field is defined. */
             get class(): Il2Cpp.Class;
+
+            get fridaSignature(): NativeType[];
 
             /** Determines whether this method is generic. */
             get isGeneric(): boolean;
@@ -317,43 +341,59 @@ declare global {
             /** Gets the name of this method. */
             get name(): string;
 
+            /** @internal */
+            get nativeFunction(): NativeFunction;
+
+            /** */
+            get object(): Il2Cpp.Object;
+
             /** Gets the amount of parameters of this method. */
             get parameterCount(): number;
 
             /** Gets the parameters of this method. */
             get parameters(): Readonly<Record<string, Il2Cpp.Parameter>>;
 
-            /** Gets the static offset of this method, calculated from Il2Cpp module base. */
-            get relativePointerAsString(): string;
+            /** Gets the relative virtual address (RVA) of this method. */
+            get relativeVirtualAddress(): NativePointer;
 
             /** Gets the return type of this method. */
             get returnType(): Il2Cpp.Type;
 
-            /** @internal */
-            get nativeFunction(): NativeFunction;
+            /** Gets the virtual address (VA) to this method. */
+            get virtualAddress(): NativePointer;
 
             /** Replaces the body of this method. */
-            set implementation(block: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => void | Il2Cpp.AllowedType);
-
-            /** @internal */
-            get fridaSignature(): string[];
+            set implementation(block: Il2Cpp.Method.Implementation);
 
             /** Invokes this method. */
-            invoke<T extends Il2Cpp.AllowedType>(...parameters: Il2Cpp.AllowedType[]): T;
+            invoke<T extends Il2Cpp.Method.ReturnType>(...parameters: Il2Cpp.Parameter.Type[]): T;
 
             /** @internal */
-            invokeRaw(instance: NativePointer, ...parameters: Il2Cpp.AllowedType[]): Il2Cpp.AllowedType;
+            invokeRaw(instance: NativePointer, ...parameters: Il2Cpp.Parameter.Type[]): Il2Cpp.Method.ReturnType;
 
+            /** */
             restoreImplementation(): void;
 
             /** @internal */
-            asHeld(holder: NativePointer): Invokable;
+            withHolder(instance: Il2Cpp.Object): Il2Cpp.Method;
+        }
+
+        /** */
+        namespace Method {
+            /** */
+            type Implementation = (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => Il2Cpp.Method.ReturnType;
+
+            /** */
+            type ReturnType = void | Il2Cpp.Field.Type;
         }
 
         /** Represents a `Il2CppObject`. */
         class Object extends NativeStruct {
             /** Gets the size of the `Il2CppObject` C struct. */
             static get headerSize(): number;
+
+            /** Allocates a new object of the specified class. */
+            static from(klass: Il2Cpp.Class): Il2Cpp.Object;
 
             /** Gets this object casted to its base type. */
             get base(): Il2Cpp.Object;
@@ -362,13 +402,10 @@ declare global {
             get class(): Il2Cpp.Class;
 
             /** Gets the fields of this object. */
-            get fields(): Readonly<Record<string, Il2Cpp.WithValue>>;
+            get fields(): Readonly<Record<string, Il2Cpp.Field>>;
 
             /** Gets the methods of this object. */
-            get methods(): Readonly<Record<string, Il2Cpp.Invokable>>;
-
-            /** Allocates a new object of the specified class. */
-            static from(klass: Il2Cpp.Class): Il2Cpp.Object;
+            get methods(): Readonly<Record<string, Il2Cpp.Method>>;
 
             /** Creates a reference to this object. */
             ref(pin: boolean): Il2Cpp.GCHandle;
@@ -392,24 +429,67 @@ declare global {
             get type(): Il2Cpp.Type;
         }
 
-        /** Represent a parameter passed by reference. */
-        class Reference<T extends Il2Cpp.AllowedType = Il2Cpp.AllowedType> extends NativeStruct {
+        /** */
+        namespace Parameter {
+            /** */
+            type Type = Il2Cpp.Field.Type | Il2Cpp.Reference;
+        }
+
+        /** */
+        class Pointer<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends NativeStruct implements Iterable<T> {
+            /** */
             readonly type: Il2Cpp.Type;
 
+            /** @internal */
             constructor(handle: NativePointer, type: Il2Cpp.Type);
 
-            set value(value: T);
+            /** */
+            get values(): T[];
 
+            /** */
+            set values(values: T[]);
+
+            /** */
+            get(index: number): T;
+
+            /** */
+            getElementHandle(index: number): NativePointer;
+
+            /** */
+            read(offset?: number, length?: number): T[];
+
+            /** */
+            set(index: number, value: T): void;
+
+            /** */
+            write(values: T[], offset?: number): void;
+
+            /** Iterable. */
+            [Symbol.iterator](): IterableIterator<T>;
+        }
+
+        /** Represent a parameter passed by reference. */
+        class Reference<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends NativeStruct {
+            /** */
+            readonly type: Il2Cpp.Type;
+
+            /** @internal */
+            constructor(handle: NativePointer, type: Il2Cpp.Type);
+
+            /** */
             get value(): T;
+
+            /** */
+            set value(value: T);
         }
 
         /** Represents a `Il2CppString`. */
         class String extends NativeStruct {
+            /** Creates a new string with the specified content. */
+            static from(content: string): Il2Cpp.String;
+
             /** Gets the content of this string. */
             get content(): string | null;
-
-            /** Sets the content of this string. */
-            set content(value: string | null);
 
             /** Gets the length of this string. */
             get length(): number;
@@ -417,10 +497,8 @@ declare global {
             /** Gets this string as an object. */
             get object(): Il2Cpp.Object;
 
-            /** Creates a new string with the specified content. */
-            static from(content: string): Il2Cpp.String;
-
-            toString(): string | null;
+            /** Sets the content of this string. */
+            set content(value: string | null);
         }
 
         /** Represents a `Il2CppType`. */
@@ -428,28 +506,14 @@ declare global {
             /** @internal */
             static get offsetOfTypeEnum(): number;
 
-            /** @internal */
-            get fridaAlias():
-                | "void"
-                | "pointer"
-                | "bool"
-                | "uint32"
-                | "uint16"
-                | "int32"
-                | "uint64"
-                | "uint8"
-                | "char"
-                | "int8"
-                | "int16"
-                | "int64"
-                | "float"
-                | "double";
-
             /** Gets the class of this type. */
             get class(): Il2Cpp.Class;
 
             /** Gets the encompassed type of this array type. */
             get dataType(): Il2Cpp.Type | null;
+
+            /** @internal */
+            get fridaAlias(): NativeType;
 
             /** Determines whether this type is passed by reference. */
             get isByReference(): boolean;
@@ -457,23 +521,43 @@ declare global {
             /** Gets the name of this type. */
             get name(): string;
 
+            /** */
+            get object(): Il2Cpp.Object;
+
+            /** */
             get typeEnum(): Il2Cpp.TypeEnum;
         }
 
         /** Abstraction over the value type (`struct`). */
         class ValueType extends NativeStruct {
             /** @internal */
-            klass: Il2Cpp.Class;
+            readonly klass: Il2Cpp.Class;
 
+            /** */
             constructor(handle: NativePointer, klass: Il2Cpp.Class);
 
             /** Gets the (hardcoded) class of this value type. */
             get class(): Il2Cpp.Class;
 
             /** Gets the fields of this value type. */
-            get fields(): Readonly<Record<string, Il2Cpp.WithValue>>;
+            get fields(): Readonly<Record<string, Il2Cpp.Field>>;
 
             /** Boxed this value type into a object. */
+            box(): Il2Cpp.Object;
+        }
+
+        /** */
+        class Struct {
+            /** @internal */
+            readonly type: Il2Cpp.Type;
+
+            /** */
+            constructor(values: any[], type: Il2Cpp.Type);
+
+            /** Gets the fields of this value type. */
+            get fields(): Readonly<Record<string, Il2Cpp.Field>>;
+
+            /** Box this value type into a object. */
             box(): Il2Cpp.Object;
         }
 
@@ -482,13 +566,20 @@ declare global {
             /** @internal */
             private constructor();
 
-            static get destinationPath(): string | undefined;
+            /** */
+            static get directoryPath(): string;
 
-            static dump(generator: () => Generator<string>, destinationPath?: string): void;
+            /** */
+            static get fileName(): string;
 
-            static classicDump(destinationPath?: string): void;
+            /** */
+            static classicDump(fileName?: string, destinationDirectoryPath?: string): void;
 
-            static snapshotDump(destinationPath?: string): void;
+            /** */
+            static dump(generator: () => Generator<string>, fileName?: string, destinationDirectoryPath?: string): void;
+
+            /** */
+            static snapshotDump(fileName?: string, destinationDirectoryPath?: string): void;
         }
 
         /** Filtering utilities. */
@@ -506,93 +597,31 @@ declare global {
         /** Tracing utilities. */
         class Tracer {
             /** @internal */
-            counter: number;
+            private constructor();
 
-            /** @internal */
-            readonly invocationListeners: InvocationListener[];
+            /** Reports method invocations, input arguments, returns and return values. */
+            static fullWithValuesTrace(...targets: Il2Cpp.Tracer.Targets): void;
 
-            /** @internal */
-            readonly logging: Il2Cpp.Tracer.Logging;
+            /** Reports method invocations and returns. */
+            static fullTrace(...targets: Il2Cpp.Tracer.Targets): void;
 
-            /** @internal */
-            constructor(logger: Il2Cpp.Tracer.Logging, ...targets: (Il2Cpp.Class | Il2Cpp.Method)[]);
+            /** Reports method invocations. */
+            static simpleTrace(...targets: Il2Cpp.Tracer.Targets): void;
 
-            /** Creates a tracer with a custom behaviour. */
-            static Custom(logger: Il2Cpp.Tracer.Logging, ...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer;
-
-            /** Creates a tracer of onEnter invocations. */
-            static Simple(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer;
-
-            /** Creates a tracer of onEnter and onLeave invocations. */
-            static Full(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer;
-
-            /** Creates a tracer of onEnter and onLeave invocations, including parameters and return values. */
-            // static FullWithValues(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer;
-
-            /** Starts tracing the given targets. */
-            add(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): void;
-
-            /** Stops tracing. */
-            clear(): void;
-        }
-
-        /** Tracing utilities. */
-        class Tracer2 {
-            /** @internal */
-            counter: number;
-
-            /** @internal */
-            readonly methods: Il2Cpp.Method[];
-
-            /** @internal */
-            // readonly logging: Il2Cpp.Tracer2.Logging;
-
-            /** @internal */
-            constructor(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]);
-
-            /** Creates a tracer with a custom behaviour. */
-            // static Custom(logger: Il2Cpp.Tracer.Logging, ...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer;
-
-            /** Creates a tracer of onEnter invocations. */
-            // static Simple(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer;
-
-            /** Creates a tracer of onEnter and onLeave invocations. */
-            // static Full(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer;
-
-            /** Creates a tracer of onEnter and onLeave invocations, including parameters and return values. */
-            static FullWithValues(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): Il2Cpp.Tracer2;
-
-            /** Starts tracing the given targets. */
-            // add(...targets: (Il2Cpp.Class | Il2Cpp.Method)[]): void;
-
-            /** Stops tracing. */
-            clear(): void;
+            /** Traces the given methods. */
+            static trace(callbacksGenerator: (method: Il2Cpp.Method) => Il2Cpp.Tracer.Callbacks, ...targets: Il2Cpp.Tracer.Targets): void;
         }
 
         /** */
         namespace Tracer {
             /** */
-            type Logging = (this: Il2Cpp.Tracer, method: Il2Cpp.Method) => InvocationListenerCallbacks;
-        }
+            type Callbacks = RequireAtLeastOne<{
+                onEnter?: (...parameters: Il2Cpp.Parameter.Type[]) => void;
+                onLeave?: (returnValue: Il2Cpp.Method.ReturnType) => void;
+            }>;
 
-        /** */
-        namespace Tracer2 {
             /** */
-            type Logging = (this: Il2Cpp.Tracer2, method: Il2Cpp.Method) => void;
-        }
-
-        /** Represents an invokable method. */
-        interface Invokable {
-            invoke<T extends Il2Cpp.AllowedType>(...parameters: Il2Cpp.AllowedType[]): T;
-        }
-
-        /** Represents something which has an accessible value. */
-        interface WithValue {
-            /** The actual "pretty" value. */
-            value: Il2Cpp.AllowedType;
-
-            /** The actual location. */
-            valueHandle: NativePointer;
+            type Targets = (Il2Cpp.Method | Il2Cpp.Class)[];
         }
 
         /** Represents a `Il2CppTypeEnum`. */
@@ -633,20 +662,10 @@ declare global {
             | "sentinel"
             | "pinned"
             | "enum";
-
-        /** Types this module is familiar with. */
-        type AllowedType =
-            | boolean
-            | number
-            | Int64
-            | UInt64
-            | NativePointer
-            | Il2Cpp.ValueType
-            | Il2Cpp.Object
-            | Il2Cpp.String
-            | Il2Cpp.Array
-            | Il2Cpp.Reference;
     }
+
+    /** https://docs.microsoft.com/en-us/javascript/api/@azure/keyvault-certificates/requireatleastone */
+    type RequireAtLeastOne<T> = { [K in keyof T]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<keyof T, K>>> }[keyof T];
 
     /** @internal */
     namespace console {
