@@ -28,6 +28,6 @@ class Il2CppString extends NativeStruct {
 
     @checkNull
     override toString(): string | null {
-        return this.content;
+        return `"${this.content}"`;
     }
 }

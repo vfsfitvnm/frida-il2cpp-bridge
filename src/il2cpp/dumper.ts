@@ -14,7 +14,6 @@ class Dumper {
         return Application.methods.get_persistentDataPath.invoke<Il2Cpp.String>().content!;
     }
 
-    @cache
     static get fileName(): string {
         const UnityEngine = getUntilFound(Il2Cpp.Domain.reference.assemblies, "UnityEngine.CoreModule", "UnityEngine")!.image;
         const Application = UnityEngine.classes["UnityEngine.Application"];
@@ -22,7 +21,7 @@ class Dumper {
         try {
             const identifier = getUntilFound(Application.methods, "get_identifier", "get_bundleIdentifier")!.invoke<Il2Cpp.String>();
             const version = Application.methods.get_version.invoke<Il2Cpp.String>();
-            return `${identifier}_${version}.cs`;
+            return `${identifier.content}_${version.content}.cs`;
         } catch (e) {
             return `${new Date().getTime()}.cs`;
         }
@@ -65,9 +64,22 @@ class Dumper {
 
         this.dump(
             function* (): Generator<string> {
-                for (const metadataType of new Il2Cpp.MemorySnapshot().metadataSnapshot.metadataTypes) {
-                    yield metadataType.class.toString();
+                for (const assembly of Object.values(Il2Cpp.Domain.reference.assemblies)) {
+                    inform(`Dumping \x1b[1m${assembly.name}\x1b[0m...`);
+                    for (const klass of Object.values(assembly.image.classes)) {
+                        yield klass.toString();
+                    }
                 }
+
+                inform("Appending some \x1b[1mmemory-snapshot-discovered\x1b[0m classes...");
+
+                const snapshot = new Il2Cpp.MemorySnapshot();
+                for (const metadataType of Object.values(snapshot.metadataSnapshot.metadataTypes)) {
+                    if (!(metadataType.name in Il2Cpp.Domain.reference.assemblies[metadataType.assemblyName].image.classes)) {
+                        yield metadataType.class.toString();
+                    }
+                }
+                snapshot.free();
             },
             fileName,
             destinationDirectoryPath

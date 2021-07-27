@@ -81,6 +81,17 @@ export function filterMapArray<V, U>(source: Record<string, V>, filter: (value: 
 }
 
 /** @internal */
+export function mapToArray<V, U>(source: Record<string, V>, map: (value: V) => U): U[] {
+    const dest: U[] = [];
+
+    for (const value of Object.values(source)) {
+        dest.push(map(value));
+    }
+
+    return dest;
+}
+
+/** @internal */
 export function isEmpty(source: Record<any, any>): boolean {
     for (const _ in source) {
         return false;

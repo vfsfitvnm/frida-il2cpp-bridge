@@ -21,8 +21,6 @@ export class NativeStruct implements ObjectWrapper {
     isNull(): boolean {
         return this.handle.isNull();
     }
-
-    // safeToString<T>(): T {}
 }
 
 /** Scaffold class whom pointer cannot be null. */

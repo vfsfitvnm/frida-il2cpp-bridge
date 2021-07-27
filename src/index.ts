@@ -86,7 +86,7 @@ declare global {
             /** Gets the image in which the current class is defined. */
             get image(): Il2Cpp.Image;
 
-            /** Gets the of the instances of the current class. */
+            /** Gets the size of the instances of the current class. */
             get instanceSize(): number;
 
             /** Determines whether the current class is an enumeration. */
@@ -187,6 +187,9 @@ declare global {
 
             /** Sets the value of this field. Thread static or literal values cannot be altered yet. */
             set value(value: Il2Cpp.Field.Type);
+
+            /** @internal */
+            get valueHandle(): NativePointer;
 
             /** @internal */
             withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Field;
@@ -304,7 +307,8 @@ declare global {
             get metadataTypeCount(): number;
 
             /** */
-            get metadataTypes(): Il2Cpp.MetadataType[];
+            get metadataTypes(): Readonly<Record<string, Il2Cpp.MetadataType>>;
+            // get metadataTypes(): Il2Cpp.MetadataType[];
         }
 
         /** Represents a `Il2CppMetadataType`. */
@@ -411,7 +415,7 @@ declare global {
             ref(pin: boolean): Il2Cpp.GCHandle;
 
             /** Unboxes the value type out of this object. */
-            unbox(): Il2Cpp.ValueType;
+            unbox(): NativePointer;
 
             /** Creates a weak reference to this object. */
             weakRef(trackResurrection: boolean): Il2Cpp.GCHandle;
@@ -501,6 +505,16 @@ declare global {
             set content(value: string | null);
         }
 
+        class ValueType extends NativeStruct {
+            readonly type: Il2Cpp.Type;
+
+            constructor(handle: NativePointer, type: Il2Cpp.Type);
+
+            get fields(): Readonly<Record<string, Il2Cpp.Field>>;
+
+            box(): Il2Cpp.Object;
+        }
+
         /** Represents a `Il2CppType`. */
         class Type extends NonNullNativeStruct {
             /** @internal */
@@ -525,40 +539,160 @@ declare global {
             get object(): Il2Cpp.Object;
 
             /** */
-            get typeEnum(): Il2Cpp.TypeEnum;
-        }
-
-        /** Abstraction over the value type (`struct`). */
-        class ValueType extends NativeStruct {
-            /** @internal */
-            readonly klass: Il2Cpp.Class;
-
-            /** */
-            constructor(handle: NativePointer, klass: Il2Cpp.Class);
-
-            /** Gets the (hardcoded) class of this value type. */
-            get class(): Il2Cpp.Class;
-
-            /** Gets the fields of this value type. */
-            get fields(): Readonly<Record<string, Il2Cpp.Field>>;
-
-            /** Boxed this value type into a object. */
-            box(): Il2Cpp.Object;
+            get typeEnum(): Il2Cpp.Type.Enum;
         }
 
         /** */
-        class Struct {
-            /** @internal */
-            readonly type: Il2Cpp.Type;
-
+        namespace Type {
             /** */
-            constructor(values: any[], type: Il2Cpp.Type);
+            // const enum Enum {
+            //     /** */
+            //     End = 0x00,
+            //
+            //     /** */
+            //     Void = 0x01,
+            //
+            //     /** Unsigned 1-byte integer */
+            //     Boolean = 0x02,
+            //
+            //     /** Unsigned 2-byte integer */
+            //     Char = 0x03,
+            //
+            //     /** Signed 1-byte integer */
+            //     I1 = 0x04,
+            //
+            //     /** Unsigned 1-byte integer */
+            //     U1 = 0x05,
+            //
+            //     /** Signed 2-byte integer */
+            //     I2 = 0x06,
+            //
+            //     /** Unsigned 2-byte integer */
+            //     U2 = 0x07,
+            //
+            //     /** Signed 4-byte integer */
+            //     I4 = 0x08,
+            //
+            //     /** Unsigned 4-byte integer */
+            //     U4 = 0x09,
+            //
+            //     /** Signed 8-byte integer */
+            //     I8 = 0x0a,
+            //
+            //     /** Unsigned 8-byte integer */
+            //     U8 = 0x0b,
+            //
+            //     /** Signed 4-byte floating point */
+            //     R4 = 0x0c,
+            //
+            //     /** Signed 4-byte floating point */
+            //     R8 = 0x0d,
+            //
+            //     /** */
+            //     String = 0x0e,
+            //
+            //     /** Unmanaged pointer */
+            //     Ptr = 0x0f,
+            //
+            //     /** Managed pointer */
+            //     ByRef = 0x10,
+            //
+            //     /** */
+            //     ValueType = 0x11,
+            //
+            //     /** */
+            //     Class = 0x12,
+            //
+            //     /** */
+            //     Var = 0x13,
+            //
+            //     /** Array */
+            //     Array = 0x14,
+            //
+            //     /** */
+            //     GenericInst = 0x15,
+            //
+            //     /** Typed reference */
+            //     TypedByRef = 0x16,
+            //
+            //     /** Signed pointer-size integer */
+            //     I = 0x18,
+            //
+            //     /** Unsigned pointer-size integer */
+            //     U = 0x19,
+            //
+            //     /** Managed function pointer */
+            //     FnPtr = 0x1b,
+            //
+            //     /** */
+            //     Object = 0x1c,
+            //
+            //     /** Vector */
+            //     SzArray = 0x1d,
+            //
+            //     /** */
+            //     Mvar = 0x1e,
+            //
+            //     /** */
+            //     Cmod_reqd = 0x1f,
+            //
+            //     /**  */
+            //     Cmod_opt = 0x20,
+            //
+            //     /** */
+            //     Internal = 0x21,
+            //
+            //     /** */
+            //     Modifier = 0x40,
+            //
+            //     /** */
+            //     Sentinel = 0x41,
+            //
+            //     /** */
+            //     Pinned = 0x45,
+            //
+            //     /** */
+            //     Enum = 0x55
+            // }
 
-            /** Gets the fields of this value type. */
-            get fields(): Readonly<Record<string, Il2Cpp.Field>>;
-
-            /** Box this value type into a object. */
-            box(): Il2Cpp.Object;
+            /** Represents a `Il2CppTypeEnum`. */
+            type Enum =
+                | "end"
+                | "void"
+                | "boolean"
+                | "char"
+                | "i1"
+                | "u1"
+                | "i2"
+                | "u2"
+                | "i4"
+                | "u4"
+                | "i8"
+                | "u8"
+                | "r4"
+                | "r8"
+                | "string"
+                | "ptr"
+                | "byref"
+                | "valuetype"
+                | "class"
+                | "var"
+                | "array"
+                | "genericinst"
+                | "typedbyref"
+                | "i"
+                | "u"
+                | "fnptr"
+                | "object"
+                | "szarray"
+                | "mvar"
+                | "cmod_reqd"
+                | "cmod_opt"
+                | "internal"
+                | "modifier"
+                | "sentinel"
+                | "pinned"
+                | "enum";
         }
 
         /** Dumping utilities. */
@@ -623,45 +757,6 @@ declare global {
             /** */
             type Targets = (Il2Cpp.Method | Il2Cpp.Class)[];
         }
-
-        /** Represents a `Il2CppTypeEnum`. */
-        type TypeEnum =
-            | "end"
-            | "void"
-            | "boolean"
-            | "char"
-            | "i1"
-            | "u1"
-            | "i2"
-            | "u2"
-            | "i4"
-            | "u4"
-            | "i8"
-            | "u8"
-            | "r4"
-            | "r8"
-            | "string"
-            | "ptr"
-            | "byref"
-            | "valuetype"
-            | "class"
-            | "var"
-            | "array"
-            | "genericinst"
-            | "typedbyref"
-            | "i"
-            | "u"
-            | "fnptr"
-            | "object"
-            | "szarray"
-            | "mvar"
-            | "cmod_reqd"
-            | "cmod_opt"
-            | "internal"
-            | "modifier"
-            | "sentinel"
-            | "pinned"
-            | "enum";
     }
 
     /** https://docs.microsoft.com/en-us/javascript/api/@azure/keyvault-certificates/requireatleastone */

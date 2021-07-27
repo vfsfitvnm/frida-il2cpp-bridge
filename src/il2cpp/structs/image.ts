@@ -17,7 +17,7 @@ class Il2CppImage extends NonNullNativeStruct {
     get classes(): Readonly<Record<string, Il2Cpp.Class>> {
         const record: Record<string, Il2Cpp.Class> = {};
 
-        if (Il2Cpp.unityVersion.isLegacy) {
+        if (Il2Cpp.unityVersion.isBefore2018_3_0) {
             const start = this.classStart;
             const end = start + this.classCount;
 
