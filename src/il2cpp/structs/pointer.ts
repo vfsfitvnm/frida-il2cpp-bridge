@@ -1,5 +1,5 @@
 import { injectToIl2Cpp } from "../decorators";
-import { readFieldValue, writeFieldValue } from "../utils";
+import { read, write } from "../utils";
 
 import { NativeStruct } from "../../utils/native-struct";
 
@@ -18,7 +18,7 @@ class Il2CppPointer<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Nat
     }
 
     get(index: number): T {
-        return readFieldValue(this.getElementHandle(index), this.type) as T;
+        return read(this.getElementHandle(index), this.type) as T;
     }
 
     getElementHandle(index: number): NativePointer {
@@ -33,13 +33,13 @@ class Il2CppPointer<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Nat
             if (elementHandle.readPointer().isNull()) {
                 break;
             }
-            value.push(readFieldValue(elementHandle, this.type) as T);
+            value.push(read(elementHandle, this.type) as T);
         }
         return value;
     }
 
     set(index: number, value: T): void {
-        writeFieldValue(this.getElementHandle(index), value, this.type);
+        write(this.getElementHandle(index), value, this.type);
     }
 
     write(values: T[], offset: number = 0): void {

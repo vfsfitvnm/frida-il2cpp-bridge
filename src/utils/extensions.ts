@@ -40,7 +40,7 @@ type NCI = {
     utf8string: string | null;
     utf16string: string | null;
     ansistring: string | null;
-    pointer: NativePointer | ObjectWrapper;
+    pointer: NativePointerValue;
 } & Base;
 
 type NCO = {

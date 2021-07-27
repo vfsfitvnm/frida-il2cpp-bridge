@@ -1,6 +1,7 @@
 import { cache } from "decorator-cache-getter";
 
 import { Api } from "../api";
+
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { injectToIl2Cpp } from "../decorators";
 
@@ -13,7 +14,7 @@ class Il2CppAssembly extends NonNullNativeStruct {
 
     @cache
     get name(): string {
-        if (Il2Cpp.unityVersion.isLegacy) {
+        if (Il2Cpp.unityVersion.isBefore2018_3_0) {
             return this.image.name.replace(".dll", "");
         } else {
             return Api._assemblyGetName(this)!;

@@ -18,7 +18,7 @@ class Il2CppMethod extends NonNullNativeStruct {
     @cache
     get fridaSignature(): NativeType[] {
         const types = Object.values(this.parameters).map((parameter: Il2Cpp.Parameter) => parameter.type.fridaAlias);
-        if (!this.isStatic || Il2Cpp.unityVersion.isLegacy) {
+        if (!this.isStatic || Il2Cpp.unityVersion.isBefore2018_3_0) {
             types.unshift("pointer"); // TODO or this.class.type.aliasForFrida?, check structs
         }
         if (this.isInflated) {
@@ -99,7 +99,7 @@ class Il2CppMethod extends NonNullNativeStruct {
         }
 
         const replaceCallback: NativeCallbackImplementation = (...args: any[]): any => {
-            const startIndex = +!this.isStatic | +Il2Cpp.unityVersion.isLegacy;
+            const startIndex = +!this.isStatic | +Il2Cpp.unityVersion.isBefore2018_3_0;
             // TODO check inflated
 
             const result = block.call(
@@ -110,7 +110,7 @@ class Il2CppMethod extends NonNullNativeStruct {
             );
 
             if (typeof result != "undefined") {
-                return toFridaValue(result, this.returnType);
+                return toFridaValue(result);
             }
         };
 
@@ -133,10 +133,10 @@ class Il2CppMethod extends NonNullNativeStruct {
         }
 
         const allocatedParameters = Object.values(this.parameters).map((parameter: Il2Cpp.Parameter, index: number) =>
-            toFridaValue(parameters[index], parameter.type)
+            toFridaValue(parameters[index])
         );
 
-        if (!this.isStatic || Il2Cpp.unityVersion.isLegacy) {
+        if (!this.isStatic || Il2Cpp.unityVersion.isBefore2018_3_0) {
             allocatedParameters.unshift(instance);
         }
         if (this.isInflated) {

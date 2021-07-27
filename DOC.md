@@ -160,8 +160,8 @@ The dump will produce the following output:
 // mscorlib.dll
 struct System.Int32 : System.ValueType, System.IFormattable, System.IConvertible, System.IComparable, System.IComparable<System.Int32>, System.IEquatable<System.Int32>
 {
-    static System.Int32 MaxValue = 2147483647; // 0x0
-    static System.Int32 MinValue = -2147483648; // 0x0
+    static System.Int32 MaxValue = 2147483647;
+    static System.Int32 MinValue = -2147483648;
     System.Int32 m_value; // 0x10
 
     System.Boolean System.IConvertible.ToBoolean(System.IFormatProvider provider); // 0x00bed724

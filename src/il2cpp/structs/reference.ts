@@ -1,5 +1,5 @@
 import { checkNull, injectToIl2Cpp } from "../decorators";
-import { readFieldValue, writeFieldValue } from "../utils";
+import { read, write } from "../utils";
 
 import { NativeStruct } from "../../utils/native-struct";
 
@@ -10,11 +10,11 @@ class Il2CppReference<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends N
     }
 
     get value(): T {
-        return readFieldValue(this.handle, this.type) as T;
+        return read(this.handle, this.type) as T;
     }
 
     set value(value: T) {
-        writeFieldValue(this.handle, value, this.type);
+        write(this.handle, value, this.type);
     }
 
     @checkNull

@@ -2,7 +2,6 @@ import { cache } from "decorator-cache-getter";
 
 import { Api } from "../api";
 import { checkNull, injectToIl2Cpp } from "../decorators";
-import { readFieldValue, writeFieldValue } from "../utils";
 
 import { raise } from "../../utils/console";
 import { NativeStruct } from "../../utils/native-struct";
@@ -32,9 +31,6 @@ class Il2CppArray<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Nativ
 
     @cache
     get length(): number {
-        // if (this.handle.isNull()) {
-        //     return 0;
-        // }
         return Api._arrayGetLength(this);
     }
 

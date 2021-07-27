@@ -105,13 +105,13 @@ class Tracer {
             };
         }
 
-        for (const methodOrClass of targets) {
-            if (methodOrClass instanceof Il2Cpp.Class) {
-                for (const method of Object.values(methodOrClass.methods)) {
+        for (const target of targets) {
+            if (target instanceof Il2Cpp.Class) {
+                for (const method of Object.values(target.methods)) {
                     applyMethodImplementation(method);
                 }
             } else {
-                applyMethodImplementation(methodOrClass);
+                applyMethodImplementation(target);
             }
         }
     }

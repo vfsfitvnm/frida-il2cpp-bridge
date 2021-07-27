@@ -1,9 +1,8 @@
 import { cache } from "decorator-cache-getter";
 
 import { Api } from "../api";
-import { injectToIl2Cpp } from "../decorators";
+import { checkNull, injectToIl2Cpp } from "../decorators";
 
-import { raise } from "../../utils/console";
 import { NativeStruct } from "../../utils/native-struct";
 import { addLevenshtein, filterMap, overridePropertyValue } from "../../utils/record";
 
@@ -54,14 +53,29 @@ class Il2CppObject extends NativeStruct {
         return new Il2Cpp.GCHandle(Api._gcHandleNew(this, pin));
     }
 
-    unbox(): Il2Cpp.ValueType {
-        // if (!this.class.isValueType) {
-        //     raise(`Cannot unbox a non value type object of class "${this.class.type.name}"`);
-        // }
-        return new Il2Cpp.ValueType(Api._objectUnbox(this), this.class);
+    unbox(): NativePointer {
+        return Api._objectUnbox(this);
     }
 
     weakRef(trackResurrection: boolean): Il2Cpp.GCHandle {
         return new Il2Cpp.GCHandle(Api._gcHandleNewWeakRef(this, trackResurrection));
+    }
+
+    @checkNull
+    override toString(): string | null {
+        let object: Il2Cpp.Object = this;
+        while (!("ToString" in object.methods)) {
+            object = object.base;
+        }
+        return object.methods.ToString.invoke<Il2Cpp.String>().content;
+
+        // if ("ToString" in this.methods) {
+        //     return this.methods.ToString.invoke<Il2Cpp.String>().content;
+        // } else {
+        // const UnityEngineJSONSerializeModule = Il2Cpp.Domain.reference.assemblies["UnityEngine.JSONSerializeModule"];
+        // return UnityEngineJSONSerializeModule.image.classes["UnityEngine.JsonUtility"].methods.ToJson_.invoke<Il2Cpp.String>(this, true)
+        //     .content;
+        // return `{ ${mapToArray(this.fields, (field: Il2Cpp.Field) => `${field.name} = ${field.value}`).join(", ")} }`;
+        // }
     }
 }

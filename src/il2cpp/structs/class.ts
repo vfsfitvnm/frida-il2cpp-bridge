@@ -191,17 +191,22 @@ class Il2CppClass extends NonNullNativeStruct {
         text += "\n{";
         for (const field of Object.values(this.fields)) {
             text += spacer;
-            if (field.isStatic && !this.isEnum) text += "static ";
-            text += (this.isEnum && field.name != "value__" ? "" : field.type.name + " ") + field.name;
+            if (field.isStatic) text += "static ";
+            text += field.type.name + " " + field.name;
             if (field.isLiteral) {
-                text += " = ";
-                if (field.type.typeEnum == "string") text += '"';
-                text += field.value;
-                if (field.type.typeEnum == "string") text += '"';
+                if (field.type.class.isEnum) {
+                    text += " = " + field.valueHandle.readS32();
+                } else {
+                    text += " = " + field.value;
+                }
             }
-            text += this.isEnum && field.name != "value__" ? "," : "; // 0x" + field.offset.toString(16);
+            text += ";";
+            if (!field.isLiteral) {
+                text += " // 0x" + field.offset.toString(16);
+            }
         }
-        if (this.fieldCount + this.methodCount > 0) text += "\n";
+        if (this.fieldCount && this.methodCount > 0) text += "\n";
+
         for (const method of Object.values(this.methods)) {
             text += spacer;
             if (method.isStatic) text += "static ";

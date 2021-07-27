@@ -31,12 +31,9 @@ export class UnityVersion {
         }
     }
 
-    /**
-     *  @internal
-     * `true` if the current version is older than 2018.3.0.
-     */
+    /** @internal */
     @cache
-    get isLegacy(): boolean {
+    get isBefore2018_3_0(): boolean {
         return this.isBelow("2018.3.0");
     }
 

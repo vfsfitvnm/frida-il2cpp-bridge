@@ -556,7 +556,9 @@ export class Api {
         const name = "il2cpp_" + exportName;
         for (const source of this.sources) {
             const result = source instanceof Module ? source.findExportByName(name) : source[name];
-            if (result) return result as NativePointer;
+            if (result) {
+                return result as NativePointer;
+            }
         }
         raise(`Couldn't resolve export "${name}".`);
     }
