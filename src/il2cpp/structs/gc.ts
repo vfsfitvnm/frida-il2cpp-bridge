@@ -51,6 +51,6 @@ class Il2CppGC {
 
     @since("2018.3.0")
     static isDisabled(): boolean {
-        return Api._gcIsDisabled();
+        return !!Api._gcIsDisabled();
     }
 }

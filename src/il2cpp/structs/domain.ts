@@ -4,7 +4,7 @@ import { Api } from "../api";
 import { injectToIl2Cpp } from "../decorators";
 
 import { NativeStruct } from "../../utils/native-struct";
-import { addLevenshtein } from "../../utils/record";
+import { addLevenshtein } from "../../utils/utils";
 
 @injectToIl2Cpp("Domain")
 class Il2CppDomain extends NativeStruct {
@@ -32,6 +32,6 @@ class Il2CppDomain extends NativeStruct {
 
     @cache
     get name(): string {
-        return Api._domainGetName(this);
+        return Api._domainGetName(this).readUtf8String()!;
     }
 }

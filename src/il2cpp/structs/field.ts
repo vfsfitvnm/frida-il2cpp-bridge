@@ -6,7 +6,7 @@ import { read, write } from "../utils";
 
 import { warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { overridePropertyValue } from "../../utils/record";
+import { overridePropertyValue } from "../../utils/utils";
 
 @injectToIl2Cpp("Field")
 class Il2CppField extends NonNullNativeStruct {
@@ -17,7 +17,7 @@ class Il2CppField extends NonNullNativeStruct {
 
     @cache
     get isLiteral(): boolean {
-        return Api._fieldIsLiteral(this);
+        return !!Api._fieldIsLiteral(this);
     }
 
     @cache
@@ -32,7 +32,7 @@ class Il2CppField extends NonNullNativeStruct {
 
     @cache
     get name(): string {
-        return Api._fieldGetName(this)!;
+        return Api._fieldGetName(this).readUtf8String()!;
     }
 
     @cache

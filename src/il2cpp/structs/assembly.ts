@@ -17,7 +17,7 @@ class Il2CppAssembly extends NonNullNativeStruct {
         if (Il2Cpp.unityVersion.isBefore2018_3_0) {
             return this.image.name.replace(".dll", "");
         } else {
-            return Api._assemblyGetName(this)!;
+            return Api._assemblyGetName(this).readUtf8String()!;
         }
     }
 }

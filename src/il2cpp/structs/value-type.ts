@@ -4,7 +4,7 @@ import { Api } from "../api";
 import { checkNull, injectToIl2Cpp } from "../decorators";
 
 import { NativeStruct } from "../../utils/native-struct";
-import { addLevenshtein, filterMap } from "../../utils/record";
+import { addLevenshtein, filterMap } from "../../utils/utils";
 
 @injectToIl2Cpp("ValueType")
 class Il2CppValueType extends NativeStruct {

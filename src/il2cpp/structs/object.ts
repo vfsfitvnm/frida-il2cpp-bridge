@@ -4,7 +4,7 @@ import { Api } from "../api";
 import { checkNull, injectToIl2Cpp } from "../decorators";
 
 import { NativeStruct } from "../../utils/native-struct";
-import { addLevenshtein, filterMap, overridePropertyValue } from "../../utils/record";
+import { addLevenshtein, filterMap, overridePropertyValue } from "../../utils/utils";
 
 @injectToIl2Cpp("Object")
 class Il2CppObject extends NativeStruct {
@@ -50,7 +50,7 @@ class Il2CppObject extends NativeStruct {
     }
 
     ref(pin: boolean): Il2Cpp.GCHandle {
-        return new Il2Cpp.GCHandle(Api._gcHandleNew(this, pin));
+        return new Il2Cpp.GCHandle(Api._gcHandleNew(this, +pin));
     }
 
     unbox(): NativePointer {
@@ -58,7 +58,7 @@ class Il2CppObject extends NativeStruct {
     }
 
     weakRef(trackResurrection: boolean): Il2Cpp.GCHandle {
-        return new Il2Cpp.GCHandle(Api._gcHandleNewWeakRef(this, trackResurrection));
+        return new Il2Cpp.GCHandle(Api._gcHandleNewWeakRef(this, +trackResurrection));
     }
 
     @checkNull
