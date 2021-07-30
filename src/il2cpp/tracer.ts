@@ -1,7 +1,7 @@
 import { injectToIl2Cpp } from "./decorators";
 
 import { inform } from "../utils/console";
-import { formatNativePointer } from "../utils/record";
+import { formatNativePointer } from "../utils/utils";
 
 @injectToIl2Cpp("Tracer")
 class Tracer {

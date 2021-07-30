@@ -3,7 +3,7 @@ import { cache } from "decorator-cache-getter";
 import { injectToIl2Cpp } from "./decorators";
 
 import { inform, ok, warn } from "../utils/console";
-import { getUntilFound } from "../utils/record";
+import { getUntilFound } from "../utils/utils";
 
 @injectToIl2Cpp("Dumper")
 class Dumper {

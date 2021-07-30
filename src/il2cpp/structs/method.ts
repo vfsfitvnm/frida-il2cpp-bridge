@@ -4,7 +4,7 @@ import { Api } from "../api";
 import { injectToIl2Cpp, shouldBeInstance } from "../decorators";
 import { fromFridaValue, toFridaValue } from "../utils";
 
-import { addLevenshtein, overridePropertyValue } from "../../utils/record";
+import { addLevenshtein, overridePropertyValue } from "../../utils/utils";
 import { raise, warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 
@@ -16,7 +16,7 @@ class Il2CppMethod extends NonNullNativeStruct {
     }
 
     @cache
-    get fridaSignature(): NativeType[] {
+    get fridaSignature(): NativeCallbackArgumentType[] {
         const types = Object.values(this.parameters).map((parameter: Il2Cpp.Parameter) => parameter.type.fridaAlias);
         if (!this.isStatic || Il2Cpp.unityVersion.isBefore2018_3_0) {
             types.unshift("pointer"); // TODO or this.class.type.aliasForFrida?, check structs
@@ -29,12 +29,12 @@ class Il2CppMethod extends NonNullNativeStruct {
 
     @cache
     get isGeneric(): boolean {
-        return Api._methodIsGeneric(this);
+        return !!Api._methodIsGeneric(this);
     }
 
     @cache
     get isInflated(): boolean {
-        return Api._methodIsInflated(this);
+        return !!Api._methodIsInflated(this);
     }
 
     @cache
@@ -44,12 +44,12 @@ class Il2CppMethod extends NonNullNativeStruct {
 
     @cache
     get name(): string {
-        return Api._methodGetName(this)!;
+        return Api._methodGetName(this).readUtf8String()!;
     }
 
     @cache
-    get nativeFunction(): NativeFunction {
-        return new NativeFunction(this.virtualAddress, this.returnType.fridaAlias, this.fridaSignature);
+    get nativeFunction(): NativeFunction<any, any> {
+        return new NativeFunction(this.virtualAddress, "void", this.fridaSignature as NativeFunctionArgumentType[]);
     }
 
     @cache
@@ -98,7 +98,7 @@ class Il2CppMethod extends NonNullNativeStruct {
             raise(`Skipping implementation for ${this.class.type.name}.${this.name}: pointer is null.`);
         }
 
-        const replaceCallback: NativeCallbackImplementation = (...args: any[]): any => {
+        const replaceCallback: NativeCallbackImplementation<any, any> = (...args: any[]): any => {
             const startIndex = +!this.isStatic | +Il2Cpp.unityVersion.isBefore2018_3_0;
             // TODO check inflated
 
@@ -116,7 +116,10 @@ class Il2CppMethod extends NonNullNativeStruct {
 
         this.restoreImplementation();
         try {
-            Interceptor.replace(this.virtualAddress, new NativeCallback(replaceCallback, this.returnType.fridaAlias, this.fridaSignature));
+            Interceptor.replace(
+                this.virtualAddress,
+                new NativeCallback(replaceCallback, this.returnType.fridaAlias, this.fridaSignature as NativeCallbackArgumentType[])
+            );
         } catch (e) {
             warn(`Skipping implementation for ${this.class.type.name}.\x1b[1m${this.name}\x1b[0m (${e}).`);
         }

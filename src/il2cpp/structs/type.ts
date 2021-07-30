@@ -4,7 +4,7 @@ import { Api } from "../api";
 import { injectToIl2Cpp } from "../decorators";
 
 import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
-import { filterMapArray } from "../../utils/record";
+import { filterMapArray } from "../../utils/utils";
 import { warn } from "../../utils/console";
 
 @injectToIl2Cpp("Type")
@@ -25,82 +25,12 @@ class Il2CppType extends NonNullNativeStruct {
     }
 
     @cache
-    get fridaAlias(): NativeType {
+    get fridaAlias(): NativeCallbackArgumentType {
         if (this.isByReference) {
             return "pointer";
         }
 
         switch (this.typeEnum) {
-            //     case Il2Cpp.Type.Enum.Void:
-            //         return "void";
-            //     case Il2Cpp.Type.Enum.Boolean:
-            //         return "bool";
-            //     case Il2Cpp.Type.Enum.Char:
-            //         return "uchar";
-            //     case Il2Cpp.Type.Enum.I1:
-            //         return "int8";
-            //     case Il2Cpp.Type.Enum.U1:
-            //         return "uint8";
-            //     case Il2Cpp.Type.Enum.I2:
-            //         return "int16";
-            //     case Il2Cpp.Type.Enum.U2:
-            //         return "uint16";
-            //     case Il2Cpp.Type.Enum.I4:
-            //         return "int32"
-            //     case Il2Cpp.Type.Enum.U4:
-            //         return "uint32"
-            //     case Il2Cpp.Type.Enum.I8:
-            //         return "int64"
-            //     case Il2Cpp.Type.Enum.U8:
-            //         return "uint64"
-            //     case Il2Cpp.Type.Enum.R4:
-            //         break;
-            //     case Il2Cpp.Type.Enum.R8:
-            //         break;
-            //     case Il2Cpp.Type.Enum.String:
-            //         break;
-            //     case Il2Cpp.Type.Enum.Ptr:
-            //         break;
-            //     case Il2Cpp.Type.Enum.ByRef:
-            //         break;
-            //     case Il2Cpp.Type.Enum.ValueType:
-            //         break;
-            //     case Il2Cpp.Type.Enum.Class:
-            //         break;
-            //     case Il2Cpp.Type.Enum.Var:
-            //         break;
-            //     case Il2Cpp.Type.Enum.Array:
-            //         break;
-            //     case Il2Cpp.Type.Enum.GenericInst:
-            //         break;
-            //     case Il2Cpp.Type.Enum.TypedByRef:
-            //         break;
-            //     case Il2Cpp.Type.Enum.I:
-            //         break;
-            //     case Il2Cpp.Type.Enum.U:
-            //         break;
-            //     case Il2Cpp.Type.Enum.FnPtr:
-            //         break;
-            //     case Il2Cpp.Type.Enum.Object:
-            //         break;
-            //     case Il2Cpp.Type.Enum.SzArray:
-            //         break;
-            //     case Il2Cpp.Type.Enum.Mvar:
-            //         break;
-            //     case Il2Cpp.Type.Enum.Cmod_reqd:
-            //         break;
-            //     case Il2Cpp.Type.Enum.Cmod_opt:
-            //         break;
-            //     case Il2Cpp.Type.Enum.Internal:
-            //         break;
-            //     case Il2Cpp.Type.Enum.Modifier:
-            //         break;
-            //     case Il2Cpp.Type.Enum.Sentinel:
-            //         break;
-            //     case Il2Cpp.Type.Enum.Pinned:
-            //         break;
-            //     case Il2Cpp.Type.Enum.Enum:
-            //         break;
             case "void":
                 return "void";
             case "boolean":
@@ -151,12 +81,12 @@ class Il2CppType extends NonNullNativeStruct {
 
     @cache
     get isByReference(): boolean {
-        return Api._typeIsByReference(this);
+        return !!Api._typeIsByReference(this);
     }
 
     @cache
     get name(): string {
-        return Api._typeGetName(this)!;
+        return Api._typeGetName(this).readUtf8String()!;
     }
 
     @cache

@@ -6,7 +6,7 @@ import { NativeStruct } from "../../utils/native-struct";
 @injectToIl2Cpp("String")
 class Il2CppString extends NativeStruct {
     static from(content: string | null): Il2Cpp.String {
-        return new Il2Cpp.String(Api._stringNew(content || ""));
+        return new Il2Cpp.String(Api._stringNew(Memory.allocUtf8String(content || "")));
     }
 
     get content(): string | null {

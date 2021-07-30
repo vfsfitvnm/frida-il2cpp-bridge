@@ -331,7 +331,7 @@ declare global {
             /** Gets the class in which this field is defined. */
             get class(): Il2Cpp.Class;
 
-            get fridaSignature(): NativeType[];
+            get fridaSignature(): NativeCallbackArgumentType[];
 
             /** Determines whether this method is generic. */
             get isGeneric(): boolean;
@@ -346,7 +346,7 @@ declare global {
             get name(): string;
 
             /** @internal */
-            get nativeFunction(): NativeFunction;
+            get nativeFunction(): NativeFunction<any, any>;
 
             /** */
             get object(): Il2Cpp.Object;
@@ -527,7 +527,7 @@ declare global {
             get dataType(): Il2Cpp.Type | null;
 
             /** @internal */
-            get fridaAlias(): NativeType;
+            get fridaAlias(): NativeCallbackArgumentType;
 
             /** Determines whether this type is passed by reference. */
             get isByReference(): boolean;
@@ -544,117 +544,6 @@ declare global {
 
         /** */
         namespace Type {
-            /** */
-            // const enum Enum {
-            //     /** */
-            //     End = 0x00,
-            //
-            //     /** */
-            //     Void = 0x01,
-            //
-            //     /** Unsigned 1-byte integer */
-            //     Boolean = 0x02,
-            //
-            //     /** Unsigned 2-byte integer */
-            //     Char = 0x03,
-            //
-            //     /** Signed 1-byte integer */
-            //     I1 = 0x04,
-            //
-            //     /** Unsigned 1-byte integer */
-            //     U1 = 0x05,
-            //
-            //     /** Signed 2-byte integer */
-            //     I2 = 0x06,
-            //
-            //     /** Unsigned 2-byte integer */
-            //     U2 = 0x07,
-            //
-            //     /** Signed 4-byte integer */
-            //     I4 = 0x08,
-            //
-            //     /** Unsigned 4-byte integer */
-            //     U4 = 0x09,
-            //
-            //     /** Signed 8-byte integer */
-            //     I8 = 0x0a,
-            //
-            //     /** Unsigned 8-byte integer */
-            //     U8 = 0x0b,
-            //
-            //     /** Signed 4-byte floating point */
-            //     R4 = 0x0c,
-            //
-            //     /** Signed 4-byte floating point */
-            //     R8 = 0x0d,
-            //
-            //     /** */
-            //     String = 0x0e,
-            //
-            //     /** Unmanaged pointer */
-            //     Ptr = 0x0f,
-            //
-            //     /** Managed pointer */
-            //     ByRef = 0x10,
-            //
-            //     /** */
-            //     ValueType = 0x11,
-            //
-            //     /** */
-            //     Class = 0x12,
-            //
-            //     /** */
-            //     Var = 0x13,
-            //
-            //     /** Array */
-            //     Array = 0x14,
-            //
-            //     /** */
-            //     GenericInst = 0x15,
-            //
-            //     /** Typed reference */
-            //     TypedByRef = 0x16,
-            //
-            //     /** Signed pointer-size integer */
-            //     I = 0x18,
-            //
-            //     /** Unsigned pointer-size integer */
-            //     U = 0x19,
-            //
-            //     /** Managed function pointer */
-            //     FnPtr = 0x1b,
-            //
-            //     /** */
-            //     Object = 0x1c,
-            //
-            //     /** Vector */
-            //     SzArray = 0x1d,
-            //
-            //     /** */
-            //     Mvar = 0x1e,
-            //
-            //     /** */
-            //     Cmod_reqd = 0x1f,
-            //
-            //     /**  */
-            //     Cmod_opt = 0x20,
-            //
-            //     /** */
-            //     Internal = 0x21,
-            //
-            //     /** */
-            //     Modifier = 0x40,
-            //
-            //     /** */
-            //     Sentinel = 0x41,
-            //
-            //     /** */
-            //     Pinned = 0x45,
-            //
-            //     /** */
-            //     Enum = 0x55
-            // }
-
             /** Represents a `Il2CppTypeEnum`. */
             type Enum =
                 | "end"

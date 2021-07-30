@@ -9,7 +9,7 @@ import { NonNullNativeStruct } from "../../utils/native-struct";
 class Il2CppParameter extends NonNullNativeStruct {
     @cache
     get name(): string {
-        return Api._parameterGetName(this)!;
+        return Api._parameterGetName(this).readUtf8String()!;
     }
 
     @cache

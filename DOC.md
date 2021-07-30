@@ -65,7 +65,7 @@ Learn more about `packages.json` [here](https://docs.npmjs.com/cli/v7/configurin
     "app1-with-spawn": "npm run attach-with-spawn com.example.application1"
   },
   "devDependencies": {
-    "@types/frida-gum": "^17.0.0",
+    "@types/frida-gum": "^17.1.0",
     "@types/node": "^16.3.3",
     "frida-compile": "^10.2.4",
     "frida-il2cpp-bridge": "^0.4.0"

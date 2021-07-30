@@ -4,7 +4,7 @@ import { Api } from "../api";
 import { injectToIl2Cpp } from "../decorators";
 
 import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
-import { addLevenshtein, formatNativePointer, preventKeyClash } from "../../utils/record";
+import { addLevenshtein, formatNativePointer, preventKeyClash } from "../../utils/utils";
 
 @injectToIl2Cpp("Class")
 class Il2CppClass extends NonNullNativeStruct {
@@ -20,7 +20,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
     @cache
     get assemblyName(): string {
-        return Api._classGetAssemblyName(this)!;
+        return Api._classGetAssemblyName(this).readUtf8String()!;
     }
 
     @cache
@@ -56,7 +56,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
     @cache
     get hasClassConstructor(): boolean {
-        return Api._classHasClassConstructor(this);
+        return !!Api._classHasClassConstructor(this);
     }
 
     @cache
@@ -71,31 +71,31 @@ class Il2CppClass extends NonNullNativeStruct {
 
     @cache
     get isEnum(): boolean {
-        return Api._classIsEnum(this);
+        return !!Api._classIsEnum(this);
     }
 
     @cache
     get isGeneric(): boolean {
-        return Api._classIsGeneric(this);
+        return !!Api._classIsGeneric(this);
     }
 
     @cache
     get isInflated(): boolean {
-        return Api._classIsInflated(this);
+        return !!Api._classIsInflated(this);
     }
 
     @cache
     get isInterface(): boolean {
-        return Api._classIsInterface(this);
+        return !!Api._classIsInterface(this);
     }
 
     get isStaticConstructorFinished(): boolean {
-        return Api._classIsStaticConstructorFinished(this);
+        return !!Api._classIsStaticConstructorFinished(this);
     }
 
     @cache
     get isValueType(): boolean {
-        return Api._classIsValueType(this);
+        return !!Api._classIsValueType(this);
     }
 
     @cache
@@ -142,12 +142,12 @@ class Il2CppClass extends NonNullNativeStruct {
 
     @cache
     get name(): string {
-        return Api._classGetName(this)!;
+        return Api._classGetName(this).readUtf8String()!;
     }
 
     @cache
     get namespace(): string {
-        return Api._classGetNamespace(this)!;
+        return Api._classGetNamespace(this).readUtf8String()!;
     }
 
     @cache
@@ -170,11 +170,11 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     isAssignableFrom(other: Il2Cpp.Class): boolean {
-        return Api._classIsAssignableFrom(this, other);
+        return !!Api._classIsAssignableFrom(this, other);
     }
 
     isSubclassOf(other: Il2Cpp.Class, checkInterfaces: boolean): boolean {
-        return Api._classIsSubclassOf(this, other, checkInterfaces);
+        return !!Api._classIsSubclassOf(this, other, +checkInterfaces);
     }
 
     override toString(): string {

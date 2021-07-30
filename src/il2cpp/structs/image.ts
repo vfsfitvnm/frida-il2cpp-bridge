@@ -4,7 +4,7 @@ import { Api } from "../api";
 import { injectToIl2Cpp } from "../decorators";
 
 import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
-import { addLevenshtein } from "../../utils/record";
+import { addLevenshtein } from "../../utils/utils";
 
 @injectToIl2Cpp("Image")
 class Il2CppImage extends NonNullNativeStruct {
@@ -47,10 +47,10 @@ class Il2CppImage extends NonNullNativeStruct {
 
     @cache
     get name(): string {
-        return Api._imageGetName(this)!;
+        return Api._imageGetName(this).readUtf8String()!;
     }
 
     getClassFromName(namespace: string, name: string): Il2Cpp.Class | null {
-        return getOrNull(Api._classFromName(this, namespace, name), Il2Cpp.Class);
+        return getOrNull(Api._classFromName(this, Memory.allocUtf8String(namespace), Memory.allocUtf8String(name)), Il2Cpp.Class);
     }
 }

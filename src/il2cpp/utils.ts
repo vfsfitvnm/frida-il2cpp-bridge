@@ -1,56 +1,9 @@
 import { raise, warn } from "../utils/console";
-import { filterMapArray, mapToArray } from "../utils/record";
+import { filterMapArray, mapToArray } from "../utils/utils";
 import { NativeStruct } from "../utils/native-struct";
-
-// function check(value: Il2Cpp.Parameter.Type, type: Il2Cpp.Type): void {
-//     function execute(): boolean {
-//         if (type.isByReference) {
-//             return value instanceof Il2Cpp.Reference;
-//         }
-//
-//         switch (type.typeEnum) {
-//             case "boolean":
-//                 return typeof value == "boolean";
-//             case "i1":
-//             case "u1":
-//             case "i2":
-//             case "u2":
-//             case "i4":
-//             case "u4":
-//             case "char":
-//             case "r4":
-//             case "r8":
-//                 return typeof value == "number";
-//             case "i8":
-//                 return value instanceof Int64;
-//             case "u8":
-//                 return value instanceof UInt64;
-//             case "i":
-//             case "u":
-//                 return value instanceof NativePointer;
-//             case "ptr":
-//                 return value instanceof Il2Cpp.Pointer;
-//             case "valuetype":
-//                 return value instanceof Il2Cpp.ValueType;
-//             case "object":
-//                 return value instanceof Il2Cpp.Object;
-//             case "string":
-//                 return value instanceof Il2Cpp.String;
-//             case "szarray":
-//                 return value instanceof Il2Cpp.Array;
-//         }
-//
-//         raise(`${type.name} - ${type} has not been handled yet. Please file an issue!`);
-//     }
-//
-//     if (!execute()) {
-//         raise(`A "${type.name}" is required, but a "${Object.getPrototypeOf(value).constructor.name}" was supplied.`);
-//     }
-// }
 
 /** @internal */
 export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Type {
-    // inform(`Reading a ${type.name} (${type.typeEnum}) from ${pointer}`);
     switch (type.typeEnum) {
         case "boolean":
             return !!pointer.readS8();
@@ -100,7 +53,6 @@ export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Ty
 
 /** @internal */
 export function write(pointer: NativePointer, value: any, type: Il2Cpp.Type): NativePointer {
-    // inform(`Writing ${value} as a ${type.name} (${type.typeEnum}) to ${pointer}`);
     if (type.isByReference) {
         return pointer.writePointer(value);
     }
@@ -147,7 +99,7 @@ export function write(pointer: NativePointer, value: any, type: Il2Cpp.Type): Na
 }
 
 /** @internal */
-export function fromFridaValue(value: NativeReturnValue, type: Il2Cpp.Type): Il2Cpp.Parameter.Type | Il2Cpp.Method.ReturnType {
+export function fromFridaValue(value: NativeFunctionReturnValue, type: Il2Cpp.Type): Il2Cpp.Parameter.Type | Il2Cpp.Method.ReturnType {
     if (Array.isArray(value)) {
         return arrayToValueType(type, value);
     } else if (value instanceof NativePointer) {
@@ -178,7 +130,7 @@ export function fromFridaValue(value: NativeReturnValue, type: Il2Cpp.Type): Il2
 }
 
 /** @internal */
-export function toFridaValue(value: Il2Cpp.Parameter.Type): NativeArgumentValue {
+export function toFridaValue(value: Il2Cpp.Parameter.Type): NativeFunctionArgumentValue {
     if (typeof value == "boolean") {
         return +value;
     } else if (value instanceof Il2Cpp.ValueType) {
@@ -188,7 +140,7 @@ export function toFridaValue(value: Il2Cpp.Parameter.Type): NativeArgumentValue 
     }
 }
 
-function valueTypeToArray(value: Il2Cpp.ValueType): any[] {
+function valueTypeToArray(value: Il2Cpp.ValueType): NativeFunctionArgumentValue[] {
     return mapToArray(value.fields, (field: Il2Cpp.Field) => {
         const fieldValue = field.value;
         return fieldValue instanceof Il2Cpp.ValueType

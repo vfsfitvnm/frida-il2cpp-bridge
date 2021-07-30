@@ -4,7 +4,7 @@ import { UnityVersion } from "./version";
 
 import { platformNotSupported, raise, warn } from "../utils/console";
 import { forModule } from "../utils/native-wait";
-import { isEmpty } from "../utils/record";
+import { isEmpty } from "../utils/utils";
 
 async function getUnityVersion(): Promise<UnityVersion> {
     const unityLibraryName =

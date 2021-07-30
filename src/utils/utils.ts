@@ -1,4 +1,5 @@
 import { closest } from "fastest-levenshtein";
+
 import { raise } from "./console";
 
 /** @internal */

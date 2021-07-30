@@ -9,7 +9,7 @@ import { NonNullNativeStruct } from "../../utils/native-struct";
 class Il2CppMetadataType extends NonNullNativeStruct {
     @cache
     get assemblyName(): string {
-        return Api._metadataTypeGetAssemblyName(this);
+        return Api._metadataTypeGetAssemblyName(this).readUtf8String()!;
     }
 
     @cache
@@ -24,6 +24,6 @@ class Il2CppMetadataType extends NonNullNativeStruct {
 
     @cache
     get name(): string {
-        return Api._metadataTypeGetName(this);
+        return Api._metadataTypeGetName(this).readUtf8String()!;
     }
 }
