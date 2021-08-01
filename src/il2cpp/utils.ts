@@ -155,7 +155,7 @@ function valueTypeToArray(value: Il2Cpp.ValueType): NativeFunctionArgumentValue[
 
 function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueType {
     function expandType(type: Il2Cpp.Type): Il2Cpp.Type[] {
-        if (type.typeEnum == "valuetype") {
+        if (type.typeEnum == "valuetype" || (type.typeEnum == "genericinst" && type.class.isValueType)) {
             return filterMapArray(
                 type.class.fields,
                 (field: Il2Cpp.Field) => !field.isStatic,

@@ -9,6 +9,8 @@ import "./structs/domain";
 import "./structs/field";
 import "./structs/gc";
 import "./structs/gchandle";
+import "./structs/generic-class";
+import "./structs/generic-instance";
 import "./structs/image";
 import "./structs/memory-snapshot";
 import "./structs/metadata-snapshot";
