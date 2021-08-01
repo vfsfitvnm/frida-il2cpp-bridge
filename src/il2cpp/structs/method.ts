@@ -49,7 +49,7 @@ class Il2CppMethod extends NonNullNativeStruct {
 
     @cache
     get nativeFunction(): NativeFunction<any, any> {
-        return new NativeFunction(this.virtualAddress, "void", this.fridaSignature as NativeFunctionArgumentType[]);
+        return new NativeFunction(this.virtualAddress, this.returnType.fridaAlias, this.fridaSignature as NativeFunctionArgumentType[]);
     }
 
     @cache
