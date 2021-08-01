@@ -259,6 +259,27 @@ declare global {
             free(): void;
         }
 
+        /** */
+        class GenericClass extends NonNullNativeStruct {
+            /** */
+            get cachedClass(): Il2Cpp.Class;
+
+            /** */
+            get classGenericInstance(): Il2Cpp.GenericInstance | null;
+
+            /** */
+            get methodGenericInstance(): Il2Cpp.GenericInstance | null;
+        }
+
+        /** */
+        class GenericInstance extends NonNullNativeStruct {
+            /** */
+            get typesCount(): number;
+
+            /** */
+            get types(): Readonly<Record<string, Il2Cpp.Type>>;
+        }
+
         /** Represents a `Il2CppImage`. */
         class Image extends NonNullNativeStruct {
             /** Gets the amount of classes defined in this image. */
@@ -528,6 +549,9 @@ declare global {
 
             /** @internal */
             get fridaAlias(): NativeCallbackArgumentType;
+
+            /** */
+            get genericClass(): Il2Cpp.GenericClass;
 
             /** Determines whether this type is passed by reference. */
             get isByReference(): boolean;

@@ -10,7 +10,7 @@ Frida module to dump, manipulate and hijack any IL2CPP application at runtime wi
 ## Compatibility
 
 #### Unity version
-It should work for any Unity version in the inclusive range **5.3.0** -  **2021.1.0**.
+It should work for any Unity version in the inclusive range **5.3.0** - **2021.1.0**.
 
 #### Platforms
 **Android** is supported; **Linux** and **Windows** are not tested; **iOS** is not supported yet 

@@ -295,6 +295,31 @@ export class Api {
     }
 
     @cache
+    static get _genericClassGetCachedClass() {
+        return new NativeFunction(this.r`generic_class_get_cached_class`, "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _genericClassGetClassGenericInstance() {
+        return new NativeFunction(this.r`generic_class_get_class_generic_instance`, "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _genericClassGetMethodGenericInstance() {
+        return new NativeFunction(this.r`generic_class_get_method_generic_instance`, "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _genericInstanceGetTypeCount() {
+        return new NativeFunction(this.r`generic_instance_get_type_count`, "uint32", ["pointer"]);
+    }
+
+    @cache
+    static get _genericInstanceGetTypes() {
+        return new NativeFunction(this.r`generic_instance_get_types`, "pointer", ["pointer"]);
+    }
+
+    @cache
     static get _imageGetClass() {
         return new NativeFunction(this.r`image_get_class`, "pointer", ["pointer", "uint"]);
     }
@@ -522,6 +547,11 @@ export class Api {
     }
 
     @cache
+    static get _typeGetGenericClass() {
+        return new NativeFunction(this.r`type_get_generic_class`, "pointer", ["pointer"]);
+    }
+
+    @cache
     static get _typeGetName() {
         return new NativeFunction(this.r`type_get_name`, "pointer", ["pointer"]);
     }
@@ -617,6 +647,9 @@ typedef struct _MethodInfo MethodInfo;
 typedef struct _ParameterInfo ParameterInfo;
 typedef enum _Il2CppTypeEnum Il2CppTypeEnum;
 typedef struct _VirtualInvokeData VirtualInvokeData;
+typedef struct _Il2CppGenericInst Il2CppGenericInst;
+typedef struct _Il2CppGenericClass Il2CppGenericClass;
+typedef struct _Il2CppGenericContext Il2CppGenericContext;
 typedef uint16_t Il2CppChar;
 typedef struct _Il2CppManagedMemorySnapshot Il2CppManagedMemorySnapshot;
 typedef struct _Il2CppMetadataSnapshot Il2CppMetadataSnapshot;
@@ -842,7 +875,7 @@ struct _Il2CppType
 #if ${isEqualOrAbove_2020_2_0}
         const struct Il2CppMetadataGenericParameterHandle * genericParameterHandle;
 #endif
-        struct Il2CppGenericClass * generic_class;
+        Il2CppGenericClass * generic_class;
     } data;
     unsigned int attrs: 16;
     Il2CppTypeEnum type: 8;
@@ -861,6 +894,12 @@ const Il2CppType *
 il2cpp_type_get_data_type (const Il2CppType * type)
 {
     return type->data.type;
+}
+
+Il2CppGenericClass *
+il2cpp_type_get_generic_class (const Il2CppType * type)
+{
+    return type->data.generic_class;
 }
 
 #if ${isBelow_2018_1_0}
@@ -894,7 +933,7 @@ struct _Il2CppClass
     Il2CppClass * castClass;
     Il2CppClass * declaringType;
     Il2CppClass * parent;
-    struct Il2CppGenericClass * generic_class;
+    Il2CppGenericClass * generic_class;
 #if ${isEqualOrAbove_2020_2_0}
     const struct Il2CppMetadataTypeHandle * typeMetadataHandle;
 #else
@@ -1036,6 +1075,59 @@ il2cpp_class_get_static_field_data (const Il2CppClass * klass)
     return klass->static_fields;
 }
 #endif
+
+struct _Il2CppGenericInst
+{
+    uint32_t type_argc;
+    const Il2CppType ** type_argv;
+};
+
+uint32_t
+il2cpp_generic_instance_get_type_count (Il2CppGenericInst * inst)
+{
+    return inst->type_argc;
+}
+
+const Il2CppType **
+il2cpp_generic_instance_get_types (Il2CppGenericInst * inst)
+{
+    return inst->type_argv;
+}
+
+struct _Il2CppGenericContext
+{
+    const Il2CppGenericInst * class_inst;
+    const Il2CppGenericInst * method_inst;
+};
+
+struct _Il2CppGenericClass
+{
+#if ${isEqualOrAbove_2020_2_0}
+    const Il2CppType * type;
+#else
+    int32_t typeDefinitionIndex;
+#endif
+    Il2CppGenericContext context;
+    Il2CppClass * cached_class;
+};
+
+Il2CppClass *
+il2cpp_generic_class_get_cached_class (Il2CppGenericClass * class)
+{
+    return class->cached_class;
+}
+
+const Il2CppGenericInst *
+il2cpp_generic_class_get_class_generic_instance (Il2CppGenericClass * class)
+{
+    return class->context.class_inst;
+}
+
+const Il2CppGenericInst *
+il2cpp_generic_class_get_method_generic_instance (Il2CppGenericClass * class)
+{
+    return class->context.method_inst;
+}
 
 struct _FieldInfo
 {

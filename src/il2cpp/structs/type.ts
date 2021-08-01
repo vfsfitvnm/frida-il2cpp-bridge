@@ -58,11 +58,7 @@ class Il2CppType extends NonNullNativeStruct {
             case "r8":
                 return "double";
             case "valuetype":
-                return filterMapArray(
-                    this.class.fields,
-                    (field: Il2Cpp.Field) => !field.isStatic,
-                    (field: Il2Cpp.Field) => field.type.fridaAlias
-                );
+                return getValueTypeFields(this);
             case "i":
             case "u":
             case "ptr":
@@ -72,11 +68,16 @@ class Il2CppType extends NonNullNativeStruct {
             case "class":
             case "object":
             case "genericinst":
-                return "pointer";
+                return this.class.isValueType ? getValueTypeFields(this) : "pointer";
             default:
                 warn(`fridaAlias: defaulting ${this.name}, "${this.typeEnum}" to pointer`);
                 return "pointer";
         }
+    }
+
+    @cache
+    get genericClass(): Il2Cpp.GenericClass {
+        return new Il2Cpp.GenericClass(Api._typeGetGenericClass(this));
     }
 
     @cache
@@ -173,4 +174,12 @@ class Il2CppType extends NonNullNativeStruct {
                 return "end";
         }
     }
+}
+
+function getValueTypeFields(type: Il2Cpp.Type): NativeCallbackArgumentType {
+    return filterMapArray(
+        type.class.fields,
+        (field: Il2Cpp.Field) => !field.isStatic,
+        (field: Il2Cpp.Field) => field.type.fridaAlias
+    );
 }
