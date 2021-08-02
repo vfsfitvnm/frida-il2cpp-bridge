@@ -1,5 +1,5 @@
 import { raise, warn } from "../utils/console";
-import { filterMapArray, mapToArray } from "../utils/utils";
+import { mapToArray } from "../utils/utils";
 import { NativeStruct } from "../utils/native-struct";
 
 /** @internal */
@@ -35,7 +35,6 @@ export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Ty
         case "ptr":
             return new Il2Cpp.Pointer(pointer.readPointer(), type.dataType!);
         case "valuetype":
-            console.log("!!!", pointer);
             return new Il2Cpp.ValueType(pointer, type);
         case "object":
         case "class":
@@ -154,27 +153,34 @@ function valueTypeToArray(value: Il2Cpp.ValueType): NativeFunctionArgumentValue[
 }
 
 function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueType {
-    function expandType(type: Il2Cpp.Type): Il2Cpp.Type[] {
-        if (type.typeEnum == "valuetype" || (type.typeEnum == "genericinst" && type.class.isValueType)) {
-            return filterMapArray(
-                type.class.fields,
-                (field: Il2Cpp.Field) => !field.isStatic,
-                (field: Il2Cpp.Field) => expandType(field.type)
-            ).flat();
-        } else {
-            return [type];
+    function iter(type: Il2Cpp.Type, startOffset: number = 0): [Il2Cpp.Type.Enum, number][] {
+        const arr: [Il2Cpp.Type.Enum, number][] = [];
+
+        for (const field of Object.values(type.class.fields)) {
+            if (!field.isStatic) {
+                const offset = startOffset + field.offset - Il2Cpp.Object.headerSize;
+                if (field.type.typeEnum == "valuetype" || (field.type.typeEnum == "genericinst" && field.type.class.isValueType)) {
+                    arr.push(...iter(field.type, offset));
+                } else {
+                    arr.push([field.type.typeEnum, offset]);
+                }
+            }
         }
+
+        return arr;
     }
 
-    const types = expandType(type);
     const valueType = Memory.alloc(type.class.instanceSize - Il2Cpp.Object.headerSize);
+
     nativeValues = nativeValues.flat();
+    const typesAndOffsets = iter(type);
 
-    for (let i = 0, offset = 0; i < nativeValues.length; offset += types[i].class.arrayElementSize, i++) {
-        const pointer = valueType.add(offset);
+    for (let i = 0; i < nativeValues.length; i++) {
         const value = nativeValues[i];
+        const [typeEnum, offset] = typesAndOffsets[i];
+        const pointer = valueType.add(offset);
 
-        switch (types[i].typeEnum) {
+        switch (typeEnum) {
             case "boolean":
                 pointer.writeU8(value);
                 break;
@@ -223,7 +229,7 @@ function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueT
                 pointer.writePointer(value);
                 break;
             default:
-                warn(`arrayToValueType: defaulting ${types[i].typeEnum}, ${type.name} to pointer`);
+                warn(`arrayToValueType: defaulting ${typeEnum} to pointer`);
                 pointer.writePointer(value);
                 break;
         }
