@@ -547,7 +547,7 @@ declare global {
             /** Gets the encompassed type of this array type. */
             get dataType(): Il2Cpp.Type | null;
 
-            /** @internal */
+            /** */
             get fridaAlias(): NativeCallbackArgumentType;
 
             /** */

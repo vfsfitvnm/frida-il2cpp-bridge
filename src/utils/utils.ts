@@ -36,6 +36,7 @@ export function addLevenshtein<T extends PropertyKey, V>(object: Record<T, V>): 
     });
 }
 
+/** @internal */
 export function getUntilFound<T extends PropertyKey, V>(record: Readonly<Record<T, V>>, ...keys: T[]): V | undefined {
     for (const key of keys) {
         if (key in record) {
