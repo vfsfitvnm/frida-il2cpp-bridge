@@ -3,8 +3,8 @@ import { cache } from "decorator-cache-getter";
 import { Api } from "../api";
 import { injectToIl2Cpp } from "../decorators";
 
-import { addLevenshtein, preventKeyClash } from "../../utils/record";
 import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
+import { addLevenshtein, formatNativePointer, preventKeyClash } from "../../utils/utils";
 
 @injectToIl2Cpp("Class")
 class Il2CppClass extends NonNullNativeStruct {
@@ -20,7 +20,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
     @cache
     get assemblyName(): string {
-        return Api._classGetAssemblyName(this)!;
+        return Api._classGetAssemblyName(this).readUtf8String()!;
     }
 
     @cache
@@ -55,8 +55,8 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     @cache
-    get hasStaticConstructor(): boolean {
-        return Api._classHasStaticConstructor(this);
+    get hasClassConstructor(): boolean {
+        return !!Api._classHasClassConstructor(this);
     }
 
     @cache
@@ -71,21 +71,31 @@ class Il2CppClass extends NonNullNativeStruct {
 
     @cache
     get isEnum(): boolean {
-        return Api._classIsEnum(this);
+        return !!Api._classIsEnum(this);
+    }
+
+    @cache
+    get isGeneric(): boolean {
+        return !!Api._classIsGeneric(this);
+    }
+
+    @cache
+    get isInflated(): boolean {
+        return !!Api._classIsInflated(this);
     }
 
     @cache
     get isInterface(): boolean {
-        return Api._classIsInterface(this);
+        return !!Api._classIsInterface(this);
     }
 
     get isStaticConstructorFinished(): boolean {
-        return Api._classIsStaticConstructorFinished(this);
+        return !!Api._classIsStaticConstructorFinished(this);
     }
 
     @cache
     get isValueType(): boolean {
-        return Api._classIsValueType(this) && !this.isEnum;
+        return !!Api._classIsValueType(this);
     }
 
     @cache
@@ -132,12 +142,12 @@ class Il2CppClass extends NonNullNativeStruct {
 
     @cache
     get name(): string {
-        return Api._classGetName(this)!;
+        return Api._classGetName(this).readUtf8String()!;
     }
 
     @cache
     get namespace(): string {
-        return Api._classGetNamespace(this)!;
+        return Api._classGetNamespace(this).readUtf8String()!;
     }
 
     @cache
@@ -155,16 +165,16 @@ class Il2CppClass extends NonNullNativeStruct {
         return new Il2Cpp.Type(Api._classGetType(this));
     }
 
+    initialize(): void {
+        Api._classInit(this);
+    }
+
     isAssignableFrom(other: Il2Cpp.Class): boolean {
-        return Api._classIsAssignableFrom(this, other);
+        return !!Api._classIsAssignableFrom(this, other);
     }
 
     isSubclassOf(other: Il2Cpp.Class, checkInterfaces: boolean): boolean {
-        return Api._classIsSubclassOf(this, other, checkInterfaces);
-    }
-
-    initialize(): void {
-        Api._classInit(this);
+        return !!Api._classIsSubclassOf(this, other, +checkInterfaces);
     }
 
     override toString(): string {
@@ -181,17 +191,22 @@ class Il2CppClass extends NonNullNativeStruct {
         text += "\n{";
         for (const field of Object.values(this.fields)) {
             text += spacer;
-            if (field.isStatic && !this.isEnum) text += "static ";
-            text += (this.isEnum && field.name != "value__" ? "" : field.type.name + " ") + field.name;
+            if (field.isStatic) text += "static ";
+            text += field.type.name + " " + field.name;
             if (field.isLiteral) {
-                text += " = ";
-                if (field.type.typeEnum == "string") text += '"';
-                text += field.value;
-                if (field.type.typeEnum == "string") text += '"';
+                if (field.type.class.isEnum) {
+                    text += " = " + field.valueHandle.readS32();
+                } else {
+                    text += " = " + field.value;
+                }
             }
-            text += this.isEnum && field.name != "value__" ? "," : "; // 0x" + field.offset.toString(16);
+            text += ";";
+            if (!field.isLiteral) {
+                text += " // 0x" + field.offset.toString(16);
+            }
         }
-        if (this.fieldCount + this.methodCount > 0) text += "\n";
+        if (this.fieldCount && this.methodCount > 0) text += "\n";
+
         for (const method of Object.values(this.methods)) {
             text += spacer;
             if (method.isStatic) text += "static ";
@@ -201,7 +216,7 @@ class Il2CppClass extends NonNullNativeStruct {
                 text += parameter.type.name + " " + parameter.name;
             }
             text += ");";
-            if (!method.pointer.isNull()) text += " // " + method.relativePointerAsString + ";";
+            if (!method.virtualAddress.isNull()) text += " // " + formatNativePointer(method.relativeVirtualAddress);
         }
         text += "\n}\n\n";
         return text;

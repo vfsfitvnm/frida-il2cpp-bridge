@@ -1,42 +1,42 @@
 import { cache } from "decorator-cache-getter";
 
-import { addLevenshtein } from "../../utils/record";
-
 import { Api } from "../api";
+import { injectToIl2Cpp, since } from "../decorators";
+
 import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
-import { injectToIl2Cpp } from "../decorators";
+import { addLevenshtein } from "../../utils/utils";
 
 @injectToIl2Cpp("Image")
 class Il2CppImage extends NonNullNativeStruct {
+    static get corlib(): Il2Cpp.Image {
+        return new Il2Cpp.Image(Api._getCorlib());
+    }
+
+    @cache
+    @since("2018.1.0")
+    get assembly(): Il2Cpp.Assembly {
+        return new Il2Cpp.Assembly(Api._imageGetAssembly(this));
+    }
+
     @cache
     get classCount(): number {
         return Api._imageGetClassCount(this);
     }
 
     @cache
-    get classStart(): number {
-        return Api._imageGetClassStart(this);
-    }
-
-    @cache
     get classes(): Readonly<Record<string, Il2Cpp.Class>> {
         const record: Record<string, Il2Cpp.Class> = {};
 
-        if (Il2Cpp.unityVersion.isLegacy) {
+        if (Il2Cpp.unityVersion.isBefore2018_3_0) {
             const start = this.classStart;
             const end = start + this.classCount;
 
             const globalIndex = Memory.alloc(Process.pointerSize);
             globalIndex.add(Il2Cpp.Type.offsetOfTypeEnum).writeInt(0x20);
 
-            console.log(start, end, globalIndex);
-
             for (let i = start; i < end; i++) {
-                try {
-                    const klass = new Il2Cpp.Class(Api._typeGetClassOrElementClass(globalIndex.writeInt(i)));
-                    console.log(klass.name);
-                    record[klass.type!.name!] = klass;
-                } catch (e) {}
+                const klass = new Il2Cpp.Class(Api._typeGetClassOrElementClass(globalIndex.writeInt(i)));
+                record[klass.type!.name!] = klass;
             }
         } else {
             const end = this.classCount;
@@ -51,11 +51,16 @@ class Il2CppImage extends NonNullNativeStruct {
     }
 
     @cache
+    get classStart(): number {
+        return Api._imageGetClassStart(this);
+    }
+
+    @cache
     get name(): string {
-        return Api._imageGetName(this)!;
+        return Api._imageGetName(this).readUtf8String()!;
     }
 
     getClassFromName(namespace: string, name: string): Il2Cpp.Class | null {
-        return getOrNull(Api._classFromName(this, namespace, name), Il2Cpp.Class);
+        return getOrNull(Api._classFromName(this, Memory.allocUtf8String(namespace), Memory.allocUtf8String(name)), Il2Cpp.Class);
     }
 }

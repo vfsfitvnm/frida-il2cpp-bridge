@@ -1,288 +1,357 @@
 import { cache } from "decorator-cache-getter";
 
-import { createNF } from "../utils/extensions";
 import { raise } from "../utils/console";
 
 /** @internal */
 export class Api {
     @cache
     static get _arrayGetElements() {
-        return createNF(this.r`array_elements`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`array_elements`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _arrayGetLength() {
-        return createNF(this.r`array_length`, "uint32", ["pointer"]);
+        return new NativeFunction(this.r`array_length`, "uint32", ["pointer"]);
     }
 
     @cache
     static get _arrayNew() {
-        return createNF(this.r`array_new`, "pointer", ["pointer", "uint32"]);
+        return new NativeFunction(this.r`array_new`, "pointer", ["pointer", "uint32"]);
     }
 
     @cache
     static get _assemblyGetImage() {
-        return createNF(this.r`assembly_get_image`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`assembly_get_image`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _assemblyGetName() {
-        return createNF(this.r`assembly_get_name`, "utf8string", ["pointer"]);
+        return new NativeFunction(this.r`assembly_get_name`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _classFromName() {
-        return createNF(this.r`class_from_name`, "pointer", ["pointer", "utf8string", "utf8string"]);
+        return new NativeFunction(this.r`class_from_name`, "pointer", ["pointer", "pointer", "pointer"]);
     }
 
     @cache
     static get _classFromType() {
-        return createNF(this.r`class_from_type`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`class_from_type`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetArrayClass() {
-        return createNF(this.r`array_class_get`, "pointer", ["pointer", "uint32"]);
+        return new NativeFunction(this.r`array_class_get`, "pointer", ["pointer", "uint32"]);
     }
 
     @cache
     static get _classGetArrayElementSize() {
-        return createNF(this.r`class_array_element_size`, "int", ["pointer"]);
+        return new NativeFunction(this.r`class_array_element_size`, "int", ["pointer"]);
     }
 
     @cache
     static get _classGetAssemblyName() {
-        return createNF(this.r`class_get_assemblyname`, "utf8string", ["pointer"]);
+        return new NativeFunction(this.r`class_get_assemblyname`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetDeclaringType() {
-        return createNF(this.r`class_get_declaring_type`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`class_get_declaring_type`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetElementClass() {
-        return createNF(this.r`class_get_element_class`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`class_get_element_class`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetFieldCount() {
-        return createNF(this.r`class_get_field_count`, "uint16", ["pointer"]);
+        return new NativeFunction(this.r`class_get_field_count`, "uint16", ["pointer"]);
     }
 
     @cache
     static get _classGetFields() {
-        return createNF(this.r`class_get_fields`, "pointer", ["pointer", "pointer"]);
+        return new NativeFunction(this.r`class_get_fields`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classGetImage() {
-        return createNF(this.r`class_get_image`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`class_get_image`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetInstanceSize() {
-        return createNF(this.r`class_instance_size`, "uint32", ["pointer"]);
+        return new NativeFunction(this.r`class_instance_size`, "uint32", ["pointer"]);
     }
 
     @cache
     static get _classGetInterfaceCount() {
-        return createNF(this.r`class_get_interface_count`, "uint16", ["pointer"]);
+        return new NativeFunction(this.r`class_get_interface_count`, "uint16", ["pointer"]);
     }
 
     @cache
     static get _classGetInterfaces() {
-        return createNF(this.r`class_get_interfaces`, "pointer", ["pointer", "pointer"]);
+        return new NativeFunction(this.r`class_get_interfaces`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classGetMethodCount() {
-        return createNF(this.r`class_get_method_count`, "uint16", ["pointer"]);
+        return new NativeFunction(this.r`class_get_method_count`, "uint16", ["pointer"]);
     }
 
     @cache
     static get _classGetMethods() {
-        return createNF(this.r`class_get_methods`, "pointer", ["pointer", "pointer"]);
+        return new NativeFunction(this.r`class_get_methods`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classGetName() {
-        return createNF(this.r`class_get_name`, "utf8string", ["pointer"]);
+        return new NativeFunction(this.r`class_get_name`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetNamespace() {
-        return createNF(this.r`class_get_namespace`, "utf8string", ["pointer"]);
+        return new NativeFunction(this.r`class_get_namespace`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetParent() {
-        return createNF(this.r`class_get_parent`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`class_get_parent`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetStaticFieldData() {
-        return createNF(this.r`class_get_static_field_data`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`class_get_static_field_data`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetType() {
-        return createNF(this.r`class_get_type`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`class_get_type`, "pointer", ["pointer"]);
     }
 
     @cache
-    static get _classHasStaticConstructor() {
-        return createNF(this.r`class_has_static_constructor`, "bool", ["pointer"]);
+    static get _classHasClassConstructor() {
+        return new NativeFunction(this.r`class_has_class_constructor`, "bool", ["pointer"]);
     }
 
     @cache
     static get _classInit() {
-        return createNF(this.r`runtime_class_init`, "void", ["pointer"]);
+        return new NativeFunction(this.r`runtime_class_init`, "void", ["pointer"]);
     }
 
     @cache
     static get _classIsAssignableFrom() {
-        return createNF(this.r`class_is_assignable_from`, "bool", ["pointer", "pointer"]);
+        return new NativeFunction(this.r`class_is_assignable_from`, "bool", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classIsEnum() {
-        return createNF(this.r`class_is_enum`, "bool", ["pointer"]);
+        return new NativeFunction(this.r`class_is_enum`, "bool", ["pointer"]);
+    }
+
+    @cache
+    static get _classIsGeneric() {
+        return new NativeFunction(this.r`class_is_generic`, "bool", ["pointer"]);
+    }
+
+    @cache
+    static get _classIsInflated() {
+        return new NativeFunction(this.r`class_is_inflated`, "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsInterface() {
-        return createNF(this.r`class_is_interface`, "bool", ["pointer"]);
+        return new NativeFunction(this.r`class_is_interface`, "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsStaticConstructorFinished() {
-        return createNF(this.r`class_is_static_constructor_finished`, "bool", ["pointer"]);
+        return new NativeFunction(this.r`class_is_class_constructor_finished`, "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsSubclassOf() {
-        return createNF(this.r`class_is_subclass_of`, "bool", ["pointer", "pointer", "bool"]);
+        return new NativeFunction(this.r`class_is_subclass_of`, "bool", ["pointer", "pointer", "bool"]);
     }
 
     @cache
     static get _classIsValueType() {
-        return createNF(this.r`class_is_valuetype`, "bool", ["pointer"]);
+        return new NativeFunction(this.r`class_is_valuetype`, "bool", ["pointer"]);
+    }
+
+    @cache
+    static get _domainAssemblyOpen() {
+        return new NativeFunction(this.r`domain_assembly_open`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _domainGet() {
-        return createNF(this.r`domain_get`, "pointer", []);
+        return new NativeFunction(this.r`domain_get`, "pointer", []);
     }
 
     @cache
     static get _domainGetAssemblies() {
-        return createNF(this.r`domain_get_assemblies`, "pointer", ["pointer", "pointer"]);
+        return new NativeFunction(this.r`domain_get_assemblies`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _domainGetName() {
-        return createNF(this.r`domain_get_name`, "utf8string", ["pointer"]);
+        return new NativeFunction(this.r`domain_get_name`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _fieldGetClass() {
-        return createNF(this.r`field_get_parent`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`field_get_parent`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _fieldGetName() {
-        return createNF(this.r`field_get_name`, "utf8string", ["pointer"]);
+        return new NativeFunction(this.r`field_get_name`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _fieldGetOffset() {
-        return createNF(this.r`field_get_offset`, "int32", ["pointer"]);
+        return new NativeFunction(this.r`field_get_offset`, "int32", ["pointer"]);
     }
 
     @cache
     static get _fieldGetStaticValue() {
-        return createNF(this.r`field_static_get_value`, "void", ["pointer", "pointer"]);
+        return new NativeFunction(this.r`field_static_get_value`, "void", ["pointer", "pointer"]);
     }
 
     @cache
     static get _fieldGetType() {
-        return createNF(this.r`field_get_type`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`field_get_type`, "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _fieldGetValue() {
+        return new NativeFunction(this.r`field_get_value`, "void", ["pointer", "pointer", "pointer"]);
     }
 
     @cache
     static get _fieldIsInstance() {
-        return createNF(this.r`field_is_instance`, "bool", ["pointer"]);
+        return new NativeFunction(this.r`field_is_instance`, "bool", ["pointer"]);
     }
 
     @cache
     static get _fieldIsLiteral() {
-        return createNF(this.r`field_is_literal`, "bool", ["pointer"]);
+        return new NativeFunction(this.r`field_is_literal`, "bool", ["pointer"]);
+    }
+
+    @cache
+    static get _fieldSetStaticValue() {
+        return new NativeFunction(this.r`field_static_set_value`, "void", ["pointer", "pointer"]);
     }
 
     @cache
     static get _gcCollect() {
-        return createNF(this.r`gc_collect`, "void", ["int"]);
+        return new NativeFunction(this.r`gc_collect`, "void", ["int"]);
     }
 
     @cache
     static get _gcCollectALittle() {
-        return createNF(this.r`gc_collect_a_little`, "void", []);
+        return new NativeFunction(this.r`gc_collect_a_little`, "void", []);
     }
 
     @cache
     static get _gcDisable() {
-        return createNF(this.r`gc_disable`, "void", []);
+        return new NativeFunction(this.r`gc_disable`, "void", []);
     }
 
     @cache
     static get _gcEnable() {
-        return createNF(this.r`gc_enable`, "void", []);
+        return new NativeFunction(this.r`gc_enable`, "void", []);
+    }
+
+    @cache
+    static get _gcGetHeapSize() {
+        return new NativeFunction(this.r`gc_get_heap_size`, "int64", []);
+    }
+
+    @cache
+    static get _gcGetUsedSize() {
+        return new NativeFunction(this.r`gc_get_used_size`, "int64", []);
     }
 
     @cache
     static get _gcHandleGetTarget() {
-        return createNF(this.r`gchandle_get_target`, "pointer", ["uint32"]);
+        return new NativeFunction(this.r`gchandle_get_target`, "pointer", ["uint32"]);
     }
 
     @cache
     static get _gcHandleFree() {
-        return createNF(this.r`gchandle_free`, "void", ["uint32"]);
+        return new NativeFunction(this.r`gchandle_free`, "void", ["uint32"]);
     }
 
     @cache
     static get _gcHandleNew() {
-        return createNF(this.r`gchandle_new`, "uint32", ["pointer", "bool"]);
+        return new NativeFunction(this.r`gchandle_new`, "uint32", ["pointer", "bool"]);
     }
 
     @cache
     static get _gcHandleNewWeakRef() {
-        return createNF(this.r`gchandle_new_weakref`, "uint32", ["pointer", "bool"]);
+        return new NativeFunction(this.r`gchandle_new_weakref`, "uint32", ["pointer", "bool"]);
     }
 
     @cache
     static get _gcIsDisabled() {
-        return createNF(this.r`gc_is_disabled`, "bool", []);
+        return new NativeFunction(this.r`gc_is_disabled`, "bool", []);
+    }
+
+    @cache
+    static get _genericClassGetCachedClass() {
+        return new NativeFunction(this.r`generic_class_get_cached_class`, "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _genericClassGetClassGenericInstance() {
+        return new NativeFunction(this.r`generic_class_get_class_generic_instance`, "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _genericClassGetMethodGenericInstance() {
+        return new NativeFunction(this.r`generic_class_get_method_generic_instance`, "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _genericInstanceGetTypeCount() {
+        return new NativeFunction(this.r`generic_instance_get_type_count`, "uint32", ["pointer"]);
+    }
+
+    @cache
+    static get _genericInstanceGetTypes() {
+        return new NativeFunction(this.r`generic_instance_get_types`, "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _getCorlib() {
+        return new NativeFunction(this.r`get_corlib`, "pointer", []);
+    }
+
+    @cache
+    static get _imageGetAssembly() {
+        return new NativeFunction(this.r`image_get_assembly`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _imageGetClass() {
-        return createNF(this.r`image_get_class`, "pointer", ["pointer", "uint"]);
+        return new NativeFunction(this.r`image_get_class`, "pointer", ["pointer", "uint"]);
     }
 
     @cache
     static get _imageGetClassCount() {
-        return createNF(this.r`image_get_class_count`, "uint32", ["pointer"]);
+        return new NativeFunction(this.r`image_get_class_count`, "uint32", ["pointer"]);
     }
 
     @cache
     static get _imageGetClassStart() {
-        return createNF(this.r`image_get_class_start`, "uint32", ["pointer"]);
+        return new NativeFunction(this.r`image_get_class_start`, "uint32", ["pointer"]);
     }
 
     @cache
     static get _imageGetName() {
-        return createNF(this.r`image_get_name`, "utf8string", ["pointer"]);
+        return new NativeFunction(this.r`image_get_name`, "pointer", ["pointer"]);
     }
 
     @cache
@@ -292,7 +361,7 @@ export class Api {
 
     @cache
     static get _livenessCalculationBegin() {
-        return createNF(this.r`unity_liveness_calculation_begin`, "pointer", [
+        return new NativeFunction(this.r`unity_liveness_calculation_begin`, "pointer", [
             "pointer",
             "int",
             "pointer",
@@ -304,207 +373,222 @@ export class Api {
 
     @cache
     static get _livenessCalculationEnd() {
-        return createNF(this.r`unity_liveness_calculation_end`, "void", ["pointer"]);
+        return new NativeFunction(this.r`unity_liveness_calculation_end`, "void", ["pointer"]);
     }
 
     @cache
     static get _livenessCalculationFromStatics() {
-        return createNF(this.r`unity_liveness_calculation_from_statics`, "void", ["pointer"]);
+        return new NativeFunction(this.r`unity_liveness_calculation_from_statics`, "void", ["pointer"]);
     }
 
     @cache
     static get _memorySnapshotCapture() {
-        return createNF(this.r`capture_memory_snapshot`, "pointer", []);
+        return new NativeFunction(this.r`capture_memory_snapshot`, "pointer", []);
     }
 
     @cache
     static get _memorySnapshotFree() {
-        return createNF(this.r`free_captured_memory_snapshot`, "void", ["pointer"]);
+        return new NativeFunction(this.r`free_captured_memory_snapshot`, "void", ["pointer"]);
     }
 
     @cache
     static get _memorySnapshotGetMetadataSnapshot() {
-        return createNF(this.r`memory_snapshot_get_metadata_snapshot`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`memory_snapshot_get_metadata_snapshot`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _memorySnapshotGetObjects() {
-        return createNF(this.r`memory_snapshot_get_objects`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`memory_snapshot_get_objects`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _memorySnapshotGetTrackedObjectCount() {
-        return createNF(this.r`memory_snapshot_get_tracked_object_count`, "uint64", ["pointer"]);
+        return new NativeFunction(this.r`memory_snapshot_get_tracked_object_count`, "uint64", ["pointer"]);
     }
 
     @cache
     static get _metadataSnapshotGetMetadataTypeCount() {
-        return createNF(this.r`metadata_snapshot_get_metadata_type_count`, "uint32", ["pointer"]);
+        return new NativeFunction(this.r`metadata_snapshot_get_metadata_type_count`, "uint32", ["pointer"]);
     }
 
     @cache
     static get _metadataSnapshotGetMetadataTypes() {
-        return createNF(this.r`metadata_snapshot_get_metadata_types`, "pointer", ["pointer", "pointer"]);
+        return new NativeFunction(this.r`metadata_snapshot_get_metadata_types`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _metadataTypeGetAssemblyName() {
-        return createNF(this.r`metadata_type_get_assembly_name`, "utf8string", ["pointer"]);
+        return new NativeFunction(this.r`metadata_type_get_assembly_name`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _metadataTypeGetBaseOrElementTypeIndex() {
-        return createNF(this.r`metadata_type_get_base_or_element_type_index`, "uint32", ["pointer"]);
+        return new NativeFunction(this.r`metadata_type_get_base_or_element_type_index`, "uint32", ["pointer"]);
     }
 
     @cache
     static get _metadataTypeGetName() {
-        return createNF(this.r`metadata_type_get_name`, "utf8string", ["pointer"]);
+        return new NativeFunction(this.r`metadata_type_get_name`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _metadataTypeGetClass() {
-        return createNF(this.r`metadata_type_get_class`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`metadata_type_get_class`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _methodGetClass() {
-        return createNF(this.r`method_get_class`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`method_get_class`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _methodGetName() {
-        return createNF(this.r`method_get_name`, "utf8string", ["pointer"]);
+        return new NativeFunction(this.r`method_get_name`, "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _methodGetObject() {
+        return new NativeFunction(this.r`method_get_object`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _methodGetParamCount() {
-        return createNF(this.r`method_get_param_count`, "uint8", ["pointer"]);
+        return new NativeFunction(this.r`method_get_param_count`, "uint8", ["pointer"]);
     }
 
     @cache
     static get _methodGetParameters() {
-        return createNF(this.r`method_get_parameters`, "pointer", ["pointer", "pointer"]);
+        return new NativeFunction(this.r`method_get_parameters`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _methodGetPointer() {
-        return createNF(this.r`method_get_pointer`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`method_get_pointer`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _methodGetReturnType() {
-        return createNF(this.r`method_get_return_type`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`method_get_return_type`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _methodIsGeneric() {
-        return createNF(this.r`method_is_generic`, "bool", ["pointer"]);
+        return new NativeFunction(this.r`method_is_generic`, "bool", ["pointer"]);
     }
 
     @cache
     static get _methodIsInflated() {
-        return createNF(this.r`method_is_inflated`, "bool", ["pointer"]);
+        return new NativeFunction(this.r`method_is_inflated`, "bool", ["pointer"]);
     }
 
     @cache
     static get _methodIsInstance() {
-        return createNF(this.r`method_is_instance`, "bool", ["pointer"]);
+        return new NativeFunction(this.r`method_is_instance`, "bool", ["pointer"]);
     }
 
     @cache
     static get _objectGetClass() {
-        return createNF(this.r`object_get_class`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`object_get_class`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _objectGetHeaderSize() {
-        return createNF(this.r`object_header_size`, "uint", []);
+        return new NativeFunction(this.r`object_header_size`, "uint", []);
     }
 
     @cache
     static get _objectNew() {
-        return createNF(this.r`object_new`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`object_new`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _objectUnbox() {
-        return createNF(this.r`object_unbox`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`object_unbox`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _parameterGetName() {
-        return createNF(this.r`parameter_get_name`, "utf8string", ["pointer"]);
+        return new NativeFunction(this.r`parameter_get_name`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _parameterGetPosition() {
-        return createNF(this.r`parameter_get_position`, "int32", ["pointer"]);
+        return new NativeFunction(this.r`parameter_get_position`, "int32", ["pointer"]);
     }
 
     @cache
     static get _parameterGetType() {
-        return createNF(this.r`parameter_get_type`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`parameter_get_type`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _stringChars() {
-        return createNF(this.r`string_chars`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`string_chars`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _stringLength() {
-        return createNF(this.r`string_length`, "int32", ["pointer"]);
+        return new NativeFunction(this.r`string_length`, "int32", ["pointer"]);
     }
 
     @cache
     static get _stringNew() {
-        return createNF(this.r`string_new`, "pointer", ["utf8string"]);
+        return new NativeFunction(this.r`string_new`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _stringSetLength() {
-        return createNF(this.r`string_set_length`, "void", ["pointer", "int32"]);
+        return new NativeFunction(this.r`string_set_length`, "void", ["pointer", "int32"]);
     }
 
     @cache
     static get _valueBox() {
-        return createNF(this.r`value_box`, "pointer", ["pointer", "pointer"]);
+        return new NativeFunction(this.r`value_box`, "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _threadAttach() {
-        return createNF(this.r`thread_attach`, "void", ["pointer"]);
+        return new NativeFunction(this.r`thread_attach`, "void", ["pointer"]);
     }
 
     @cache
     static get _typeGetClassOrElementClass() {
-        return createNF(this.r`type_get_class_or_element_class`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`type_get_class_or_element_class`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _typeGetDataType() {
-        return createNF(this.r`type_get_data_type`, "pointer", ["pointer"]);
+        return new NativeFunction(this.r`type_get_data_type`, "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _typeGetGenericClass() {
+        return new NativeFunction(this.r`type_get_generic_class`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _typeGetName() {
-        return createNF(this.r`type_get_name`, "utf8string", ["pointer"]);
+        return new NativeFunction(this.r`type_get_name`, "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _typeGetObject() {
+        return new NativeFunction(this.r`type_get_object`, "pointer", ["pointer"]);
     }
 
     @cache
     static get _typeGetTypeEnum() {
-        return createNF(this.r`type_get_type`, "int", ["pointer"]);
+        return new NativeFunction(this.r`type_get_type`, "int", ["pointer"]);
     }
 
     @cache
     static get _typeIsByReference() {
-        return createNF(this.r`type_is_byref`, "bool", ["pointer"]);
+        return new NativeFunction(this.r`type_is_byref`, "bool", ["pointer"]);
     }
 
     @cache
     static get _typeOffsetOfTypeEnum() {
-        return createNF(this.r`type_offset_of_type`, "uint16", []);
+        return new NativeFunction(this.r`type_offset_of_type`, "uint16", []);
     }
 
     @cache
@@ -516,10 +600,14 @@ export class Api {
         const name = "il2cpp_" + exportName;
         for (const source of this.sources) {
             const result = source instanceof Module ? source.findExportByName(name) : source[name];
-            if (result) return result as NativePointer;
+            if (result) {
+                return result as NativePointer;
+            }
         }
         raise(`Couldn't resolve export "${name}".`);
     }
+
+    private constructor() {}
 }
 
 function createMissingApi(): CModule {
@@ -574,6 +662,9 @@ typedef struct _MethodInfo MethodInfo;
 typedef struct _ParameterInfo ParameterInfo;
 typedef enum _Il2CppTypeEnum Il2CppTypeEnum;
 typedef struct _VirtualInvokeData VirtualInvokeData;
+typedef struct _Il2CppGenericInst Il2CppGenericInst;
+typedef struct _Il2CppGenericClass Il2CppGenericClass;
+typedef struct _Il2CppGenericContext Il2CppGenericContext;
 typedef uint16_t Il2CppChar;
 typedef struct _Il2CppManagedMemorySnapshot Il2CppManagedMemorySnapshot;
 typedef struct _Il2CppMetadataSnapshot Il2CppMetadataSnapshot;
@@ -666,7 +757,7 @@ struct _Il2CppDomain
 };
 
 const char *
-il2cpp_domain_get_name (const Il2CppDomain* domain)
+il2cpp_domain_get_name (const Il2CppDomain * domain)
 {
     return domain->friendly_name;
 }
@@ -766,6 +857,14 @@ struct _Il2CppImage
 #endif
 };
 
+#if ${isEqualOrAbove_2018_1_0}
+Il2CppAssembly *
+il2cpp_image_get_assembly (const Il2CppImage * image)
+{
+    return image->assembly;
+}
+#endif
+
 uint32_t
 il2cpp_image_get_class_start (const Il2CppImage * image)
 {
@@ -799,7 +898,7 @@ struct _Il2CppType
 #if ${isEqualOrAbove_2020_2_0}
         const struct Il2CppMetadataGenericParameterHandle * genericParameterHandle;
 #endif
-        struct Il2CppGenericClass * generic_class;
+        Il2CppGenericClass * generic_class;
     } data;
     unsigned int attrs: 16;
     Il2CppTypeEnum type: 8;
@@ -818,6 +917,12 @@ const Il2CppType *
 il2cpp_type_get_data_type (const Il2CppType * type)
 {
     return type->data.type;
+}
+
+Il2CppGenericClass *
+il2cpp_type_get_generic_class (const Il2CppType * type)
+{
+    return type->data.generic_class;
 }
 
 #if ${isBelow_2018_1_0}
@@ -851,7 +956,7 @@ struct _Il2CppClass
     Il2CppClass * castClass;
     Il2CppClass * declaringType;
     Il2CppClass * parent;
-    struct Il2CppGenericClass * generic_class;
+    Il2CppGenericClass * generic_class;
 #if ${isEqualOrAbove_2020_2_0}
     const struct Il2CppMetadataTypeHandle * typeMetadataHandle;
 #else
@@ -975,13 +1080,13 @@ il2cpp_class_get_field_count (const Il2CppClass * klass)
 }
 
 uint8_t
-il2cpp_class_has_static_constructor (const Il2CppClass * klass)
+il2cpp_class_has_class_constructor (const Il2CppClass * klass)
 {
     return klass->has_cctor;
 }
 
 uint32_t
-il2cpp_class_is_static_constructor_finished (const Il2CppClass * klass)
+il2cpp_class_is_class_constructor_finished (const Il2CppClass * klass)
 {
     return klass->cctor_finished;
 }
@@ -993,6 +1098,59 @@ il2cpp_class_get_static_field_data (const Il2CppClass * klass)
     return klass->static_fields;
 }
 #endif
+
+struct _Il2CppGenericInst
+{
+    uint32_t type_argc;
+    const Il2CppType ** type_argv;
+};
+
+uint32_t
+il2cpp_generic_instance_get_type_count (Il2CppGenericInst * inst)
+{
+    return inst->type_argc;
+}
+
+const Il2CppType **
+il2cpp_generic_instance_get_types (Il2CppGenericInst * inst)
+{
+    return inst->type_argv;
+}
+
+struct _Il2CppGenericContext
+{
+    const Il2CppGenericInst * class_inst;
+    const Il2CppGenericInst * method_inst;
+};
+
+struct _Il2CppGenericClass
+{
+#if ${isEqualOrAbove_2020_2_0}
+    const Il2CppType * type;
+#else
+    int32_t typeDefinitionIndex;
+#endif
+    Il2CppGenericContext context;
+    Il2CppClass * cached_class;
+};
+
+Il2CppClass *
+il2cpp_generic_class_get_cached_class (Il2CppGenericClass * class)
+{
+    return class->cached_class;
+}
+
+const Il2CppGenericInst *
+il2cpp_generic_class_get_class_generic_instance (Il2CppGenericClass * class)
+{
+    return class->context.class_inst;
+}
+
+const Il2CppGenericInst *
+il2cpp_generic_class_get_method_generic_instance (Il2CppGenericClass * class)
+{
+    return class->context.method_inst;
+}
 
 struct _FieldInfo
 {
@@ -1207,7 +1365,7 @@ il2cpp_metadata_type_get_assembly_name (Il2CppMetadataType * metadata_type)
 Il2CppClass *
 il2cpp_metadata_type_get_class (Il2CppMetadataType * metadata_type)
 {
-    return (Il2CppClass *) metadata_type->typeInfoAddress;
+    return (Il2CppClass *) (uintptr_t) metadata_type->typeInfoAddress;
 }
 
 char *

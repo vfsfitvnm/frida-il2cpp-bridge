@@ -2,8 +2,8 @@
 
 ### Table of contents
 * [Project setup](#project-setup)
-    * [From scratch](#from-scratch)
-    * [Existing project](#existing-project)
+  * [From scratch](#from-scratch)
+   * [Existing project](#existing-project)
 * [Snippets](#snippets)
   * [Initialization](#initialization)
   * [Dump](#dump)
@@ -11,10 +11,12 @@
   * [Heap scan](#heap-scan)
   * [Methods](#methods)
     * [Invocation](#invocation)
-    * [Replacement](#replacement)
-    * [Interception](#interception)
+    * [Replacement & Interception](#replacement-&-interception)
+* [Miscellaneous](#miscellaneous)
+  * [How to handle overloading](#how-to-handle-overloading)
 
 ---
+
 
 ## Project setup 
 
@@ -46,24 +48,27 @@ main().catch(error => console.log(error.stack));
 **packages.json** \
 This is where you can declare scripts (commands to execute) and dependencies. \
 `frida-compile` packs and transpile a multi file project with its dependencies into a single plain JavaScript file 
-(its name `_.js` here). \
+(its name is `_.js` here). \
 Learn more about `packages.json` [here](https://docs.npmjs.com/cli/v7/configuring-npm/package-json).
 ```json
 {
   "name": "project",
+  "main": "index.ts",
   "version": "1.0.0",
   "private": true,
-  "main": "index.ts",
   "scripts": {
     "build": "frida-compile -o _.js -S -w index.ts",
-    "spawn_and_attach": "frida -U -f TARGET -l _.js --runtime=v8 --no-pause",
-    "just_attach": "frida -U TARGET -l _.js"
+    "attach": "run() { frida -U $1 -l _.js --runtime=v8; }; run",
+    "attach-with-spawn": "run() { frida -U -f $1 -l _.js --no-pause --runtime=v8; }; run",
+    "app0-with-spawn": "npm run attach-with-spawn com.example.application0",
+    "app1": "npm run com.example.application1",
+    "app1-with-spawn": "npm run attach-with-spawn com.example.application1"
   },
   "devDependencies": {
-    "@types/frida-gum": "^17.0.0",
+    "@types/frida-gum": "^17.1.0",
     "@types/node": "^16.3.3",
     "frida-compile": "^10.2.4",
-    "frida-il2cpp-bridge": "^0.3.1"
+    "frida-il2cpp-bridge": "^0.4.5"
   }
 }
 ```
@@ -101,9 +106,6 @@ You may need to add `"moduleResolution": "node"` in your `tsconfig.json` under `
 Consider contribute or opening an issue, if you think something is missing.
 
 ### Initialization
-You import the global `Il2Cpp` object and initialize in the following way. \
-This procedure is asynchronous because it may need to wait for IL2CPP module load and initialization (`il2cpp_init`). 
-
 ```ts
 import "frida-il2cpp-bridge";
 
@@ -113,39 +115,61 @@ async function main() {
 
 main().catch(error => console.log(error.stack));
 ```
+You import the global `Il2Cpp` object and initialize in the following way. \
+This procedure is asynchronous because it may need to wait for IL2CPP module load and initialization (`il2cpp_init`).
 
 ### Dump
-You can perform an application dump quite easily. \
-Make sure the target has write-permissions to the destination.
 ```ts
 import "frida-il2cpp-bridge";
 
 async function main() {
     await Il2Cpp.initialize();
+    
+    // it will use default directory path and file name: /<default_path>/<default_name>.cs
+    Il2Cpp.Dumper.classicDump();
+    
+    // the file name is overridden: /<default_path>/custom_file_name.cs
+    Il2Cpp.Dumper.classicDump("custom_file_name");
 
-    Il2Cpp.dump("/full/path/to/file.cs");
+    // the file name and directory path are overridden: /i/can/write/to/this/path/custom_file_name.cs
+    Il2Cpp.Dumper.classicDump("custom_file_name", "/i/can/write/to/this/path");
+    
+    // alternatively
+    Il2Cpp.Dumper.snapshotDump();
 }
 
 main().catch(error => console.log(error.stack));
 ```
-If you don't provide a path, the code will try to build it. For instance, this will be
-`/storage/emulated/0/Android/data/com.example.application/files/com.example.application_1.2.3.cs` on Android.
+There are two already defined strategies you can follow in order to dump the application. \
+The **first one**, the _classic dump_, iterates
+all the assemblies, and then dump all the classes inside them. This strategy is pretty straightforward, however it
+misses quite few classes (array and inflated classes - `System.String[]` and
+`System.Collections.Generic.List<System.String>` for instance). These _missing_ classes do not contain any "hidden"
+code, however they may be useful during static analysis. \
+The **second one**, the _snapshot dump_, comes to the rescue. It performs a memory snapshot
+(IL2CPP generously exposes the APIs), which also includes  the classes the classic dump could not easily guess,
+thankfully. However, the snapshot only reports already initialized classes: it's important to run this dump as
+late as possible. The second dump seems to include the same classes the first one would find.
+
+Dumping may require two parameters: a directory path (e.g. a place where the application can write to) and a file name.
+If not provided, the code will just guess them;
+however it might fail on some applications and/or Unity versions.
 
 The dump will produce the following output:
 ```cs
 // mscorlib.dll
 struct System.Int32 : System.ValueType, System.IFormattable, System.IConvertible, System.IComparable, System.IComparable<System.Int32>, System.IEquatable<System.Int32>
 {
-    System.Int32 MaxValue = 2147483647; // 0x0
-    System.Int32 MinValue = -2147483648; // 0x0
+    static System.Int32 MaxValue = 2147483647;
+    static System.Int32 MinValue = -2147483648;
     System.Int32 m_value; // 0x10
 
-    System.Boolean System.IConvertible.ToBoolean(System.IFormatProvider provider); // 0x00bed724;
-    System.Byte System.IConvertible.ToByte(System.IFormatProvider provider); // 0x00bed72c;
-    System.Char System.IConvertible.ToChar(System.IFormatProvider provider); // 0x00bed734;
-    System.DateTime System.IConvertible.ToDateTime(System.IFormatProvider provider); // 0x00bed73c;
-    System.Decimal System.IConvertible.ToDecimal(System.IFormatProvider provider); // 0x00bed744;
-    System.Double System.IConvertible.ToDouble(System.IFormatProvider provider); // 0x00bed74c;
+    System.Boolean System.IConvertible.ToBoolean(System.IFormatProvider provider); // 0x00bed724
+    System.Byte System.IConvertible.ToByte(System.IFormatProvider provider); // 0x00bed72c
+    System.Char System.IConvertible.ToChar(System.IFormatProvider provider); // 0x00bed734
+    System.DateTime System.IConvertible.ToDateTime(System.IFormatProvider provider); // 0x00bed73c
+    System.Decimal System.IConvertible.ToDecimal(System.IFormatProvider provider); // 0x00bed744
+    System.Double System.IConvertible.ToDouble(System.IFormatProvider provider); // 0x00bed74c
     // ...
 }
 
@@ -153,7 +177,6 @@ struct System.Int32 : System.ValueType, System.IFormattable, System.IConvertible
 ```
 
 ### Trace
-You can also easily trace invocations of the given a classes methods and/or methods.
 ```ts
 import "frida-il2cpp-bridge";
 
@@ -167,38 +190,31 @@ async function main() {
     const SystemObject = mscorlib.classes["System.Object"];
     const Account = CSharp.classes.Account;
     
-    const tracer0 = Il2Cpp.Tracer.Simple(SystemString, Account.methods.isLoggedIn);
+    // simple trace, it only traces method calls
+    Il2Cpp.Tracer.simpleTrace(SystemString, Account.methods.isLoggedIn);
     
-    const tracer1 = Il2Cpp.Tracer.Full(SystemString, Account.methods.isLoggedIn);
-    
-    const tracer2 = Il2Cpp.Tracer.FullWithValues(SystemString, Account.methods.isLoggedIn);
-    
-    const tracer3 = Il2Cpp.Tracer.Custom(function (this: Il2Cpp.Tracer, method: Il2Cpp.Method): InvocationListenerCallbacks {
-      return method.createFridaInterceptCallbacks({
-        onLeave(returnValue: Il2Cpp.WithValue): void {
-          console.log(`[custom log] ${method.name} => ${returnValue.value} @ ${returnValue.valueHandle}`);
-        }
-      });
-    }, SystemString, Account.methods.isLoggedIn);
+    // full trace, it traces method calls and returns
+    Il2Cpp.Tracer.fullTrace(SystemString, Account.methods.isLoggedIn);
 
-    // adds to tracer2 another class to trace after 1 second
-    setTimeout(() => {
-        tracer2.add(SystemObject);
-    }, 1000);
+    // full trace, it traces method calls and returns and it reports any value
+    Il2Cpp.Tracer.fullWithValuesTrace(SystemString, Account.methods.isLoggedIn);
     
-    // stops tracer0, tracer1, and tracer2 after 5 seconds
-    setTimeout(() => {
-        tracer0.clear();
-        tracer1.clear();
-        tracer2.clear();
-    }, 5000);
-    
+    // custom behaviour, it traces method returns and return values
+    Il2Cpp.Tracer.trace((method: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
+        const signature = `${method.name} (${method.parameterCount})`;
+        return {
+            onLeave(returnValue: Il2Cpp.Method.ReturnType) {
+                console.log(`[custom log] ${signature} ----> ${returnValue}`);
+            }
+        };
+    }, SystemString, Account.methods.isLoggedIn);    
 }
 
 main().catch(error => console.log(error.stack));
 ```
-There are three default types of tracing.
-All the examples will trace every `System.String` method invocation and the method `Account.isLoggedIn`.
+There are three already defined strategies you can follow in order to trace methods. I will use `onEnter` and `onLeave`
+words, however `Il2Cpp.Tracer` does not use `Interceptor.attach`, but a combination of `Interceptor.replace` and
+`NativeFunction` ([here's why](https://t.me/fridadotre/52178)). 
 
 - `Il2Cpp.Tracer.Simple` only reports `onEnter` calls.
   ```~~~~
@@ -246,22 +262,22 @@ All the examples will trace every `System.String` method invocation and the meth
   
 - `Il2Cpp.Tracer.FullWithValues` reports both `onEnter` and `onLeave` nicely, plus every printable value.
   ```
-  [il2cpp] 0x01a3cfbc ┌─System.String.FastAllocateString(length: System.Int32 = 1)
+  [il2cpp] 0x01a3cfbc ┌─System.String.FastAllocateString(System.Int32 length = 1)
   [il2cpp] 0x01a3cfbc └─System.String.FastAllocateString System.String =
   
-  [il2cpp] 0x01a3daf4 ┌─System.String.IsNullOrEmpty(value: System.String = assets/bin/Data/)
+  [il2cpp] 0x01a3daf4 ┌─System.String.IsNullOrEmpty(System.String value = assets/bin/Data/)
   [il2cpp] 0x01a3daf4 └─System.String.IsNullOrEmpty System.Boolean = false
   
-  [il2cpp] 0x01a30f2c ┌─System.String.Replace(oldValue: System.String = \, newValue: System.String = /)
-  [il2cpp] 0x01a42054 │ ┌─System.String.ReplaceInternal(oldValue: System.String = \, newValue: System.String = /)
-  [il2cpp] 0x01a43ae8 │ │ ┌─System.String.ReplaceUnchecked(oldValue: System.String = \, newValue: System.String = /)
-  [il2cpp] 0x01a36ed8 │ │ │ ┌─System.String.get_Chars(index: System.Int32 = 0)
+  [il2cpp] 0x01a30f2c ┌─System.String.Replace(System.String oldValue = \, System.String newValue = /)
+  [il2cpp] 0x01a42054 │ ┌─System.String.ReplaceInternal(System.String oldValue = \, System.String newValue = /)
+  [il2cpp] 0x01a43ae8 │ │ ┌─System.String.ReplaceUnchecked(System.String oldValue = \, System.String newValue = /)
+  [il2cpp] 0x01a36ed8 │ │ │ ┌─System.String.get_Chars(System.Int32 index = 0)
   [il2cpp] 0x01a36ed8 │ │ │ └─System.String.get_Chars System.Char = 92
-  [il2cpp] 0x01a36ed8 │ │ │ ┌─System.String.get_Chars(index: System.Int32 = 0)
+  [il2cpp] 0x01a36ed8 │ │ │ ┌─System.String.get_Chars(System.Int32 index = 0)
   [il2cpp] 0x01a36ed8 │ │ │ └─System.String.get_Chars System.Char = 47
-  [il2cpp] 0x01a41f60 │ │ │ ┌─System.String.Replace(oldChar: System.Char = 92, newChar: System.Char = 47)
-  [il2cpp] 0x01a41f64 │ │ │ │ ┌─System.String.ReplaceInternal(oldChar: System.Char = 92, newChar: System.Char = 47)
-  [il2cpp] 0x01a4346c │ │ │ │ │ ┌─System.String.IndexOfUnchecked(value: System.Char = 92, startIndex: System.Int32 = 0, count: System.Int32 = 16)
+  [il2cpp] 0x01a41f60 │ │ │ ┌─System.String.Replace(System.Char oldChar = 92, System.Char newChar = 47)
+  [il2cpp] 0x01a41f64 │ │ │ │ ┌─System.String.ReplaceInternal(System.Char oldChar = 92, System.Char newChar = 47)
+  [il2cpp] 0x01a4346c │ │ │ │ │ ┌─System.String.IndexOfUnchecked(System.Char value = 92, System.Int32 startIndex = 0, System.Int32 count = 16)
   [il2cpp] 0x01a4346c │ │ │ │ │ └─System.String.IndexOfUnchecked System.Int32 = 4294967295
   [il2cpp] 0x01a41f60 │ │ │ │ └─System.String.Replace System.String = assets/bin/Data/
   [il2cpp] 0x01a41f64 │ │ │ └─System.String.ReplaceInternal System.String = assets/bin/Data/
@@ -269,126 +285,119 @@ All the examples will trace every `System.String` method invocation and the meth
   [il2cpp] 0x01a42054 │ └─System.String.ReplaceInternal System.String = assets/bin/Data/
   [il2cpp] 0x01a30f2c └─System.String.Replace System.String = assets/bin/Data/
   
-  [il2cpp] 0x01a3cfbc ┌─System.String.FastAllocateString(length: System.Int32 = 0)
-  [il2cpp] 0x01a3cfbc └─System.String.FastAllocateString System.String =
+  [il2cpp] 0x01a3cfbc ┌─System.String.FastAllocateString(System.Int32 length = 0)
+  [il2cpp] 0x01a3cfbc └─System.String.FastAllocateString System.String = 
   ```
-  
-The output is nicely coloured so you won't get crazy when inspecting the log.
+> The output is nicely coloured so you won't get crazy when inspecting the console.
 
 ### Heap scan
-You can "scan" the heap or whatever the place where the objects gets allocated in to find instances of the given
-class. \
-There are two ways of doing this:
+```ts
+import "frida-il2cpp-bridge";
 
-- Reading classes GC descriptors
-  ```ts
-  import "frida-il2cpp-bridge";
+async function main() {
+    await Il2Cpp.initialize();
   
-  async function main() {
-      await Il2Cpp.initialize();
+    const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+    const SystemType = mscorlib.classes["System.Type"];
     
-      const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-      const SystemType = mscorlib.classes["System.Type"];
+    // it relies on classes gc descriptors
+    Il2Cpp.GC.choose(SystemType).forEach((instance: Il2Cpp.Object) => {
+        // instance.class.type.name == "System.Type"
+    });
     
-      Il2Cpp.GC.choose(SystemType).forEach(instance => {
-          // instance.class.type.name == "System.Type"
-      });
-  }
-  
-  main().catch(error => console.log(error.stack));
-  ```
+    // it relies on a memory snapshot
+    new Il2Cpp.MemorySnapshot().objects
+        .filter(Il2Cpp.Filtering.IsExactly(SystemType))
+        .forEach((instance: Il2Cpp.Object) => {
+            // instance.class.type.name == "System.Type"
+        });
 
-- Taking a memory snapshot
-  ```ts
-  import "frida-il2cpp-bridge";
-  
-  async function main() {
-      await Il2Cpp.initialize();
-    
-      const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-      const SystemType = mscorlib.classes["System.Type"];
-    
-      new Il2Cpp.MemorySnapshot().objects.filter(Il2Cpp.Filtering.IsExactly(SystemType)).forEach(instance => {
-          // instance.class.type.name == "System.Type"
-      });
-  }
-  
-  main().catch(error => console.log(error.stack));
-  ```
-  The memory snapshot will be automatically freed, but you can do it explicitly.
+    // the memory snapshot will be automatically freed, but you can do it explicitly
+}
+
+main().catch(error => console.log(error.stack));
+```
+You can "scan" the heap or whatever the place where the objects get allocated in to find instances of the given
+class. There are two ways of doing this: reading classes GC descriptors or taking a memory snapshot. However, I don't
+really know how they internally work, I read enough uncommented C++ source code for my taste.
 
 ### Methods
+```ts
+import "frida-il2cpp-bridge";
+
+async function main() {
+    await Il2Cpp.initialize();
+  
+    const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+    const SystemString = mscorlib.classes["System.String"];
+
+    const IsNullOrEmpty = mscorlib.classes["System.String"].methods.IsNullOrEmpty;
+    const MemberwiseClone = mscorlib.classes["System.Object"].methods.MemberwiseClone;
+    
+    const string = Il2Cpp.String.from("Hello, il2cpp!");
+    
+    // static method invocation, it will return false
+    const result0 = IsNullOrEmpty.invoke<boolean>(string);
+    
+    // instance method invocation, it will return true
+    const result1 = string.object.methods.Contains.invoke<boolean>(Il2Cpp.String.from("il2cpp"));
+    
+    // 
+    IsNullOrEmpty.implementation = function (value: Il2Cpp.String): boolean {
+        value.content = "!"; // <--- onEnter
+                             // <--- onEnter
+        const result = this.methods.IsNullOrEmpty.invoke(value);
+        // <--- onLeave
+        console.log(result); // <--- onLeave
+        return result;       // <--- onLeave
+    };
+    
+    //
+    MemberwiseClone.implementation = function (): Il2Cpp.Object {
+        // `this` is a "System.Object", because MemberwiseClone is a System.Object method
+    
+        // `originalInstance` can be any type
+        const originalInstance = new Il2Cpp.Object(this.handle);
+    
+        // not cloning!
+        return this as Il2Cpp.Object;
+    };
+}
+
+main().catch(error => console.log(error.stack));
+```
 
 - #### Invocation
-  You can invoke any method (this is just an abstraction over `NativeFunction`).
+  You can invoke any method using `invoke` (this is just an abstraction over `NativeFunction`).
+
+
+- #### Replacement & Interception
+  You can replace and intercept any method implementation using `implementation` (this is just an abstraction over 
+  `Interceptor.replace` and `NativeCallback`). It follows `frida-java-bridge` syntax.
+  If the method is static, `this` will be a `Il2Cpp.Class`, or `Il2Cpp.Object` otherwise: the instance is artificially
+  down-casted to the method declaring class. \
+  Some other examples:
   ```ts
-  import "frida-il2cpp-bridge";
+  // System.Int32 GetByteCount(System.Char[] chars, System.Int32 index, System.Int32 count, System.Boolean flush);
+  GetByteCount.implementation =
+          function (chars: Il2Cpp.Array<number>, index: number, count: number, flush: boolean): number {}
   
-  async function main() {
-      await Il2Cpp.initialize();
-    
-      const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-      const SystemString = mscorlib.classes["System.String"];
-      
-      const string = Il2Cpp.String.from("Hello, il2cpp!");
-      
-      // static method invocation
-      const result0 = SystemString.methods.IsNullOrEmpty.invoke<boolean>(string); // false
-      
-      // instance method invocation
-      const result1 = string.object.methods.Contains.invoke<boolean>(Il2Cpp.String.from("il2cpp")); // true
-  }
-  
-  main().catch(error => console.log(error.stack));
+  // System.Boolean InternalFallback(System.Char ch, System.Char*& chars);
+  InternalFallback.implementation = 
+          function (ch: number, chars: Il2Cpp.Reference<Il2Cpp.Pointer<number>>): boolean {}
   ```
 
-- #### Replacement
-  You can replace any method implementation (this is just an abstraction over `Interceptor.replace` and `NativeCallback`).
-  ```ts
-  import "frida-il2cpp-bridge";
-  
-  async function main() {
-      await Il2Cpp.initialize();
-    
-      const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-      const IsNullOrEmpty = mscorlib.classes["System.String"].methods.IsNullOrEmpty;
-      
-      IsNullOrEmpty.implementation = (instance: Il2Cpp.Object | null, parameters: Readonly<Record<string, Il2Cpp.WithValue>>) => {
-          parameters.value.value = Il2Cpp.String.from("Hello!");
-  
-          // restores the original implementation after 1 second
-          setTimeout(() => {
-              IsNullOrEmpty.implementation = null;
-          }, 1000);
-          
-          return 0;
-      };
-  }
-  
-  main().catch(error => console.log(error.stack));
-  ```
+---
 
-- #### Interception
-  You can intercept any method invocation (this is just an abstraction over `Interceptor.attach`).
-  ```ts
-  import "frida-il2cpp-bridge";
-  
-  async function main() {
-      await Il2Cpp.initialize();
-    
-      const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
-      const IsNullOrEmpty = mscorlib.classes["System.String"].methods.IsNullOrEmpty;
-  
-      IsNullOrEmpty.intercept({
-          onEnter(instance: Il2Cpp.Object | null, parameters: Readonly<Record<string, Il2Cpp.WithValue>>) {
-              parameters.value.value = Il2Cpp.String.from("Replaced!");
-          },
-          onLeave(returnValue: Il2Cpp.WithValue) {
-              returnValue.value = true;
-          }
-      });
-  }
-  
-  main().catch(error => console.log(error.stack));
-  ```
-  
+## Miscellaneous
+
+### How to handle overloading
+There's not a nice way to handle overloading yet (there's no such `.overload(...)` method). However, method gets
+renamed. Consider the following `System.String` methods:
+```cs
+System.Boolean Equals(System.Object obj); // SystemString.methods.Equals
+System.Boolean Equals(System.String value); // SystemString.methods.Equals_
+System.Boolean Equals(System.String value, System.StringComparison comparisonType); // SystemString.methods.Equals__
+```
+Basically, an underscore is appended to the method name (key) until the key can be used.
+

@@ -1,13 +1,15 @@
-import { injectToIl2Cpp } from "../decorators";
-import { NativeStruct, NonNullNativeStruct } from "../../utils/native-struct";
 import { cache } from "decorator-cache-getter";
+
 import { Api } from "../api";
+import { injectToIl2Cpp } from "../decorators";
+
+import { NonNullNativeStruct } from "../../utils/native-struct";
 
 @injectToIl2Cpp("MetadataType")
 class Il2CppMetadataType extends NonNullNativeStruct {
     @cache
     get assemblyName(): string {
-        return Api._metadataTypeGetAssemblyName(this);
+        return Api._metadataTypeGetAssemblyName(this).readUtf8String()!;
     }
 
     @cache
@@ -22,6 +24,6 @@ class Il2CppMetadataType extends NonNullNativeStruct {
 
     @cache
     get name(): string {
-        return Api._metadataTypeGetName(this);
+        return Api._metadataTypeGetName(this).readUtf8String()!;
     }
 }

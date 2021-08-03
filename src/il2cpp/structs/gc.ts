@@ -3,6 +3,14 @@ import { injectToIl2Cpp, since } from "../decorators";
 
 @injectToIl2Cpp("GC")
 class Il2CppGC {
+    static get heapSize(): Int64 {
+        return Api._gcGetHeapSize();
+    }
+
+    static get usedHeapSize(): Int64 {
+        return Api._gcGetUsedSize();
+    }
+
     static choose(klass: Il2Cpp.Class): Il2Cpp.Object[] {
         const matches: Il2Cpp.Object[] = [];
 
@@ -43,6 +51,6 @@ class Il2CppGC {
 
     @since("2018.3.0")
     static isDisabled(): boolean {
-        return Api._gcIsDisabled();
+        return !!Api._gcIsDisabled();
     }
 }

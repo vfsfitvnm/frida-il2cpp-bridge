@@ -1,23 +1,19 @@
 import { cache } from "decorator-cache-getter";
 
-import { addLevenshtein } from "../../utils/record";
-
 import { Api } from "../api";
-import { NonNullNativeStruct } from "../../utils/native-struct";
 import { injectToIl2Cpp } from "../decorators";
 
+import { getOrNull, NativeStruct } from "../../utils/native-struct";
+import { addLevenshtein } from "../../utils/utils";
+
 @injectToIl2Cpp("Domain")
-class Il2CppDomain extends NonNullNativeStruct {
+class Il2CppDomain extends NativeStruct {
     @cache
     static get reference(): Il2Cpp.Domain {
         return new Il2Cpp.Domain(Api._domainGet());
     }
 
     @cache
-    get name(): string | null {
-        return Api._domainGetName(this);
-    }
-
     get assemblies(): Readonly<Record<string, Il2Cpp.Assembly>> {
         const record: Record<string, Il2Cpp.Assembly> = {};
 
@@ -32,5 +28,14 @@ class Il2CppDomain extends NonNullNativeStruct {
         }
 
         return addLevenshtein(record);
+    }
+
+    @cache
+    get name(): string {
+        return Api._domainGetName(this).readUtf8String()!;
+    }
+
+    open(assemblyName: string): Il2Cpp.Assembly | null {
+        return getOrNull(Api._domainAssemblyOpen(this, Memory.allocUtf8String(assemblyName)), Il2Cpp.Assembly);
     }
 }

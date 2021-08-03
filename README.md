@@ -6,12 +6,11 @@
 Frida module to dump, manipulate and hijack any IL2CPP application at runtime with a high level
  of abstraction, without needing the `global-metadata.dat` file.
 
-![Screenshot_20210715_200304](https://user-images.githubusercontent.com/46219656/125983829-3aec7702-b7e6-48c1-acba-e74817733d7f.png)
-
+![Screenshot_20210724_195807](https://user-images.githubusercontent.com/46219656/126877297-97529b9b-e74b-4130-9b6e-061b938a5737.png)
 ## Compatibility
 
 #### Unity version
-It should work for any Unity version in the inclusive range **5.3.0** -  **2021.1.0**.
+It should work for any Unity version in the inclusive range **5.3.0** - **2021.1.0**.
 
 #### Platforms
 **Android** is supported; **Linux** and **Windows** are not tested; **iOS** is not supported yet 
@@ -22,11 +21,11 @@ Please have a read at [DOC.md](DOC.md).
 
 ## Known limitations
 A lot of aspects are still unknown to me.
-- Lack of support for reference types (e.g. `System.Boolean&`)
 - Absent generic classes or methods utilities
 - Missing traceback system
 
 
 ## Acknowledgements
 Thanks to [meme](https://github.com/meme) and [tryso](https://github.com/tryso) for helping and getting me into this, 
-and to [djkaty](https://github.com/djkaty) for providing the IL2CPP C headers.
+and to [djkaty](https://github.com/djkaty) and [nneonneo](https://github.com/nneonneo) for providing the IL2CPP C
+headers.
