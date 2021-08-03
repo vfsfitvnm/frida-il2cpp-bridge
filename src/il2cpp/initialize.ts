@@ -4,7 +4,6 @@ import { UnityVersion } from "./version";
 
 import { platformNotSupported, raise, warn } from "../utils/console";
 import { forModule } from "../utils/native-wait";
-import { isEmpty } from "../utils/utils";
 
 async function getUnityVersion(): Promise<UnityVersion> {
     const unityLibraryName =
@@ -46,7 +45,7 @@ async function initialize(): Promise<void> {
     injectToIl2Cpp("unityVersion")(await getUnityVersion());
     injectToIl2Cpp("module")(await forModule(il2CppLibraryName));
 
-    if (isEmpty(new Il2Cpp.Domain(NULL).assemblies)) {
+    if (Api._getCorlib().isNull()) {
         await new Promise<void>(resolve => {
             const interceptor = Interceptor.attach(Api._init, {
                 onLeave() {

@@ -1,13 +1,23 @@
 import { cache } from "decorator-cache-getter";
 
 import { Api } from "../api";
-import { injectToIl2Cpp } from "../decorators";
+import { injectToIl2Cpp, since } from "../decorators";
 
 import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
 import { addLevenshtein } from "../../utils/utils";
 
 @injectToIl2Cpp("Image")
 class Il2CppImage extends NonNullNativeStruct {
+    static get corlib(): Il2Cpp.Image {
+        return new Il2Cpp.Image(Api._getCorlib());
+    }
+
+    @cache
+    @since("2018.1.0")
+    get assembly(): Il2Cpp.Assembly {
+        return new Il2Cpp.Assembly(Api._imageGetAssembly(this));
+    }
+
     @cache
     get classCount(): number {
         return Api._imageGetClassCount(this);

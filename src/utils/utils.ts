@@ -94,14 +94,6 @@ export function mapToArray<V, U>(source: Record<string, V>, map: (value: V) => U
 }
 
 /** @internal */
-export function isEmpty(source: Record<any, any>): boolean {
-    for (const _ in source) {
-        return false;
-    }
-    return true;
-}
-
-/** @internal */
 export function overridePropertyValue<T extends object, K extends keyof T>(target: T, property: K, value: T[K]): T {
     Reflect.defineProperty(target, property, { value: value });
     return target;

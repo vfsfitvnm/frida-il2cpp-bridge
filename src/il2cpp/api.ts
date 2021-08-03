@@ -180,6 +180,11 @@ export class Api {
     }
 
     @cache
+    static get _domainAssemblyOpen() {
+        return new NativeFunction(this.r`domain_assembly_open`, "pointer", ["pointer", "pointer"]);
+    }
+
+    @cache
     static get _domainGet() {
         return new NativeFunction(this.r`domain_get`, "pointer", []);
     }
@@ -317,6 +322,16 @@ export class Api {
     @cache
     static get _genericInstanceGetTypes() {
         return new NativeFunction(this.r`generic_instance_get_types`, "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _getCorlib() {
+        return new NativeFunction(this.r`get_corlib`, "pointer", []);
+    }
+
+    @cache
+    static get _imageGetAssembly() {
+        return new NativeFunction(this.r`image_get_assembly`, "pointer", ["pointer"]);
     }
 
     @cache
@@ -841,6 +856,14 @@ struct _Il2CppImage
     uint8_t dynamic;
 #endif
 };
+
+#if ${isEqualOrAbove_2018_1_0}
+Il2CppAssembly *
+il2cpp_image_get_assembly (const Il2CppImage * image)
+{
+    return image->assembly;
+}
+#endif
 
 uint32_t
 il2cpp_image_get_class_start (const Il2CppImage * image)
