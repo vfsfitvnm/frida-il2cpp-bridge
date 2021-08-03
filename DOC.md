@@ -68,7 +68,7 @@ Learn more about `packages.json` [here](https://docs.npmjs.com/cli/v7/configurin
     "@types/frida-gum": "^17.1.0",
     "@types/node": "^16.3.3",
     "frida-compile": "^10.2.4",
-    "frida-il2cpp-bridge": "^0.4.4"
+    "frida-il2cpp-bridge": "^0.4.5"
   }
 }
 ```
@@ -149,7 +149,7 @@ code, however they may be useful during static analysis. \
 The **second one**, the _snapshot dump_, comes to the rescue. It performs a memory snapshot
 (IL2CPP generously exposes the APIs), which also includes  the classes the classic dump could not easily guess,
 thankfully. However, the snapshot only reports already initialized classes: it's important to run this dump as
-late as possible. The second dump always includes the same classes the first one would find.
+late as possible. The second dump seems to include the same classes the first one would find.
 
 Dumping may require two parameters: a directory path (e.g. a place where the application can write to) and a file name.
 If not provided, the code will just guess them;

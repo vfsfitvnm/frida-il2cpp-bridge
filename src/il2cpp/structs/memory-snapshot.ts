@@ -7,11 +7,8 @@ import { NonNullNativeStruct } from "../../utils/native-struct";
 
 @injectToIl2Cpp("MemorySnapshot")
 class Il2CppMemorySnapshot extends NonNullNativeStruct {
-    readonly weakRefId: WeakRefId;
-
-    constructor() {
-        super(Api._memorySnapshotCapture());
-        this.weakRefId = Script.bindWeak(this, Api._memorySnapshotFree.bind(this, this));
+    static capture(): Il2Cpp.MemorySnapshot {
+        return new Il2Cpp.MemorySnapshot(Api._memorySnapshotCapture());
     }
 
     @cache
@@ -44,6 +41,6 @@ class Il2CppMemorySnapshot extends NonNullNativeStruct {
     }
 
     free(): void {
-        Script.unbindWeak(this.weakRefId);
+        Api._memorySnapshotFree(this);
     }
 }

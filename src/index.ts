@@ -15,9 +15,6 @@ declare global {
         /** */
         function initialize(): Promise<void>;
 
-        /** Performs a dump of the assemblies. */
-        function dump(filePath?: string): void;
-
         /** Represents a `Il2CppArraySize`. */
         class Array<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends NativeStruct implements Iterable<T> {
             /** Creates a new array. */
@@ -154,6 +151,9 @@ declare global {
 
             /** Gets the name of the current application domain. */
             get name(): string;
+
+            /** */
+            open(assemblyName: string): Il2Cpp.Assembly | null;
         }
 
         /** Represents a `FieldInfo`. */
@@ -282,6 +282,12 @@ declare global {
 
         /** Represents a `Il2CppImage`. */
         class Image extends NonNullNativeStruct {
+            /** */
+            static get corlib(): Il2Cpp.Image;
+
+            /** */
+            get assembly(): Il2Cpp.Assembly;
+
             /** Gets the amount of classes defined in this image. */
             get classCount(): number;
 
@@ -300,11 +306,8 @@ declare global {
 
         /** Represents a `Il2CppMemorySnapshot`. */
         class MemorySnapshot extends NonNullNativeStruct {
-            /** @internal */
-            readonly weakRefId: WeakRefId;
-
             /** Captures a memory snapshot. */
-            constructor();
+            static capture(): Il2Cpp.MemorySnapshot;
 
             /** */
             get metadataSnapshot(): Il2Cpp.MetadataSnapshot;

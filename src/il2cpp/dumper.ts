@@ -64,20 +64,11 @@ class Dumper {
 
         this.dump(
             function* (): Generator<string> {
-                for (const assembly of Object.values(Il2Cpp.Domain.reference.assemblies)) {
-                    inform(`Dumping \x1b[1m${assembly.name}\x1b[0m...`);
-                    for (const klass of Object.values(assembly.image.classes)) {
-                        yield klass.toString();
-                    }
-                }
-
                 inform("Appending some \x1b[1mmemory-snapshot-discovered\x1b[0m classes...");
 
-                const snapshot = new Il2Cpp.MemorySnapshot();
+                const snapshot = Il2Cpp.MemorySnapshot.capture();
                 for (const metadataType of Object.values(snapshot.metadataSnapshot.metadataTypes)) {
-                    if (!(metadataType.name in Il2Cpp.Domain.reference.assemblies[metadataType.assemblyName].image.classes)) {
-                        yield metadataType.class.toString();
-                    }
+                    yield metadataType.class.toString();
                 }
                 snapshot.free();
             },
