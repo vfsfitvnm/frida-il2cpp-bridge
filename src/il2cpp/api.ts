@@ -548,7 +548,7 @@ export class Api {
 
     @cache
     static get _threadAttach() {
-        return new NativeFunction(this.r`thread_attach`, "void", ["pointer"]);
+        return new NativeFunction(this.r`thread_attach`, "pointer", ["pointer"]);
     }
 
     @cache

@@ -57,18 +57,17 @@ Learn more about `packages.json` [here](https://docs.npmjs.com/cli/v7/configurin
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "frida-compile -o _.js -S -w index.ts",
-    "attach": "run() { frida -U $1 -l _.js --runtime=v8; }; run",
-    "attach-with-spawn": "run() { frida -U -f $1 -l _.js --no-pause --runtime=v8; }; run",
+    "build": "frida-compile -o _.js -w index.ts",
+    "attach": "run() { frida -U \"$1\" -l _.js --runtime=v8; }; run",
+    "attach-with-spawn": "run() { frida -U -f \"$1\" -l _.js --no-pause --runtime=v8; }; run",
     "app0-with-spawn": "npm run attach-with-spawn com.example.application0",
-    "app1": "npm run com.example.application1",
+    "app1": "npm run \"Application1 Name\"",
     "app1-with-spawn": "npm run attach-with-spawn com.example.application1"
   },
   "devDependencies": {
     "@types/frida-gum": "^17.1.0",
-    "@types/node": "^16.3.3",
     "frida-compile": "^10.2.4",
-    "frida-il2cpp-bridge": "^0.4.6"
+    "frida-il2cpp-bridge": "^0.4.7"
   }
 }
 ```

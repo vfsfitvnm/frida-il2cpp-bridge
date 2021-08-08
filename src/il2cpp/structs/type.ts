@@ -65,6 +65,7 @@ class Il2CppType extends NonNullNativeStruct {
             case "string":
             case "szarray":
             case "array":
+                return "pointer";
             case "class":
             case "object":
             case "genericinst":

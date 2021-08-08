@@ -23,4 +23,3 @@ import "./structs/reference";
 import "./structs/string";
 import "./structs/type";
 import "./structs/value-type";
-import "./structs/struct";

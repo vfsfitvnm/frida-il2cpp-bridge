@@ -38,8 +38,9 @@ export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Ty
             return new Il2Cpp.ValueType(pointer, type);
         case "object":
         case "class":
-        case "genericinst":
             return new Il2Cpp.Object(pointer.readPointer());
+        case "genericinst":
+            return type.class.isValueType ? new Il2Cpp.ValueType(pointer, type) : new Il2Cpp.Object(pointer.readPointer());
         case "string":
             return new Il2Cpp.String(pointer.readPointer());
         case "szarray":
