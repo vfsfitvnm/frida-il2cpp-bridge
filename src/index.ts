@@ -529,13 +529,18 @@ declare global {
             set content(value: string | null);
         }
 
+        /** */
         class ValueType extends NativeStruct {
+            /** */
             readonly type: Il2Cpp.Type;
 
+            /** */
             constructor(handle: NativePointer, type: Il2Cpp.Type);
 
+            /** */
             get fields(): Readonly<Record<string, Il2Cpp.Field>>;
 
+            /** */
             box(): Il2Cpp.Object;
         }
 
