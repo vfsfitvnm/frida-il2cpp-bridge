@@ -5,33 +5,26 @@ import { UnityVersion } from "./version";
 import { platformNotSupported, raise, warn } from "../utils/console";
 import { forModule } from "../utils/native-wait";
 
-async function getUnityVersion(): Promise<UnityVersion> {
-    const unityLibraryName =
+async function setUnityVersion(): Promise<void> {
+    const unityModuleName =
         Process.platform == "linux" ? "libunity.so" : Process.platform == "windows" ? "UnityPlayer.dll" : platformNotSupported();
 
-    let unityVersion: UnityVersion | undefined;
-    const searchStringHex = "45787065637465642076657273696f6e3a"; // "Expected version: "
+    const unityModule = await forModule(unityModuleName);
+    const range = Process.getRangeByAddress(unityModule.base);
 
-    try {
-        const unityLibrary = await forModule(unityLibraryName);
-        for (const range of unityLibrary.enumerateRanges("r--").concat(Process.getRangeByAddress(unityLibrary.base))) {
-            const result = Memory.scanSync(range.base, range.size, searchStringHex)[0];
-            if (result !== undefined) {
-                unityVersion = new UnityVersion(result.address.readUtf8String()!);
-                break;
+    Memory.scan(range.base, range.size, "45787065637465642076657273696f6e3a", {
+        onMatch(address: NativePointer): EnumerateAction {
+            injectToIl2Cpp("unityVersion")(new UnityVersion(address.readUtf8String()!));
+            return "stop";
+        },
+        onComplete(): void {
+            if (Il2Cpp.unityVersion == undefined) {
+                raise("Couldn't obtain the Unity version.");
+            } else if (Il2Cpp.unityVersion.isBelow("5.3.0") || Il2Cpp.unityVersion.isEqualOrAbove("2021.1.0")) {
+                raise(`Unity version "${Il2Cpp.unityVersion}" is not valid or supported.`);
             }
         }
-    } catch (e) {
-        raise("Couldn't obtain the Unity version: " + e);
-    }
-
-    if (unityVersion == undefined) {
-        raise("Couldn't obtain the Unity version.");
-    } else if (unityVersion.isBelow("5.3.0") || unityVersion.isEqualOrAbove("2021.1.0")) {
-        raise(`Unity version "${unityVersion}" is not valid or supported.`);
-    }
-
-    return unityVersion;
+    });
 }
 
 async function initialize(): Promise<void> {
@@ -39,11 +32,11 @@ async function initialize(): Promise<void> {
         warn("Frida's JavaScript runtime is not V8 (--runtime=v8). Proceed with caution.");
     }
 
-    const il2CppLibraryName =
+    const il2CppModuleName =
         Process.platform == "linux" ? "libil2cpp.so" : Process.platform == "windows" ? "GameAssembly.dll" : platformNotSupported();
 
-    injectToIl2Cpp("unityVersion")(await getUnityVersion());
-    injectToIl2Cpp("module")(await forModule(il2CppLibraryName));
+    await setUnityVersion();
+    injectToIl2Cpp("module")(await forModule(il2CppModuleName));
 
     if (Api._getCorlib().isNull()) {
         await new Promise<void>(resolve => {
@@ -55,7 +48,8 @@ async function initialize(): Promise<void> {
             });
         });
     }
-    Api._threadAttach(Il2Cpp.Domain.reference);
+
+    Api._threadAttach(Il2Cpp.Domain.reference); // Yes, it will leak
 }
 
 injectToIl2Cpp("initialize")(initialize);
