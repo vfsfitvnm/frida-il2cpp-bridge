@@ -2,8 +2,14 @@ import { cache } from "decorator-cache-getter";
 
 import { raise } from "../utils/console";
 
-/** @internal */
-export class Api {
+class Il2CppApi {
+    protected constructor() {}
+
+    @cache
+    static get _alloc() {
+        return new NativeFunction(this.r`alloc`, "pointer", ["size_t"]);
+    }
+
     @cache
     static get _arrayGetElements() {
         return new NativeFunction(this.r`array_elements`, "pointer", ["pointer"]);
@@ -245,6 +251,11 @@ export class Api {
     }
 
     @cache
+    static get _free() {
+        return new NativeFunction(this.r`free`, "void", ["pointer"]);
+    }
+
+    @cache
     static get _gcCollect() {
         return new NativeFunction(this.r`gc_collect`, "void", ["int"]);
     }
@@ -356,7 +367,7 @@ export class Api {
 
     @cache
     static get _init() {
-        return this.r`init`;
+        return new NativeFunction(this.r`init`, "void", []);
     }
 
     @cache
@@ -487,6 +498,41 @@ export class Api {
     }
 
     @cache
+    static get _monitorEnter() {
+        return new NativeFunction(this.r`monitor_enter`, "void", ["pointer"]);
+    }
+
+    @cache
+    static get _monitorExit() {
+        return new NativeFunction(this.r`monitor_exit`, "void", ["pointer"]);
+    }
+
+    @cache
+    static get _monitorPulse() {
+        return new NativeFunction(this.r`monitor_pulse`, "void", ["pointer"]);
+    }
+
+    @cache
+    static get _monitorPulseAll() {
+        return new NativeFunction(this.r`monitor_pulse_all`, "void", ["pointer"]);
+    }
+
+    @cache
+    static get _monitorTryEnter() {
+        return new NativeFunction(this.r`monitor_try_enter`, "bool", ["pointer", "uint32"]);
+    }
+
+    @cache
+    static get _monitorTryWait() {
+        return new NativeFunction(this.r`monitor_try_wait`, "bool", ["pointer", "uint32"]);
+    }
+
+    @cache
+    static get _monitorWait() {
+        return new NativeFunction(this.r`monitor_wait`, "void", ["pointer"]);
+    }
+
+    @cache
     static get _objectGetClass() {
         return new NativeFunction(this.r`object_get_class`, "pointer", ["pointer"]);
     }
@@ -522,6 +568,11 @@ export class Api {
     }
 
     @cache
+    static get _shutdown() {
+        return new NativeFunction(this.r`shutdown`, "void", []);
+    }
+
+    @cache
     static get _stringChars() {
         return new NativeFunction(this.r`string_chars`, "pointer", ["pointer"]);
     }
@@ -549,6 +600,16 @@ export class Api {
     @cache
     static get _threadAttach() {
         return new NativeFunction(this.r`thread_attach`, "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _threadDetach() {
+        return new NativeFunction(this.r`thread_detach`, "void", ["pointer"]);
+    }
+
+    @cache
+    static get _threadCurrent() {
+        return new NativeFunction(this.r`thread_current`, "pointer", []);
     }
 
     @cache
@@ -591,11 +652,13 @@ export class Api {
         return new NativeFunction(this.r`type_offset_of_type`, "uint16", []);
     }
 
+    /** @internal */
     @cache
     static get sources(): (Module | CModule)[] {
         return [Il2Cpp.module, createMissingApi()];
     }
 
+    /** @internal */
     private static r(exportName: readonly string[]): NativePointer {
         const name = "il2cpp_" + exportName;
         for (const source of this.sources) {
@@ -606,8 +669,6 @@ export class Api {
         }
         raise(`Couldn't resolve export "${name}".`);
     }
-
-    private constructor() {}
 }
 
 function createMissingApi(): CModule {
@@ -1482,4 +1543,12 @@ il2cpp_memory_snapshot_get_tracked_object_count (Il2CppManagedMemorySnapshot * s
     return snapshot->gcHandles.trackedObjectCount;
 }
 `);
+}
+
+Il2Cpp.Api = Il2CppApi;
+
+declare global {
+    namespace Il2Cpp {
+        class Api extends Il2CppApi {}
+    }
 }

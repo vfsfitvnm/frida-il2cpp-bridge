@@ -1,29 +1,38 @@
 import { cache } from "decorator-cache-getter";
 
-import { Api } from "../api";
-import { injectToIl2Cpp } from "../decorators";
-
 import { NonNullNativeStruct } from "../../utils/native-struct";
 
-@injectToIl2Cpp("MetadataType")
+/** Represents a `Il2CppMetadataType`. */
 class Il2CppMetadataType extends NonNullNativeStruct {
+    /** */
     @cache
     get assemblyName(): string {
-        return Api._metadataTypeGetAssemblyName(this).readUtf8String()!;
+        return Il2Cpp.Api._metadataTypeGetAssemblyName(this).readUtf8String()!;
     }
 
+    /** */
     @cache
     get baseOrElementTypeIndex(): number {
-        return Api._metadataTypeGetBaseOrElementTypeIndex(this);
+        return Il2Cpp.Api._metadataTypeGetBaseOrElementTypeIndex(this);
     }
 
+    /** */
     @cache
     get class(): Il2Cpp.Class {
-        return new Il2Cpp.Class(Api._metadataTypeGetClass(this));
+        return new Il2Cpp.Class(Il2Cpp.Api._metadataTypeGetClass(this));
     }
 
+    /** */
     @cache
     get name(): string {
-        return Api._metadataTypeGetName(this).readUtf8String()!;
+        return Il2Cpp.Api._metadataTypeGetName(this).readUtf8String()!;
+    }
+}
+
+Il2Cpp.MetadataType = Il2CppMetadataType;
+
+declare global {
+    namespace Il2Cpp {
+        class MetadataType extends Il2CppMetadataType {}
     }
 }

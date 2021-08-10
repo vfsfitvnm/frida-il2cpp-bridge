@@ -37,10 +37,6 @@ export class UnityVersion {
         return this.isBelow("2018.3.0");
     }
 
-    toString(): string {
-        return this.source;
-    }
-
     isEqual(other: string): boolean {
         return this.compare(other) == 0;
     }
@@ -73,5 +69,14 @@ export class UnityVersion {
         if (this.revision < other.revision) return -1;
 
         return 0;
+    }
+
+    /** @internal */
+    toJSON(): string {
+        return this.toString();
+    }
+
+    toString(): string {
+        return this.source;
     }
 }

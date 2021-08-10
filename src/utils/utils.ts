@@ -113,3 +113,8 @@ export function redefineProperty<T extends object, K extends keyof T>(
 export function formatNativePointer(nativePointer: NativePointer): string {
     return `0x${nativePointer.toString(16).padStart(8, "0")}`;
 }
+
+/** @internal */
+export function getOrNull<T extends ObjectWrapper>(handle: NativePointer, Class: new (handle: NativePointer) => T): T | null {
+    return handle.isNull() ? null : new Class(handle);
+}

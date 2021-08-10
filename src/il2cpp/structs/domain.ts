@@ -1,25 +1,24 @@
 import { cache } from "decorator-cache-getter";
 
-import { Api } from "../api";
-import { injectToIl2Cpp } from "../decorators";
-
-import { getOrNull, NativeStruct } from "../../utils/native-struct";
-import { addLevenshtein } from "../../utils/utils";
+import { NativeStruct } from "../../utils/native-struct";
+import { addLevenshtein, getOrNull } from "../../utils/utils";
 import { warn } from "../../utils/console";
 
-@injectToIl2Cpp("Domain")
+/** Represents a `Il2CppDomain`. */
 class Il2CppDomain extends NativeStruct {
+    /** Gets the current application domain. */
     @cache
     static get reference(): Il2Cpp.Domain {
-        return new Il2Cpp.Domain(Api._domainGet());
+        return new Il2Cpp.Domain(Il2Cpp.Api._domainGet());
     }
 
+    /** Gets the assemblies that have been loaded into the execution context of this domain. */
     @cache
     get assemblies(): Readonly<Record<string, Il2Cpp.Assembly>> {
         const record: Record<string, Il2Cpp.Assembly> = {};
 
         const sizePointer = Memory.alloc(Process.pointerSize);
-        const startPointer = Api._domainGetAssemblies(this, sizePointer);
+        const startPointer = Il2Cpp.Api._domainGetAssemblies(this, sizePointer);
 
         const count = sizePointer.readInt();
 
@@ -47,12 +46,22 @@ class Il2CppDomain extends NativeStruct {
         return addLevenshtein(record);
     }
 
+    /** Gets the name of the current application domain. */
     @cache
     get name(): string {
-        return Api._domainGetName(this).readUtf8String()!;
+        return Il2Cpp.Api._domainGetName(this).readUtf8String()!;
     }
 
+    /** Opens and loads the assembly with the given name. */
     open(assemblyName: string): Il2Cpp.Assembly | null {
-        return getOrNull(Api._domainAssemblyOpen(this, Memory.allocUtf8String(assemblyName)), Il2Cpp.Assembly);
+        return getOrNull(Il2Cpp.Api._domainAssemblyOpen(this, Memory.allocUtf8String(assemblyName)), Il2Cpp.Assembly);
+    }
+}
+
+Il2Cpp.Domain = Il2CppDomain;
+
+declare global {
+    namespace Il2Cpp {
+        class Domain extends Il2CppDomain {}
     }
 }
