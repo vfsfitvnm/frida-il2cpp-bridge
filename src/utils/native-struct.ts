@@ -33,8 +33,3 @@ export class NonNullNativeStruct extends NativeStruct {
         }
     }
 }
-
-/** @internal */
-export function getOrNull<T extends ObjectWrapper>(handle: NativePointer, Class: new (handle: NativePointer) => T): T | null {
-    return handle.isNull() ? null : new Class(handle);
-}

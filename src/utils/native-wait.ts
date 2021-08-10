@@ -50,11 +50,11 @@ class Target {
 }
 
 /** @internal */
-export function forModule(moduleName: string): Promise<Module> {
-    return new Promise<Module>(resolve => {
+export function forModule(moduleName: string): Promise<void> {
+    return new Promise<void>(resolve => {
         const module = Process.findModuleByName(moduleName);
         if (module != null) {
-            resolve(module);
+            resolve();
         } else {
             const interceptors = Target.targets.map(target =>
                 Interceptor.attach(target.address, {
@@ -64,7 +64,7 @@ export function forModule(moduleName: string): Promise<Module> {
                     onLeave(returnValue: InvocationReturnValue) {
                         if (!returnValue.isNull() && this.modulePath.endsWith(moduleName)) {
                             setTimeout(() => interceptors.forEach(i => i.detach()));
-                            resolve(Process.getModuleByName(moduleName));
+                            resolve();
                         }
                     }
                 })

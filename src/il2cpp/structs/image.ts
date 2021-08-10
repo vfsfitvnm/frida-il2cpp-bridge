@@ -1,28 +1,31 @@
 import { cache } from "decorator-cache-getter";
 
-import { Api } from "../api";
-import { injectToIl2Cpp, since } from "../decorators";
+import { since } from "../decorators";
 
-import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
-import { addLevenshtein } from "../../utils/utils";
+import { NonNullNativeStruct } from "../../utils/native-struct";
+import { addLevenshtein, getOrNull } from "../../utils/utils";
 
-@injectToIl2Cpp("Image")
+/** Represents a `Il2CppImage`. */
 class Il2CppImage extends NonNullNativeStruct {
+    /** Gets the COR library. */
     static get corlib(): Il2Cpp.Image {
-        return new Il2Cpp.Image(Api._getCorlib());
+        return new Il2Cpp.Image(Il2Cpp.Api._getCorlib());
     }
 
+    /** Gets the assembly in which the current image is defined. */
     @cache
     @since("2018.1.0")
     get assembly(): Il2Cpp.Assembly {
-        return new Il2Cpp.Assembly(Api._imageGetAssembly(this));
+        return new Il2Cpp.Assembly(Il2Cpp.Api._imageGetAssembly(this));
     }
 
+    /** Gets the amount of classes defined in this image. */
     @cache
     get classCount(): number {
-        return Api._imageGetClassCount(this);
+        return Il2Cpp.Api._imageGetClassCount(this);
     }
 
+    /** Gets the classes defined in this image. */
     @cache
     get classes(): Readonly<Record<string, Il2Cpp.Class>> {
         const record: Record<string, Il2Cpp.Class> = {};
@@ -35,14 +38,14 @@ class Il2CppImage extends NonNullNativeStruct {
             globalIndex.add(Il2Cpp.Type.offsetOfTypeEnum).writeInt(0x20);
 
             for (let i = start; i < end; i++) {
-                const klass = new Il2Cpp.Class(Api._typeGetClassOrElementClass(globalIndex.writeInt(i)));
+                const klass = new Il2Cpp.Class(Il2Cpp.Api._typeGetClassOrElementClass(globalIndex.writeInt(i)));
                 record[klass.type!.name!] = klass;
             }
         } else {
             const end = this.classCount;
 
             for (let i = 0; i < end; i++) {
-                const klass = new Il2Cpp.Class(Api._imageGetClass(this, i));
+                const klass = new Il2Cpp.Class(Il2Cpp.Api._imageGetClass(this, i));
                 record[klass.type.name] = klass;
             }
         }
@@ -50,17 +53,28 @@ class Il2CppImage extends NonNullNativeStruct {
         return addLevenshtein(record);
     }
 
+    /** Gets the index of the first class defined in this image. */
     @cache
     get classStart(): number {
-        return Api._imageGetClassStart(this);
+        return Il2Cpp.Api._imageGetClassStart(this);
     }
 
+    /** Gets the name of this image. */
     @cache
     get name(): string {
-        return Api._imageGetName(this).readUtf8String()!;
+        return Il2Cpp.Api._imageGetName(this).readUtf8String()!;
     }
 
+    /** Gets the class with the specified namespace and name defined in this image. */
     getClassFromName(namespace: string, name: string): Il2Cpp.Class | null {
-        return getOrNull(Api._classFromName(this, Memory.allocUtf8String(namespace), Memory.allocUtf8String(name)), Il2Cpp.Class);
+        return getOrNull(Il2Cpp.Api._classFromName(this, Memory.allocUtf8String(namespace), Memory.allocUtf8String(name)), Il2Cpp.Class);
+    }
+}
+
+Il2Cpp.Image = Il2CppImage;
+
+declare global {
+    namespace Il2Cpp {
+        class Image extends Il2CppImage {}
     }
 }

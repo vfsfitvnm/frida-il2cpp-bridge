@@ -1,21 +1,21 @@
 import { cache } from "decorator-cache-getter";
 
-import { Api } from "../api";
-import { injectToIl2Cpp } from "../decorators";
-
 import { NonNullNativeStruct } from "../../utils/native-struct";
 
-@injectToIl2Cpp("MemorySnapshot")
+/** Represents a `Il2CppMemorySnapshot`. */
 class Il2CppMemorySnapshot extends NonNullNativeStruct {
+    /** Captures a memory snapshot. */
     static capture(): Il2Cpp.MemorySnapshot {
-        return new Il2Cpp.MemorySnapshot(Api._memorySnapshotCapture());
+        return new Il2Cpp.MemorySnapshot(Il2Cpp.Api._memorySnapshotCapture());
     }
 
+    /** */
     @cache
     get metadataSnapshot(): Il2Cpp.MetadataSnapshot {
-        return new Il2Cpp.MetadataSnapshot(Api._memorySnapshotGetMetadataSnapshot(this));
+        return new Il2Cpp.MetadataSnapshot(Il2Cpp.Api._memorySnapshotGetMetadataSnapshot(this));
     }
 
+    /** Gets the objects tracked by this memory snapshot. */
     @cache
     get objects(): Il2Cpp.Object[] {
         const objects: Il2Cpp.Object[] = [];
@@ -30,17 +30,28 @@ class Il2CppMemorySnapshot extends NonNullNativeStruct {
         return objects;
     }
 
+    /** Gets a pointer to the first object tracked in this memory snapshot. */
     @cache
     get objectsPointer(): NativePointer {
-        return Api._memorySnapshotGetObjects(this);
+        return Il2Cpp.Api._memorySnapshotGetObjects(this);
     }
 
+    /** Gets the amount of objects tracked in this memory snapshot. */
     @cache
     get trackedObjectCount(): UInt64 {
-        return Api._memorySnapshotGetTrackedObjectCount(this);
+        return Il2Cpp.Api._memorySnapshotGetTrackedObjectCount(this);
     }
 
+    /** Frees this memory snapshot. */
     free(): void {
-        Api._memorySnapshotFree(this);
+        Il2Cpp.Api._memorySnapshotFree(this);
+    }
+}
+
+Il2Cpp.MemorySnapshot = Il2CppMemorySnapshot;
+
+declare global {
+    namespace Il2Cpp {
+        class MemorySnapshot extends Il2CppMemorySnapshot {}
     }
 }

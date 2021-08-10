@@ -1,35 +1,38 @@
-import { injectToIl2Cpp } from "./decorators";
-
 import { inform } from "../utils/console";
 import { formatNativePointer } from "../utils/utils";
+import kleur from "kleur";
 
-@injectToIl2Cpp("Tracer")
-class Tracer {
+/** Tracing utilities. */
+class Il2CppTracer {
+    protected constructor() {}
+
+    /** Reports method invocations, input arguments, returns and return values. */
     static fullWithValuesTrace(...targets: Il2Cpp.Tracer.Targets): void {
         let counter = 0;
 
         this.trace((method: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
-            const at = `\x1b[37m${formatNativePointer(method.relativeVirtualAddress)}\x1b[0m`;
-            const sign = `${method.class.type.name}.\x1b[1m${method.name}\x1b[0m`;
+            const at = kleur.white(formatNativePointer(method.relativeVirtualAddress));
+            const sign = `${method.class.type.name}.${kleur.bold(method.name)}`;
             const _parametersInfo = Object.values(method.parameters);
 
             return {
                 onEnter(...parameters: Il2Cpp.Parameter.Type[]): void {
                     const parametersInfo = parameters
                         .map((value: Il2Cpp.Parameter.Type, index: number) => {
-                            return `\x1b[34m${_parametersInfo[index].type.name}\x1b[0m \x1b[33m${_parametersInfo[index].name}\x1b[0m = \x1b[36m${value}\x1b[0m`;
+                            const _param = _parametersInfo[index];
+                            return `${kleur.blue(_param.type.name)} ${kleur.yellow(_param.name)} = ${kleur.cyan(value + "")}`;
                         })
                         .join(", ");
 
-                    inform(`${at} ${"│ ".repeat(counter)}┌─\x1b[31m${sign}\x1b[0m\x1b[33m(\x1b[0m${parametersInfo}\x1b[33m)\x1b[0m`);
+                    inform(`${at} ${"│ ".repeat(counter)}┌─${kleur.red(sign)}${kleur.yellow("(")}${parametersInfo}${kleur.yellow(")")}`);
                     counter += 1;
                 },
                 onLeave(returnValue: Il2Cpp.Method.ReturnType): void {
                     counter -= 1;
                     inform(
-                        `${at} ${"│ ".repeat(counter)}└─\x1b[32m${sign}\x1b[0m \x1b[35m${
-                            method.returnType.name
-                        }\x1b[0m = \x1b[36m${returnValue}\x1b[0m`
+                        `${at} ${"│ ".repeat(counter)}└─${kleur.green(sign)} ${kleur.magenta(method.returnType.name)} = ${kleur.cyan(
+                            returnValue + ""
+                        )}`
                     );
                     if (counter == 0) {
                         console.log();
@@ -39,21 +42,22 @@ class Tracer {
         }, ...targets);
     }
 
+    /** Reports method invocations and returns. */
     static fullTrace(...targets: Il2Cpp.Tracer.Targets): void {
         let counter = 0;
 
         this.trace((method: Il2Cpp.Method) => {
-            const at = `\x1b[37m${formatNativePointer(method.relativeVirtualAddress)}\x1b[0m`;
-            const sign = `${method.class.type.name}.\x1b[1m${method.name}\x1b[0m`;
+            const at = kleur.white(formatNativePointer(method.relativeVirtualAddress));
+            const sign = `${method.class.type.name}.${kleur.bold(method.name)}`;
 
             return {
                 onEnter() {
-                    inform(`${at} ${"│ ".repeat(counter)}┌─\x1b[31m${sign}\x1b[0m`);
+                    inform(`${at} ${"│ ".repeat(counter)}┌─${kleur.red(sign)}`);
                     counter += 1;
                 },
                 onLeave() {
                     counter -= 1;
-                    inform(`${at} ${"│ ".repeat(counter)}└─\x1b[32m${sign}\x1b[0m`);
+                    inform(`${at} ${"│ ".repeat(counter)}└─${kleur.green(sign)}`);
 
                     if (counter == 0) {
                         console.log();
@@ -63,20 +67,20 @@ class Tracer {
         }, ...targets);
     }
 
+    /** Reports method invocations. */
     static simpleTrace(...targets: Il2Cpp.Tracer.Targets): void {
         this.trace((method: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
+            const at = kleur.white(formatNativePointer(method.relativeVirtualAddress));
+            const sign = `${method.class.type.name}.${kleur.bold(method.name)}`;
             return {
                 onEnter() {
-                    inform(
-                        `\x1b[37m${formatNativePointer(method.relativeVirtualAddress)}\x1b[0m ${method.class.type.name}.\x1b[1m${
-                            method.name
-                        }\x1b[0m`
-                    );
+                    inform(`${at} ${sign}`);
                 }
             };
         }, ...targets);
     }
 
+    /** Traces the given methods. */
     static trace(callbacksGenerator: (method: Il2Cpp.Method) => Il2Cpp.Tracer.Callbacks, ...targets: Il2Cpp.Tracer.Targets): void {
         function applyMethodImplementation(method: Il2Cpp.Method): void {
             if (method.virtualAddress.isNull()) {
@@ -113,6 +117,23 @@ class Tracer {
             } else {
                 applyMethodImplementation(target);
             }
+        }
+    }
+}
+
+Il2Cpp.Tracer = Il2CppTracer;
+
+declare global {
+    namespace Il2Cpp {
+        class Tracer extends Il2CppTracer {}
+
+        namespace Tracer {
+            type Callbacks = RequireAtLeastOne<{
+                onEnter?: (...parameters: Il2Cpp.Parameter.Type[]) => void;
+                onLeave?: (returnValue: Il2Cpp.Method.ReturnType) => void;
+            }>;
+
+            type Targets = (Il2Cpp.Method | Il2Cpp.Class)[];
         }
     }
 }
