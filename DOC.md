@@ -34,19 +34,14 @@ This is a Frida TypeScript module, so it follows any other TypeScript (`npm`) pr
 This is how it should looke like:
 
 **index.ts** \
-This is where you write the code. `frida-il2cpp-bridge` needs to be initialized asynchronously, hence the `async` block
-(you can use `Promise` as well, of course).
+This is where you write the code. More info [here](#initialization).
 
 ```ts
 import "frida-il2cpp-bridge";
 
-async function main() {
-    await Il2Cpp.initialize();
-
-    // <code>
-}
-
-main().catch(error => console.log(error.stack));
+Il2Cpp.perform(() => {
+    // code here
+});
 ```
 
 **packages.json** \
