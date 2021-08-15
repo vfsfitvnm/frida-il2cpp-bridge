@@ -1,11 +1,13 @@
 {
   "name": "frida-il2cpp-bridge",
   "version": "0.5.0",
-  "description": "Frida module to dump, manipulate and hijack any IL2CPP application at runtime with a high level of abstraction.",
+  "description": "A Frida module to dump, trace or hijack any Il2Cpp application at runtime with a high level of abstraction, without needing the global-metadata.dat file.",
   "keywords": [
     "frida",
     "il2cpp",
-    "global-metadata.dat"
+    "dump",
+    "trace",
+    "global-metadata"
   ],
   "module": "./dist/index.js",
   "main": "./dist/index.js",
@@ -17,7 +19,7 @@
     "build": "tsc"
   },
   "author": "vfsfitvnm",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/vfsfitvnm/frida-il2cpp-bridge.git"
