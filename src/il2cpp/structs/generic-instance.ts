@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
 
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { addLevenshtein } from "../../utils/utils";
+import { addLevenshtein, makeIterable } from "../../utils/utils";
 
 /** Represents a `Il2CppGenericInst`. */
 class Il2CppGenericInstance extends NonNullNativeStruct {
@@ -13,7 +13,7 @@ class Il2CppGenericInstance extends NonNullNativeStruct {
 
     /** */
     @cache
-    get types(): Readonly<Record<string, Il2Cpp.Type>> {
+    get types(): IterableRecord<Il2Cpp.Type> {
         const record: Record<string, Il2Cpp.Type> = {};
 
         const startPointer = Il2Cpp.Api._genericInstanceGetTypes(this);
@@ -23,7 +23,7 @@ class Il2CppGenericInstance extends NonNullNativeStruct {
             record[type.name] = type;
         }
 
-        return addLevenshtein(record);
+        return makeIterable(addLevenshtein(record));
     }
 }
 

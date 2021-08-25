@@ -1,7 +1,9 @@
 import { cache } from "decorator-cache-getter";
 
+import { since } from "../decorators";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { addLevenshtein, formatNativePointer, getOrNull, preventKeyClash } from "../../utils/utils";
+import { addLevenshtein, getOrNull, makeIterable, preventKeyClash } from "../../utils/utils";
+import { raise } from "../../utils/console";
 
 /** Represents a `Il2CppClass`. */
 class Il2CppClass extends NonNullNativeStruct {
@@ -37,13 +39,13 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the amount of the fields of the current class. */
     @cache
-    get fieldCount(): number {
+    get fieldCount(): UInt64 {
         return Il2Cpp.Api._classGetFieldCount(this);
     }
 
     /** Gets the fields of the current class. */
     @cache
-    get fields(): Readonly<Record<string, Il2Cpp.Field>> {
+    get fields(): IterableRecord<Il2Cpp.Field> {
         const iterator = Memory.alloc(Process.pointerSize);
         const record: Record<string, Il2Cpp.Field> = {};
 
@@ -55,13 +57,25 @@ class Il2CppClass extends NonNullNativeStruct {
             record[field.name!] = field;
         }
 
-        return addLevenshtein(record);
+        return makeIterable(addLevenshtein(record));
+    }
+
+    /** Gets the flags of the current class. */
+    @cache
+    get flags(): number {
+        return Il2Cpp.Api._classGetFlags(this);
     }
 
     /** Determines whether the current class has a class constructor. */
     @cache
     get hasClassConstructor(): boolean {
         return !!Il2Cpp.Api._classHasClassConstructor(this);
+    }
+
+    /** Determines whether the GC has tracking references to the current class instances. */
+    @cache
+    get hasReferences(): boolean {
+        return !!Il2Cpp.Api._classHasReferences(this);
     }
 
     /** Gets the image in which the current class is defined. */
@@ -76,6 +90,18 @@ class Il2CppClass extends NonNullNativeStruct {
         return Il2Cpp.Api._classGetInstanceSize(this);
     }
 
+    /** Determines whether the current class is abstract. */
+    @cache
+    get isAbstract(): boolean {
+        return !!Il2Cpp.Api._classIsAbstract(this);
+    }
+
+    /** Determines whether the current class is blittable. */
+    @cache
+    get isBlittable(): boolean {
+        return !!Il2Cpp.Api._classIsBlittable(this);
+    }
+
     /** Determines whether the current class is an enumeration. */
     @cache
     get isEnum(): boolean {
@@ -88,7 +114,7 @@ class Il2CppClass extends NonNullNativeStruct {
         return !!Il2Cpp.Api._classIsGeneric(this);
     }
 
-    /** */
+    /** Determines whether the current class is inflated. */
     @cache
     get isInflated(): boolean {
         return !!Il2Cpp.Api._classIsInflated(this);
@@ -119,7 +145,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the interfaces implemented or inherited by the current class. */
     @cache
-    get interfaces(): Readonly<Record<string, Il2Cpp.Class>> {
+    get interfaces(): IterableRecord<Il2Cpp.Class> {
         const iterator = Memory.alloc(Process.pointerSize);
         const record: Record<string, Il2Cpp.Class> = {};
 
@@ -131,7 +157,7 @@ class Il2CppClass extends NonNullNativeStruct {
             record[klass.type.name] = klass;
         }
 
-        return addLevenshtein(record);
+        return makeIterable(addLevenshtein(record));
     }
 
     /** Gets the amount of the implemented methods by the current class. */
@@ -142,7 +168,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the methods implemented by the current class. */
     @cache
-    get methods(): Readonly<Record<string, Il2Cpp.Method>> {
+    get methods(): IterableRecord<Il2Cpp.Method> {
         const iterator = Memory.alloc(Process.pointerSize);
         const record: Record<string, Il2Cpp.Method> = preventKeyClash({});
 
@@ -154,7 +180,7 @@ class Il2CppClass extends NonNullNativeStruct {
             record[method.name] = method;
         }
 
-        return addLevenshtein(record);
+        return makeIterable(addLevenshtein(record));
     }
 
     /** Gets the name of the current class. */
@@ -175,16 +201,44 @@ class Il2CppClass extends NonNullNativeStruct {
         return getOrNull(Il2Cpp.Api._classGetParent(this), Il2Cpp.Class);
     }
 
+    /** Gets the rank (number of dimensions) of the current array class. */
+    @cache
+    get rank(): number {
+        return Il2Cpp.Api._classGetRank(this);
+    }
+
     /** Gets a pointer to the static fields of the current class. */
     @cache
     get staticFieldsData(): NativePointer {
         return Il2Cpp.Api._classGetStaticFieldData(this);
     }
 
+    /** */
+    @cache
+    get valueSize(): number {
+        return Il2Cpp.Api._classGetValueSize(this, NULL);
+    }
+
     /** Gets the type of the current class. */
     @cache
     get type(): Il2Cpp.Type {
         return new Il2Cpp.Type(Il2Cpp.Api._classGetType(this));
+    }
+
+    /** */
+    inflate(...classes: Il2Cpp.Class[]): Il2Cpp.Class {
+        if (!this.isGeneric) {
+            raise(`Cannot inflate ${this.type.name} because it's not generic.`);
+        }
+
+        const typeArray = Il2Cpp.Array.from(
+            Il2Cpp.Image.corlib.classes["System.RuntimeType"],
+            classes.map(klass => klass.type.object)
+        );
+        const inflatedType = this.type.object.methods.MakeGenericType.invoke<Il2Cpp.Object>(typeArray);
+        
+        // TODO: typeArray leaks
+        return new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(inflatedType));
     }
 
     /** Calls the static constructor of the current class. */
@@ -203,48 +257,42 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     override toString(): string {
-        const spacer = "\n    ";
-        let text = "// " + this.image.name + "\n";
-        text += this.isEnum ? "enum" : this.isValueType ? "struct" : this.isInterface ? "interface" : "class";
-        text += " " + this.type.name;
-        if (this.parent != null || this.interfaceCount > 0) text += " : ";
-        if (this.parent != null) {
-            text += this.parent.type.name;
-            if (this.interfaceCount > 0) text += ", ";
-        }
-        if (this.interfaceCount > 0) text += Object.keys(this.interfaces).join(", ");
-        text += "\n{";
-        for (const field of Object.values(this.fields)) {
-            text += spacer;
-            if (field.isStatic) text += "static ";
-            text += field.type.name + " " + field.name;
-            if (field.isLiteral) {
-                if (field.type.class.isEnum) {
-                    text += " = " + field.valueHandle.readS32();
-                } else {
-                    text += " = " + field.value;
-                }
-            }
-            text += ";";
-            if (!field.isLiteral) {
-                text += " // 0x" + field.offset.toString(16);
-            }
-        }
-        if (this.fieldCount && this.methodCount > 0) text += "\n";
+        let fieldsString = "";
+        let methodsString = "";
 
-        for (const method of Object.values(this.methods)) {
-            text += spacer;
-            if (method.isStatic) text += "static ";
-            text += method.returnType.name + " " + method.name + "(";
-            for (const parameter of Object.values(method.parameters)) {
-                if (parameter.position > 0) text += ", ";
-                text += parameter.type.name + " " + parameter.name;
-            }
-            text += ");";
-            if (!method.virtualAddress.isNull()) text += " // " + formatNativePointer(method.relativeVirtualAddress);
-        }
-        text += "\n}\n\n";
-        return text;
+        for (const field of this.fields) fieldsString += "\n    " + field;
+        for (const method of this.methods) methodsString += "\n    " + method;
+
+        return (
+            "// " +
+            this.image.name +
+            "\n" +
+            (this.isEnum ? "enum" : this.isValueType ? "struct" : this.isInterface ? "interface" : "class") +
+            " " +
+            this.type.name +
+            (this.parent != null || this.interfaceCount > 0 ? " : " : "") +
+            (this.parent != null ? this.parent.type.name + (this.interfaceCount > 0 ? ", " : "") : "") +
+            (this.interfaceCount > 0 ? Object.keys(this.interfaces).join(", ") : "") +
+            "\n{" +
+            fieldsString +
+            (this.fieldCount.toNumber() > 0 && this.methodCount > 0 ? "\n" : "") +
+            methodsString +
+            "\n}\n\n"
+        );
+    }
+
+    /** */
+    @since("2019.3.0")
+    static enumerate(block: (klass: Il2Cpp.Class) => void): void {
+        const callback = new NativeCallback(
+            function (klass: NativePointer, _: NativePointer): void {
+                block(new Il2Cpp.Class(klass));
+            },
+            "void",
+            ["pointer", "pointer"]
+        );
+
+        return Il2Cpp.Api._classForEach(callback, NULL);
     }
 }
 

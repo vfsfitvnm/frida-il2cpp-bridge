@@ -15,6 +15,12 @@ class Il2CppField extends NonNullNativeStruct {
         return new Il2Cpp.Class(Il2Cpp.Api._fieldGetClass(this));
     }
 
+    /** Gets the flags of the current field. */
+    @cache
+    get flags(): number {
+        return Il2Cpp.Api._fieldGetFlags(this);
+    }
+
     /** Determines whether this field value is written at compile time. */
     @cache
     get isLiteral(): boolean {
@@ -86,6 +92,18 @@ class Il2CppField extends NonNullNativeStruct {
         }
 
         return overridePropertyValue(new Il2Cpp.Field(this.handle), "valueHandle", valueHandle);
+    }
+
+    override toString(): string {
+        return (
+            (this.isStatic ? "static " : "") +
+            this.type.name +
+            " " +
+            this.name +
+            (this.isLiteral
+                ? " = " + (this.type.class.isEnum ? this.valueHandle.readS32() : this.value) + ";"
+                : "; // 0x" + this.offset.toString(16))
+        );
     }
 }
 

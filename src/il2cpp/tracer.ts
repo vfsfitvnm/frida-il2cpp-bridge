@@ -1,6 +1,7 @@
+import kleur from "kleur";
+
 import { inform } from "../utils/console";
 import { formatNativePointer } from "../utils/utils";
-import kleur from "kleur";
 
 /** Tracing utilities. */
 class Il2CppTracer {

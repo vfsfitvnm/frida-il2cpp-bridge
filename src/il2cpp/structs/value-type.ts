@@ -3,7 +3,7 @@ import { cache } from "decorator-cache-getter";
 import { checkNull } from "../decorators";
 
 import { NativeStruct } from "../../utils/native-struct";
-import { addLevenshtein, filterMap } from "../../utils/utils";
+import { addLevenshtein, filterMap, makeIterable } from "../../utils/utils";
 
 /** */
 class Il2CppValueType extends NativeStruct {
@@ -14,12 +14,14 @@ class Il2CppValueType extends NativeStruct {
 
     /** */
     @cache
-    get fields(): Readonly<Record<string, Il2Cpp.Field>> {
-        return addLevenshtein(
-            filterMap(
-                this.type.class.fields,
-                (field: Il2Cpp.Field) => !field.isStatic,
-                (field: Il2Cpp.Field) => field.withHolder(this)
+    get fields(): IterableRecord<Il2Cpp.Field> {
+        return makeIterable(
+            addLevenshtein(
+                filterMap(
+                    this.type.class.fields,
+                    (field: Il2Cpp.Field) => !field.isStatic,
+                    (field: Il2Cpp.Field) => field.withHolder(this)
+                )
             )
         );
     }

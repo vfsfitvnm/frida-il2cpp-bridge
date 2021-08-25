@@ -10,14 +10,14 @@ class Il2CppDumper {
     /** */
     @cache
     static get directoryPath(): string {
-        const UnityEngine = getUntilFound(Il2Cpp.Domain.reference.assemblies, "UnityEngine.CoreModule", "UnityEngine")!.image;
+        const UnityEngine = getUntilFound(Il2Cpp.Domain.assemblies, "UnityEngine.CoreModule", "UnityEngine")!.image;
         const Application = UnityEngine.classes["UnityEngine.Application"];
         return Application.methods.get_persistentDataPath.invoke<Il2Cpp.String>().content!;
     }
 
     /** */
     static get fileName(): string {
-        const UnityEngine = getUntilFound(Il2Cpp.Domain.reference.assemblies, "UnityEngine.CoreModule", "UnityEngine")!.image;
+        const UnityEngine = getUntilFound(Il2Cpp.Domain.assemblies, "UnityEngine.CoreModule", "UnityEngine")!.image;
         const Application = UnityEngine.classes["UnityEngine.Application"];
 
         try {
@@ -33,7 +33,7 @@ class Il2CppDumper {
     static classicDump(fileName?: string, destinationDirectoryPath?: string): void {
         this.dump(
             function* (): Generator<string> {
-                for (const assembly of Object.values(Il2Cpp.Domain.reference.assemblies)) {
+                for (const assembly of Il2Cpp.Domain.assemblies) {
                     inform(`Dumping \x1b[1m${assembly.name}\x1b[0m...`);
                     for (const klass of Object.values(assembly.image.classes)) {
                         yield klass.toString();

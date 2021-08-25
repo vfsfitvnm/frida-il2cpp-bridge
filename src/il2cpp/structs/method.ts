@@ -3,16 +3,25 @@ import { cache } from "decorator-cache-getter";
 import { shouldBeInstance } from "../decorators";
 import { fromFridaValue, toFridaValue } from "../utils";
 
-import { addLevenshtein, overridePropertyValue } from "../../utils/utils";
+import { addLevenshtein, formatNativePointer, makeIterable, overridePropertyValue } from "../../utils/utils";
 import { raise, warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 
 /** Represents a `MethodInfo`. */
 class Il2CppMethod extends NonNullNativeStruct {
-    /** Gets the class in which this field is defined. */
+    /** Gets the class in which this method is defined. */
     @cache
     get class(): Il2Cpp.Class {
         return new Il2Cpp.Class(Il2Cpp.Api._methodGetClass(this));
+    }
+
+    /** Gets the flags (and implementation flags) of the current method. */
+    @cache
+    get flags(): [number, number] {
+        const implementationFlagsPointer = Memory.alloc(Process.pointerSize);
+        const flags = Il2Cpp.Api._methodGetFlags(this, implementationFlagsPointer);
+
+        return [flags, implementationFlagsPointer.readU32()];
     }
 
     /** */
@@ -72,7 +81,7 @@ class Il2CppMethod extends NonNullNativeStruct {
 
     /** Gets the parameters of this method. */
     @cache
-    get parameters(): Readonly<Record<string, Il2Cpp.Parameter>> {
+    get parameters(): IterableRecord<Il2Cpp.Parameter> {
         const iterator = Memory.alloc(Process.pointerSize);
         const accessor: Record<string, Il2Cpp.Parameter> = {};
 
@@ -84,7 +93,7 @@ class Il2CppMethod extends NonNullNativeStruct {
             accessor[parameter.name!] = parameter;
         }
 
-        return addLevenshtein(accessor);
+        return makeIterable(addLevenshtein(accessor));
     }
 
     /** Gets the relative virtual address (RVA) of this method. */
@@ -138,6 +147,23 @@ class Il2CppMethod extends NonNullNativeStruct {
         }
     }
 
+    /** */
+    inflate(...classes: Il2Cpp.Class[]): Il2Cpp.Method {
+        if (!this.isGeneric) {
+            raise(`Cannot inflate ${this.name} because it's not generic.`);
+        }
+
+        const typeArray = Il2Cpp.Array.from(
+            Il2Cpp.Image.corlib.classes["System.RuntimeType"],
+            classes.map(klass => klass.type.object)
+        );
+        
+        const inflatedMethodObject = this.object.methods.MakeGenericMethod.invoke<Il2Cpp.Object>(typeArray);
+        
+        // TODO: will typeArray leak?
+        return new Il2Cpp.Method(Il2Cpp.Api._methodGetFromReflection(inflatedMethodObject));
+    }
+
     /** Invokes this method. */
     @shouldBeInstance(false)
     invoke<T extends Il2Cpp.Method.ReturnType>(...parameters: Il2Cpp.Parameter.Type[]): T {
@@ -147,7 +173,7 @@ class Il2CppMethod extends NonNullNativeStruct {
     /** @internal */
     invokeRaw(instance: NativePointer, ...parameters: Il2Cpp.Parameter.Type[]): Il2Cpp.Method.ReturnType {
         if (this.parameterCount != parameters.length) {
-            raise(`This method takes ${this.parameterCount} parameters, but ${parameters.length} were supplied.`);
+            raise(`${this.name} requires ${this.parameterCount} parameters, but ${parameters.length} were supplied.`);
         }
 
         const allocatedParameters = Object.values(this.parameters).map((parameter: Il2Cpp.Parameter, index: number) =>
@@ -178,6 +204,19 @@ class Il2CppMethod extends NonNullNativeStruct {
             <T extends Il2Cpp.Method.ReturnType>(...parameters: Il2Cpp.Parameter.Type[]): T => {
                 return this.invokeRaw(instance.handle, ...parameters) as T;
             }
+        );
+    }
+
+    override toString(): string {
+        return (
+            (this.isStatic ? "static " : "") +
+            this.returnType.name +
+            " " +
+            this.name +
+            "(" +
+            Object.values(this.parameters).join(", ") +
+            ");" +
+            (this.virtualAddress.isNull() ? "" : " // " + formatNativePointer(this.relativeVirtualAddress))
         );
     }
 }

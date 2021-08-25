@@ -1,6 +1,7 @@
 import { cache } from "decorator-cache-getter";
 
 import { NonNullNativeStruct } from "../../utils/native-struct";
+import { addLevenshtein, makeIterable } from "../../utils/utils";
 
 /** Represents a `Il2CppMetadataSnapshot`. */
 class Il2CppMetadataSnapshot extends NonNullNativeStruct {
@@ -12,7 +13,7 @@ class Il2CppMetadataSnapshot extends NonNullNativeStruct {
 
     /** */
     @cache
-    get metadataTypes(): Readonly<Record<string, Il2Cpp.MetadataType>> {
+    get metadataTypes(): IterableRecord<Il2Cpp.MetadataType> {
         const iterator = Memory.alloc(Process.pointerSize);
         const record: Record<string, Il2Cpp.MetadataType> = {};
 
@@ -23,7 +24,7 @@ class Il2CppMetadataSnapshot extends NonNullNativeStruct {
             record[metadataType.name] = metadataType;
         }
 
-        return record;
+        return makeIterable(addLevenshtein(record));
     }
 }
 

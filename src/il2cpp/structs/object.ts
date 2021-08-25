@@ -3,7 +3,7 @@ import { cache } from "decorator-cache-getter";
 import { checkNull } from "../decorators";
 
 import { NativeStruct } from "../../utils/native-struct";
-import { addLevenshtein, filterMap, overridePropertyValue } from "../../utils/utils";
+import { addLevenshtein, filterMap, getOrNull, makeIterable, overridePropertyValue } from "../../utils/utils";
 
 /** Represents a `Il2CppObject`. */
 class Il2CppObject extends NativeStruct {
@@ -32,26 +32,36 @@ class Il2CppObject extends NativeStruct {
 
     /** Gets the fields of this object. */
     @cache
-    get fields(): Readonly<Record<string, Il2Cpp.Field>> {
-        return addLevenshtein(
-            filterMap(
-                this.class.fields,
-                (field: Il2Cpp.Field) => !field.isStatic,
-                (field: Il2Cpp.Field) => field.withHolder(this)
+    get fields(): IterableRecord<Il2Cpp.Field> {
+        return makeIterable(
+            addLevenshtein(
+                filterMap(
+                    this.class.fields,
+                    (field: Il2Cpp.Field) => !field.isStatic,
+                    (field: Il2Cpp.Field) => field.withHolder(this)
+                )
             )
         );
     }
 
     /** Gets the methods of this object. */
     @cache
-    get methods(): Readonly<Record<string, Il2Cpp.Method>> {
-        return addLevenshtein(
-            filterMap(
-                this.class.methods,
-                (method: Il2Cpp.Method) => !method.isStatic,
-                (method: Il2Cpp.Method) => method.withHolder(this)
+    get methods(): IterableRecord<Il2Cpp.Method> {
+        return makeIterable(
+            addLevenshtein(
+                filterMap(
+                    this.class.methods,
+                    (method: Il2Cpp.Method) => !method.isStatic,
+                    (method: Il2Cpp.Method) => method.withHolder(this)
+                )
             )
         );
+    }
+
+    /** */
+    @cache
+    get size(): number {
+        return Il2Cpp.Api._objectGetSize(this);
     }
 
     /** Acquires an exclusive lock on the current object. */
@@ -62,6 +72,11 @@ class Il2CppObject extends NativeStruct {
     /** Release an exclusive lock on the current object. */
     exit(): void {
         return Il2Cpp.Api._monitorExit(this);
+    }
+
+    /** */
+    getVirtualMethod(method: Il2Cpp.Method): Il2Cpp.Method | null {
+        return getOrNull(Il2Cpp.Api._objectGetVirtualMethod(this, method), Il2Cpp.Method);
     }
 
     /** Notifies a thread in the waiting queue of a change in the locked object's state. */
@@ -110,16 +125,8 @@ class Il2CppObject extends NativeStruct {
         while (!("ToString" in object.methods)) {
             object = object.base;
         }
-        return object.methods.ToString.invoke<Il2Cpp.String>().content;
 
-        // if ("ToString" in this.methods) {
-        //     return this.methods.ToString.invoke<Il2Cpp.String>().content;
-        // } else {
-        // const UnityEngineJSONSerializeModule = Il2Cpp.Domain.reference.assemblies["UnityEngine.JSONSerializeModule"];
-        // return UnityEngineJSONSerializeModule.image.classes["UnityEngine.JsonUtility"].methods.ToJson_.invoke<Il2Cpp.String>(this, true)
-        //     .content;
-        // return `{ ${mapToArray(this.fields, (field: Il2Cpp.Field) => `${field.name} = ${field.value}`).join(", ")} }`;
-        // }
+        return object.methods.ToString.invoke<Il2Cpp.String>().content;
     }
 }
 

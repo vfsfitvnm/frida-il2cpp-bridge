@@ -171,7 +171,8 @@ function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueT
         return arr;
     }
 
-    const valueType = Memory.alloc(type.class.instanceSize - Il2Cpp.Object.headerSize);
+    // TODO: check if it's equal to (type.class.instanceSize - Il2Cpp.Object.headerSize)
+    const valueType = Memory.alloc(type.class.valueSize); 
 
     nativeValues = nativeValues.flat(Infinity);
     const typesAndOffsets = iter(type);

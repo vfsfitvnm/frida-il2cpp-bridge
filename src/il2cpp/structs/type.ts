@@ -6,12 +6,6 @@ import { warn } from "../../utils/console";
 
 /** Represents a `Il2CppType`. */
 class Il2CppType extends NonNullNativeStruct {
-    /** @internal */
-    @cache
-    static get offsetOfTypeEnum() {
-        return Il2Cpp.Api._typeOffsetOfTypeEnum();
-    }
-
     /** Gets the class of this type. */
     @cache
     get class(): Il2Cpp.Class {
