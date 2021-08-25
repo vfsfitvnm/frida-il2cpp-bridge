@@ -15,6 +15,18 @@ class Il2CppGC {
         return !Il2Cpp.Api._gcIsDisabled();
     }
 
+    /** Determines whether the garbage collector is incremental. */
+    @since("2019.1.0")
+    static get isIncremental(): boolean {
+        return !!Il2Cpp.Api._gcIsIncremental();
+    }
+
+    /** */
+    @since("2019.1.0", "2019.1.0")
+    static get maxTimeSlice(): Int64 {
+        return Il2Cpp.Api._gcGetMaxTimeSlice();
+    }
+
     /** Gets the used heap size in bytes. */
     static get usedHeapSize(): Int64 {
         return Il2Cpp.Api._gcGetUsedSize();
@@ -23,6 +35,11 @@ class Il2CppGC {
     /** Enables or disables the garbage collector. */
     static set isEnabled(value: boolean) {
         value ? Il2Cpp.Api._gcEnable() : Il2Cpp.Api._gcDisable();
+    }
+
+    /** */
+    static set maxTimeSlice(nanoseconds: number | Int64) {
+        Il2Cpp.Api._gcSetMaxTimeSlice(nanoseconds);
     }
 
     /** Returns the heap allocated objects of the specified class. This variant reads GC descriptors. */
@@ -54,6 +71,24 @@ class Il2CppGC {
     @since("5.3.5")
     static collectALittle(): void {
         Il2Cpp.Api._gcCollectALittle();
+    }
+
+    /** */
+    @since("2019.3.0")
+    static startWorld(): void {
+        return Il2Cpp.Api._gcStartWorld();
+    }
+
+    /** */
+    @since("2020.2.0")
+    static startIncrementalCollection(): void {
+        return Il2Cpp.Api._gcStartIncrementalCollection();
+    }
+
+    /** */
+    @since("2019.3.0")
+    static stopWorld(): void {
+        return Il2Cpp.Api._gcStopWorld();
     }
 }
 

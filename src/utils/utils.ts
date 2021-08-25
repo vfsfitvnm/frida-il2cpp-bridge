@@ -37,12 +37,23 @@ export function addLevenshtein<T extends PropertyKey, V>(object: Record<T, V>): 
 }
 
 /** @internal */
-export function getUntilFound<T extends PropertyKey, V>(record: Readonly<Record<T, V>>, ...keys: T[]): V | undefined {
+export function getUntilFound<V>(record: Record<string, V>, ...keys: string[]): V | undefined {
     for (const key of keys) {
         if (key in record) {
             return record[key];
         }
     }
+}
+
+/** @internal */
+export function makeIterable<V>(source: Record<string, V>): Record<string, V> & Iterable<V> {
+    Reflect.set(source, Symbol.iterator, function* () {
+        for (const value of Object.values(source)) {
+            yield value;
+        }
+    });
+
+    return source as any;
 }
 
 /** @internal */

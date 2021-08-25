@@ -4,10 +4,17 @@ import { UnityVersion } from "./version";
 
 import { platformNotSupported, raise, warn } from "../utils/console";
 import { forModule } from "../utils/native-wait";
+import { since } from "./decorators";
 
 /** */
 class Il2CppBase {
     protected constructor() {}
+
+    /** */
+    @since("2019.3.0")
+    static get allocationGranularity(): number {
+        return Il2Cpp.Api._allocationGranularity();
+    }
 
     /** @internal */
     static get il2CppModuleName(): string {
@@ -28,18 +35,32 @@ class Il2CppBase {
     /** The Unity version of the current application. */
     @cache
     static get unityVersion(): UnityVersion {
-        const range = Process.getRangeByAddress(Process.getModuleByName(this.unityModuleName).base);
+        const unityModule = Process.getModuleByName(this.unityModuleName);
+        const ranges = [...unityModule.enumerateRanges("r--"), Process.getRangeByAddress(unityModule.base)];
 
-        const address = Memory.scanSync(range.base, range.size, "45787065637465642076657273696f6e3a")[0].address;
-        const unityVersion = new UnityVersion(address.readUtf8String()!);
+        for (const range of ranges) {
+            const scan = Memory.scanSync(range.base, range.size, "45787065637465642076657273696f6e3a")[0];
+            
+            if (scan != undefined) {
+                const unityVersion = new UnityVersion(scan.address.readUtf8String()!);
 
-        if (unityVersion == undefined) {
-            raise("Couldn't obtain the Unity version.");
-        } else if (unityVersion.isBelow("5.3.0") || unityVersion.isEqualOrAbove("2021.1.0")) {
-            raise(`Unity version "${unityVersion}" is not valid or supported.`);
+                if (unityVersion.isBelow("5.3.0") || unityVersion.isEqualOrAbove("2021.2.0")) {
+                    raise(`Unity version "${unityVersion}" is not valid or supported.`);
+                }
+
+                return unityVersion;
+            }
         }
 
-        return unityVersion;
+        raise("Couldn't obtain the Unity version.");
+    }
+
+    static alloc(size: number | UInt64 = Process.pointerSize): NativePointer {
+        return Il2Cpp.Api._alloc(size);
+    }
+
+    static free(pointer: NativePointerValue): void {
+        return Il2Cpp.Api._free(pointer);
     }
 
     /** @internal Waits for Il2Cpp native libraries to be loaded and initialized. */
@@ -55,7 +76,7 @@ class Il2CppBase {
             await new Promise<void>(resolve => {
                 const interceptor = Interceptor.attach(Il2Cpp.Api._init, {
                     onLeave() {
-                        setTimeout(() => {
+                        setImmediate(() => {
                             interceptor.detach();
                             resolve();
                         });
@@ -68,16 +89,17 @@ class Il2CppBase {
     /** Attaches the caller thread to Il2Cpp domain and executes the given block.  */
     static perform(block: () => void): void {
         function executor() {
-            const isForeignThread = Il2Cpp.Api._threadCurrent().isNull();
+            let thread = Il2Cpp.Thread.current;
+            const isForeignThread = thread == null;
 
             if (isForeignThread) {
-                Il2Cpp.Api._threadAttach(Il2Cpp.Domain.reference);
+                thread = Il2Cpp.Domain.attach();
             }
 
             block();
 
             if (isForeignThread) {
-                Il2Cpp.Api._threadDetach(Il2Cpp.Api._threadCurrent());
+                thread?.detach();
             }
         }
 

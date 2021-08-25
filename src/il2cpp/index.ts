@@ -23,6 +23,7 @@ import "./structs/parameter";
 import "./structs/pointer";
 import "./structs/reference";
 import "./structs/string";
+import "./structs/thread";
 import "./structs/type";
 import "./structs/type-enum";
 import "./structs/value-type";

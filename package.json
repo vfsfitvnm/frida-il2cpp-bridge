@@ -1,7 +1,7 @@
 {
   "name": "frida-il2cpp-bridge",
-  "version": "0.5.0",
-  "description": "A Frida module to dump, trace or hijack any Il2Cpp application at runtime with a high level of abstraction, without needing the global-metadata.dat file.",
+  "version": "0.5.1",
+  "description": "A Frida module to dump, trace or hijack any Il2Cpp application at runtime, without needing the global-metadata.dat file.",
   "keywords": [
     "frida",
     "il2cpp",
@@ -9,8 +9,14 @@
     "trace",
     "global-metadata"
   ],
-  "module": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vfsfitvnm/frida-il2cpp-bridge.git"
+  },
+  "license": "MIT",
+  "author": "vfsfitvnm",
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
     "/dist/*"
@@ -18,26 +24,20 @@
   "scripts": {
     "build": "tsc"
   },
-  "author": "vfsfitvnm",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/vfsfitvnm/frida-il2cpp-bridge.git"
-  },
   "prettier": {
-    "tabWidth": 4,
     "arrowParens": "avoid",
-    "trailingComma": "none",
+    "bracketSpacing": true,
     "printWidth": 140,
-    "bracketSpacing": true
-  },
-  "devDependencies": {
-    "@types/frida-gum": "^17.1.0",
-    "prettier": "^2.3.2"
+    "tabWidth": 4,
+    "trailingComma": "none"
   },
   "dependencies": {
     "decorator-cache-getter": "^1.0.0",
     "fastest-levenshtein": "^1.0.12",
     "kleur": "^4.1.4"
+  },
+  "devDependencies": {
+    "@types/frida-gum": "^17.1.0",
+    "prettier": "^2.3.2"
   }
 }

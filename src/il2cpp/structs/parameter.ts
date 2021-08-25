@@ -21,6 +21,10 @@ class Il2CppParameter extends NonNullNativeStruct {
     get type(): Il2Cpp.Type {
         return new Il2Cpp.Type(Il2Cpp.Api._parameterGetType(this));
     }
+
+    override toString(): string {
+        return this.type.name + " " + this.name;
+    }
 }
 
 Il2Cpp.Parameter = Il2CppParameter;
