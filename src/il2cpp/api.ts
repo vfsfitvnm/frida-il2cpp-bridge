@@ -126,6 +126,11 @@ class Il2CppApi {
     }
 
     @cache
+    static get _classGetMethodFromName() {
+        return this.r("class_get_method_from_name", "pointer", ["pointer", "pointer", "int"]);
+    }
+
+    @cache
     static get _classGetMethods() {
         return this.r("class_get_methods", "pointer", ["pointer", "pointer"]);
     }
@@ -783,6 +788,7 @@ class Il2CppApi {
         const isBelow_5_5_0 = +!isEqualOrAbove_5_5_0;
         const isBelow_2017_1_0 = +!isEqualOrAbove_2017_1_0;
         const isBelow_2018_1_0 = +!isEqualOrAbove_2018_1_0;
+        const isBelow_2018_2_0 = +!isEqualOrAbove_2018_2_0;
         const isBelow_2018_3_0 = +!isEqualOrAbove_2018_3_0;
         const isBelow_2019_3_0 = +Il2Cpp.unityVersion.isBelow("2019.3.0");
         const isBelow_2020_2_0 = +!isEqualOrAbove_2020_2_0;
@@ -827,6 +833,7 @@ typedef struct _Il2CppStacks Il2CppStacks;
 typedef struct _Il2CppGCHandles Il2CppGCHandles;
 typedef struct _Il2CppRuntimeInformation Il2CppRuntimeInformation;
 typedef struct _Il2CppMetadataType Il2CppMetadataType;
+typedef struct _Il2CppReflectionMethod Il2CppReflectionMethod;
 
 enum _Il2CppTypeEnum
 {
@@ -1637,6 +1644,22 @@ il2cpp_memory_snapshot_get_tracked_object_count (Il2CppManagedMemorySnapshot * s
 {
     return snapshot->gcHandles.trackedObjectCount;
 }
+
+struct _Il2CppReflectionMethod
+{
+    Il2CppObject object;
+    const MethodInfo * method;
+    Il2CppString * name;
+    struct Il2CppReflectionType * reftype;
+};
+
+#if ${isBelow_2018_2_0}
+const MethodInfo *
+il2cpp_method_get_from_reflection (const Il2CppReflectionMethod * method)
+{
+    return method->method;
+}
+#endif
         `);
     }
 

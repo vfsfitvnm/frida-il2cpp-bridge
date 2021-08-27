@@ -226,19 +226,27 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     /** */
+    getMethod(name: string, parametersCount: number = -1): Il2Cpp.Method | null {
+        return getOrNull(Il2Cpp.Api._classGetMethodFromName(this, Memory.allocUtf8String(name), parametersCount), Il2Cpp.Method);
+    }
+
+    /** */
     inflate(...classes: Il2Cpp.Class[]): Il2Cpp.Class {
         if (!this.isGeneric) {
             raise(`Cannot inflate ${this.type.name} because it's not generic.`);
         }
 
-        const typeArray = Il2Cpp.Array.from(
-            Il2Cpp.Image.corlib.classes["System.RuntimeType"],
-            classes.map(klass => klass.type.object)
-        );
-        const inflatedType = this.type.object.methods.MakeGenericType.invoke<Il2Cpp.Object>(typeArray);
-        
+        const types = classes.map(klass => klass.type.object);
+        const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.classes["System.Type"], types);
+        const MakeGenericType = this.type.object.class.getMethod("MakeGenericType", 1)!
+
+        let object = this.type.object;
+        while (!object.class.equals(MakeGenericType.class)) object = object.base;
+
+        const inflatedType = MakeGenericType.invokeRaw(object, typeArray);
+
         // TODO: typeArray leaks
-        return new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(inflatedType));
+        return new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(inflatedType as Il2Cpp.Object));
     }
 
     /** Calls the static constructor of the current class. */

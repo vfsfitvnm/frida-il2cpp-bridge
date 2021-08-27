@@ -15,13 +15,19 @@ class Il2CppMethod extends NonNullNativeStruct {
         return new Il2Cpp.Class(Il2Cpp.Api._methodGetClass(this));
     }
 
-    /** Gets the flags (and implementation flags) of the current method. */
+    /** Gets the flags of the current method. */
     @cache
-    get flags(): [number, number] {
-        const implementationFlagsPointer = Memory.alloc(Process.pointerSize);
-        const flags = Il2Cpp.Api._methodGetFlags(this, implementationFlagsPointer);
+    get flags(): number {
+        return Il2Cpp.Api._methodGetFlags(this, NULL);
+    }
 
-        return [flags, implementationFlagsPointer.readU32()];
+    /** Gets the implementation flags of the current method. */
+    @cache
+    get implementationFlags(): number {
+        const implementationFlagsPointer = Memory.alloc(Process.pointerSize);
+        Il2Cpp.Api._methodGetFlags(this, implementationFlagsPointer);
+
+        return implementationFlagsPointer.readU32();
     }
 
     /** */
@@ -35,6 +41,12 @@ class Il2CppMethod extends NonNullNativeStruct {
             types.unshift("pointer");
         }
         return types;
+    }
+
+    /** Determines whether this method is external. */
+    @cache
+    get isExternal(): boolean {
+        return (this.implementationFlags & Il2Cpp.Method.ImplementationAttribute.InternalCall) != 0;
     }
 
     /** Determines whether this method is generic. */
@@ -117,7 +129,7 @@ class Il2CppMethod extends NonNullNativeStruct {
     /** Replaces the body of this method. */
     set implementation(block: Il2Cpp.Method.Implementation) {
         if (this.virtualAddress.isNull()) {
-            raise(`Skipping implementation for ${this.class.type.name}.${this.name}: pointer is null.`);
+            raise(`Cannot implementation for ${this.class.type.name}.${this.name}: pointer is null.`);
         }
 
         const replaceCallback: NativeCallbackImplementation<any, any> = (...args: any[]): any => {
@@ -153,15 +165,17 @@ class Il2CppMethod extends NonNullNativeStruct {
             raise(`Cannot inflate ${this.name} because it's not generic.`);
         }
 
-        const typeArray = Il2Cpp.Array.from(
-            Il2Cpp.Image.corlib.classes["System.RuntimeType"],
-            classes.map(klass => klass.type.object)
-        );
-        
-        const inflatedMethodObject = this.object.methods.MakeGenericMethod.invoke<Il2Cpp.Object>(typeArray);
-        
+        const types = classes.map(klass => klass.type.object);
+        const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.classes["System.Type"], types);
+        const MakeGenericMethod = this.object.class.getMethod("MakeGenericMethod", 1)!;
+
+        let object = this.object;
+        while (!object.class.equals(MakeGenericMethod.class)) object = object.base;
+
+        const inflatedMethodObject = MakeGenericMethod.invokeRaw(object, typeArray);
+
         // TODO: will typeArray leak?
-        return new Il2Cpp.Method(Il2Cpp.Api._methodGetFromReflection(inflatedMethodObject));
+        return new Il2Cpp.Method(Il2Cpp.Api._methodGetFromReflection(inflatedMethodObject as Il2Cpp.Object));
     }
 
     /** Invokes this method. */
@@ -171,7 +185,7 @@ class Il2CppMethod extends NonNullNativeStruct {
     }
 
     /** @internal */
-    invokeRaw(instance: NativePointer, ...parameters: Il2Cpp.Parameter.Type[]): Il2Cpp.Method.ReturnType {
+    invokeRaw(instance: NativePointerValue, ...parameters: Il2Cpp.Parameter.Type[]): Il2Cpp.Method.ReturnType {
         if (this.parameterCount != parameters.length) {
             raise(`${this.name} requires ${this.parameterCount} parameters, but ${parameters.length} were supplied.`);
         }
@@ -221,7 +235,7 @@ class Il2CppMethod extends NonNullNativeStruct {
     }
 }
 
-Il2Cpp.Method = Il2CppMethod;
+Reflect.set(Il2Cpp, "Method", Il2CppMethod);
 
 declare global {
     namespace Il2Cpp {
@@ -229,6 +243,26 @@ declare global {
         namespace Method {
             type Implementation = (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => Il2Cpp.Method.ReturnType;
             type ReturnType = void | Il2Cpp.Field.Type;
+
+            const enum ImplementationAttribute {
+                CodeTypeMask = 0x0003,
+                IntermediateLanguage = 0x0000,
+                Native = 0x0001,
+                OptimizedIntermediateLanguage = 0x0002,
+                Runtime = 0x0003,
+                ManagedMask = 0x0004,
+                Unmanaged = 0x0004,
+                Managed = 0x0000,
+                ForwardRef = 0x0010,
+                PreserveSig = 0x0080,
+                InternalCall = 0x1000,
+                Synchronized = 0x0020,
+                NoInlining = 0x0008,
+                AggressiveInlining = 0x0100,
+                NoOptimization = 0x0040,
+                SecurityMitigations = 0x0400,
+                MaxMethodImplVal = 0xffff
+            }
         }
     }
 }
