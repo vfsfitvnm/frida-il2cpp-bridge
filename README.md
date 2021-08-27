@@ -29,9 +29,9 @@ headers.
     * [Existing project](#existing-project)
 * [Snippets](#snippets)
     * [Initialization](#initialization)
-    * [Dump](#dump)
-    * [Trace](#trace)
-    * [Heap scan](#heap-scan)
+    * [Dumping](#dumping)
+    * [Tracing](#tracing)
+    * [Heap scanning](#heap-scanning)
     * [Methods](#methods)
         * [Invocation](#invocation)
         * [Replacement & Interception](#replacement--interception)
@@ -91,7 +91,7 @@ Learn more about `packages.json` [here](https://docs.npmjs.com/cli/v7/configurin
   "devDependencies": {
     "@types/frida-gum": "^17.1.0",
     "frida-compile": "^10.2.4",
-    "frida-il2cpp-bridge": "^0.5.1"
+    "frida-il2cpp-bridge": "^0.5.2"
   }
 }
 ```
@@ -151,7 +151,7 @@ You can ensure this behaviour wrapping your code inside a `Il2Cpp.perform` funct
 initialization process has finished. Given so, this function is asynchronous because it may need to wait for Il2Cpp
 module to load and initialize (`il2cpp_init`).
 
-### Dump
+### Dumping
 
 ```ts
 import "frida-il2cpp-bridge";
@@ -207,33 +207,73 @@ struct System.Int32 : System.ValueType, System.IFormattable, System.IConvertible
 // ...
 ```
 
-### Trace
+### Tracing
 
 ```ts
 import "frida-il2cpp-bridge";
 
 Il2Cpp.perform(() => {
-    const mscorlib = Il2Cpp.Domain.assemblies.mscorlib.image;
-    const SystemString = mscorlib.classes["System.String"];
+    const SystemString = Il2Cpp.Image.corlib.classes["System.String"];
 
-    // simple trace, it only traces method calls
-    Il2Cpp.Tracer.simpleTrace(SystemString);
+    // it traces method calls
+    Il2Cpp.Tracer.builder()
+        .findInAssemblies(Il2Cpp.Image.corlib.assembly, Il2Cpp.Domain.assemblies.System)
+        .withMethodFilter(method => method.isStatic && method.returnType.equals(SystemString.type) && !method.isExternal)
+        .commitAnd()
+        .simply()
+        .trace();
 
-    // full trace, it traces method calls and returns
-    Il2Cpp.Tracer.fullTrace(SystemString);
+    // it traces method calls and returns
+    Il2Cpp.Tracer.builder()
+        .findInClasses(SystemString)
+        .commitAnd()
+        .fully()
+        .trace();
 
-    // full trace, it traces method calls and returns and it reports any value
-    Il2Cpp.Tracer.fullWithValuesTrace(SystemString);
+    // full trace, it traces method calls and returns and it reports every value
+    Il2Cpp.Tracer.builder()
+        .findInAssemblies(Il2Cpp.Image.corlib.assembly)
+        .withClassFilter(klass => klass.namespace == "System")
+        .withParameterFilter(param => param.type.equals(SystemString) && param.name == "msg")
+        .commitAnd()
+        .findInAssemblies(Il2Cpp.Image.corlib.assembly)
+        .withMethodFilter(method => method.name.toLowerCase().includes("begin"))
+        .commitAnd()
+        .detailedly()
+        .trace();
 
-    // custom behaviour, it traces method returns and return values
-    Il2Cpp.Tracer.trace((method: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
-        const signature = `${method.name} (${method.parameterCount})`;
-        return {
-            onLeave(returnValue: Il2Cpp.Method.ReturnType) {
-                console.log(`[custom log] ${signature} ----> ${returnValue}`);
-            }
-        };
-    }, SystemString);
+    // custom behaviour
+    Il2Cpp.Tracer.new()
+        .findInDomain()
+        .withMethodFilter(method => method.parameterCount == 0)
+        .commitAnd()
+        .specially((target: Il2Cpp.Method) => {
+            const signature = `${target.name} (${target.parameterCount})`;
+            return {
+                onLeave(returnValue: Il2Cpp.Method.ReturnType) {
+                    console.log(`[custom log] ${signature} ----> ${returnValue}`);
+                }
+            };
+        })
+        .trace();
+});
+```
+`Il2Cpp.Tracer` follows the builder pattern in order to be flexible and, you know, this pattern is better than
+a custom domain specific language. A new builder must be created via `Il2Cpp.Tracer.builder()`. After that, you can start searching in the whole domain or in a set of assemblies, classes or methods (using `findIn*`). Then, you can apply a custom filter via `with*Filter`. You push all the methods that meet the requirements in a private field using `commitAnd`. In this way, you can combine multiple requirements without writing complex filters (see the third example). \
+After `commitAnd` you can start over or you can choose a generator (`simply`, `fully` or `detailedly`). A generator is just a function that produces the callbacks that will be called when a method is invoked. You can roll your own generator using `specially` (see the last example). Finally, you begin the actual tracing calling `trace`.
+
+Uh, you don't need al this black magic? Do you just want to trace a single method?
+```ts
+Il2Cpp.perform(() => {
+    const Equals = Il2Cpp.Image.corlib.classes["System.String"].methods.Equals;
+
+    Il2Cpp.Tracer.builder().
+        .findInMethods(Equals)
+        .commitAnd()
+        .fully()
+        .trace();
+
+    // I know, this is more verbose than the old Il2Cpp.Tracer.fullTrace(Equals);
 });
 ```
 
@@ -241,82 +281,59 @@ There are three already defined strategies you can follow in order to trace meth
 words, however `Il2Cpp.Tracer` does not use `Interceptor.attach`, but a combination of `Interceptor.replace` and
 `NativeFunction` ([here's why](https://t.me/fridadotre/52178)).
 
-- `Il2Cpp.Tracer.Simple` only reports `onEnter` calls.
-  ```~~~~
+- `simply` only reports `onEnter` calls.
+  ```
+  [il2cpp] 0x01a2f3e4 System.String.Concat
   [il2cpp] 0x01a3cfbc System.String.FastAllocateString
-  [il2cpp] 0x01a3daf4 System.String.IsNullOrEmpty
-  [il2cpp] 0x01a30f2c System.String.Replace
-  [il2cpp] 0x01a42054 System.String.ReplaceInternal
-  [il2cpp] 0x01a43ae8 System.String.ReplaceUnchecked
-  [il2cpp] 0x01a36ed8 System.String.get_Chars
-  [il2cpp] 0x01a36ed8 System.String.get_Chars
+  [il2cpp] 0x01a3f118 System.String.FillStringChecked
+  [il2cpp] 0x01a3f118 System.String.FillStringChecked
+
   [il2cpp] 0x01a41f60 System.String.Replace
-  [il2cpp] 0x01a41f64 System.String.ReplaceInternal
   [il2cpp] 0x01a4346c System.String.IndexOfUnchecked
   [il2cpp] 0x01a3cfbc System.String.FastAllocateString
   ```
 
-- `Il2Cpp.Tracer.Full` reports both `onEnter` and `onLeave` nicely.
+- `fully` reports both `onEnter` and `onLeave` nicely.
   ```
-  [il2cpp] 0x01a3cfbc ┌─System.String.FastAllocateString
-  [il2cpp] 0x01a3cfbc └─System.String.FastAllocateString
-  
-  [il2cpp] 0x01a3daf4 ┌─System.String.IsNullOrEmpty
-  [il2cpp] 0x01a3daf4 └─System.String.IsNullOrEmpty
-  
-  [il2cpp] 0x01a30f2c ┌─System.String.Replace
-  [il2cpp] 0x01a42054 │ ┌─System.String.ReplaceInternal
-  [il2cpp] 0x01a43ae8 │ │ ┌─System.String.ReplaceUnchecked
-  [il2cpp] 0x01a36ed8 │ │ │ ┌─System.String.get_Chars
-  [il2cpp] 0x01a36ed8 │ │ │ └─System.String.get_Chars
-  [il2cpp] 0x01a36ed8 │ │ │ ┌─System.String.get_Chars
-  [il2cpp] 0x01a36ed8 │ │ │ └─System.String.get_Chars
-  [il2cpp] 0x01a41f60 │ │ │ ┌─System.String.Replace
-  [il2cpp] 0x01a41f64 │ │ │ │ ┌─System.String.ReplaceInternal
-  [il2cpp] 0x01a4346c │ │ │ │ │ ┌─System.String.IndexOfUnchecked
-  [il2cpp] 0x01a4346c │ │ │ │ │ └─System.String.IndexOfUnchecked
-  [il2cpp] 0x01a41f60 │ │ │ │ └─System.String.Replace
-  [il2cpp] 0x01a41f64 │ │ │ └─System.String.ReplaceInternal
-  [il2cpp] 0x01a43ae8 │ │ └─System.String.ReplaceUnchecked
-  [il2cpp] 0x01a42054 │ └─System.String.ReplaceInternal
-  [il2cpp] 0x01a30f2c └─System.String.Replace
-  
-  [il2cpp] 0x01a3cfbc ┌─System.String.FastAllocateString
-  [il2cpp] 0x01a3cfbc └─System.String.FastAllocateString
+  [il2cpp] 0x01a2f3e4 ┌─System.String.Concat
+  [il2cpp] 0x01a3cfbc │ ┌─System.String.FastAllocateString
+  [il2cpp] 0x01a3cfbc │ └─System.String.FastAllocateString
+  [il2cpp] 0x01a3f118 │ ┌─System.String.FillStringChecked
+  [il2cpp] 0x01a3f118 │ └─System.String.FillStringChecked
+  [il2cpp] 0x01a3f118 │ ┌─System.String.FillStringChecked
+  [il2cpp] 0x01a3f118 │ └─System.String.FillStringChecked
+  [il2cpp] 0x01a2f3e4 └─System.String.Concat
+
+  [il2cpp] 0x01a41f60 ┌─System.String.Replace
+  [il2cpp] 0x01a4346c │ ┌─System.String.IndexOfUnchecked
+  [il2cpp] 0x01a4346c │ └─System.String.IndexOfUnchecked
+  [il2cpp] 0x01a3cfbc │ ┌─System.String.FastAllocateString
+  [il2cpp] 0x01a3cfbc │ └─System.String.FastAllocateString
+  [il2cpp] 0x01a41f60 └─System.String.Replace
   ```
 
-- `Il2Cpp.Tracer.FullWithValues` reports both `onEnter` and `onLeave` nicely, plus every printable value.
+- `detailedly` reports both `onEnter` and `onLeave` nicely, plus every printable value.
   ```
-  [il2cpp] 0x01a3cfbc ┌─System.String.FastAllocateString(System.Int32 length = 1)
-  [il2cpp] 0x01a3cfbc └─System.String.FastAllocateString System.String =
-  
-  [il2cpp] 0x01a3daf4 ┌─System.String.IsNullOrEmpty(System.String value = assets/bin/Data/)
-  [il2cpp] 0x01a3daf4 └─System.String.IsNullOrEmpty System.Boolean = false
-  
-  [il2cpp] 0x01a30f2c ┌─System.String.Replace(System.String oldValue = \, System.String newValue = /)
-  [il2cpp] 0x01a42054 │ ┌─System.String.ReplaceInternal(System.String oldValue = \, System.String newValue = /)
-  [il2cpp] 0x01a43ae8 │ │ ┌─System.String.ReplaceUnchecked(System.String oldValue = \, System.String newValue = /)
-  [il2cpp] 0x01a36ed8 │ │ │ ┌─System.String.get_Chars(System.Int32 index = 0)
-  [il2cpp] 0x01a36ed8 │ │ │ └─System.String.get_Chars System.Char = 92
-  [il2cpp] 0x01a36ed8 │ │ │ ┌─System.String.get_Chars(System.Int32 index = 0)
-  [il2cpp] 0x01a36ed8 │ │ │ └─System.String.get_Chars System.Char = 47
-  [il2cpp] 0x01a41f60 │ │ │ ┌─System.String.Replace(System.Char oldChar = 92, System.Char newChar = 47)
-  [il2cpp] 0x01a41f64 │ │ │ │ ┌─System.String.ReplaceInternal(System.Char oldChar = 92, System.Char newChar = 47)
-  [il2cpp] 0x01a4346c │ │ │ │ │ ┌─System.String.IndexOfUnchecked(System.Char value = 92, System.Int32 startIndex = 0, System.Int32 count = 16)
-  [il2cpp] 0x01a4346c │ │ │ │ │ └─System.String.IndexOfUnchecked System.Int32 = 4294967295
-  [il2cpp] 0x01a41f60 │ │ │ │ └─System.String.Replace System.String = assets/bin/Data/
-  [il2cpp] 0x01a41f64 │ │ │ └─System.String.ReplaceInternal System.String = assets/bin/Data/
-  [il2cpp] 0x01a43ae8 │ │ └─System.String.ReplaceUnchecked System.String = assets/bin/Data/
-  [il2cpp] 0x01a42054 │ └─System.String.ReplaceInternal System.String = assets/bin/Data/
-  [il2cpp] 0x01a30f2c └─System.String.Replace System.String = assets/bin/Data/
-  
-  [il2cpp] 0x01a3cfbc ┌─System.String.FastAllocateString(System.Int32 length = 0)
-  [il2cpp] 0x01a3cfbc └─System.String.FastAllocateString System.String = 
+  [il2cpp] 0x01a2f3e4 ┌─System.String.Concat(System.String str0 = "Creating AndroidJavaClass from ", System.String str1 = "com.unity3d.player.UnityPlayer")
+  [il2cpp] 0x01a3cfbc │ ┌─System.String.FastAllocateString(System.Int32 length = 61)
+  [il2cpp] 0x01a3cfbc │ └─System.String.FastAllocateString System.String = ""
+  [il2cpp] 0x01a3f118 │ ┌─System.String.FillStringChecked(System.String dest = "", System.Int32 destPos = 0, System.String src = "Creating AndroidJavaClass from ")
+  [il2cpp] 0x01a3f118 │ └─System.String.FillStringChecked System.Void = undefined
+  [il2cpp] 0x01a3f118 │ ┌─System.String.FillStringChecked(System.String dest = "Creating AndroidJavaClass from ", System.Int32 destPos = 31, System.String src = "com.unity3d.player.UnityPlayer")
+  [il2cpp] 0x01a3f118 │ └─System.String.FillStringChecked System.Void = undefined
+  [il2cpp] 0x01a2f3e4 └─System.String.Concat System.String = "Creating AndroidJavaClass from com.unity3d.player.UnityPlayer"
+
+  [il2cpp] 0x01a41f60 ┌─System.String.Replace(System.Char oldChar = 46, System.Char newChar = 47)
+  [il2cpp] 0x01a4346c │ ┌─System.String.IndexOfUnchecked(System.Char value = 46, System.Int32 startIndex = 0, System.Int32 count = 30)
+  [il2cpp] 0x01a4346c │ └─System.String.IndexOfUnchecked System.Int32 = 3
+  [il2cpp] 0x01a3cfbc │ ┌─System.String.FastAllocateString(System.Int32 length = 30)
+  [il2cpp] 0x01a3cfbc │ └─System.String.FastAllocateString System.String = ""
+  [il2cpp] 0x01a41f60 └─System.String.Replace System.String = "com/unity3d/player/UnityPlayer"
   ```
 
 > The output is nicely coloured so you won't get crazy when inspecting the console.
 
-### Heap scan
+### Heap scanning
 
 ```ts
 import "frida-il2cpp-bridge";
@@ -408,7 +425,7 @@ Il2Cpp.perform(() => {
 ### Generics handling
 
 Dealing with generics is problematic when the `global-metadata.dat` file is ignored. You can
-gather the inflated version (if any) via `Il2Cpp.Class.inflate` and `Il2Cpp.method.inflate`.
+gather the inflated version (if any) via `Il2Cpp.Class.inflate` and `Il2Cpp.Method.inflate`.
 Reference types (aka objects) all shares the same code: it is easy to retrieve virtual address in this case. Value types (aka primitives and structs) does not share any code.
 `inflate` will always return an inflated class or method (you must match the number of type arguments with the number of types you pass to `inflate`), but the returned value it's not
 necessarely a class or method that has been implemented.
@@ -417,7 +434,7 @@ Il2Cpp.perform(() => {
     const classes = Il2Cpp.Image.corlib.classes;
 
     const SystemObject = classes["System.Object"];
-    const SystemInt32 = classes["System.Object"];
+    const SystemInt32 = classes["System.Int32"];
 
 
     const GenericList = classes["System.Collections.Generic.List<T>"];
@@ -429,15 +446,15 @@ Il2Cpp.perform(() => {
     const SystemInt32List = GenericList.inflate(SystemInt32);
 
 
-    // static T UnsafeCast(System.Object o);
-    const UnsafeCast = classes["System.Runtime.CompilerServices.JitHelpers"].methods.UnsafeCast;
-    // UnsafeCast is a generic method, its virtual address is null
+    // static T[] FindAll(T[] array, System.Predicate<T> match);
+    const FindAll = classes["System.Array"].methods.FindAll;
+    // FindAll is a generic method, its virtual address is null
 
-    // This is the UnsafeCast for every reference type
-    const SystemObjectUnsafeCast = UnsafeCast.inflate(SystemObject);
+    // This is the FindAll for every reference type
+    const SystemObjectFindAll = FindAll.inflate(SystemObject);
 
-    // This doesn't make sense, but this is the UnsafeCast specific to System.Int32, because it's a value type
-    const SystemInt32UnsafeCast = UnsafeCast.inflate(SystemInt32);
+    // This is the FindAll specific to System.Int32, because it's a value type
+    const SystemInt32FindAll = FindAll.inflate(SystemInt32);
 });
 ```
 
