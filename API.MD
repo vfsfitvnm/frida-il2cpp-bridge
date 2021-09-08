@@ -1,5 +1,11 @@
 # frida-il2cpp-bridge
 
+---
+
+参考：
+https://github.com/vfsfitvnm/frida-il2cpp-bridge/tree/3abafa75c8485e6c45417efee2484479e6961031#api
+
+---
 ### API
 * [`Il2Cpp.Array`](#il2cpparray)
 * [`Il2Cpp.Assembly`](#il2cppassembly)
