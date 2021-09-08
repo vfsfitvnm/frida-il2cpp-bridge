@@ -18,38 +18,38 @@
 ##### `Il2Cpp.Array`
 It's not possible to add or remove an array element at the moment.
 ```ts
-const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.assemblies.mscorlib.image;
 const SystemString = mscorlib.classes["System.String"];
 
 const arr = Il2Cpp.Array.from<Il2Cpp.String>(SystemString, [
     Il2Cpp.String.from("One"), Il2Cpp.String.from("Two"), Il2Cpp.String.from("Three")
 ]);
 
-assert(arr.elementSize == StringClass.arrayElementSize);
+console.log(arr.elementSize == StringClass.arrayElementSize);
 
-assert(arr.length == 3);
+console.log(arr.length == 3);
 
-assert(arr.object.class.type.name == "System.String[]");
+console.log(arr.object.class.type.name == "System.String[]");
 
-assert(arr.elementType.name == "System.String");
+console.log(arr.elementType.name == "System.String");
 
-assert(Array.from(arr).join(",") == "One,Two,Three");
+console.log(Array.from(arr).join(",") == "One,Two,Three");
 
-assert(arr.get(0).content == "One");
+console.log(arr.get(0).content == "One");
 arr.set(0, Il2Cpp.String.from("Replaced"));
-assert(arr.get(0).content == "Replaced");
+console.log(arr.get(0).content == "Replaced");
 ```
 
 ##### `Il2Cpp.Assembly`
 ```ts
-const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.assemblies.mscorlib.image;
 
-assert(mscorlib.name == "mscorlib");
+console.log(mscorlib.name == "mscorlib");
 ```
 
 ##### `Il2Cpp.Class`
 ```ts
-const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.assemblies.mscorlib.image;
 
 const BooleanClass = mscorlib.classes["System.Boolean"];
 const Int32Class = mscorlib.classes["System.Int32"];
@@ -61,52 +61,52 @@ const IFormattableClass = mscorlib.classes["System.IFormattable"];
 const ExecutionContextClass = mscorlib.classes["System.Threading.ExecutionContext"];
 const ExecutionContextFlagsClass = mscorlib.classes["System.Threading.ExecutionContext.Flags"];
 
-assert(BooleanClass.arrayClass.name == "Boolean[]");
+console.log(BooleanClass.arrayClass.name == "Boolean[]");
 
-assert(Int32Class.arrayElementSize == 4);
-assert(Int64Class.arrayElementSize == 8);
-assert(ObjectClass.arrayElementSize == Process.pointerSize);
+console.log(Int32Class.arrayElementSize == 4);
+console.log(Int64Class.arrayElementSize == 8);
+console.log(ObjectClass.arrayElementSize == Process.pointerSize);
 
-assert(BooleanClass.arrayClass.elementClass?.name == "Boolean");
+console.log(BooleanClass.arrayClass.elementClass?.name == "Boolean");
 
-assert(ExecutionContextFlagsClass.declaringClass!.handle.equals(ExecutionContextClass.handle));
+console.log(ExecutionContextFlagsClass.declaringClass!.handle.equals(ExecutionContextClass.handle));
 
-assert(Int32Class.hasStaticConstructor == ".cctor" in Int32Class.methods);
+console.log(Int32Class.hasStaticConstructor == ".cctor" in Int32Class.methods);
 
-assert(Int32Class.image.name == "mscorlib.dll");
+console.log(Int32Class.image.name == "mscorlib.dll");
 
-assert(DayOfWeekClass.isEnum);
-assert(!ObjectClass.isEnum);
+console.log(DayOfWeekClass.isEnum);
+console.log(!ObjectClass.isEnum);
 
-assert(IFormattableClass.isInterface);
-assert(!ObjectClass.isInterface);
+console.log(IFormattableClass.isInterface);
+console.log(!ObjectClass.isInterface);
 
 if (!MathClass.isStaticConstructorFinished) {
  MathClass.initialize();
- assert(MathClass.isStaticConstructorFinished);
+ console.log(MathClass.isStaticConstructorFinished);
 }
 
-assert(Int32Class.isValueType);
-assert(!ObjectClass.isValueType);
+console.log(Int32Class.isValueType);
+console.log(!ObjectClass.isValueType);
 
-assert(BooleanClass.name == "Boolean");
+console.log(BooleanClass.name == "Boolean");
 
-assert(BooleanClass.namespace == "System");
+console.log(BooleanClass.namespace == "System");
 
-assert(BooleanClass.parent!.type.name == "System.ValueType");
-assert(ObjectClass.parent == null);
+console.log(BooleanClass.parent!.type.name == "System.ValueType");
+console.log(ObjectClass.parent == null);
 
-assert(BooleanClass.type.name == "System.Boolean");
+console.log(BooleanClass.type.name == "System.Boolean");
 ```
 
 #### `Il2Cpp.Domain`
 ```ts
-assert(Il2Cpp.Domain.reference.name == "IL2CPP Root Domain");
+console.log(Il2Cpp.Domain.reference.name == "IL2CPP Root Domain");
 ```
 
 #### `Il2Cpp.Field`
 ```ts
-const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.assemblies.mscorlib.image;
 const coreModule = Il2Cpp.Domain.reference.assemblies["UnityEngine.CoreModule"].image;
 
 const BooleanClass = mscorlib.classes["System.Boolean"];
@@ -114,149 +114,149 @@ const MathClass = mscorlib.classes["System.Math"];
 const ThreadClass = mscorlib.classes["System.Threading.Thread"];
 const Vector2Class = coreModule.classes["UnityEngine.Vector2"];
 
-assert(MathClass.fields.PI.class.handle.equals(MathClass.handle));
+console.log(MathClass.fields.PI.class.handle.equals(MathClass.handle));
 
-assert(!Vector2Class.fields.x.isStatic);
-assert(Vector2Class.fields.oneVector.isStatic);
+console.log(!Vector2Class.fields.x.isStatic);
+console.log(Vector2Class.fields.oneVector.isStatic);
 
-assert(MathClass.fields.PI.isLiteral);
+console.log(MathClass.fields.PI.isLiteral);
 
-assert(ThreadClass.fields.current_thread.isThreadStatic);
-assert(!ThreadClass.fields.m_Delegate.isThreadStatic);
+console.log(ThreadClass.fields.current_thread.isThreadStatic);
+console.log(!ThreadClass.fields.m_Delegate.isThreadStatic);
 
-assert(BooleanClass.fields.TrueLiteral.name == "TrueLiteral");
+console.log(BooleanClass.fields.TrueLiteral.name == "TrueLiteral");
 
-assert(MathClass.fields.PI.type.name == "System.Double");
+console.log(MathClass.fields.PI.type.name == "System.Double");
 
 const vec = Vector2Class.fields.oneVector.value as Il2Cpp.ValueType;
-assert(vec.fields.x.value == 1);
-assert(vec.fields.y.value == 1);
+console.log(vec.fields.x.value == 1);
+console.log(vec.fields.y.value == 1);
 
 vec.fields.x.value = 42;
-assert(vec.fields.x.value == 42);
+console.log(vec.fields.x.value == 42);
 ```
 
 #### `Il2Cpp.Image`
 ```ts
-const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.assemblies.mscorlib.image;
 
-assert(mscorlib.name == "mscorlib.dll");
+console.log(mscorlib.name == "mscorlib.dll");
 ```
 
 #### `Il2Cpp.Method`
 ```ts
-const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.assemblies.mscorlib.image;
 
 const BooleanClass = mscorlib.classes["System.Boolean"];
 const ArrayClass = mscorlib.classes["System.Array"];
 const MathClass = mscorlib.classes["System.Math"];
 
-assert(MathClass.methods.Sqrt.class.handle.equals(MathClass.handle));
+console.log(MathClass.methods.Sqrt.class.handle.equals(MathClass.handle));
 
-assert(ArrayClass.methods.Empty.isGeneric);
+console.log(ArrayClass.methods.Empty.isGeneric);
 
-assert(!BooleanClass.methods.ToString.isStatic);
-assert(!BooleanClass.methods.Parse.isStatic);
+console.log(!BooleanClass.methods.ToString.isStatic);
+console.log(!BooleanClass.methods.Parse.isStatic);
 
-assert(MathClass.methods.Sqrt.name == "Sqrt");
+console.log(MathClass.methods.Sqrt.name == "Sqrt");
 
-assert(MathClass.methods[".cctor"].parameterCount == 0);
-assert(MathClass.methods.Abs.parameterCount == 1);
-assert(MathClass.methods.Max.parameterCount == 2);
+console.log(MathClass.methods[".cctor"].parameterCount == 0);
+console.log(MathClass.methods.Abs.parameterCount == 1);
+console.log(MathClass.methods.Max.parameterCount == 2);
 
-assert(BooleanClass.methods.Parse.invoke<boolean>(Il2Cpp.String.from("true")));
+console.log(BooleanClass.methods.Parse.invoke<boolean>(Il2Cpp.String.from("true")));
 
 MathClass.methods.Max.implementation = (_instance, parameters) => {
  const val1 = parameters.val1.value as number;
  const val2 = parameters.val2.value as number;
  return val1 > val2 ? val2 : val1;
 };
-assert(MathClass.methods.Max.invoke<number>(1, 2) == 1);
+console.log(MathClass.methods.Max.invoke<number>(1, 2) == 1);
 
 MathClass.methods.Max.implementation = null;
-assert(MathClass.methods.Max.invoke<number>(1, 2) == 2);
+console.log(MathClass.methods.Max.invoke<number>(1, 2) == 2);
 
 MathClass.methods.Max.intercept({
  onEnter(_instance, parameters) {
   parameters.val1.value = 10;
  }
 });
-assert(MathClass.methods.Max.invoke<number>(1, 2) == 10);
+console.log(MathClass.methods.Max.invoke<number>(1, 2) == 10);
 ```
 
 #### `Il2Cpp.Object`
 ```ts
-const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.assemblies.mscorlib.image;
 const coreModule = Il2Cpp.Domain.reference.assemblies["UnityEngine.CoreModule"].image;
 
 const OrdinalComparerClass = mscorlib.classes["System.OrdinalComparer"];
 const Vector2Class = coreModule.classes["UnityEngine.Vector2"];
 
 const ordinalComparer = Il2Cpp.Object.from(OrdinalComparerClass);
-assert(ordinalComparer.class.name == "OrdinalComparer");
-assert(ordinalComparer.base.class.name == "StringComparer");
+console.log(ordinalComparer.class.name == "OrdinalComparer");
+console.log(ordinalComparer.base.class.name == "StringComparer");
 
 const vec = Il2Cpp.Object.from(Vector2Class);
 vec.methods[".ctor"].invoke(36, 4);
 
 const vecUnboxed = vec.unbox();
-assert(vec.fields.x.value == vecUnboxed.fields.x.value);
-assert(vec.fields.y.value == vecUnboxed.fields.y.value);
+console.log(vec.fields.x.value == vecUnboxed.fields.x.value);
+console.log(vec.fields.y.value == vecUnboxed.fields.y.value);
 
 const vecBoxed = vecUnboxed.box();
-assert(vecBoxed.fields.x.value == vecUnboxed.fields.x.value);
-assert(vecBoxed.fields.y.value == vecUnboxed.fields.y.value);
+console.log(vecBoxed.fields.x.value == vecUnboxed.fields.x.value);
+console.log(vecBoxed.fields.y.value == vecUnboxed.fields.y.value);
 
-assert(!vecBoxed.handle.equals(vec.handle));
+console.log(!vecBoxed.handle.equals(vec.handle));
 ```
 
 #### `Il2Cpp.Parameter`
 ```ts
-const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.assemblies.mscorlib.image;
 
 const dParameter = mscorlib.classes["System.Math"].methods.Sqrt.parameters.d;
 
-assert(dParameter.name == "d");
+console.log(dParameter.name == "d");
 
-assert(dParameter.position == 0);
+console.log(dParameter.position == 0);
 
-assert(dParameter.type.name == "System.Double");
+console.log(dParameter.type.name == "System.Double");
 ```
 
 #### `Il2Cpp.String`
 ```ts
 const str = Il2Cpp.String.from("Hello!");
 
-assert(str.content == "Hello!");
+console.log(str.content == "Hello!");
 
 str.content = "Bye";
-assert(str.content == "Bye");
+console.log(str.content == "Bye");
 
-assert(str.length == 3);
-assert(str.content?.length == 3);
+console.log(str.length == 3);
+console.log(str.content?.length == 3);
 
-assert(str.object.class.type.name == "System.String");
-assert(str.object.class.type.typeEnum == "string");
+console.log(str.object.class.type.name == "System.String");
+console.log(str.object.class.type.typeEnum == "string");
 ```
 
 #### `Il2Cpp.Type`
 ```ts
-const mscorlib = Il2Cpp.Domain.reference.assemblies.mscorlib.image;
+const mscorlib = Il2Cpp.Domain.assemblies.mscorlib.image;
 
 const Int32Class = mscorlib.classes["System.Int32"];
 const StringClass = mscorlib.classes["System.String"];
 const ObjectClass = mscorlib.classes["System.Object"];
 
-assert(StringClass.type.class.handle.equals(StringClass.handle));
+console.log(StringClass.type.class.handle.equals(StringClass.handle));
 
 const array = Il2Cpp.Array.from<number>(Int32Class, [0, 1, 2, 3, 4]);
-assert(array.object.class.type.name == "System.Int32[]");
-assert(array.object.class.type.dataType?.name == "System.Int32");
+console.log(array.object.class.type.name == "System.Int32[]");
+console.log(array.object.class.type.dataType?.name == "System.Int32");
 
-assert(StringClass.type.name == "System.String");
+console.log(StringClass.type.name == "System.String");
 
-assert(Int32Class.type.typeEnum == "i4");
-assert(ObjectClass.type.typeEnum == "object");
+console.log(Int32Class.type.typeEnum == "i4");
+console.log(ObjectClass.type.typeEnum == "object");
 ```
 
 #### `Il2Cpp.ValueType`
@@ -267,8 +267,8 @@ const Vector2Class = coreModule.classes["UnityEngine.Vector2"];
 
 const vec = Vector2Class.fields.positiveInfinityVector.value as Il2Cpp.ValueType;
 
-assert(vec.class.type.name == "UnityEngine.Vector2");
+console.log(vec.class.type.name == "UnityEngine.Vector2");
 
-assert(vec.fields.x.value == Infinity);
-assert(vec.fields.y.value == Infinity);
+console.log(vec.fields.x.value == Infinity);
+console.log(vec.fields.y.value == Infinity);
 ```
