@@ -4,7 +4,7 @@
 [![NPM](https://img.shields.io/npm/v/frida-il2cpp-bridge?label=&logo=npm&style=for-the-badge)](https://npmjs.org/package/frida-il2cpp-bridge)
 
 API：
-https://github.com/vfsfitvnm/frida-il2cpp-bridge/tree/3abafa75c8485e6c45417efee2484479e6961031#api
+https://github.com/350030173/frida-il2cpp-bridge/blob/master/API.MD
 
 
 A Frida module to dump, trace or hijack any Il2Cpp application at runtime, without needing the `global-metadata.dat` file.
