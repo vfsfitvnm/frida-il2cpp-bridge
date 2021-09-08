@@ -85,7 +85,7 @@ Learn more about `packages.json` [here](https://docs.npmjs.com/cli/v7/configurin
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "frida-compile -o _.js -w index.ts",
+    "build": "frida-compile.cmd -o fuck.js -w index.ts",
     "attach": "run() { frida -U \"$1\" -l _.js --runtime=v8; }; run",
     "spawn": "run() { frida -U -f \"$1\" -l _.js --no-pause --runtime=v8; }; run",
     "app0-spawn": "npm run spawn com.example.application0",
@@ -109,14 +109,17 @@ Learn more about `tsconfig.json` [here](https://www.typescriptlang.org/docs/hand
   "compilerOptions": {
     "target": "es2020",
     "lib": [
-      "es2020"
+      "es2020",
+      "dom"
     ],
     "allowJs": true,
     "noEmit": true,
     "strict": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true
   }
 }
 ```
