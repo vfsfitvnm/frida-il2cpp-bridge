@@ -1,29 +1,36 @@
 import { cache } from "decorator-cache-getter";
 
-import { Api } from "../api";
-import { injectToIl2Cpp } from "../decorators";
-
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { addLevenshtein } from "../../utils/utils";
+import { addLevenshtein, makeIterable } from "../../utils/utils";
 
-@injectToIl2Cpp("GenericInstance")
+/** Represents a `Il2CppGenericInst`. */
 class Il2CppGenericInstance extends NonNullNativeStruct {
+    /** */
     @cache
     get typesCount(): number {
-        return Api._genericInstanceGetTypeCount(this);
+        return Il2Cpp.Api._genericInstanceGetTypeCount(this);
     }
 
+    /** */
     @cache
-    get types(): Readonly<Record<string, Il2Cpp.Type>> {
+    get types(): IterableRecord<Il2Cpp.Type> {
         const record: Record<string, Il2Cpp.Type> = {};
 
-        const startPointer = Api._genericInstanceGetTypes(this);
+        const startPointer = Il2Cpp.Api._genericInstanceGetTypes(this);
 
         for (let i = 0; i < this.typesCount; i++) {
             const type = new Il2Cpp.Type(startPointer.add(i * Process.pointerSize).readPointer());
             record[type.name] = type;
         }
 
-        return addLevenshtein(record);
+        return makeIterable(addLevenshtein(record));
+    }
+}
+
+Il2Cpp.GenericInstance = Il2CppGenericInstance;
+
+declare global {
+    namespace Il2Cpp {
+        class GenericInstance extends Il2CppGenericInstance {}
     }
 }

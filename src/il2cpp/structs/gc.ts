@@ -1,16 +1,48 @@
-import { Api } from "../api";
-import { injectToIl2Cpp, since } from "../decorators";
+import { since } from "../decorators";
 
-@injectToIl2Cpp("GC")
+/** Garbage collector utility functions. */
 class Il2CppGC {
+    protected constructor() {}
+
+    /** Gets the heap size in bytes. */
     static get heapSize(): Int64 {
-        return Api._gcGetHeapSize();
+        return Il2Cpp.Api._gcGetHeapSize();
     }
 
+    /** Determines whether the garbage collector is disabled. */
+    @since("2018.3.0", "5.3.5")
+    static get isEnabled(): boolean {
+        return !Il2Cpp.Api._gcIsDisabled();
+    }
+
+    /** Determines whether the garbage collector is incremental. */
+    @since("2019.1.0")
+    static get isIncremental(): boolean {
+        return !!Il2Cpp.Api._gcIsIncremental();
+    }
+
+    /** */
+    @since("2019.1.0", "2019.1.0")
+    static get maxTimeSlice(): Int64 {
+        return Il2Cpp.Api._gcGetMaxTimeSlice();
+    }
+
+    /** Gets the used heap size in bytes. */
     static get usedHeapSize(): Int64 {
-        return Api._gcGetUsedSize();
+        return Il2Cpp.Api._gcGetUsedSize();
     }
 
+    /** Enables or disables the garbage collector. */
+    static set isEnabled(value: boolean) {
+        value ? Il2Cpp.Api._gcEnable() : Il2Cpp.Api._gcDisable();
+    }
+
+    /** */
+    static set maxTimeSlice(nanoseconds: number | Int64) {
+        Il2Cpp.Api._gcSetMaxTimeSlice(nanoseconds);
+    }
+
+    /** Returns the heap allocated objects of the specified class. This variant reads GC descriptors. */
     static choose(klass: Il2Cpp.Class): Il2Cpp.Object[] {
         const matches: Il2Cpp.Object[] = [];
 
@@ -23,34 +55,47 @@ class Il2CppGC {
         const chooseCallback = new NativeCallback(callback, "void", ["pointer", "int", "pointer"]);
         const onWorld = new NativeCallback(() => {}, "void", []);
 
-        const state = Api._livenessCalculationBegin(klass.handle, 0, chooseCallback, NULL, onWorld, onWorld);
-        Api._livenessCalculationFromStatics(state);
-        Api._livenessCalculationEnd(state);
+        const state = Il2Cpp.Api._livenessCalculationBegin(klass.handle, 0, chooseCallback, NULL, onWorld, onWorld);
+        Il2Cpp.Api._livenessCalculationFromStatics(state);
+        Il2Cpp.Api._livenessCalculationEnd(state);
 
         return matches;
     }
 
+    /** Forces a garbage collection of the specified generation. */
     static collect(generation: 0 | 1 | 2): void {
-        Api._gcCollect(generation < 0 ? 0 : generation > 2 ? 2 : generation);
+        Il2Cpp.Api._gcCollect(generation < 0 ? 0 : generation > 2 ? 2 : generation);
     }
 
+    /** Forces a garbage collection. */
     @since("5.3.5")
     static collectALittle(): void {
-        Api._gcCollectALittle();
+        Il2Cpp.Api._gcCollectALittle();
     }
 
-    @since("5.3.5")
-    static disable(): void {
-        Api._gcDisable();
+    /** */
+    @since("2019.3.0")
+    static startWorld(): void {
+        return Il2Cpp.Api._gcStartWorld();
     }
 
-    @since("5.3.5")
-    static enable(): void {
-        Api._gcEnable();
+    /** */
+    @since("2020.2.0")
+    static startIncrementalCollection(): void {
+        return Il2Cpp.Api._gcStartIncrementalCollection();
     }
 
-    @since("2018.3.0")
-    static isDisabled(): boolean {
-        return !!Api._gcIsDisabled();
+    /** */
+    @since("2019.3.0")
+    static stopWorld(): void {
+        return Il2Cpp.Api._gcStopWorld();
+    }
+}
+
+Reflect.set(Il2Cpp, "GC", Il2CppGC);
+
+declare global {
+    namespace Il2Cpp {
+        class GC extends Il2CppGC {}
     }
 }

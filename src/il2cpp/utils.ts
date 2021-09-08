@@ -38,8 +38,9 @@ export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Ty
             return new Il2Cpp.ValueType(pointer, type);
         case "object":
         case "class":
-        case "genericinst":
             return new Il2Cpp.Object(pointer.readPointer());
+        case "genericinst":
+            return type.class.isValueType ? new Il2Cpp.ValueType(pointer, type) : new Il2Cpp.Object(pointer.readPointer());
         case "string":
             return new Il2Cpp.String(pointer.readPointer());
         case "szarray":
@@ -170,7 +171,8 @@ function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueT
         return arr;
     }
 
-    const valueType = Memory.alloc(type.class.instanceSize - Il2Cpp.Object.headerSize);
+    // TODO: check if it's equal to (type.class.instanceSize - Il2Cpp.Object.headerSize)
+    const valueType = Memory.alloc(type.class.valueSize); 
 
     nativeValues = nativeValues.flat(Infinity);
     const typesAndOffsets = iter(type);

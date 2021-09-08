@@ -21,6 +21,10 @@ export class NativeStruct implements ObjectWrapper {
     isNull(): boolean {
         return this.handle.isNull();
     }
+
+    toJSON(): string | null {
+        return this.toString();
+    }
 }
 
 /** Scaffold class whom pointer cannot be null. */
@@ -32,9 +36,4 @@ export class NonNullNativeStruct extends NativeStruct {
             raise(`Handle for "${this.constructor.name}" cannot be NULL.`);
         }
     }
-}
-
-/** @internal */
-export function getOrNull<T extends ObjectWrapper>(handle: NativePointer, Class: new (handle: NativePointer) => T): T | null {
-    return handle.isNull() ? null : new Class(handle);
 }

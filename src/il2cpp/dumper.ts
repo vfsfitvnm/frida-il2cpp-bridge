@@ -1,21 +1,23 @@
 import { cache } from "decorator-cache-getter";
 
-import { injectToIl2Cpp } from "./decorators";
-
 import { inform, ok, warn } from "../utils/console";
 import { getUntilFound } from "../utils/utils";
 
-@injectToIl2Cpp("Dumper")
-class Dumper {
+/** Dumping utilities. */
+class Il2CppDumper {
+    protected constructor() {}
+
+    /** */
     @cache
     static get directoryPath(): string {
-        const UnityEngine = getUntilFound(Il2Cpp.Domain.reference.assemblies, "UnityEngine.CoreModule", "UnityEngine")!.image;
+        const UnityEngine = getUntilFound(Il2Cpp.Domain.assemblies, "UnityEngine.CoreModule", "UnityEngine")!.image;
         const Application = UnityEngine.classes["UnityEngine.Application"];
         return Application.methods.get_persistentDataPath.invoke<Il2Cpp.String>().content!;
     }
 
+    /** */
     static get fileName(): string {
-        const UnityEngine = getUntilFound(Il2Cpp.Domain.reference.assemblies, "UnityEngine.CoreModule", "UnityEngine")!.image;
+        const UnityEngine = getUntilFound(Il2Cpp.Domain.assemblies, "UnityEngine.CoreModule", "UnityEngine")!.image;
         const Application = UnityEngine.classes["UnityEngine.Application"];
 
         try {
@@ -27,10 +29,11 @@ class Dumper {
         }
     }
 
+    /** */
     static classicDump(fileName?: string, destinationDirectoryPath?: string): void {
         this.dump(
             function* (): Generator<string> {
-                for (const assembly of Object.values(Il2Cpp.Domain.reference.assemblies)) {
+                for (const assembly of Il2Cpp.Domain.assemblies) {
                     inform(`Dumping \x1b[1m${assembly.name}\x1b[0m...`);
                     for (const klass of Object.values(assembly.image.classes)) {
                         yield klass.toString();
@@ -42,6 +45,7 @@ class Dumper {
         );
     }
 
+    /** */
     static dump(
         generator: () => Generator<string>,
         fileName: string = this.fileName,
@@ -59,6 +63,7 @@ class Dumper {
         ok(`Dump saved to ${destinationPath}.`);
     }
 
+    /** */
     static snapshotDump(fileName?: string, destinationDirectoryPath?: string): void {
         warn("A snapshot dump will be effective only after process startup.");
 
@@ -75,5 +80,13 @@ class Dumper {
             fileName,
             destinationDirectoryPath
         );
+    }
+}
+
+Il2Cpp.Dumper = Il2CppDumper;
+
+declare global {
+    namespace Il2Cpp {
+        class Dumper extends Il2CppDumper {}
     }
 }

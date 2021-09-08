@@ -2,642 +2,801 @@ import { cache } from "decorator-cache-getter";
 
 import { raise } from "../utils/console";
 
-/** @internal */
-export class Api {
+class Il2CppApi {
+    protected constructor() {}
+
+    @cache
+    static get _alloc() {
+        return this.r("alloc", "pointer", ["size_t"]);
+    }
+
+    @cache
+    static get _allocationGranularity() {
+        return this.r("allocation_granularity", "uint32", []);
+    }
+
     @cache
     static get _arrayGetElements() {
-        return new NativeFunction(this.r`array_elements`, "pointer", ["pointer"]);
+        return this.r("array_elements", "pointer", ["pointer"]);
     }
 
     @cache
     static get _arrayGetLength() {
-        return new NativeFunction(this.r`array_length`, "uint32", ["pointer"]);
+        return this.r("array_length", "uint32", ["pointer"]);
     }
 
     @cache
     static get _arrayNew() {
-        return new NativeFunction(this.r`array_new`, "pointer", ["pointer", "uint32"]);
+        return this.r("array_new", "pointer", ["pointer", "uint32"]);
     }
 
     @cache
     static get _assemblyGetImage() {
-        return new NativeFunction(this.r`assembly_get_image`, "pointer", ["pointer"]);
+        return this.r("assembly_get_image", "pointer", ["pointer"]);
     }
 
     @cache
     static get _assemblyGetName() {
-        return new NativeFunction(this.r`assembly_get_name`, "pointer", ["pointer"]);
+        return this.r("assembly_get_name", "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _classForEach() {
+        return this.r("class_for_each", "void", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classFromName() {
-        return new NativeFunction(this.r`class_from_name`, "pointer", ["pointer", "pointer", "pointer"]);
+        return this.r("class_from_name", "pointer", ["pointer", "pointer", "pointer"]);
     }
 
     @cache
+    static get _classFromSystemType() {
+        return this.r("class_from_system_type", "pointer", ["pointer"]);
+    }
+    
+    @cache
     static get _classFromType() {
-        return new NativeFunction(this.r`class_from_type`, "pointer", ["pointer"]);
+        return this.r("class_from_type", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetArrayClass() {
-        return new NativeFunction(this.r`array_class_get`, "pointer", ["pointer", "uint32"]);
+        return this.r("array_class_get", "pointer", ["pointer", "uint32"]);
     }
 
     @cache
     static get _classGetArrayElementSize() {
-        return new NativeFunction(this.r`class_array_element_size`, "int", ["pointer"]);
+        return this.r("class_array_element_size", "int", ["pointer"]);
     }
 
     @cache
     static get _classGetAssemblyName() {
-        return new NativeFunction(this.r`class_get_assemblyname`, "pointer", ["pointer"]);
+        return this.r("class_get_assemblyname", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetDeclaringType() {
-        return new NativeFunction(this.r`class_get_declaring_type`, "pointer", ["pointer"]);
+        return this.r("class_get_declaring_type", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetElementClass() {
-        return new NativeFunction(this.r`class_get_element_class`, "pointer", ["pointer"]);
+        return this.r("class_get_element_class", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetFieldCount() {
-        return new NativeFunction(this.r`class_get_field_count`, "uint16", ["pointer"]);
+        return this.r("class_num_fields", "size_t", ["pointer"]);
     }
 
     @cache
     static get _classGetFields() {
-        return new NativeFunction(this.r`class_get_fields`, "pointer", ["pointer", "pointer"]);
+        return this.r("class_get_fields", "pointer", ["pointer", "pointer"]);
+    }
+
+    @cache
+    static get _classGetFlags() {
+        return this.r("class_get_fields", "int", ["pointer"]);
     }
 
     @cache
     static get _classGetImage() {
-        return new NativeFunction(this.r`class_get_image`, "pointer", ["pointer"]);
+        return this.r("class_get_image", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetInstanceSize() {
-        return new NativeFunction(this.r`class_instance_size`, "uint32", ["pointer"]);
+        return this.r("class_instance_size", "int32", ["pointer"]);
     }
 
     @cache
     static get _classGetInterfaceCount() {
-        return new NativeFunction(this.r`class_get_interface_count`, "uint16", ["pointer"]);
+        return this.r("class_get_interface_count", "uint16", ["pointer"]);
     }
 
     @cache
     static get _classGetInterfaces() {
-        return new NativeFunction(this.r`class_get_interfaces`, "pointer", ["pointer", "pointer"]);
+        return this.r("class_get_interfaces", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classGetMethodCount() {
-        return new NativeFunction(this.r`class_get_method_count`, "uint16", ["pointer"]);
+        return this.r("class_get_method_count", "uint16", ["pointer"]);
+    }
+
+    @cache
+    static get _classGetMethodFromName() {
+        return this.r("class_get_method_from_name", "pointer", ["pointer", "pointer", "int"]);
     }
 
     @cache
     static get _classGetMethods() {
-        return new NativeFunction(this.r`class_get_methods`, "pointer", ["pointer", "pointer"]);
+        return this.r("class_get_methods", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classGetName() {
-        return new NativeFunction(this.r`class_get_name`, "pointer", ["pointer"]);
+        return this.r("class_get_name", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetNamespace() {
-        return new NativeFunction(this.r`class_get_namespace`, "pointer", ["pointer"]);
+        return this.r("class_get_namespace", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetParent() {
-        return new NativeFunction(this.r`class_get_parent`, "pointer", ["pointer"]);
+        return this.r("class_get_parent", "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _classGetRank() {
+        return this.r("class_get_rank", "int", ["pointer"]);
     }
 
     @cache
     static get _classGetStaticFieldData() {
-        return new NativeFunction(this.r`class_get_static_field_data`, "pointer", ["pointer"]);
+        return this.r("class_get_static_field_data", "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _classGetValueSize() {
+        return this.r("class_value_size", "int32", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classGetType() {
-        return new NativeFunction(this.r`class_get_type`, "pointer", ["pointer"]);
+        return this.r("class_get_type", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classHasClassConstructor() {
-        return new NativeFunction(this.r`class_has_class_constructor`, "bool", ["pointer"]);
+        return this.r("class_has_class_constructor", "bool", ["pointer"]);
+    }
+
+    @cache
+    static get _classHasReferences() {
+        return this.r("class_has_references", "bool", ["pointer"]);
     }
 
     @cache
     static get _classInit() {
-        return new NativeFunction(this.r`runtime_class_init`, "void", ["pointer"]);
+        return this.r("runtime_class_init", "void", ["pointer"]);
+    }
+
+    @cache
+    static get _classIsAbstract() {
+        return this.r("class_is_abstract", "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsAssignableFrom() {
-        return new NativeFunction(this.r`class_is_assignable_from`, "bool", ["pointer", "pointer"]);
+        return this.r("class_is_assignable_from", "bool", ["pointer", "pointer"]);
+    }
+
+    @cache
+    static get _classIsBlittable() {
+        return this.r("class_is_blittable", "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsEnum() {
-        return new NativeFunction(this.r`class_is_enum`, "bool", ["pointer"]);
+        return this.r("class_is_enum", "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsGeneric() {
-        return new NativeFunction(this.r`class_is_generic`, "bool", ["pointer"]);
+        return this.r("class_is_generic", "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsInflated() {
-        return new NativeFunction(this.r`class_is_inflated`, "bool", ["pointer"]);
+        return this.r("class_is_inflated", "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsInterface() {
-        return new NativeFunction(this.r`class_is_interface`, "bool", ["pointer"]);
+        return this.r("class_is_interface", "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsStaticConstructorFinished() {
-        return new NativeFunction(this.r`class_is_class_constructor_finished`, "bool", ["pointer"]);
+        return this.r("class_is_class_constructor_finished", "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsSubclassOf() {
-        return new NativeFunction(this.r`class_is_subclass_of`, "bool", ["pointer", "pointer", "bool"]);
+        return this.r("class_is_subclass_of", "bool", ["pointer", "pointer", "bool"]);
     }
 
     @cache
     static get _classIsValueType() {
-        return new NativeFunction(this.r`class_is_valuetype`, "bool", ["pointer"]);
+        return this.r("class_is_valuetype", "bool", ["pointer"]);
     }
 
     @cache
     static get _domainAssemblyOpen() {
-        return new NativeFunction(this.r`domain_assembly_open`, "pointer", ["pointer", "pointer"]);
+        return this.r("domain_assembly_open", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _domainGet() {
-        return new NativeFunction(this.r`domain_get`, "pointer", []);
+        return this.r("domain_get", "pointer", []);
     }
 
     @cache
     static get _domainGetAssemblies() {
-        return new NativeFunction(this.r`domain_get_assemblies`, "pointer", ["pointer", "pointer"]);
+        return this.r("domain_get_assemblies", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _domainGetName() {
-        return new NativeFunction(this.r`domain_get_name`, "pointer", ["pointer"]);
+        return this.r("domain_get_name", "pointer", ["pointer"]);
     }
 
     @cache
     static get _fieldGetClass() {
-        return new NativeFunction(this.r`field_get_parent`, "pointer", ["pointer"]);
+        return this.r("field_get_parent", "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _fieldGetFlags() {
+        return this.r("field_get_flags", "int", ["pointer"]);
     }
 
     @cache
     static get _fieldGetName() {
-        return new NativeFunction(this.r`field_get_name`, "pointer", ["pointer"]);
+        return this.r("field_get_name", "pointer", ["pointer"]);
     }
 
     @cache
     static get _fieldGetOffset() {
-        return new NativeFunction(this.r`field_get_offset`, "int32", ["pointer"]);
+        return this.r("field_get_offset", "int32", ["pointer"]);
     }
 
     @cache
     static get _fieldGetStaticValue() {
-        return new NativeFunction(this.r`field_static_get_value`, "void", ["pointer", "pointer"]);
+        return this.r("field_static_get_value", "void", ["pointer", "pointer"]);
     }
 
     @cache
     static get _fieldGetType() {
-        return new NativeFunction(this.r`field_get_type`, "pointer", ["pointer"]);
+        return this.r("field_get_type", "pointer", ["pointer"]);
     }
 
     @cache
     static get _fieldGetValue() {
-        return new NativeFunction(this.r`field_get_value`, "void", ["pointer", "pointer", "pointer"]);
+        return this.r("field_get_value", "void", ["pointer", "pointer", "pointer"]);
     }
 
     @cache
     static get _fieldIsInstance() {
-        return new NativeFunction(this.r`field_is_instance`, "bool", ["pointer"]);
+        return this.r("field_is_instance", "bool", ["pointer"]);
     }
 
     @cache
     static get _fieldIsLiteral() {
-        return new NativeFunction(this.r`field_is_literal`, "bool", ["pointer"]);
+        return this.r("field_is_literal", "bool", ["pointer"]);
     }
 
     @cache
     static get _fieldSetStaticValue() {
-        return new NativeFunction(this.r`field_static_set_value`, "void", ["pointer", "pointer"]);
+        return this.r("field_static_set_value", "void", ["pointer", "pointer"]);
+    }
+
+    @cache
+    static get _free() {
+        return this.r("free", "void", ["pointer"]);
     }
 
     @cache
     static get _gcCollect() {
-        return new NativeFunction(this.r`gc_collect`, "void", ["int"]);
+        return this.r("gc_collect", "void", ["int"]);
     }
 
     @cache
     static get _gcCollectALittle() {
-        return new NativeFunction(this.r`gc_collect_a_little`, "void", []);
+        return this.r("gc_collect_a_little", "void", []);
     }
 
     @cache
     static get _gcDisable() {
-        return new NativeFunction(this.r`gc_disable`, "void", []);
+        return this.r("gc_disable", "void", []);
     }
 
     @cache
     static get _gcEnable() {
-        return new NativeFunction(this.r`gc_enable`, "void", []);
+        return this.r("gc_enable", "void", []);
     }
 
     @cache
     static get _gcGetHeapSize() {
-        return new NativeFunction(this.r`gc_get_heap_size`, "int64", []);
+        return this.r("gc_get_heap_size", "int64", []);
+    }
+
+    @cache
+    static get _gcGetMaxTimeSlice() {
+        return this.r("gc_get_max_time_slice_ns", "int64", []);
     }
 
     @cache
     static get _gcGetUsedSize() {
-        return new NativeFunction(this.r`gc_get_used_size`, "int64", []);
+        return this.r("gc_get_used_size", "int64", []);
     }
 
     @cache
     static get _gcHandleGetTarget() {
-        return new NativeFunction(this.r`gchandle_get_target`, "pointer", ["uint32"]);
+        return this.r("gchandle_get_target", "pointer", ["uint32"]);
     }
 
     @cache
     static get _gcHandleFree() {
-        return new NativeFunction(this.r`gchandle_free`, "void", ["uint32"]);
+        return this.r("gchandle_free", "void", ["uint32"]);
     }
 
     @cache
     static get _gcHandleNew() {
-        return new NativeFunction(this.r`gchandle_new`, "uint32", ["pointer", "bool"]);
+        return this.r("gchandle_new", "uint32", ["pointer", "bool"]);
     }
 
     @cache
     static get _gcHandleNewWeakRef() {
-        return new NativeFunction(this.r`gchandle_new_weakref`, "uint32", ["pointer", "bool"]);
+        return this.r("gchandle_new_weakref", "uint32", ["pointer", "bool"]);
     }
 
     @cache
     static get _gcIsDisabled() {
-        return new NativeFunction(this.r`gc_is_disabled`, "bool", []);
+        return this.r("gc_is_disabled", "bool", []);
+    }
+
+    @cache
+    static get _gcIsIncremental() {
+        return this.r("gc_is_incremental", "bool", []);
+    }
+
+    @cache
+    static get _gcSetMaxTimeSlice() {
+        return this.r("gc_set_max_time_slice_ns", "void", ["int64"]);
+    }
+
+    @cache
+    static get _gcStartIncrementalCollection() {
+        return this.r("gc_start_incremental_collection", "void", []);
+    }
+
+    @cache
+    static get _gcStartWorld() {
+        return this.r("start_gc_world", "void", []);
+    }
+
+    @cache
+    static get _gcStopWorld() {
+        return this.r("stop_gc_world", "void", []);
     }
 
     @cache
     static get _genericClassGetCachedClass() {
-        return new NativeFunction(this.r`generic_class_get_cached_class`, "pointer", ["pointer"]);
+        return this.r("generic_class_get_cached_class", "pointer", ["pointer"]);
     }
 
     @cache
     static get _genericClassGetClassGenericInstance() {
-        return new NativeFunction(this.r`generic_class_get_class_generic_instance`, "pointer", ["pointer"]);
+        return this.r("generic_class_get_class_generic_instance", "pointer", ["pointer"]);
     }
 
     @cache
     static get _genericClassGetMethodGenericInstance() {
-        return new NativeFunction(this.r`generic_class_get_method_generic_instance`, "pointer", ["pointer"]);
+        return this.r("generic_class_get_method_generic_instance", "pointer", ["pointer"]);
     }
 
     @cache
     static get _genericInstanceGetTypeCount() {
-        return new NativeFunction(this.r`generic_instance_get_type_count`, "uint32", ["pointer"]);
+        return this.r("generic_instance_get_type_count", "uint32", ["pointer"]);
     }
 
     @cache
     static get _genericInstanceGetTypes() {
-        return new NativeFunction(this.r`generic_instance_get_types`, "pointer", ["pointer"]);
+        return this.r("generic_instance_get_types", "pointer", ["pointer"]);
     }
 
     @cache
     static get _getCorlib() {
-        return new NativeFunction(this.r`get_corlib`, "pointer", []);
+        return this.r("get_corlib", "pointer", []);
     }
 
     @cache
     static get _imageGetAssembly() {
-        return new NativeFunction(this.r`image_get_assembly`, "pointer", ["pointer"]);
+        return this.r("image_get_assembly", "pointer", ["pointer"]);
     }
 
     @cache
     static get _imageGetClass() {
-        return new NativeFunction(this.r`image_get_class`, "pointer", ["pointer", "uint"]);
+        return this.r("image_get_class", "pointer", ["pointer", "uint"]);
     }
 
     @cache
     static get _imageGetClassCount() {
-        return new NativeFunction(this.r`image_get_class_count`, "uint32", ["pointer"]);
+        return this.r("image_get_class_count", "uint32", ["pointer"]);
     }
 
     @cache
     static get _imageGetClassStart() {
-        return new NativeFunction(this.r`image_get_class_start`, "uint32", ["pointer"]);
+        return this.r("image_get_class_start", "uint32", ["pointer"]);
+    }
+
+    @cache
+    static get _imageGetEntryPoint() {
+        return this.r("image_get_entry_point", "pointer", ["pointer"]);
     }
 
     @cache
     static get _imageGetName() {
-        return new NativeFunction(this.r`image_get_name`, "pointer", ["pointer"]);
+        return this.r("image_get_name", "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _imageGetHashTable() {
+        return this.r("image_get_hash_table", "pointer", ["pointer"]);
     }
 
     @cache
     static get _init() {
-        return this.r`init`;
+        return this.r("init", "void", []);
     }
 
     @cache
     static get _livenessCalculationBegin() {
-        return new NativeFunction(this.r`unity_liveness_calculation_begin`, "pointer", [
-            "pointer",
-            "int",
-            "pointer",
-            "pointer",
-            "pointer",
-            "pointer"
-        ]);
+        return this.r("unity_liveness_calculation_begin", "pointer", ["pointer", "int", "pointer", "pointer", "pointer", "pointer"]);
     }
 
     @cache
     static get _livenessCalculationEnd() {
-        return new NativeFunction(this.r`unity_liveness_calculation_end`, "void", ["pointer"]);
+        return this.r("unity_liveness_calculation_end", "void", ["pointer"]);
     }
 
     @cache
     static get _livenessCalculationFromStatics() {
-        return new NativeFunction(this.r`unity_liveness_calculation_from_statics`, "void", ["pointer"]);
+        return this.r("unity_liveness_calculation_from_statics", "void", ["pointer"]);
     }
 
     @cache
     static get _memorySnapshotCapture() {
-        return new NativeFunction(this.r`capture_memory_snapshot`, "pointer", []);
+        return this.r("capture_memory_snapshot", "pointer", []);
     }
 
     @cache
     static get _memorySnapshotFree() {
-        return new NativeFunction(this.r`free_captured_memory_snapshot`, "void", ["pointer"]);
+        return this.r("free_captured_memory_snapshot", "void", ["pointer"]);
     }
 
     @cache
     static get _memorySnapshotGetMetadataSnapshot() {
-        return new NativeFunction(this.r`memory_snapshot_get_metadata_snapshot`, "pointer", ["pointer"]);
+        return this.r("memory_snapshot_get_metadata_snapshot", "pointer", ["pointer"]);
     }
 
     @cache
     static get _memorySnapshotGetObjects() {
-        return new NativeFunction(this.r`memory_snapshot_get_objects`, "pointer", ["pointer"]);
+        return this.r("memory_snapshot_get_objects", "pointer", ["pointer"]);
     }
 
     @cache
     static get _memorySnapshotGetTrackedObjectCount() {
-        return new NativeFunction(this.r`memory_snapshot_get_tracked_object_count`, "uint64", ["pointer"]);
+        return this.r("memory_snapshot_get_tracked_object_count", "uint64", ["pointer"]);
     }
 
     @cache
     static get _metadataSnapshotGetMetadataTypeCount() {
-        return new NativeFunction(this.r`metadata_snapshot_get_metadata_type_count`, "uint32", ["pointer"]);
+        return this.r("metadata_snapshot_get_metadata_type_count", "uint32", ["pointer"]);
     }
 
     @cache
     static get _metadataSnapshotGetMetadataTypes() {
-        return new NativeFunction(this.r`metadata_snapshot_get_metadata_types`, "pointer", ["pointer", "pointer"]);
+        return this.r("metadata_snapshot_get_metadata_types", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _metadataTypeGetAssemblyName() {
-        return new NativeFunction(this.r`metadata_type_get_assembly_name`, "pointer", ["pointer"]);
+        return this.r("metadata_type_get_assembly_name", "pointer", ["pointer"]);
     }
 
     @cache
     static get _metadataTypeGetBaseOrElementTypeIndex() {
-        return new NativeFunction(this.r`metadata_type_get_base_or_element_type_index`, "uint32", ["pointer"]);
+        return this.r("metadata_type_get_base_or_element_type_index", "uint32", ["pointer"]);
     }
 
     @cache
     static get _metadataTypeGetName() {
-        return new NativeFunction(this.r`metadata_type_get_name`, "pointer", ["pointer"]);
+        return this.r("metadata_type_get_name", "pointer", ["pointer"]);
     }
 
     @cache
     static get _metadataTypeGetClass() {
-        return new NativeFunction(this.r`metadata_type_get_class`, "pointer", ["pointer"]);
+        return this.r("metadata_type_get_class", "pointer", ["pointer"]);
     }
 
     @cache
     static get _methodGetClass() {
-        return new NativeFunction(this.r`method_get_class`, "pointer", ["pointer"]);
+        return this.r("method_get_class", "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _methodGetFlags() {
+        return this.r("method_get_flags", "uint32", ["pointer", "pointer"]);
+    }
+
+    @cache
+    static get _methodGetFromReflection() {
+        return this.r("method_get_from_reflection", "pointer", ["pointer"]);
     }
 
     @cache
     static get _methodGetName() {
-        return new NativeFunction(this.r`method_get_name`, "pointer", ["pointer"]);
+        return this.r("method_get_name", "pointer", ["pointer"]);
     }
 
     @cache
     static get _methodGetObject() {
-        return new NativeFunction(this.r`method_get_object`, "pointer", ["pointer", "pointer"]);
+        return this.r("method_get_object", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _methodGetParamCount() {
-        return new NativeFunction(this.r`method_get_param_count`, "uint8", ["pointer"]);
+        return this.r("method_get_param_count", "uint8", ["pointer"]);
     }
 
     @cache
     static get _methodGetParameters() {
-        return new NativeFunction(this.r`method_get_parameters`, "pointer", ["pointer", "pointer"]);
+        return this.r("method_get_parameters", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _methodGetPointer() {
-        return new NativeFunction(this.r`method_get_pointer`, "pointer", ["pointer"]);
+        return this.r("method_get_pointer", "pointer", ["pointer"]);
     }
 
     @cache
     static get _methodGetReturnType() {
-        return new NativeFunction(this.r`method_get_return_type`, "pointer", ["pointer"]);
+        return this.r("method_get_return_type", "pointer", ["pointer"]);
     }
 
     @cache
     static get _methodIsGeneric() {
-        return new NativeFunction(this.r`method_is_generic`, "bool", ["pointer"]);
+        return this.r("method_is_generic", "bool", ["pointer"]);
     }
 
     @cache
     static get _methodIsInflated() {
-        return new NativeFunction(this.r`method_is_inflated`, "bool", ["pointer"]);
+        return this.r("method_is_inflated", "bool", ["pointer"]);
     }
 
     @cache
     static get _methodIsInstance() {
-        return new NativeFunction(this.r`method_is_instance`, "bool", ["pointer"]);
+        return this.r("method_is_instance", "bool", ["pointer"]);
+    }
+
+    @cache
+    static get _monitorEnter() {
+        return this.r("monitor_enter", "void", ["pointer"]);
+    }
+
+    @cache
+    static get _monitorExit() {
+        return this.r("monitor_exit", "void", ["pointer"]);
+    }
+
+    @cache
+    static get _monitorPulse() {
+        return this.r("monitor_pulse", "void", ["pointer"]);
+    }
+
+    @cache
+    static get _monitorPulseAll() {
+        return this.r("monitor_pulse_all", "void", ["pointer"]);
+    }
+
+    @cache
+    static get _monitorTryEnter() {
+        return this.r("monitor_try_enter", "bool", ["pointer", "uint32"]);
+    }
+
+    @cache
+    static get _monitorTryWait() {
+        return this.r("monitor_try_wait", "bool", ["pointer", "uint32"]);
+    }
+
+    @cache
+    static get _monitorWait() {
+        return this.r("monitor_wait", "void", ["pointer"]);
     }
 
     @cache
     static get _objectGetClass() {
-        return new NativeFunction(this.r`object_get_class`, "pointer", ["pointer"]);
+        return this.r("object_get_class", "pointer", ["pointer"]);
     }
 
     @cache
     static get _objectGetHeaderSize() {
-        return new NativeFunction(this.r`object_header_size`, "uint", []);
+        return this.r("object_header_size", "uint", []);
+    }
+
+    @cache
+    static get _objectGetVirtualMethod() {
+        return this.r("object_get_virtual_method", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _objectNew() {
-        return new NativeFunction(this.r`object_new`, "pointer", ["pointer"]);
+        return this.r("object_new", "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _objectGetSize() {
+        return this.r("object_get_size", "uint32", ["pointer"]);
     }
 
     @cache
     static get _objectUnbox() {
-        return new NativeFunction(this.r`object_unbox`, "pointer", ["pointer"]);
+        return this.r("object_unbox", "pointer", ["pointer"]);
     }
 
     @cache
     static get _parameterGetName() {
-        return new NativeFunction(this.r`parameter_get_name`, "pointer", ["pointer"]);
+        return this.r("parameter_get_name", "pointer", ["pointer"]);
     }
 
     @cache
     static get _parameterGetPosition() {
-        return new NativeFunction(this.r`parameter_get_position`, "int32", ["pointer"]);
+        return this.r("parameter_get_position", "int32", ["pointer"]);
     }
 
     @cache
     static get _parameterGetType() {
-        return new NativeFunction(this.r`parameter_get_type`, "pointer", ["pointer"]);
+        return this.r("parameter_get_type", "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _shutdown() {
+        return this.r("shutdown", "void", []);
     }
 
     @cache
     static get _stringChars() {
-        return new NativeFunction(this.r`string_chars`, "pointer", ["pointer"]);
+        return this.r("string_chars", "pointer", ["pointer"]);
     }
 
     @cache
     static get _stringLength() {
-        return new NativeFunction(this.r`string_length`, "int32", ["pointer"]);
+        return this.r("string_length", "int32", ["pointer"]);
     }
 
     @cache
     static get _stringNew() {
-        return new NativeFunction(this.r`string_new`, "pointer", ["pointer"]);
+        return this.r("string_new", "pointer", ["pointer"]);
     }
 
     @cache
     static get _stringSetLength() {
-        return new NativeFunction(this.r`string_set_length`, "void", ["pointer", "int32"]);
+        return this.r("string_set_length", "void", ["pointer", "int32"]);
     }
 
     @cache
     static get _valueBox() {
-        return new NativeFunction(this.r`value_box`, "pointer", ["pointer", "pointer"]);
+        return this.r("value_box", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _threadAttach() {
-        return new NativeFunction(this.r`thread_attach`, "void", ["pointer"]);
+        return this.r("thread_attach", "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _threadCurrent() {
+        return this.r("thread_current", "pointer", []);
+    }
+
+    @cache
+    static get _threadGetAllAttachedThreads() {
+        return this.r("thread_get_all_attached_threads", "pointer", ["pointer"]);
+    }
+
+    @cache
+    static get _threadIsVm() {
+        return this.r("is_vm_thread", "bool", ["pointer"]);
+    }
+
+    @cache
+    static get _threadDetach() {
+        return this.r("thread_detach", "void", ["pointer"]);
     }
 
     @cache
     static get _typeGetClassOrElementClass() {
-        return new NativeFunction(this.r`type_get_class_or_element_class`, "pointer", ["pointer"]);
+        return this.r("type_get_class_or_element_class", "pointer", ["pointer"]);
     }
 
     @cache
     static get _typeGetDataType() {
-        return new NativeFunction(this.r`type_get_data_type`, "pointer", ["pointer"]);
+        return this.r("type_get_data_type", "pointer", ["pointer"]);
     }
 
     @cache
     static get _typeGetGenericClass() {
-        return new NativeFunction(this.r`type_get_generic_class`, "pointer", ["pointer"]);
+        return this.r("type_get_generic_class", "pointer", ["pointer"]);
     }
 
     @cache
     static get _typeGetName() {
-        return new NativeFunction(this.r`type_get_name`, "pointer", ["pointer"]);
+        return this.r("type_get_name", "pointer", ["pointer"]);
     }
 
     @cache
     static get _typeGetObject() {
-        return new NativeFunction(this.r`type_get_object`, "pointer", ["pointer"]);
+        return this.r("type_get_object", "pointer", ["pointer"]);
     }
 
     @cache
     static get _typeGetTypeEnum() {
-        return new NativeFunction(this.r`type_get_type`, "int", ["pointer"]);
+        return this.r("type_get_type", "int", ["pointer"]);
     }
 
     @cache
     static get _typeIsByReference() {
-        return new NativeFunction(this.r`type_is_byref`, "bool", ["pointer"]);
+        return this.r("type_is_byref", "bool", ["pointer"]);
     }
 
+    /** @internal */
     @cache
-    static get _typeOffsetOfTypeEnum() {
-        return new NativeFunction(this.r`type_offset_of_type`, "uint16", []);
-    }
+    static get cModule(): Record<string, NativePointer | null> {
+        const isEqualOrAbove_5_3_2 = +Il2Cpp.unityVersion.isEqualOrAbove("5.3.2");
+        const isEqualOrAbove_5_3_3 = +Il2Cpp.unityVersion.isEqualOrAbove("5.3.3");
+        const isEqualOrAbove_5_3_6 = +Il2Cpp.unityVersion.isEqualOrAbove("5.3.6");
+        const isEqualOrAbove_5_4_4 = +Il2Cpp.unityVersion.isEqualOrAbove("5.4.4");
+        const isEqualOrAbove_5_5_0 = +Il2Cpp.unityVersion.isEqualOrAbove("5.5.0");
+        const isEqualOrAbove_5_6_0 = +Il2Cpp.unityVersion.isEqualOrAbove("5.6.0");
+        const isEqualOrAbove_2017_1_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2017.1.0");
+        const isEqualOrAbove_2017_1_3 = +Il2Cpp.unityVersion.isEqualOrAbove("2017.1.3");
+        const isEqualOrAbove_2018_1_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2018.1.0");
+        const isEqualOrAbove_2018_2_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2018.2.0");
+        const isEqualOrAbove_2018_3_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2018.3.0");
+        const isEqualOrAbove_2018_3_8 = +Il2Cpp.unityVersion.isEqualOrAbove("2018.3.8");
+        const isEqualOrAbove_2019_1_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2019.1.0");
+        const isEqualOrAbove_2020_2_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2020.2.0");
 
-    @cache
-    static get sources(): (Module | CModule)[] {
-        return [Il2Cpp.module, createMissingApi()];
-    }
+        const isBelow_5_3_3 = +!isEqualOrAbove_5_3_3;
+        const isBelow_5_3_6 = +!isEqualOrAbove_5_3_6;
+        const isBelow_5_5_0 = +!isEqualOrAbove_5_5_0;
+        const isBelow_2017_1_0 = +!isEqualOrAbove_2017_1_0;
+        const isBelow_2018_1_0 = +!isEqualOrAbove_2018_1_0;
+        const isBelow_2018_2_0 = +!isEqualOrAbove_2018_2_0;
+        const isBelow_2018_3_0 = +!isEqualOrAbove_2018_3_0;
+        const isBelow_2019_3_0 = +Il2Cpp.unityVersion.isBelow("2019.3.0");
+        const isBelow_2020_2_0 = +!isEqualOrAbove_2020_2_0;
 
-    private static r(exportName: readonly string[]): NativePointer {
-        const name = "il2cpp_" + exportName;
-        for (const source of this.sources) {
-            const result = source instanceof Module ? source.findExportByName(name) : source[name];
-            if (result) {
-                return result as NativePointer;
-            }
-        }
-        raise(`Couldn't resolve export "${name}".`);
-    }
+        const isNotEqual_2017_2_0 = +!Il2Cpp.unityVersion.isEqual("2017.2.0");
+        const isNotEqual_5_5_0 = +!Il2Cpp.unityVersion.isEqual("5.5.0");
 
-    private constructor() {}
-}
-
-function createMissingApi(): CModule {
-    const isEqualOrAbove_5_3_2 = +Il2Cpp.unityVersion.isEqualOrAbove("5.3.2");
-    const isEqualOrAbove_5_3_3 = +Il2Cpp.unityVersion.isEqualOrAbove("5.3.3");
-    const isEqualOrAbove_5_3_6 = +Il2Cpp.unityVersion.isEqualOrAbove("5.3.6");
-    const isEqualOrAbove_5_4_4 = +Il2Cpp.unityVersion.isEqualOrAbove("5.4.4");
-    const isEqualOrAbove_5_5_0 = +Il2Cpp.unityVersion.isEqualOrAbove("5.5.0");
-    const isEqualOrAbove_5_6_0 = +Il2Cpp.unityVersion.isEqualOrAbove("5.6.0");
-    const isEqualOrAbove_2017_1_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2017.1.0");
-    const isEqualOrAbove_2017_1_3 = +Il2Cpp.unityVersion.isEqualOrAbove("2017.1.3");
-    const isEqualOrAbove_2018_1_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2018.1.0");
-    const isEqualOrAbove_2018_2_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2018.2.0");
-    const isEqualOrAbove_2018_3_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2018.3.0");
-    const isEqualOrAbove_2018_3_8 = +Il2Cpp.unityVersion.isEqualOrAbove("2018.3.8");
-    const isEqualOrAbove_2019_1_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2019.1.0");
-    const isEqualOrAbove_2020_2_0 = +Il2Cpp.unityVersion.isEqualOrAbove("2020.2.0");
-
-    const isBelow_5_3_3 = +!isEqualOrAbove_5_3_3;
-    const isBelow_5_3_6 = +!isEqualOrAbove_5_3_6;
-    const isBelow_5_5_0 = +!isEqualOrAbove_5_5_0;
-    const isBelow_2018_1_0 = +!isEqualOrAbove_2018_1_0;
-    const isBelow_2018_3_0 = +!isEqualOrAbove_2018_3_0;
-    const isBelow_2019_3_0 = +Il2Cpp.unityVersion.isBelow("2019.3.0");
-    const isBelow_2020_2_0 = +!isEqualOrAbove_2020_2_0;
-
-    const isNotEqual_2017_2_0 = +!Il2Cpp.unityVersion.isEqual("2017.2.0");
-    const isNotEqual_5_5_0 = +!Il2Cpp.unityVersion.isEqual("5.5.0");
-
-    return new CModule(`
+        return new CModule(`
 #include <stdint.h>
 
 #define FIELD_ATTRIBUTE_STATIC 0x0010
@@ -674,6 +833,7 @@ typedef struct _Il2CppStacks Il2CppStacks;
 typedef struct _Il2CppGCHandles Il2CppGCHandles;
 typedef struct _Il2CppRuntimeInformation Il2CppRuntimeInformation;
 typedef struct _Il2CppMetadataType Il2CppMetadataType;
+typedef struct _Il2CppReflectionMethod Il2CppReflectionMethod;
 
 enum _Il2CppTypeEnum
 {
@@ -907,12 +1067,6 @@ struct _Il2CppType
     unsigned int pinned: 1;
 };
 
-uint16_t
-il2cpp_type_offset_of_type (void)
-{
-    return (uint16_t) offsetof (Il2CppType, type);
-}
-
 const Il2CppType *
 il2cpp_type_get_data_type (const Il2CppType * type)
 {
@@ -949,8 +1103,8 @@ struct _Il2CppClass
     Il2CppType byval_arg;
     Il2CppType this_arg;
 #else
-    const Il2CppType* byval_arg;
-    const Il2CppType* this_arg;
+    const Il2CppType * byval_arg;
+    const Il2CppType * this_arg;
 #endif
     Il2CppClass * element_class;
     Il2CppClass * castClass;
@@ -969,7 +1123,7 @@ struct _Il2CppClass
     Il2CppClass * klass;
 #endif
     FieldInfo * fields;
-    const struct EventInfo* events;
+    const struct EventInfo * events;
     const struct PropertyInfo * properties;
     const MethodInfo ** methods;
     Il2CppClass ** nestedTypes;
@@ -1073,11 +1227,13 @@ il2cpp_class_get_method_count (const Il2CppClass * klass)
     return klass->method_count;
 }
 
-uint16_t
-il2cpp_class_get_field_count (const Il2CppClass * klass)
+#if ${isBelow_2018_1_0}
+uint8_t
+il2cpp_class_get_rank (const Il2CppClass * klass)
 {
-    return klass->field_count;
+    return klass->rank;
 }
+#endif
 
 uint8_t
 il2cpp_class_has_class_constructor (const Il2CppClass * klass)
@@ -1090,6 +1246,14 @@ il2cpp_class_is_class_constructor_finished (const Il2CppClass * klass)
 {
     return klass->cctor_finished;
 }
+
+#if ${isBelow_2017_1_0}
+uint8_t
+il2cpp_class_is_blittable (const Il2CppClass * klass)
+{
+    return klass->is_blittable;
+}
+#endif
 
 #if ${isBelow_2019_3_0}
 void *
@@ -1259,24 +1423,24 @@ il2cpp_method_get_pointer(const MethodInfo * method)
 
 const ParameterInfo *
 il2cpp_method_get_parameters (const MethodInfo * method,
-                              void ** iter)
+                                void ** iter)
 {
     uint16_t parameters_count = method->parameters_count;
 
     if (iter != 0 && parameters_count > 0)
     {
-        void* temp = *iter;
+        void * temp = *iter;
         if (temp == 0)
         {
-            *iter = (void**) method->parameters;
+            *iter = (void **) method->parameters;
             return method->parameters;
         }
         else
         {
-            const ParameterInfo * parameterInfo = (ParameterInfo*) *iter + 1;
+            const ParameterInfo * parameterInfo = (ParameterInfo *) *iter + 1;
             if (parameterInfo < method->parameters + parameters_count)
             {
-                *iter = (void*) parameterInfo;
+                *iter = (void *) parameterInfo;
                 return parameterInfo;
             }
         }
@@ -1294,7 +1458,7 @@ struct _Il2CppString
 
 void
 il2cpp_string_set_length (Il2CppString * string,
-                          int32_t length)
+                            int32_t length)
 {
     string->length = length;
 }
@@ -1337,14 +1501,13 @@ il2cpp_array_elements (Il2CppArraySize * array) {
 
 void *
 il2cpp_array_elements (Il2CppArray * array) {
-    return (void*) array->vector;
+    return (void *) array->vector;
 }
 #endif
 
 struct _Il2CppMetadataType
 {
     uint32_t flags;
-    // Il2CppMetadataTypeFlags flags;
     struct Il2CppMetadataField * fields;
     uint32_t fieldCount;
     uint32_t staticsSize;
@@ -1394,7 +1557,7 @@ il2cpp_metadata_snapshot_get_metadata_type_count (Il2CppMetadataSnapshot * metad
 
 Il2CppMetadataType *
 il2cpp_metadata_snapshot_get_metadata_types (Il2CppMetadataSnapshot * metadata_snapshot,
-                              void ** iter)
+                                void ** iter)
 {
     uint32_t metadata_type_count = metadata_snapshot->typeCount;
 
@@ -1403,7 +1566,7 @@ il2cpp_metadata_snapshot_get_metadata_types (Il2CppMetadataSnapshot * metadata_s
         void * temp = *iter;
         if (temp == 0)
         {
-            *iter = (void**) metadata_snapshot->types;
+            *iter = (void **) metadata_snapshot->types;
             return metadata_snapshot->types;
         }
         else
@@ -1481,5 +1644,48 @@ il2cpp_memory_snapshot_get_tracked_object_count (Il2CppManagedMemorySnapshot * s
 {
     return snapshot->gcHandles.trackedObjectCount;
 }
-`);
+
+struct _Il2CppReflectionMethod
+{
+    Il2CppObject object;
+    const MethodInfo * method;
+    Il2CppString * name;
+    struct Il2CppReflectionType * reftype;
+};
+
+#if ${isBelow_2018_2_0}
+const MethodInfo *
+il2cpp_method_get_from_reflection (const Il2CppReflectionMethod * method)
+{
+    return method->method;
+}
+#endif
+        `);
+    }
+
+    /** @internal */
+    private static r<RetType extends NativeFunctionReturnType, ArgTypes extends NativeFunctionArgumentType[] | []>(
+        exportName: string,
+        retType: RetType,
+        argTypes: ArgTypes,
+        options?: NativeFunctionOptions
+        // options: NativeFunctionOptions = { exceptions: "propagate" }
+    ) {
+        exportName = "il2cpp_" + exportName;
+        const exportPointer = Il2Cpp.module.findExportByName(exportName) || this.cModule[exportName];
+
+        if (exportPointer == null) {
+            raise(`Couldn't resolve export "${exportName}".`);
+        }
+
+        return new NativeFunction(exportPointer, retType, argTypes, options);
+    }
+}
+
+Il2Cpp.Api = Il2CppApi;
+
+declare global {
+    namespace Il2Cpp {
+        class Api extends Il2CppApi {}
+    }
 }

@@ -1,5 +1,4 @@
-tsconfig.json
-src
 .git
-.idea
+tsconfig.json
 node_modules
+src

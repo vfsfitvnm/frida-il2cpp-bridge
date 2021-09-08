@@ -49,26 +49,23 @@ class Target {
     }
 }
 
-/**
- * @internal
- * It waits for a `Module` to be loaded.
- * @param moduleName The name of the target module.
- */
-export function forModule(moduleName: string): Promise<Module> {
-    return new Promise<Module>(resolve => {
+/** @internal */
+export function forModule(moduleName: string): Promise<void> {
+    return new Promise<void>(resolve => {
         const module = Process.findModuleByName(moduleName);
-        if (module) {
-            resolve(module);
+        if (module != null) {
+            resolve();
         } else {
             const interceptors = Target.targets.map(target =>
                 Interceptor.attach(target.address, {
                     onEnter(args: InvocationArguments) {
-                        this.modulePath = target.readString(args[0]);
+                        this.modulePath = target.readString(args[0]) || "";
                     },
                     onLeave(returnValue: InvocationReturnValue) {
-                        if (returnValue.isNull() || !this.modulePath || !this.modulePath.endsWith(moduleName)) return;
-                        setTimeout(() => interceptors.forEach(i => i.detach()));
-                        resolve(Process.getModuleByName(moduleName));
+                        if (!returnValue.isNull() && this.modulePath.endsWith(moduleName)) {
+                            setTimeout(() => interceptors.forEach(i => i.detach()));
+                            resolve();
+                        }
                     }
                 })
             );

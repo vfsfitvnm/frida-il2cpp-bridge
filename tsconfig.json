@@ -1,20 +1,18 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "declaration": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
     "lib": [
       "es2020"
     ],
     "module": "commonjs",
     "moduleResolution": "node",
-    "experimentalDecorators": true,
-    "esModuleInterop": true,
-    "strict": true,
-    "alwaysStrict": true,
-    "declaration": true,
-    "declarationMap": false,
-    "stripInternal": true,
+    "outDir": "dist",
     "removeComments": true,
-    "outDir": "dist"
+    "strict": true,
+    "stripInternal": true,
+    "target": "esnext",
   },
   "files": [
     "src/index.ts"

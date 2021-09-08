@@ -1,9 +1,10 @@
-import { injectToIl2Cpp } from "./decorators";
+/** Filtering utilities. */
+class Il2CppFiltering<T> {
+    protected constructor() {}
 
-@injectToIl2Cpp("Filtering")
-class Filtering<T> {
-    static Is(klass: Il2Cpp.Class): (element: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.Type) => boolean {
-        return (element: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.Type): boolean => {
+    /** Creates a filter which includes `element`s whose type can be assigned to `klass` variables. */
+    static Is<T extends Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.Type>(klass: Il2Cpp.Class): (element: T) => boolean {
+        return (element: T): boolean => {
             if (element instanceof Il2Cpp.Class) {
                 return klass.isAssignableFrom(element);
             } else {
@@ -12,8 +13,9 @@ class Filtering<T> {
         };
     }
 
-    static IsExactly(klass: Il2Cpp.Class): (element: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.Type) => boolean {
-        return (element: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.Type): boolean => {
+    /** Creates a filter which includes `element`s whose type corresponds to `klass` type. */
+    static IsExactly<T extends Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.Type>(klass: Il2Cpp.Class): (element: T) => boolean {
+        return (element: T): boolean => {
             if (element instanceof Il2Cpp.Class) {
                 return element.equals(klass);
             } else {
@@ -22,3 +24,13 @@ class Filtering<T> {
         };
     }
 }
+
+Il2Cpp.Filtering = Il2CppFiltering;
+
+declare global {
+    namespace Il2Cpp {
+        class Filtering<T> extends Il2CppFiltering<T> {}
+    }
+}
+
+export {};

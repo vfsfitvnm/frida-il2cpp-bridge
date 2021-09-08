@@ -1,29 +1,24 @@
 import { cache } from "decorator-cache-getter";
 
-import { Api } from "../api";
-import { injectToIl2Cpp } from "../decorators";
-
-import { getOrNull, NonNullNativeStruct } from "../../utils/native-struct";
-import { filterMapArray } from "../../utils/utils";
+import { NonNullNativeStruct } from "../../utils/native-struct";
+import { filterMapArray, getOrNull } from "../../utils/utils";
 import { warn } from "../../utils/console";
 
-@injectToIl2Cpp("Type")
+/** Represents a `Il2CppType`. */
 class Il2CppType extends NonNullNativeStruct {
-    @cache
-    static get offsetOfTypeEnum() {
-        return Api._typeOffsetOfTypeEnum();
-    }
-
+    /** Gets the class of this type. */
     @cache
     get class(): Il2Cpp.Class {
-        return new Il2Cpp.Class(Api._classFromType(this));
+        return new Il2Cpp.Class(Il2Cpp.Api._classFromType(this));
     }
 
+    /** Gets the encompassed type of this array type. */
     @cache
     get dataType(): Il2Cpp.Type | null {
-        return getOrNull(Api._typeGetDataType(this), Il2Cpp.Type);
+        return getOrNull(Il2Cpp.Api._typeGetDataType(this), Il2Cpp.Type);
     }
 
+    /** */
     @cache
     get fridaAlias(): NativeCallbackArgumentType {
         if (this.isByReference) {
@@ -65,6 +60,7 @@ class Il2CppType extends NonNullNativeStruct {
             case "string":
             case "szarray":
             case "array":
+                return "pointer";
             case "class":
             case "object":
             case "genericinst":
@@ -75,29 +71,34 @@ class Il2CppType extends NonNullNativeStruct {
         }
     }
 
+    /** */
     @cache
     get genericClass(): Il2Cpp.GenericClass {
-        return new Il2Cpp.GenericClass(Api._typeGetGenericClass(this));
+        return new Il2Cpp.GenericClass(Il2Cpp.Api._typeGetGenericClass(this));
     }
 
+    /** Determines whether this type is passed by reference. */
     @cache
     get isByReference(): boolean {
-        return !!Api._typeIsByReference(this);
+        return !!Il2Cpp.Api._typeIsByReference(this);
     }
 
+    /** Gets the name of this type. */
     @cache
     get name(): string {
-        return Api._typeGetName(this).readUtf8String()!;
+        return Il2Cpp.Api._typeGetName(this).readUtf8String()!;
     }
 
+    /** Gets the encompassing object of the current type. */
     @cache
     get object(): Il2Cpp.Object {
-        return new Il2Cpp.Object(Api._typeGetObject(this));
+        return new Il2Cpp.Object(Il2Cpp.Api._typeGetObject(this));
     }
 
+    /** */
     @cache
     get typeEnum(): Il2Cpp.Type.Enum {
-        switch (Api._typeGetTypeEnum(this)) {
+        switch (Il2Cpp.Api._typeGetTypeEnum(this)) {
             case 0x00:
                 return "end";
             case 0x01:
@@ -182,4 +183,12 @@ function getValueTypeFields(type: Il2Cpp.Type): NativeCallbackArgumentType {
         (field: Il2Cpp.Field) => !field.isStatic,
         (field: Il2Cpp.Field) => field.type.fridaAlias
     );
+}
+
+Il2Cpp.Type = Il2CppType;
+
+declare global {
+    namespace Il2Cpp {
+        class Type extends Il2CppType {}
+    }
 }
