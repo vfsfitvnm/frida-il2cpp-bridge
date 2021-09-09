@@ -101,6 +101,11 @@ class Il2CppApi {
     }
 
     @cache
+    static get _classGetGenericParameterCount() {
+        return this.r("class_get_generic_parameter_count", "int32", ["pointer"]);
+    }
+
+    @cache
     static get _classGetImage() {
         return this.r("class_get_image", "pointer", ["pointer"]);
     }
@@ -289,17 +294,22 @@ class Il2CppApi {
     static get _fieldGetValue() {
         return this.r("field_get_value", "void", ["pointer", "pointer", "pointer"]);
     }
-
-    @cache
-    static get _fieldIsInstance() {
-        return this.r("field_is_instance", "bool", ["pointer"]);
-    }
-
+    
     @cache
     static get _fieldIsLiteral() {
         return this.r("field_is_literal", "bool", ["pointer"]);
     }
-
+    
+    @cache
+    static get _fieldIsStatic() {
+        return this.r("field_is_static", "bool", ["pointer"]);
+    }
+        
+    @cache
+    static get _fieldIsThreadStatic() {
+        return this.r("field_is_thread_static", "bool", ["pointer"]);
+    }
+    
     @cache
     static get _fieldSetStaticValue() {
         return this.r("field_static_set_value", "void", ["pointer", "pointer"]);
@@ -461,6 +471,11 @@ class Il2CppApi {
     }
 
     @cache
+    static get _imageSetEntryPointIndex() {
+        return this.r("image_set_entry_point_index", "void", ["pointer", "int32"]);
+    }
+
+    @cache
     static get _init() {
         return this.r("init", "void", []);
     }
@@ -551,6 +566,11 @@ class Il2CppApi {
     }
 
     @cache
+    static get _methodGetGenericParameterCount() {
+        return this.r("method_get_generic_parameter_count", "int32", ["pointer"]);
+    }
+
+    @cache
     static get _methodGetName() {
         return this.r("method_get_name", "pointer", ["pointer"]);
     }
@@ -561,8 +581,19 @@ class Il2CppApi {
     }
 
     @cache
-    static get _methodGetParamCount() {
+    static get _methodGetParameter() {
+        return this.r("method_get_param", "pointer", ["pointer", "uint32"]);
+    }
+
+    @cache
+    static get _methodGetParameterCount() {
         return this.r("method_get_param_count", "uint8", ["pointer"]);
+    }
+
+
+    @cache
+    static get _methodGetParameterName() {
+        return this.r("method_get_param_name", "pointer", ["pointer", "uint32"]);
     }
 
     @cache
@@ -581,6 +612,11 @@ class Il2CppApi {
     }
 
     @cache
+    static get _methodIsExternal() {
+        return this.r("method_is_external", "bool", ["pointer"]);
+    }
+
+    @cache
     static get _methodIsGeneric() {
         return this.r("method_is_generic", "bool", ["pointer"]);
     }
@@ -593,6 +629,11 @@ class Il2CppApi {
     @cache
     static get _methodIsInstance() {
         return this.r("method_is_instance", "bool", ["pointer"]);
+    }
+
+    @cache
+    static get _methodIsSynchronized() {
+        return this.r("method_is_synchronized", "bool", ["pointer"]);
     }
 
     @cache
@@ -767,9 +808,10 @@ class Il2CppApi {
 
     /** @internal */
     @cache
-    static get cModule(): Record<string, NativePointer | null> {
+    private static get cModule(): Record<string, NativePointer | null> {
         const isEqualOrAbove_5_3_2 = +Il2Cpp.unityVersion.isEqualOrAbove("5.3.2");
         const isEqualOrAbove_5_3_3 = +Il2Cpp.unityVersion.isEqualOrAbove("5.3.3");
+        const isEqualOrAbove_5_3_5 = +Il2Cpp.unityVersion.isEqualOrAbove("5.3.5");
         const isEqualOrAbove_5_3_6 = +Il2Cpp.unityVersion.isEqualOrAbove("5.3.6");
         const isEqualOrAbove_5_4_4 = +Il2Cpp.unityVersion.isEqualOrAbove("5.4.4");
         const isEqualOrAbove_5_5_0 = +Il2Cpp.unityVersion.isEqualOrAbove("5.5.0");
@@ -786,23 +828,30 @@ class Il2CppApi {
         const isBelow_5_3_3 = +!isEqualOrAbove_5_3_3;
         const isBelow_5_3_6 = +!isEqualOrAbove_5_3_6;
         const isBelow_5_5_0 = +!isEqualOrAbove_5_5_0;
+        const isBelow_5_6_0 = +Il2Cpp.unityVersion.isBelow("5.6.0");
         const isBelow_2017_1_0 = +!isEqualOrAbove_2017_1_0;
         const isBelow_2018_1_0 = +!isEqualOrAbove_2018_1_0;
         const isBelow_2018_2_0 = +!isEqualOrAbove_2018_2_0;
         const isBelow_2018_3_0 = +!isEqualOrAbove_2018_3_0;
+        const isBelow_2019_1_0 = +!isEqualOrAbove_2019_1_0;
         const isBelow_2019_3_0 = +Il2Cpp.unityVersion.isBelow("2019.3.0");
         const isBelow_2020_2_0 = +!isEqualOrAbove_2020_2_0;
 
         const isNotEqual_2017_2_0 = +!Il2Cpp.unityVersion.isEqual("2017.2.0");
         const isNotEqual_5_5_0 = +!Il2Cpp.unityVersion.isEqual("5.5.0");
-
-        return new CModule(`
+        
+        return new CModule(`\
 #include <stdint.h>
+
+#define THREAD_STATIC_FIELD_OFFSET -1;
 
 #define FIELD_ATTRIBUTE_STATIC 0x0010
 #define FIELD_ATTRIBUTE_LITERAL 0x0040
 
 #define METHOD_ATTRIBUTE_STATIC 0x0010
+
+#define METHOD_IMPL_ATTRIBUTE_INTERNAL_CALL 0x1000
+#define METHOD_IMPL_ATTRIBUTE_SYNCHRONIZED 0x0020
 
 typedef struct _Il2CppObject Il2CppObject;
 typedef struct _Il2CppString Il2CppString;
@@ -834,6 +883,22 @@ typedef struct _Il2CppGCHandles Il2CppGCHandles;
 typedef struct _Il2CppRuntimeInformation Il2CppRuntimeInformation;
 typedef struct _Il2CppMetadataType Il2CppMetadataType;
 typedef struct _Il2CppReflectionMethod Il2CppReflectionMethod;
+#if ${isEqualOrAbove_2020_2_0}
+typedef struct _Il2CppMetadataImageHandle Il2CppMetadataImageHandle;
+#endif
+typedef struct _Il2CppGenericContainer Il2CppGenericContainer;
+typedef struct _Il2CppTypeDefinition Il2CppTypeDefinition;
+
+#if ${isEqualOrAbove_2020_2_0}
+struct _Il2CppMetadataImageHandle
+{
+    int32_t typeStart;
+    int32_t exportedTypeStart;
+    int32_t customAttributeStart;
+    int32_t entryPointIndex;
+    const Il2CppImage * image;
+};
+#endif
 
 enum _Il2CppTypeEnum
 {
@@ -1000,7 +1065,7 @@ struct _Il2CppImage
     uint32_t customAttributeCount;
 #endif
 #if ${isEqualOrAbove_2020_2_0}
-    const struct Il2CppMetadataImageHandle * metadataHandle;
+    Il2CppMetadataImageHandle * metadataHandle;
     struct Il2CppNameToTypeHandleHashTable * nameToClassHashTable;
 #else
     int32_t entryPointIndex;
@@ -1017,6 +1082,17 @@ struct _Il2CppImage
 #endif
 };
 
+void
+il2cpp_image_set_entry_point_index (Il2CppImage * image,
+                                    int32_t entry_point_index)
+{
+#if ${isEqualOrAbove_2020_2_0}
+    image->metadataHandle->entryPointIndex = entry_point_index;
+#else
+    image->entryPointIndex = entry_point_index;
+#endif
+}
+
 #if ${isEqualOrAbove_2018_1_0}
 Il2CppAssembly *
 il2cpp_image_get_assembly (const Il2CppImage * image)
@@ -1025,13 +1101,13 @@ il2cpp_image_get_assembly (const Il2CppImage * image)
 }
 #endif
 
-uint32_t
+int32_t
 il2cpp_image_get_class_start (const Il2CppImage * image)
 {
-#if ${isBelow_2020_2_0}
-    return image->typeStart;
+#if ${isEqualOrAbove_2020_2_0}
+    return image->metadataHandle->typeStart;
 #else
-    return 0;
+    return image->typeStart;
 #endif
 }
 
@@ -1043,6 +1119,56 @@ il2cpp_image_get_class_count (const Il2CppImage * image)
 }
 #endif
 
+struct _Il2CppTypeDefinition
+{
+    int32_t nameIndex;
+    int32_t namespaceIndex;
+#if ${isBelow_2018_3_0}
+    int32_t customAttributeIndex;
+#endif
+    int32_t byvalTypeIndex;
+#if ${isBelow_2020_2_0}
+    int32_t byrefTypeIndex;
+#endif
+    int32_t declaringTypeIndex;
+    int32_t parentIndex;
+    int32_t elementTypeIndex;
+#if ${isBelow_2019_1_0}
+    int32_t rgctxStartIndex;
+    int32_t rgctxCount;
+#endif
+    int32_t genericContainerIndex;
+#if ${isBelow_5_6_0}
+    int32_t delegateWrapperFromManagedToNativeIndex;
+    int32_t marshalingFunctionsIndex;
+#if ${isEqualOrAbove_5_3_5}
+    int32_t ccwFunctionIndex;
+    int32_t guidIndex;
+#endif
+#endif
+    uint32_t flags;
+    int32_t fieldStart;
+    int32_t methodStart;
+    int32_t eventStart;
+    int32_t propertyStart;
+    int32_t nestedTypesStart;
+    int32_t interfacesStart;
+    int32_t vtableStart;
+    int32_t interfaceOffsetsStart;
+    uint16_t method_count;
+    uint16_t property_count;
+    uint16_t field_count;
+    uint16_t event_count;
+    uint16_t nested_type_count;
+    uint16_t vtable_count;
+    uint16_t interfaces_count;
+    uint16_t interface_offsets_count;
+    uint32_t bitfield;
+#if ${isEqualOrAbove_5_3_2}
+    uint32_t token;
+#endif
+};
+
 struct _Il2CppType
 {
     union
@@ -1050,7 +1176,7 @@ struct _Il2CppType
         void * dummy;
         int32_t klassIndex;
 #if ${isEqualOrAbove_2020_2_0}
-        const struct Il2CppMetadataTypeHandle * typeHandle;
+        Il2CppTypeDefinition * typeHandle;
 #endif
         const Il2CppType * type;
         struct Il2CppArrayType * array;
@@ -1093,6 +1219,14 @@ struct _VirtualInvokeData
     const MethodInfo * method;
 };
 
+struct _Il2CppGenericContainer
+{
+    int32_t ownerIndex;
+    int32_t type_argc;
+    int32_t is_method;
+    int32_t genericParameterStart;
+};
+
 struct _Il2CppClass
 {
     const Il2CppImage * image;
@@ -1111,11 +1245,7 @@ struct _Il2CppClass
     Il2CppClass * declaringType;
     Il2CppClass * parent;
     Il2CppGenericClass * generic_class;
-#if ${isEqualOrAbove_2020_2_0}
-    const struct Il2CppMetadataTypeHandle * typeMetadataHandle;
-#else
-    const struct Il2CppTypeDefinition * typeDefinition;
-#endif
+    const Il2CppTypeDefinition * typeDefinition;
 #if ${isEqualOrAbove_5_6_0}
     const struct Il2CppInteropData * interopData;
 #endif
@@ -1152,7 +1282,7 @@ struct _Il2CppClass
     __attribute__((aligned(8))) uint64_t cctor_thread;
 #endif
 #if ${isEqualOrAbove_2020_2_0}
-    const struct Il2CppMetadataGenericContainerHandle * genericContainerHandle;
+    const Il2CppGenericContainer * genericContainer;
 #else
     int32_t genericContainerIndex;
 #endif
@@ -1215,6 +1345,59 @@ struct _Il2CppClass
 #endif
 };
 
+int32_t
+il2cpp_class_get_generic_parameter_count (const Il2CppClass * klass)
+{   
+    int is_generic = klass->is_generic;
+    if (!is_generic)
+    {
+        return 0;
+    }
+
+#if ${isEqualOrAbove_2020_2_0}
+    return klass->genericContainer->type_argc;
+#else
+    const char * name = klass->name;
+    int count = 0;
+
+    for (int i = 0; ; i++)
+    {
+        char c = name[i];
+
+        if (c == '\\0')
+        {
+            break;
+        }
+
+        if (count > 0 && c >= '0' && c <= '9')
+        {
+            count *= 10;
+            count += c - '0';
+            
+            continue;
+        }
+
+        if (c == '\`')
+        {
+            c = name[++i];
+
+            if (c != '\\0' && c >= '0' && c <= '9')
+            {
+                count = c - '0';
+            }
+        }
+    }
+
+    Il2CppClass * declaringType = klass->declaringType;
+    if (declaringType != NULL)
+    {
+        count += il2cpp_class_get_generic_parameter_count (declaringType);
+    }
+
+    return count;
+#endif
+}
+
 uint16_t
 il2cpp_class_get_interface_count (const Il2CppClass * klass)
 {
@@ -1270,13 +1453,13 @@ struct _Il2CppGenericInst
 };
 
 uint32_t
-il2cpp_generic_instance_get_type_count (Il2CppGenericInst * inst)
+il2cpp_generic_instance_get_type_count (const Il2CppGenericInst * inst)
 {
     return inst->type_argc;
 }
 
 const Il2CppType **
-il2cpp_generic_instance_get_types (Il2CppGenericInst * inst)
+il2cpp_generic_instance_get_types (const Il2CppGenericInst * inst)
 {
     return inst->type_argv;
 }
@@ -1299,19 +1482,19 @@ struct _Il2CppGenericClass
 };
 
 Il2CppClass *
-il2cpp_generic_class_get_cached_class (Il2CppGenericClass * class)
+il2cpp_generic_class_get_cached_class (const Il2CppGenericClass * class)
 {
     return class->cached_class;
 }
 
 const Il2CppGenericInst *
-il2cpp_generic_class_get_class_generic_instance (Il2CppGenericClass * class)
+il2cpp_generic_class_get_class_generic_instance (const Il2CppGenericClass * class)
 {
     return class->context.class_inst;
 }
 
 const Il2CppGenericInst *
-il2cpp_generic_class_get_method_generic_instance (Il2CppGenericClass * class)
+il2cpp_generic_class_get_method_generic_instance (const Il2CppGenericClass * class)
 {
     return class->context.method_inst;
 }
@@ -1330,19 +1513,25 @@ struct _FieldInfo
 #endif
 };
 
-uint8_t
-il2cpp_field_is_instance (FieldInfo * field)
-{
-    return (field->type->attrs & FIELD_ATTRIBUTE_STATIC) == 0;
-}
-
 #if ${isBelow_2019_3_0}
 uint8_t
-il2cpp_field_is_literal (FieldInfo * field)
+il2cpp_field_is_literal (const FieldInfo * field)
 {
     return field->type->attrs & FIELD_ATTRIBUTE_LITERAL;
 }
 #endif
+
+uint8_t
+il2cpp_field_is_static (const FieldInfo * field)
+{
+    return field->type->attrs & FIELD_ATTRIBUTE_STATIC;
+}
+
+uint8_t
+il2cpp_field_is_thread_static (const FieldInfo * field)
+{
+    return field->offset == THREAD_STATIC_FIELD_OFFSET;
+}
 
 struct _ParameterInfo
 {
@@ -1373,6 +1562,12 @@ il2cpp_parameter_get_position (const ParameterInfo * parameter)
     return parameter->position;
 }
 
+typedef struct Il2CppGenericMethod
+{
+    const MethodInfo * methodDefinition;
+    Il2CppGenericContext context;
+} Il2CppGenericMethod;
+
 struct _MethodInfo
 {
     void * methodPointer;
@@ -1384,20 +1579,12 @@ struct _MethodInfo
     union
     {
         const struct Il2CppRGCTXData * rgctx_data;
-#if ${isEqualOrAbove_2020_2_0}
-        const struct Il2CppMetadataMethodDefinitionHandle * methodMetadataHandle;
-#else
         const struct Il2CppMethodDefinition * methodDefinition;
-#endif
     };
     union
     {
-        const struct Il2CppGenericMethod * genericMethod;
-#if ${isEqualOrAbove_2020_2_0}
-        const struct Il2CppMetadataGenericContainerHandle * genericContainerHandle;
-#else
-        const struct Il2CppGenericContainer * genericContainer;
-#endif
+        const Il2CppGenericMethod * genericMethod;
+        const Il2CppGenericContainer * genericContainer;
     };
 #if ${isBelow_2018_3_0}
     int32_t customAttributeIndex;
@@ -1415,8 +1602,27 @@ struct _MethodInfo
 #endif
 };
 
+int32_t
+il2cpp_method_get_generic_parameter_count (const MethodInfo * method)
+{   
+    uint8_t is_generic = method->is_generic;
+
+    if (is_generic)
+    {   
+        uint8_t is_inflated = method->is_inflated;
+        if (is_inflated)
+        {
+            return il2cpp_method_get_generic_parameter_count (method->genericMethod->methodDefinition);
+        }
+
+        return method->genericContainer->type_argc;
+    }
+
+    return 0;   
+}
+
 void *
-il2cpp_method_get_pointer(const MethodInfo * method)
+il2cpp_method_get_pointer (const MethodInfo * method)
 {
     return method->methodPointer;
 }
@@ -1427,10 +1633,10 @@ il2cpp_method_get_parameters (const MethodInfo * method,
 {
     uint16_t parameters_count = method->parameters_count;
 
-    if (iter != 0 && parameters_count > 0)
+    if (iter != NULL && parameters_count > 0)
     {
         void * temp = *iter;
-        if (temp == 0)
+        if (temp == NULL)
         {
             *iter = (void **) method->parameters;
             return method->parameters;
@@ -1445,9 +1651,21 @@ il2cpp_method_get_parameters (const MethodInfo * method,
             }
         }
     }
-    return 0;
+
+    return NULL;
 }
 
+uint8_t
+il2cpp_method_is_external (const MethodInfo * method)
+{
+    return method->iflags & METHOD_IMPL_ATTRIBUTE_INTERNAL_CALL;
+}
+
+uint8_t
+il2cpp_method_is_synchronized (const MethodInfo * method)
+{
+    return method->iflags & METHOD_IMPL_ATTRIBUTE_SYNCHRONIZED;
+}
 
 struct _Il2CppString
 {
@@ -1498,9 +1716,8 @@ il2cpp_array_elements (Il2CppArraySize * array) {
 #endif
 }
 #else
-
 void *
-il2cpp_array_elements (Il2CppArray * array) {
+il2cpp_array_elements (const Il2CppArray * array) {
     return (void *) array->vector;
 }
 #endif
@@ -1520,25 +1737,25 @@ struct _Il2CppMetadataType
 };
 
 const char *
-il2cpp_metadata_type_get_assembly_name (Il2CppMetadataType * metadata_type)
+il2cpp_metadata_type_get_assembly_name (const Il2CppMetadataType * metadata_type)
 {
     return metadata_type->assemblyName;
 }
 
 Il2CppClass *
-il2cpp_metadata_type_get_class (Il2CppMetadataType * metadata_type)
+il2cpp_metadata_type_get_class (const Il2CppMetadataType * metadata_type)
 {
     return (Il2CppClass *) (uintptr_t) metadata_type->typeInfoAddress;
 }
 
 char *
-il2cpp_metadata_type_get_name (Il2CppMetadataType * metadata_type)
+il2cpp_metadata_type_get_name (const Il2CppMetadataType * metadata_type)
 {
     return metadata_type->name;
 }
 
 uint32_t
-il2cpp_metadata_type_get_base_or_element_type_index (Il2CppMetadataType * metadata_type)
+il2cpp_metadata_type_get_base_or_element_type_index (const Il2CppMetadataType * metadata_type)
 {
     return metadata_type->baseOrElementTypeIndex;
 }
@@ -1550,21 +1767,21 @@ struct _Il2CppMetadataSnapshot
 };
 
 uint32_t
-il2cpp_metadata_snapshot_get_metadata_type_count (Il2CppMetadataSnapshot * metadata_snapshot)
+il2cpp_metadata_snapshot_get_metadata_type_count (const Il2CppMetadataSnapshot * metadata_snapshot)
 {
     return metadata_snapshot->typeCount;
 }
 
 Il2CppMetadataType *
-il2cpp_metadata_snapshot_get_metadata_types (Il2CppMetadataSnapshot * metadata_snapshot,
+il2cpp_metadata_snapshot_get_metadata_types (const Il2CppMetadataSnapshot * metadata_snapshot,
                                 void ** iter)
 {
     uint32_t metadata_type_count = metadata_snapshot->typeCount;
 
-    if (iter != 0 && metadata_type_count > 0)
+    if (iter != NULL && metadata_type_count > 0)
     {
         void * temp = *iter;
-        if (temp == 0)
+        if (temp == NULL)
         {
             *iter = (void **) metadata_snapshot->types;
             return metadata_snapshot->types;
@@ -1579,7 +1796,7 @@ il2cpp_metadata_snapshot_get_metadata_types (Il2CppMetadataSnapshot * metadata_s
             }
         }
     }
-    return 0;
+    return NULL;
 }
 
 struct _Il2CppManagedMemorySection
@@ -1634,13 +1851,13 @@ il2cpp_memory_snapshot_get_metadata_snapshot (Il2CppManagedMemorySnapshot * snap
 }
 
 Il2CppObject **
-il2cpp_memory_snapshot_get_objects (Il2CppManagedMemorySnapshot * snapshot)
+il2cpp_memory_snapshot_get_objects (const Il2CppManagedMemorySnapshot * snapshot)
 {
     return snapshot->gcHandles.pointersToObjects;
 }
 
 uint32_t
-il2cpp_memory_snapshot_get_tracked_object_count (Il2CppManagedMemorySnapshot * snapshot)
+il2cpp_memory_snapshot_get_tracked_object_count (const Il2CppManagedMemorySnapshot * snapshot)
 {
     return snapshot->gcHandles.trackedObjectCount;
 }
@@ -1675,7 +1892,7 @@ il2cpp_method_get_from_reflection (const Il2CppReflectionMethod * method)
         const exportPointer = Il2Cpp.module.findExportByName(exportName) || this.cModule[exportName];
 
         if (exportPointer == null) {
-            raise(`Couldn't resolve export "${exportName}".`);
+            raise(`Couldn't find export "${exportName}".`);
         }
 
         return new NativeFunction(exportPointer, retType, argTypes, options);

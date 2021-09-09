@@ -1,5 +1,6 @@
 import { raise } from "../utils/console";
 import { NativeStruct } from "../utils/native-struct";
+import { UnityVersion } from "./version";
 
 /** @internal */
 export function shouldBeInstance<T extends Il2Cpp.Field | Il2Cpp.Method>(shouldBeInstance: boolean): MethodDecorator {
@@ -17,34 +18,51 @@ export function shouldBeInstance<T extends Il2Cpp.Field | Il2Cpp.Method>(shouldB
 }
 
 /** @internal */
-export function since(version: string): MethodDecorator;
-/** @internal */
-export function since(getterVersion: string, setterVersion: string): MethodDecorator;
-/** @internal */
-export function since(version0: string, version1?: string): MethodDecorator {
+function assertVersion(block: (other: string) => boolean, version: string): MethodDecorator {
+
+    function getName(): string {
+        switch (block) {
+            case UnityVersion.prototype.isAbove:
+                return "is not above";
+            case UnityVersion.prototype.isBelow:
+                return "is not below";
+            case UnityVersion.prototype.isEqual:
+                return "is not equal to";
+            case UnityVersion.prototype.isEqualOrAbove:
+                return "is not equal to or above";
+            case UnityVersion.prototype.isEqualOrBelow:
+                return "is not equal to or below";
+            default:
+                return "unknown";
+        }
+    }
+
     return function (target: any, propertyKey: PropertyKey, descriptor: PropertyDescriptor): void {
         const fn = descriptor.value ?? descriptor.get ?? descriptor.set;
         const key = descriptor.value ? "value" : descriptor.get ? "get" : "set";
-
+        
         descriptor[key] = function (...args: any[]): any {
-            if (Il2Cpp.unityVersion.isBelow(version0)) {
-                const verb = descriptor.value ? "Calling" : descriptor.get ? "Getting" : "Setting";
+            if (!block.call(Il2Cpp.unityVersion, version)) {
                 const prop = `${("prototype" in target ? target.prototype : target).constructor.name}.${propertyKey.toString()}`;
-                raise(`${verb} ${prop} is available from version ${version0} onwards.`);
+                raise(`Cannot invoke ${prop}: the curren unity version "${Il2Cpp.unityVersion}" ${getName()} version "${version}".`);
             }
+            Reflect.defineProperty(target, propertyKey, {
+                ...descriptor,
+                [key]: fn
+            })
             return fn.apply(this, args);
         };
-
-        if (version1 != undefined) {
-            descriptor.set = function (...args: any[]): any {
-                if (Il2Cpp.unityVersion.isBelow(version1)) {
-                    const prop = `${("prototype" in target ? target.prototype : target).constructor.name}.${propertyKey.toString()}`;
-                    raise(`Setting ${prop} is available from version ${version0} onwards.`);
-                }
-                return fn.apply(this, args);
-            };
-        }
     };
+}
+
+/** @internal */
+export function isEqualOrAbove(version: string): MethodDecorator {
+    return assertVersion(UnityVersion.prototype.isEqualOrAbove, version);
+}
+
+/** @internal */
+export function isBelow(version: string): MethodDecorator {
+    return assertVersion(UnityVersion.prototype.isBelow, version);
 }
 
 /** @internal */

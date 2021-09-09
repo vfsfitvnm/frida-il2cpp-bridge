@@ -6,9 +6,4 @@ declare global {
 
     /** */
     type IterableRecord<T> = Readonly<Record<string, T>> & Iterable<T>;
-
-    /** @internal */
-    namespace console {
-        function log(message?: any, ...optionalParams: any[]): void;
-    }
 }

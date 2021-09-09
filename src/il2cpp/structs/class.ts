@@ -1,6 +1,7 @@
 import { cache } from "decorator-cache-getter";
 
-import { since } from "../decorators";
+import { isEqualOrAbove } from "../decorators";
+
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { addLevenshtein, getOrNull, makeIterable, preventKeyClash } from "../../utils/utils";
 import { raise } from "../../utils/console";
@@ -64,6 +65,12 @@ class Il2CppClass extends NonNullNativeStruct {
     @cache
     get flags(): number {
         return Il2Cpp.Api._classGetFlags(this);
+    }
+
+    /** Gets the amount of generic parameters of this generic class. */
+    @cache
+    get genericParameterCount(): number {
+        return Il2Cpp.Api._classGetGenericParameterCount(this);
     }
 
     /** Determines whether the current class has a class constructor. */
@@ -238,6 +245,13 @@ class Il2CppClass extends NonNullNativeStruct {
 
         const types = classes.map(klass => klass.type.object);
         const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.classes["System.Type"], types);
+        
+        // TODO: typeArray leaks
+        return this.inflateRaw(typeArray);
+    }
+
+    /** @internal */
+    inflateRaw(typeArray: Il2Cpp.Array<Il2Cpp.Object>): Il2Cpp.Class {
         const MakeGenericType = this.type.object.class.getMethod("MakeGenericType", 1)!
 
         let object = this.type.object;
@@ -245,7 +259,6 @@ class Il2CppClass extends NonNullNativeStruct {
 
         const inflatedType = MakeGenericType.invokeRaw(object, typeArray);
 
-        // TODO: typeArray leaks
         return new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(inflatedType as Il2Cpp.Object));
     }
 
@@ -290,7 +303,7 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     /** */
-    @since("2019.3.0")
+    @isEqualOrAbove("2019.3.0")
     static enumerate(block: (klass: Il2Cpp.Class) => void): void {
         const callback = new NativeCallback(
             function (klass: NativePointer, _: NativePointer): void {

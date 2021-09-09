@@ -65,7 +65,7 @@ class Il2CppArray<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Nativ
 
     @checkNull
     override toString(): string {
-        return this.elements.toString();
+        return `[${this.elements.read(0, this.length)}]`;
     }
 
     /** Iterable. */

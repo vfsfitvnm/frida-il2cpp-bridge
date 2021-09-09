@@ -21,7 +21,7 @@ class Il2CppField extends NonNullNativeStruct {
         return Il2Cpp.Api._fieldGetFlags(this);
     }
 
-    /** Determines whether this field value is written at compile time. */
+    /** Determines whether this field value is known at compile time. */
     @cache
     get isLiteral(): boolean {
         return !!Il2Cpp.Api._fieldIsLiteral(this);
@@ -30,13 +30,13 @@ class Il2CppField extends NonNullNativeStruct {
     /** Determines whether this field is static. */
     @cache
     get isStatic(): boolean {
-        return !Il2Cpp.Api._fieldIsInstance(this);
+        return !!Il2Cpp.Api._fieldIsStatic(this);
     }
 
     /** Determines whether this field is thread static. */
     @cache
     get isThreadStatic(): boolean {
-        return this.offset == -1;
+        return !!Il2Cpp.Api._fieldIsThreadStatic(this);;
     }
 
     /** Gets the name of this field. */
@@ -68,6 +68,7 @@ class Il2CppField extends NonNullNativeStruct {
         if (this.isThreadStatic || this.isLiteral) {
             let valueHandle = Memory.alloc(Process.pointerSize);
             Il2Cpp.Api._fieldGetStaticValue(this.handle, valueHandle);
+            
             return valueHandle;
         }
 
@@ -80,6 +81,7 @@ class Il2CppField extends NonNullNativeStruct {
             warn(`${this.class.type.name}.${this.name} is a thread static or literal field, its value won't be modified.`);
             return;
         }
+        
         write(this.valueHandle, value, this.type);
     }
 
@@ -107,11 +109,12 @@ class Il2CppField extends NonNullNativeStruct {
     }
 }
 
-Il2Cpp.Field = Il2CppField;
+Reflect.set(Il2Cpp, "Field", Il2CppField);
 
 declare global {
     namespace Il2Cpp {
         class Field extends Il2CppField {}
+        
         namespace Field {
             type Type =
                 | boolean
@@ -124,6 +127,28 @@ declare global {
                 | Il2Cpp.Object
                 | Il2Cpp.String
                 | Il2Cpp.Array;
+
+            const enum Attributes {
+                FieldAccessMask = 0x0007,
+                PrivateScope = 0x0000,
+                Private = 0x0001,
+                FamilyAndAssembly = 0x0002,
+                Assembly = 0x0003,
+                Family = 0x0004,
+                FamilyOrAssembly = 0x0005,
+                Public = 0x0006,
+                Static = 0x0010,
+                InitOnly = 0x0020,
+                Literal = 0x0040,
+                NotSerialized = 0x0080,
+                SpecialName = 0x0200,
+                PinvokeImpl = 0x2000,
+                ReservedMask = 0x9500,
+                RTSpecialName = 0x0400,
+                HasFieldMarshal = 0x1000,
+                HasDefault = 0x8000,
+                HasFieldRVA = 0x0100
+            }
         }
     }
 }

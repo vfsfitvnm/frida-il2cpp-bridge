@@ -4,9 +4,7 @@ import { raise } from "./console";
 export class NativeStruct implements ObjectWrapper {
     readonly handle: NativePointer;
 
-    constructor(handle: NativePointer);
-    constructor(wrapper: ObjectWrapper);
-    constructor(handleOrWrapper: NativePointer | ObjectWrapper) {
+    constructor(handleOrWrapper: NativePointerValue) {
         if (handleOrWrapper instanceof NativePointer) {
             this.handle = handleOrWrapper;
         } else {

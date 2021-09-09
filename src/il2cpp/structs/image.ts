@@ -1,7 +1,5 @@
 import { cache } from "decorator-cache-getter";
 
-import { since } from "../decorators";
-
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { addLevenshtein, getOrNull, makeIterable } from "../../utils/utils";
 
@@ -14,7 +12,6 @@ class Il2CppImage extends NonNullNativeStruct {
 
     /** Gets the assembly in which the current image is defined. */
     @cache
-    @since("2018.1.0")
     get assembly(): Il2Cpp.Assembly {
         return new Il2Cpp.Assembly(Il2Cpp.Api._imageGetAssembly(this));
     }
@@ -34,10 +31,8 @@ class Il2CppImage extends NonNullNativeStruct {
             const start = this.classStart;
             const end = start + this.classCount;
 
-            const globalIndex = Memory.alloc(Process.pointerSize);
-
             for (let i = start; i < end; i++) {
-                const klass = new Il2Cpp.Class(Il2Cpp.Api._typeGetClassOrElementClass(globalIndex.writeS32(i)));
+                const klass = Il2Cpp.Metadata.getClass(i)!;
                 record[klass.type.name] = klass;
             }
         } else {

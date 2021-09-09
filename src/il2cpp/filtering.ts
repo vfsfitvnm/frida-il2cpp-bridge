@@ -1,5 +1,5 @@
 /** Filtering utilities. */
-class Il2CppFiltering<T> {
+class Il2CppFiltering {
     protected constructor() {}
 
     /** Creates a filter which includes `element`s whose type can be assigned to `klass` variables. */
@@ -29,7 +29,7 @@ Il2Cpp.Filtering = Il2CppFiltering;
 
 declare global {
     namespace Il2Cpp {
-        class Filtering<T> extends Il2CppFiltering<T> {}
+        class Filtering extends Il2CppFiltering {}
     }
 }
 

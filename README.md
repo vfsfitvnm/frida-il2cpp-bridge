@@ -91,7 +91,7 @@ Learn more about `packages.json` [here](https://docs.npmjs.com/cli/v7/configurin
   "devDependencies": {
     "@types/frida-gum": "^17.1.0",
     "frida-compile": "^10.2.4",
-    "frida-il2cpp-bridge": "^0.5.2"
+    "frida-il2cpp-bridge": "^0.5.3"
   }
 }
 ```
@@ -103,16 +103,16 @@ Learn more about `tsconfig.json` [here](https://www.typescriptlang.org/docs/hand
 ```json
 {
   "compilerOptions": {
-    "target": "es2020",
+    "target": "esnext",
     "lib": [
       "es2020"
     ],
+    "experimentalDecorators": true,
+    "module": "commonjs",
     "allowJs": true,
     "noEmit": true,
-    "strict": true,
     "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "moduleResolution": "node"
+    "strict": true
   }
 }
 ```
@@ -125,7 +125,7 @@ If you just want to add this module to an already existing project:
 $ npm install --save-dev frida-il2cpp-bridge
 ```
 
-You may need to add `"moduleResolution": "node"` in your `tsconfig.json` under `compilerOptions`.
+You need to add `"moduleResolution": "node"` or `"module": "commonjs"`, in your `tsconfig.json` under `compilerOptions`.
 
 ---
 
@@ -158,54 +158,57 @@ import "frida-il2cpp-bridge";
 
 Il2Cpp.perform(() => {
     // it will use default directory path and file name: /<default_path>/<default_name>.cs
-    Il2Cpp.Dumper.classicDump();
+    Il2Cpp.dump()
+        .classes() // or methods
+        .build();
 
     // the file name is overridden: /<default_path>/custom_file_name.cs
-    Il2Cpp.Dumper.classicDump("custom_file_name");
+    Il2Cpp.dump()
+        .fileName("custom_file_name")
+        .classes() // or methods
+        .build();
 
     // the file name and directory path are overridden: /i/can/write/to/this/path/custom_file_name.cs
-    Il2Cpp.Dumper.classicDump("custom_file_name", "/i/can/write/to/this/path");
-
-    // alternatively
-    Il2Cpp.Dumper.snapshotDump();
+    Il2Cpp.dump()
+        .directoryPath("/i/can/write/to/this/path")
+        .fileName("custom_file_name")
+        .classes() // or methods
+        .build()
 });
 ```
 
-There are two already defined strategies you can follow in order to dump the application. \
-The **first one**, the _classic dump_, iterates all the assemblies, and then dump all the classes inside them. This
-strategy is pretty straightforward, however it misses quite few classes (array and inflated classes - `System.String[]`
-and
-`System.Collections.Generic.List<System.String>` for instance). These _missing_ classes do not contain any "hidden"
-code, however they may be useful during static analysis. \
-The **second one**, the _snapshot dump_, comes to the rescue. It performs a memory snapshot
-(IL2CPP generously exposes the APIs), which also includes the classes the classic dump could not easily guess,
-thankfully. However, the snapshot only reports already initialized classes: it's important to run this dump as late as
-possible. The second dump seems to include the same classes the first one would find.
+Ok, this is probably exaggerated, but I liked the new `Il2Cpp.Tracer` implementation so I wanted to apply it to `Il2Cpp.Dumper` too.
 
-Dumping may require two parameters: a directory path (e.g. a place where the application can write to) and a file name.
-If not provided, the code will just guess them; however it might fail on some applications and/or Unity versions.
+This operation may require a directory path (e.g. a place where the application can write to) and a file name.
+If not provided, the code will just guess them; however it's not guaranteed to succeed.
 
-The dump will produce the following output:
+There are two possible configurations.
 
-```cs
-// mscorlib.dll
-struct System.Int32 : System.ValueType, System.IFormattable, System.IConvertible, System.IComparable, System.IComparable<System.Int32>, System.IEquatable<System.Int32>
-{
-    static System.Int32 MaxValue = 2147483647;
-    static System.Int32 MinValue = -2147483648;
-    System.Int32 m_value; // 0x10
+- `classes` will diplay every class like the following:
+    ```cs
+    class Mono.DataConverter.PackContext : System.Object
+    {
+        System.Byte[] buffer; // 0x10
+        System.Int32 next; // 0x18
+        System.String description; // 0x20
+        System.Int32 i; // 0x28
+        Mono.DataConverter conv; // 0x30
+        System.Int32 repeat; // 0x38
+        System.Int32 align; // 0x3c
 
-    System.Boolean System.IConvertible.ToBoolean(System.IFormatProvider provider); // 0x00bed724
-    System.Byte System.IConvertible.ToByte(System.IFormatProvider provider); // 0x00bed72c
-    System.Char System.IConvertible.ToChar(System.IFormatProvider provider); // 0x00bed734
-    System.DateTime System.IConvertible.ToDateTime(System.IFormatProvider provider); // 0x00bed73c
-    System.Decimal System.IConvertible.ToDecimal(System.IFormatProvider provider); // 0x00bed744
-    System.Double System.IConvertible.ToDouble(System.IFormatProvider provider); // 0x00bed74c
-    // ...
-}
+        System.Void Add(System.Byte[] group); // 0x012ef4f0
+        System.Byte[] Get(); // 0x012ef6ec
+        System.Void .ctor(); // 0x012ef78c
+    }
+    ```
 
-// ...
-```
+- `methods` will produce a input for static analysis tools:
+    ```
+    0x012ef4f0 Mono.DataConverter.PackContext.Add
+    0x012ef6ec Mono.DataConverter.PackContext.Get
+    0x012ef78c Mono.DataConverter.PackContext..ctor
+    ```
+    For more information, see [ghidra script](#ghidra-script).
 
 ### Tracing
 
@@ -216,38 +219,38 @@ Il2Cpp.perform(() => {
     const SystemString = Il2Cpp.Image.corlib.classes["System.String"];
 
     // it traces method calls
-    Il2Cpp.Tracer.builder()
-        .findInAssemblies(Il2Cpp.Image.corlib.assembly, Il2Cpp.Domain.assemblies.System)
-        .withMethodFilter(method => method.isStatic && method.returnType.equals(SystemString.type) && !method.isExternal)
-        .commitAnd()
-        .simply()
-        .trace();
+    Il2Cpp.trace()
+        .assemblies(Il2Cpp.Image.corlib.assembly, Il2Cpp.Domain.assemblies.System)
+        .filterMethods(method => method.isStatic && method.returnType.equals(SystemString.type) && !method.isExternal)
+        .commit()
+        .simple()
+        .build();
 
     // it traces method calls and returns
-    Il2Cpp.Tracer.builder()
-        .findInClasses(SystemString)
-        .commitAnd()
-        .fully()
-        .trace();
+    Il2Cpp.trace()
+        .classes(SystemString)
+        .commit()
+        .full()
+        .build();
 
     // full trace, it traces method calls and returns and it reports every value
-    Il2Cpp.Tracer.builder()
-        .findInAssemblies(Il2Cpp.Image.corlib.assembly)
-        .withClassFilter(klass => klass.namespace == "System")
-        .withParameterFilter(param => param.type.equals(SystemString) && param.name == "msg")
-        .commitAnd()
-        .findInAssemblies(Il2Cpp.Image.corlib.assembly)
-        .withMethodFilter(method => method.name.toLowerCase().includes("begin"))
-        .commitAnd()
-        .detailedly()
-        .trace();
+    Il2Cpp.trace()
+        .assemblies(Il2Cpp.Image.corlib.assembly)
+        .filterClasses(klass => klass.namespace == "System")
+        .filterParameters(param => param.type.equals(SystemString) && param.name == "msg")
+        .commit()
+        .assemblies(Il2Cpp.Image.corlib.assembly)
+        .filterMethods(method => method.name.toLowerCase().includes("begin"))
+        .commit()
+        .detailed()
+        .build();
 
     // custom behaviour
-    Il2Cpp.Tracer.new()
-        .findInDomain()
-        .withMethodFilter(method => method.parameterCount == 0)
-        .commitAnd()
-        .specially((target: Il2Cpp.Method) => {
+    Il2Cpp.trace()
+        .domain()
+        .filterMethods(method => method.parameterCount == 0)
+        .commit()
+        .special((target: Il2Cpp.Method) => {
             const signature = `${target.name} (${target.parameterCount})`;
             return {
                 onLeave(returnValue: Il2Cpp.Method.ReturnType) {
@@ -255,25 +258,25 @@ Il2Cpp.perform(() => {
                 }
             };
         })
-        .trace();
+        .build();
 });
 ```
 `Il2Cpp.Tracer` follows the builder pattern in order to be flexible and, you know, this pattern is better than
-a custom domain specific language. A new builder must be created via `Il2Cpp.Tracer.builder()`. After that, you can start searching in the whole domain or in a set of assemblies, classes or methods (using `findIn*`). Then, you can apply a custom filter via `with*Filter`. You push all the methods that meet the requirements in a private field using `commitAnd`. In this way, you can combine multiple requirements without writing complex filters (see the third example). \
-After `commitAnd` you can start over or you can choose a generator (`simply`, `fully` or `detailedly`). A generator is just a function that produces the callbacks that will be called when a method is invoked. You can roll your own generator using `specially` (see the last example). Finally, you begin the actual tracing calling `trace`.
+a custom domain specific language. A new builder must be created via `Il2Cpp.trace()`. After that, you can start searching in the whole domain or in a set of assemblies, classes or methods. Then, you can apply a custom filter via `filter*`. You push all the methods that meet the requirements in a private field using `commit`. In this way, you can combine multiple requirements without writing complex filters (see the third example). \
+After `commit` you can start over or you can choose a generator (`simple`, `full` or `detailed`). A generator is just a function that produces the callbacks that will be called when a method is invoked. You can roll your own generator using `special` (see the last example). Finally, you begin the actual tracing calling `build`.
 
 Uh, you don't need al this black magic? Do you just want to trace a single method?
 ```ts
 Il2Cpp.perform(() => {
     const Equals = Il2Cpp.Image.corlib.classes["System.String"].methods.Equals;
 
-    Il2Cpp.Tracer.builder().
-        .findInMethods(Equals)
-        .commitAnd()
-        .fully()
-        .trace();
+    Il2Cpp.trace()
+        .methods(Equals)
+        .commit()
+        .full()
+        .build();
 
-    // I know, this is more verbose than the old Il2Cpp.Tracer.fullTrace(Equals);
+    // I know, this is verbose
 });
 ```
 
@@ -281,7 +284,7 @@ There are three already defined strategies you can follow in order to trace meth
 words, however `Il2Cpp.Tracer` does not use `Interceptor.attach`, but a combination of `Interceptor.replace` and
 `NativeFunction` ([here's why](https://t.me/fridadotre/52178)).
 
-- `simply` only reports `onEnter` calls.
+- `simple` only reports `onEnter` calls.
   ```
   [il2cpp] 0x01a2f3e4 System.String.Concat
   [il2cpp] 0x01a3cfbc System.String.FastAllocateString
@@ -293,7 +296,7 @@ words, however `Il2Cpp.Tracer` does not use `Interceptor.attach`, but a combinat
   [il2cpp] 0x01a3cfbc System.String.FastAllocateString
   ```
 
-- `fully` reports both `onEnter` and `onLeave` nicely.
+- `full` reports both `onEnter` and `onLeave` nicely.
   ```
   [il2cpp] 0x01a2f3e4 ┌─System.String.Concat
   [il2cpp] 0x01a3cfbc │ ┌─System.String.FastAllocateString
@@ -312,7 +315,7 @@ words, however `Il2Cpp.Tracer` does not use `Interceptor.attach`, but a combinat
   [il2cpp] 0x01a41f60 └─System.String.Replace
   ```
 
-- `detailedly` reports both `onEnter` and `onLeave` nicely, plus every printable value.
+- `detailed` reports both `onEnter` and `onLeave` nicely, plus every printable value.
   ```
   [il2cpp] 0x01a2f3e4 ┌─System.String.Concat(System.String str0 = "Creating AndroidJavaClass from ", System.String str1 = "com.unity3d.player.UnityPlayer")
   [il2cpp] 0x01a3cfbc │ ┌─System.String.FastAllocateString(System.Int32 length = 61)
@@ -477,22 +480,17 @@ Basically, an underscore is appended to the method name (key) until the key can 
 
 ### Ghidra script
 
-The following script parses the file outputted by `Il2Cpp.Dumper` and looks for methods using regular expression.
+The following script parses the file produced by `Il2Cpp.Dumper.emitMethodsAnd` and renames the functions.
 
 ```py
-import re
 from ghidra.program.model.address import AddressFactory
 from ghidra.program.model.symbol.SourceType import USER_DEFINED
 
-address_factory = getAddressFactory()
+addressFactory = getAddressFactory()
 
-with open("/path/to/dump.cs", "r") as file:
-    content = file.read()
-
-matches = re.findall("([^\s]+)(?:\(.+)(0x[0123456789abcdef]{8})", content)
-
-for match in matches:
-    function = getFunctionAt(address_factory.getAddress(match[1]))
-    if function:
-        function.setName(match[0], USER_DEFINED)
+with open("/path/to/dump.ms", "r") as file:
+    for line in file:
+        function = getFunctionAt(addressFactory.getAddress(line[:10]))
+        if function:
+            function.setName(line[11:], USER_DEFINED)
 ```

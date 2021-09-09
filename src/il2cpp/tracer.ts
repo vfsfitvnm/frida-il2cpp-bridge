@@ -5,83 +5,80 @@ import { formatNativePointer } from "../utils/utils";
 
 /** Tracing utilities. */
 class Il2CppTracer {
-    protected constructor() {}
+    readonly targets: Il2Cpp.Method[] = [];
 
     /** @internal */
-    private readonly targets: Il2Cpp.Method[] = [];
+    #assemblies?: Il2Cpp.Assembly[];
 
     /** @internal */
-    private assemblies?: Il2Cpp.Assembly[];
+    #classes?: Il2Cpp.Class[];
 
     /** @internal */
-    private classes?: Il2Cpp.Class[];
+    #methods?: Il2Cpp.Method[];
 
     /** @internal */
-    private methods?: Il2Cpp.Method[];
+    #assemblyFilter?: (assembly: Il2Cpp.Assembly) => boolean;
 
     /** @internal */
-    private assemblyFilter?: (assembly: Il2Cpp.Assembly) => boolean;
+    #classFilter?: (klass: Il2Cpp.Class) => boolean;
 
     /** @internal */
-    private classFilter?: (klass: Il2Cpp.Class) => boolean;
+    #methodFilter?: (method: Il2Cpp.Method) => boolean;
 
     /** @internal */
-    private methodFilter?: (method: Il2Cpp.Method) => boolean;
+    #parameterFilter?: (parameter: Il2Cpp.Parameter) => boolean;
 
     /** @internal */
-    private parameterFilter?: (parameter: Il2Cpp.Parameter) => boolean;
+    #generator?: (method: Il2Cpp.Method) => Il2Cpp.Tracer.Callbacks;
 
-    /** @internal */
-    private generator?: (method: Il2Cpp.Method) => Il2Cpp.Tracer.Callbacks;
-
-    findInDomain(): FilterAssemblies {
+    domain(): FilterAssemblies {
         return this;
     }
 
-    findInAssemblies(...assemblies: NonEmptyArray<Il2Cpp.Assembly>): FilterClasses {
-        this.assemblies = assemblies;
+    assemblies(...assemblies: NonEmptyArray<Il2Cpp.Assembly>): FilterClasses {
+        this.#assemblies = assemblies;
         return this;
     }
 
-    findInClasses(...classes: NonEmptyArray<Il2Cpp.Class>): FilterMethods {
-        this.classes = classes;
+    classes(...classes: NonEmptyArray<Il2Cpp.Class>): FilterMethods {
+        this.#classes = classes;
         return this;
     }
 
-    findInMethods(...methods: NonEmptyArray<Il2Cpp.Method>): FilterParameters {
-        this.methods = methods;
+    methods(...methods: NonEmptyArray<Il2Cpp.Method>): FilterParameters {
+        this.#methods = methods;
         return this;
     }
 
-    withAssemblyFilter(filter: (assembly: Il2Cpp.Assembly) => boolean): FilterClasses {
-        this.assemblyFilter = filter;
+    filterAssemblies(filter: (assembly: Il2Cpp.Assembly) => boolean): FilterClasses {
+        this.#assemblyFilter = filter;
         return this;
     }
 
-    withClassFilter(filter: (klass: Il2Cpp.Class) => boolean): FilterMethods {
-        this.classFilter = filter;
+    filterClasses(filter: (klass: Il2Cpp.Class) => boolean): FilterMethods {
+        this.#classFilter = filter;
         return this;
     }
 
-    withMethodFilter(filter: (method: Il2Cpp.Method) => boolean): FilterParameters {
-        this.methodFilter = filter;
+    filterMethods(filter: (method: Il2Cpp.Method) => boolean): FilterParameters {
+        this.#methodFilter = filter;
         return this;
     }
 
-    withParameterFilter(filter: (parameter: Il2Cpp.Parameter) => boolean): Pick<Il2Cpp.Tracer, "commitAnd"> {
-        this.parameterFilter = filter;
+    filterParameters(filter: (parameter: Il2Cpp.Parameter) => boolean): Pick<Il2Cpp.Tracer, "commit"> {
+        this.#parameterFilter = filter;
         return this;
     }
 
-    commitAnd(): ReturnType<typeof Il2Cpp.Tracer["builder"]> & Pick<Il2Cpp.Tracer, "simply" | "fully" | "detailedly" | "specially"> {
+    commit(): ReturnType<typeof Il2Cpp["trace"]> & Pick<Il2Cpp.Tracer, "targets" | "simple" | "full" | "detailed" | "special"> {
         const filterMethod = (method: Il2Cpp.Method): void => {
-            if (this.parameterFilter == undefined) {
+            if (this.#parameterFilter == undefined) {
                 this.targets.push(method);
                 return;
             }
 
             for (const parameter of method.parameters) {
-                if (this.parameterFilter(parameter)) {
+                if (this.#parameterFilter(parameter)) {
                     this.targets.push(method);
                     break;
                 }
@@ -95,13 +92,13 @@ class Il2CppTracer {
         };
 
         const filterClass = (klass: Il2Cpp.Class): void => {
-            if (this.methodFilter == undefined) {
+            if (this.#methodFilter == undefined) {
                 filterMethods(klass.methods);
                 return;
             }
 
             for (const method of klass.methods) {
-                if (this.methodFilter(method)) {
+                if (this.#methodFilter(method)) {
                     filterMethod(method);
                 }
             }
@@ -114,13 +111,13 @@ class Il2CppTracer {
         };
 
         const filterAssembly = (assembly: Il2Cpp.Assembly): void => {
-            if (this.classFilter == undefined) {
+            if (this.#classFilter == undefined) {
                 filterClasses(assembly.image.classes);
                 return;
             }
 
             for (const klass of assembly.image.classes) {
-                if (this.classFilter(klass)) {
+                if (this.#classFilter(klass)) {
                     filterClass(klass);
                 }
             }
@@ -133,41 +130,41 @@ class Il2CppTracer {
         };
 
         const filterDomain = (domain: typeof Il2Cpp.Domain): void => {
-            if (this.assemblyFilter == undefined) {
+            if (this.#assemblyFilter == undefined) {
                 filterAssemblies(domain.assemblies);
                 return;
             }
 
             for (const assembly of domain.assemblies) {
-                if (this.assemblyFilter(assembly)) {
+                if (this.#assemblyFilter(assembly)) {
                     filterAssembly(assembly);
                 }
             }
         };
 
-        this.methods
-            ? filterMethods(this.methods)
-            : this.classes
-            ? filterClasses(this.classes)
-            : this.assemblies
-            ? filterAssemblies(this.assemblies)
+        this.#methods
+            ? filterMethods(this.#methods)
+            : this.#classes
+            ? filterClasses(this.#classes)
+            : this.#assemblies
+            ? filterAssemblies(this.#assemblies)
             : filterDomain(Il2Cpp.Domain);
 
-        this.assemblies = undefined;
-        this.classes = undefined;
-        this.methods = undefined;
-        this.assemblyFilter = undefined;
-        this.classFilter = undefined;
-        this.methodFilter = undefined;
-        this.parameterFilter = undefined;
-        this.generator = undefined;
+        this.#assemblies = undefined;
+        this.#classes = undefined;
+        this.#methods = undefined;
+        this.#assemblyFilter = undefined;
+        this.#classFilter = undefined;
+        this.#methodFilter = undefined;
+        this.#parameterFilter = undefined;
+        this.#generator = undefined;
 
         return this;
     }
 
     /** Reports method invocations. */
-    simply(): Pick<Il2Cpp.Tracer, "trace"> {
-        this.generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
+    simple(): Pick<Il2Cpp.Tracer, "build"> {
+        this.#generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
             const at = kleur.white(formatNativePointer(target.relativeVirtualAddress));
             const sign = `${target.class.type.name}.${kleur.bold(target.name)}`;
 
@@ -182,10 +179,10 @@ class Il2CppTracer {
     }
 
     /** Reports method invocations and returns. */
-    fully(): Pick<Il2Cpp.Tracer, "trace"> {
+    full(): Pick<Il2Cpp.Tracer, "build"> {
         let counter = 0;
 
-        this.generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
+        this.#generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
             const at = kleur.white(formatNativePointer(target.relativeVirtualAddress));
             const sign = `${target.class.type.name}.${kleur.bold(target.name)}`;
 
@@ -205,10 +202,10 @@ class Il2CppTracer {
     }
 
     /** Reports method invocations, input arguments, returns and return values. */
-    detailedly(): Pick<Il2Cpp.Tracer, "trace"> {
+    detailed(): Pick<Il2Cpp.Tracer, "build"> {
         let counter = 0;
 
-        this.generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
+        this.#generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
             const at = kleur.white(formatNativePointer(target.relativeVirtualAddress));
             const sign = `${target.class.type.name}.${kleur.bold(target.name)}`;
             const parametersInfo = Object.values(target.parameters);
@@ -239,18 +236,18 @@ class Il2CppTracer {
     }
 
     /** Custom behaviour. */
-    specially(generator: (target: Il2Cpp.Method) => Il2Cpp.Tracer.Callbacks): Pick<Il2Cpp.Tracer, "trace"> {
-        this.generator = generator;
+    special(generator: (target: Il2Cpp.Method) => Il2Cpp.Tracer.Callbacks): Pick<Il2Cpp.Tracer, "build"> {
+        this.#generator = generator;
         return this;
     }
 
-    trace(): void {
+    build(): void {
         for (const target of this.targets) {
             if (target.virtualAddress.isNull()) {
                 continue;
             }
 
-            const { onEnter, onLeave } = this.generator!(target);
+            const { onEnter, onLeave } = this.#generator!(target);
 
             target.implementation = function (...parameters: Il2Cpp.Parameter.Type[]): Il2Cpp.Method.ReturnType {
                 onEnter?.apply(null, parameters);
@@ -263,21 +260,17 @@ class Il2CppTracer {
             };
         }
     }
-
-    static builder(): Pick<Il2Cpp.Tracer, "findInDomain" | "findInAssemblies" | "findInClasses" | "findInMethods"> {
-        return new Il2Cpp.Tracer();
-    }
 }
 
 type NonEmptyArray<T> = [T, ...T[]];
 
-type FilterAssemblies = FilterClasses & Pick<Il2Cpp.Tracer, "withAssemblyFilter">;
+type FilterAssemblies = FilterClasses & Pick<Il2Cpp.Tracer, "filterAssemblies">;
 
-type FilterClasses = FilterMethods & Pick<Il2Cpp.Tracer, "withClassFilter">;
+type FilterClasses = FilterMethods & Pick<Il2Cpp.Tracer, "filterClasses">;
 
-type FilterMethods = FilterParameters & Pick<Il2Cpp.Tracer, "withMethodFilter">;
+type FilterMethods = FilterParameters & Pick<Il2Cpp.Tracer, "filterMethods">;
 
-type FilterParameters = Pick<Il2Cpp.Tracer, "commitAnd"> & Pick<Il2Cpp.Tracer, "withParameterFilter">;
+type FilterParameters = Pick<Il2Cpp.Tracer, "commit"> & Pick<Il2Cpp.Tracer, "filterParameters">;
 
 Il2Cpp.Tracer = Il2CppTracer;
 

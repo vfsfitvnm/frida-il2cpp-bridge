@@ -7,24 +7,24 @@ const matchPattern = /(20\d{2}|\d)\.(\d)\.(\d{1,2})([abcfp]|rc){0,2}\d?/;
 /** Represent the Unity version of the current application. */
 export class UnityVersion {
     /** @internal */
-    private readonly source: string;
+    readonly #source: string;
 
     /** @internal */
-    private readonly major: number;
+    readonly #major: number;
 
     /** @internal */
-    private readonly minor: number;
+    readonly #minor: number;
 
     /** @internal */
-    private readonly revision: number;
+    readonly #revision: number;
 
     /** @internal */
     constructor(source: string) {
         const matches = source.match(matchPattern);
-        this.source = matches ? matches[0] : source;
-        this.major = matches ? Number(matches[1]) : -1;
-        this.minor = matches ? Number(matches[2]) : -1;
-        this.revision = matches ? Number(matches[3]) : -1;
+        this.#source = matches ? matches[0] : source;
+        this.#major = matches ? Number(matches[1]) : -1;
+        this.#minor = matches ? Number(matches[2]) : -1;
+        this.#revision = matches ? Number(matches[3]) : -1;
 
         if (matches == null) {
             warn(`"${source}" is not a valid Unity version.`);
@@ -61,12 +61,12 @@ export class UnityVersion {
     private compare(otherSource: string): -1 | 0 | 1 {
         const other = new UnityVersion(otherSource);
 
-        if (this.major > other.major) return 1;
-        if (this.major < other.major) return -1;
-        if (this.minor > other.minor) return 1;
-        if (this.minor < other.minor) return -1;
-        if (this.revision > other.revision) return 1;
-        if (this.revision < other.revision) return -1;
+        if (this.#major > other.#major) return 1;
+        if (this.#major < other.#major) return -1;
+        if (this.#minor > other.#minor) return 1;
+        if (this.#minor < other.#minor) return -1;
+        if (this.#revision > other.#revision) return 1;
+        if (this.#revision < other.#revision) return -1;
 
         return 0;
     }
@@ -77,6 +77,6 @@ export class UnityVersion {
     }
 
     toString(): string {
-        return this.source;
+        return this.#source;
     }
 }

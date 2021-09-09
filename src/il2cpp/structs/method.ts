@@ -33,20 +33,33 @@ class Il2CppMethod extends NonNullNativeStruct {
     /** */
     @cache
     get fridaSignature(): NativeCallbackArgumentType[] {
-        const types = Object.values(this.parameters).map((parameter: Il2Cpp.Parameter) => parameter.type.fridaAlias);
+        const types: NativeCallbackArgumentType[] = [];
+
+        for (const parameter of this.parameters) {
+            types.push(parameter.type.fridaAlias);
+        }
+
         if (!this.isStatic || Il2Cpp.unityVersion.isBefore2018_3_0) {
             types.unshift("pointer"); // TODO or this.class.type.aliasForFrida?, check structs
         }
+
         if (this.isInflated) {
             types.unshift("pointer");
         }
+
         return types;
+    }
+
+    /** Gets the amount of generic parameters of this generic method. */
+    @cache
+    get genericParameterCount(): number {
+        return Il2Cpp.Api._methodGetGenericParameterCount(this);
     }
 
     /** Determines whether this method is external. */
     @cache
     get isExternal(): boolean {
-        return (this.implementationFlags & Il2Cpp.Method.ImplementationAttribute.InternalCall) != 0;
+        return !!Il2Cpp.Api._methodIsExternal(this);
     }
 
     /** Determines whether this method is generic. */
@@ -65,6 +78,12 @@ class Il2CppMethod extends NonNullNativeStruct {
     @cache
     get isStatic(): boolean {
         return !Il2Cpp.Api._methodIsInstance(this);
+    }
+
+    /** Determines whether this method is synchronized. */
+    @cache
+    get isSynchronized(): boolean {
+        return !!Il2Cpp.Api._methodIsSynchronized(this);
     }
 
     /** Gets the name of this method. */
@@ -88,7 +107,7 @@ class Il2CppMethod extends NonNullNativeStruct {
     /** Gets the amount of parameters of this method. */
     @cache
     get parameterCount(): number {
-        return Il2Cpp.Api._methodGetParamCount(this);
+        return Il2Cpp.Api._methodGetParameterCount(this);
     }
 
     /** Gets the parameters of this method. */
@@ -98,10 +117,9 @@ class Il2CppMethod extends NonNullNativeStruct {
         const accessor: Record<string, Il2Cpp.Parameter> = {};
 
         let handle: NativePointer;
-        let parameter: Il2Cpp.Parameter;
 
         while (!(handle = Il2Cpp.Api._methodGetParameters(this, iterator)).isNull()) {
-            parameter = new Il2Cpp.Parameter(handle);
+            const parameter = new Il2Cpp.Parameter(handle);
             accessor[parameter.name!] = parameter;
         }
 
@@ -154,7 +172,7 @@ class Il2CppMethod extends NonNullNativeStruct {
                 this.virtualAddress,
                 new NativeCallback(replaceCallback, this.returnType.fridaAlias, this.fridaSignature as NativeCallbackArgumentType[])
             );
-        } catch (e) {
+        } catch (e: any) {
             warn(`Skipping implementation for ${this.class.type.name}.${this.name}: ${e.message}.`);
         }
     }
@@ -162,11 +180,22 @@ class Il2CppMethod extends NonNullNativeStruct {
     /** */
     inflate(...classes: Il2Cpp.Class[]): Il2Cpp.Method {
         if (!this.isGeneric) {
-            raise(`Cannot inflate ${this.name} because it's not generic.`);
+            raise(`${this.name} it's not generic, so it cannot be inflated.`);
+        }
+
+        if (this.genericParameterCount != classes.length) {
+            raise(`${this.name} has ${this.genericParameterCount} generic parameter(s), but ${classes.length} classes were supplied.`);
         }
 
         const types = classes.map(klass => klass.type.object);
         const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.classes["System.Type"], types);
+
+        // TODO: typeArray leaks
+        return this.inflateRaw(typeArray);
+    }
+
+    /** @internal */
+    inflateRaw(typeArray: Il2Cpp.Array<Il2Cpp.Object>): Il2Cpp.Method {
         const MakeGenericMethod = this.object.class.getMethod("MakeGenericMethod", 1)!;
 
         let object = this.object;
@@ -174,7 +203,6 @@ class Il2CppMethod extends NonNullNativeStruct {
 
         const inflatedMethodObject = MakeGenericMethod.invokeRaw(object, typeArray);
 
-        // TODO: will typeArray leak?
         return new Il2Cpp.Method(Il2Cpp.Api._methodGetFromReflection(inflatedMethodObject as Il2Cpp.Object));
     }
 
@@ -190,16 +218,16 @@ class Il2CppMethod extends NonNullNativeStruct {
             raise(`${this.name} requires ${this.parameterCount} parameters, but ${parameters.length} were supplied.`);
         }
 
-        const allocatedParameters = Object.values(this.parameters).map((parameter: Il2Cpp.Parameter, index: number) =>
-            toFridaValue(parameters[index])
-        );
+        const allocatedParameters = parameters.map(toFridaValue);
 
         if (!this.isStatic || Il2Cpp.unityVersion.isBefore2018_3_0) {
             allocatedParameters.unshift(instance);
         }
+
         if (this.isInflated) {
             allocatedParameters.push(this);
         }
+
         return fromFridaValue(this.nativeFunction(...allocatedParameters), this.returnType) as Il2Cpp.Method.ReturnType;
     }
 
@@ -243,6 +271,33 @@ declare global {
         namespace Method {
             type Implementation = (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => Il2Cpp.Method.ReturnType;
             type ReturnType = void | Il2Cpp.Field.Type;
+
+            const enum Attributes {
+                MemberAccessMask = 0x0007,
+                PrivateScope = 0x0000,
+                Private = 0x0001,
+                FamANDAssem = 0x0002,
+                Assembly = 0x0003,
+                Family = 0x0004,
+                FamORAssem = 0x0005,
+                Public = 0x0006,
+                Static = 0x0010,
+                Final = 0x0020,
+                Virtual = 0x0040,
+                HideBySig = 0x0080,
+                CheckAccessOnOverride = 0x0200,
+                VtableLayoutMask = 0x0100,
+                ReuseSlot = 0x0000,
+                NewSlot = 0x0100,
+                Abstract = 0x0400,
+                SpecialName = 0x0800,
+                PinvokeImpl = 0x2000,
+                UnmanagedExport = 0x0008,
+                RTSpecialName = 0x1000,
+                ReservedMask = 0xd000,
+                HasSecurity = 0x4000,
+                RequireSecObject = 0x8000
+            }
 
             const enum ImplementationAttribute {
                 CodeTypeMask = 0x0003,

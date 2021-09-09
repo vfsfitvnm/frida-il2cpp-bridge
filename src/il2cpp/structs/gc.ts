@@ -1,4 +1,4 @@
-import { since } from "../decorators";
+import { isEqualOrAbove } from "../decorators";
 
 /** Garbage collector utility functions. */
 class Il2CppGC {
@@ -10,19 +10,19 @@ class Il2CppGC {
     }
 
     /** Determines whether the garbage collector is disabled. */
-    @since("2018.3.0", "5.3.5")
+    @isEqualOrAbove("2018.3.0")
     static get isEnabled(): boolean {
         return !Il2Cpp.Api._gcIsDisabled();
     }
 
     /** Determines whether the garbage collector is incremental. */
-    @since("2019.1.0")
+    @isEqualOrAbove("2019.1.0")
     static get isIncremental(): boolean {
         return !!Il2Cpp.Api._gcIsIncremental();
     }
 
     /** */
-    @since("2019.1.0", "2019.1.0")
+    @isEqualOrAbove("2019.1.0")
     static get maxTimeSlice(): Int64 {
         return Il2Cpp.Api._gcGetMaxTimeSlice();
     }
@@ -68,25 +68,25 @@ class Il2CppGC {
     }
 
     /** Forces a garbage collection. */
-    @since("5.3.5")
+    @isEqualOrAbove("5.3.5")
     static collectALittle(): void {
         Il2Cpp.Api._gcCollectALittle();
     }
 
     /** */
-    @since("2019.3.0")
+    @isEqualOrAbove("2019.3.0")
     static startWorld(): void {
         return Il2Cpp.Api._gcStartWorld();
     }
 
     /** */
-    @since("2020.2.0")
+    @isEqualOrAbove("2020.2.0")
     static startIncrementalCollection(): void {
         return Il2Cpp.Api._gcStartIncrementalCollection();
     }
 
     /** */
-    @since("2019.3.0")
+    @isEqualOrAbove("2019.3.0")
     static stopWorld(): void {
         return Il2Cpp.Api._gcStopWorld();
     }

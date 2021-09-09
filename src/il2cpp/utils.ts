@@ -5,46 +5,46 @@ import { NativeStruct } from "../utils/native-struct";
 /** @internal */
 export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Type {
     switch (type.typeEnum) {
-        case "boolean":
+        case Il2Cpp.Type.Enum.Boolean:
             return !!pointer.readS8();
-        case "i1":
+        case Il2Cpp.Type.Enum.I1:
             return pointer.readS8();
-        case "u1":
+        case Il2Cpp.Type.Enum.U1:
             return pointer.readU8();
-        case "i2":
+        case Il2Cpp.Type.Enum.I2:
             return pointer.readS16();
-        case "u2":
+        case Il2Cpp.Type.Enum.U2:
             return pointer.readU16();
-        case "i4":
+        case Il2Cpp.Type.Enum.I4:
             return pointer.readS32();
-        case "u4":
+        case Il2Cpp.Type.Enum.U4:
             return pointer.readU32();
-        case "char":
+        case Il2Cpp.Type.Enum.Char:
             return pointer.readU16();
-        case "i8":
+        case Il2Cpp.Type.Enum.I8:
             return pointer.readS64();
-        case "u8":
+        case Il2Cpp.Type.Enum.U8:
             return pointer.readU64();
-        case "r4":
+        case Il2Cpp.Type.Enum.R4:
             return pointer.readFloat();
-        case "r8":
+        case Il2Cpp.Type.Enum.R8:
             return pointer.readDouble();
-        case "i":
-        case "u":
+        case Il2Cpp.Type.Enum.NativeInteger:
+        case Il2Cpp.Type.Enum.NativeUnsignedInteger:
             return pointer.readPointer();
-        case "ptr":
+        case Il2Cpp.Type.Enum.Pointer:
             return new Il2Cpp.Pointer(pointer.readPointer(), type.dataType!);
-        case "valuetype":
+        case Il2Cpp.Type.Enum.ValueType:
             return new Il2Cpp.ValueType(pointer, type);
-        case "object":
-        case "class":
+        case Il2Cpp.Type.Enum.Object:
+        case Il2Cpp.Type.Enum.Class:
             return new Il2Cpp.Object(pointer.readPointer());
-        case "genericinst":
+        case Il2Cpp.Type.Enum.GenericInstance:
             return type.class.isValueType ? new Il2Cpp.ValueType(pointer, type) : new Il2Cpp.Object(pointer.readPointer());
-        case "string":
+        case Il2Cpp.Type.Enum.String:
             return new Il2Cpp.String(pointer.readPointer());
-        case "szarray":
-        case "array":
+        case Il2Cpp.Type.Enum.SingleDimensionalZeroLowerBoundArray:
+        case Il2Cpp.Type.Enum.Array:
             return new Il2Cpp.Array(pointer.readPointer());
     }
 
@@ -58,40 +58,40 @@ export function write(pointer: NativePointer, value: any, type: Il2Cpp.Type): Na
     }
 
     switch (type.typeEnum) {
-        case "boolean":
+        case Il2Cpp.Type.Enum.Boolean:
             return pointer.writeU8(+value);
-        case "i1":
+        case Il2Cpp.Type.Enum.I1:
             return pointer.writeS8(value);
-        case "u1":
+        case Il2Cpp.Type.Enum.U1:
             return pointer.writeU8(value);
-        case "i2":
+        case Il2Cpp.Type.Enum.I2:
             return pointer.writeS16(value);
-        case "u2":
+        case Il2Cpp.Type.Enum.U2:
             return pointer.writeU16(value);
-        case "i4":
+        case Il2Cpp.Type.Enum.I4:
             return pointer.writeS32(value);
-        case "u4":
+        case Il2Cpp.Type.Enum.U4:
             return pointer.writeU32(value);
-        case "char":
+        case Il2Cpp.Type.Enum.Char:
             return pointer.writeU16(value);
-        case "i8":
+        case Il2Cpp.Type.Enum.I8:
             return pointer.writeS64(value);
-        case "u8":
+        case Il2Cpp.Type.Enum.U8:
             return pointer.writeU64(value);
-        case "r4":
+        case Il2Cpp.Type.Enum.R4:
             return pointer.writeFloat(value);
-        case "r8":
+        case Il2Cpp.Type.Enum.R8:
             return pointer.writeDouble(value);
-        case "i":
-        case "u":
-        case "ptr":
-        case "valuetype":
-        case "string":
-        case "object":
-        case "class":
-        case "szarray":
-        case "array":
-        case "genericinst":
+        case Il2Cpp.Type.Enum.NativeInteger:
+        case Il2Cpp.Type.Enum.NativeUnsignedInteger:
+        case Il2Cpp.Type.Enum.Pointer:
+        case Il2Cpp.Type.Enum.ValueType:
+        case Il2Cpp.Type.Enum.String:
+        case Il2Cpp.Type.Enum.Object:
+        case Il2Cpp.Type.Enum.Class:
+        case Il2Cpp.Type.Enum.SingleDimensionalZeroLowerBoundArray:
+        case Il2Cpp.Type.Enum.Array:
+        case Il2Cpp.Type.Enum.GenericInstance:
             return pointer.writePointer(value);
     }
 
@@ -108,21 +108,21 @@ export function fromFridaValue(value: NativeFunctionReturnValue, type: Il2Cpp.Ty
         }
 
         switch (type.typeEnum) {
-            case "ptr":
+            case Il2Cpp.Type.Enum.Pointer:
                 return new Il2Cpp.Pointer(value, type.dataType!);
-            case "string":
+            case Il2Cpp.Type.Enum.String:
                 return new Il2Cpp.String(value);
-            case "class":
-            case "genericinst":
-            case "object":
+            case Il2Cpp.Type.Enum.Class:
+            case Il2Cpp.Type.Enum.GenericInstance:
+            case Il2Cpp.Type.Enum.Object:
                 return new Il2Cpp.Object(value);
-            case "szarray":
-            case "array":
+            case Il2Cpp.Type.Enum.SingleDimensionalZeroLowerBoundArray:
+            case Il2Cpp.Type.Enum.Array:
                 return new Il2Cpp.Array(value);
             default:
                 return value;
         }
-    } else if (type.typeEnum == "boolean") {
+    } else if (type.typeEnum == Il2Cpp.Type.Enum.Boolean) {
         return !!(value as number);
     } else {
         return value;
@@ -160,7 +160,7 @@ function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueT
         for (const field of Object.values(type.class.fields)) {
             if (!field.isStatic) {
                 const offset = startOffset + field.offset - Il2Cpp.Object.headerSize;
-                if (field.type.typeEnum == "valuetype" || (field.type.typeEnum == "genericinst" && field.type.class.isValueType)) {
+                if (field.type.typeEnum == Il2Cpp.Type.Enum.ValueType || (field.type.typeEnum == Il2Cpp.Type.Enum.GenericInstance && field.type.class.isValueType)) {
                     arr.push(...iter(field.type, offset));
                 } else {
                     arr.push([field.type.typeEnum, offset]);
@@ -183,51 +183,51 @@ function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueT
         const pointer = valueType.add(offset);
 
         switch (typeEnum) {
-            case "boolean":
+            case Il2Cpp.Type.Enum.Boolean:
                 pointer.writeU8(value);
                 break;
-            case "i1":
+            case Il2Cpp.Type.Enum.I1:
                 pointer.writeS8(value);
                 break;
-            case "u1":
+            case Il2Cpp.Type.Enum.U1:
                 pointer.writeU8(value);
                 break;
-            case "i2":
+            case Il2Cpp.Type.Enum.I2:
                 pointer.writeS16(value);
                 break;
-            case "u2":
+            case Il2Cpp.Type.Enum.U2:
                 pointer.writeU16(value);
                 break;
-            case "i4":
+            case Il2Cpp.Type.Enum.I4:
                 pointer.writeS32(value);
                 break;
-            case "u4":
+            case Il2Cpp.Type.Enum.U4:
                 pointer.writeU32(value);
                 break;
-            case "char":
+            case Il2Cpp.Type.Enum.Char:
                 pointer.writeU16(value);
                 break;
-            case "i8":
+            case Il2Cpp.Type.Enum.I8:
                 pointer.writeS64(value);
                 break;
-            case "u8":
+            case Il2Cpp.Type.Enum.U8:
                 pointer.writeU64(value);
                 break;
-            case "r4":
+            case Il2Cpp.Type.Enum.R4:
                 pointer.writeFloat(value);
                 break;
-            case "r8":
+            case Il2Cpp.Type.Enum.R8:
                 pointer.writeDouble(value);
                 break;
-            case "i":
-            case "u":
-            case "ptr":
-            case "szarray":
-            case "array":
-            case "string":
-            case "object":
-            case "class":
-            case "genericinst":
+            case Il2Cpp.Type.Enum.NativeInteger:
+            case Il2Cpp.Type.Enum.NativeUnsignedInteger:
+            case Il2Cpp.Type.Enum.Pointer:
+            case Il2Cpp.Type.Enum.SingleDimensionalZeroLowerBoundArray:
+            case Il2Cpp.Type.Enum.Array:
+            case Il2Cpp.Type.Enum.String:
+            case Il2Cpp.Type.Enum.Object:
+            case Il2Cpp.Type.Enum.Class:
+            case Il2Cpp.Type.Enum.GenericInstance:
                 pointer.writePointer(value);
                 break;
             default:

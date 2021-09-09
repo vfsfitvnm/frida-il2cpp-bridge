@@ -11,17 +11,17 @@ export function raise(message: string): never {
 
 /** @internal */
 export function ok(message: string): void {
-    console.log(`${kleur.green("[il2cpp]")} ${message}`);
+    (globalThis as any).console.log(`${kleur.green("[il2cpp]")} ${message}`);
 }
 
 /** @internal */
 export function warn(message: string): void {
-    console.log(`${kleur.yellow("[il2cpp]")} ${message}`);
+    (globalThis as any).console.log(`${kleur.yellow("[il2cpp]")} ${message}`);
 }
 
 /** @internal */
 export function inform(message: string): void {
-    console.log(`${kleur.blue("[il2cpp]")} ${message}`);
+    (globalThis as any).console.log(`${kleur.blue("[il2cpp]")} ${message}`);
 }
 
 /** @internal */
