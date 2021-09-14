@@ -18,22 +18,16 @@ class Il2CppMemorySnapshot extends NonNullNativeStruct {
     /** Gets the objects tracked by this memory snapshot. */
     @cache
     get objects(): Il2Cpp.Object[] {
-        const objects: Il2Cpp.Object[] = [];
+        const array: Il2Cpp.Object[] = [];
 
         const count = this.trackedObjectCount.toNumber();
-        const start = this.objectsPointer;
+        const start = Il2Cpp.Api._memorySnapshotGetObjects(this);
 
         for (let i = 0; i < count; i++) {
-            objects.push(new Il2Cpp.Object(start.add(i * Process.pointerSize).readPointer()));
+            array.push(new Il2Cpp.Object(start.add(i * Process.pointerSize).readPointer()));
         }
 
-        return objects;
-    }
-
-    /** Gets a pointer to the first object tracked in this memory snapshot. */
-    @cache
-    get objectsPointer(): NativePointer {
-        return Il2Cpp.Api._memorySnapshotGetObjects(this);
+        return array;
     }
 
     /** Gets the amount of objects tracked in this memory snapshot. */

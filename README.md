@@ -5,7 +5,7 @@
 
 A Frida module to dump, trace or hijack any Il2Cpp application at runtime, without needing the `global-metadata.dat` file.
 
-![Screenshot_20210724_195807](https://user-images.githubusercontent.com/46219656/126877297-97529b9b-e74b-4130-9b6e-061b938a5737.png)
+![Screenshot_20210911_121628](https://user-images.githubusercontent.com/46219656/132944635-6fb7d70b-ff4d-457f-9cd5-d9b98f40af9c.png)
 ## Compatibility
 
 #### Unity version
@@ -14,6 +14,12 @@ It should work for any Unity version in the inclusive range **5.3.0** - **2021.1
 #### Platforms
 **Android** is supported; **Linux** and **Windows** are not tested; **iOS** is not supported yet 
 ([#15](https://github.com/vfsfitvnm/frida-il2cpp-bridge/issues/15)).
+
+## To do
+
+- Provide iOS/macOS support
+- Emit C scaffold code to improve static analysis
+- Do something about modified Il2Cpp structs
 
 ## Acknowledgements
 Thanks to [meme](https://github.com/meme) and [tryso](https://github.com/tryso) for helping and getting me into this, 
@@ -76,7 +82,7 @@ Learn more about `packages.json` [here](https://docs.npmjs.com/cli/v7/configurin
 
 ```json
 {
-  "name": "project",
+  "name": "playground",
   "main": "index.ts",
   "version": "1.0.0",
   "private": true,
@@ -91,7 +97,7 @@ Learn more about `packages.json` [here](https://docs.npmjs.com/cli/v7/configurin
   "devDependencies": {
     "@types/frida-gum": "^17.1.0",
     "frida-compile": "^10.2.4",
-    "frida-il2cpp-bridge": "^0.5.3"
+    "frida-il2cpp-bridge": "^0.5.4"
   }
 }
 ```
@@ -267,6 +273,8 @@ After `commit` you can start over or you can choose a generator (`simple`, `full
 
 Uh, you don't need al this black magic? Do you just want to trace a single method?
 ```ts
+import "frida-il2cpp-bridge";
+
 Il2Cpp.perform(() => {
     const Equals = Il2Cpp.Image.corlib.classes["System.String"].methods.Equals;
 
@@ -319,18 +327,18 @@ words, however `Il2Cpp.Tracer` does not use `Interceptor.attach`, but a combinat
   ```
   [il2cpp] 0x01a2f3e4 ┌─System.String.Concat(System.String str0 = "Creating AndroidJavaClass from ", System.String str1 = "com.unity3d.player.UnityPlayer")
   [il2cpp] 0x01a3cfbc │ ┌─System.String.FastAllocateString(System.Int32 length = 61)
-  [il2cpp] 0x01a3cfbc │ └─System.String.FastAllocateString System.String = ""
-  [il2cpp] 0x01a3f118 │ ┌─System.String.FillStringChecked(System.String dest = "", System.Int32 destPos = 0, System.String src = "Creating AndroidJavaClass from ")
+  [il2cpp] 0x01a3cfbc │ └─System.String.FastAllocateString System.String = "Creating AndroidJavaClass from com.unity3d.player.UnityPlayer"
+  [il2cpp] 0x01a3f118 │ ┌─System.String.FillStringChecked(System.String dest = "Creating AndroidJavaClass from com.unity3d.player.UnityPlayer", System.Int32 destPos = 0, System.String src = "Creating AndroidJavaClass from ")
   [il2cpp] 0x01a3f118 │ └─System.String.FillStringChecked System.Void = undefined
-  [il2cpp] 0x01a3f118 │ ┌─System.String.FillStringChecked(System.String dest = "Creating AndroidJavaClass from ", System.Int32 destPos = 31, System.String src = "com.unity3d.player.UnityPlayer")
+  [il2cpp] 0x01a3f118 │ ┌─System.String.FillStringChecked(System.String dest = "Creating AndroidJavaClass from com.unity3d.player.UnityPlayer", System.Int32 destPos = 31, System.String src = "com.unity3d.player.UnityPlayer")
   [il2cpp] 0x01a3f118 │ └─System.String.FillStringChecked System.Void = undefined
   [il2cpp] 0x01a2f3e4 └─System.String.Concat System.String = "Creating AndroidJavaClass from com.unity3d.player.UnityPlayer"
 
-  [il2cpp] 0x01a41f60 ┌─System.String.Replace(System.Char oldChar = 46, System.Char newChar = 47)
-  [il2cpp] 0x01a4346c │ ┌─System.String.IndexOfUnchecked(System.Char value = 46, System.Int32 startIndex = 0, System.Int32 count = 30)
+  [il2cpp] 0x01a41f60 ┌─System.String.Replace(this = com.unity3d.player.UnityPlayer, System.Char oldChar = 46, System.Char newChar = 47)
+  [il2cpp] 0x01a4346c │ ┌─System.String.IndexOfUnchecked(this = com.unity3d.player.UnityPlayer, System.Char value = 46, System.Int32 startIndex = 0, System.Int32 count = 30)
   [il2cpp] 0x01a4346c │ └─System.String.IndexOfUnchecked System.Int32 = 3
   [il2cpp] 0x01a3cfbc │ ┌─System.String.FastAllocateString(System.Int32 length = 30)
-  [il2cpp] 0x01a3cfbc │ └─System.String.FastAllocateString System.String = ""
+  [il2cpp] 0x01a3cfbc │ └─System.String.FastAllocateString System.String = "com/unity3d/player/UnityPlayer"
   [il2cpp] 0x01a41f60 └─System.String.Replace System.String = "com/unity3d/player/UnityPlayer"
   ```
 
@@ -433,6 +441,8 @@ Reference types (aka objects) all shares the same code: it is easy to retrieve v
 `inflate` will always return an inflated class or method (you must match the number of type arguments with the number of types you pass to `inflate`), but the returned value it's not
 necessarely a class or method that has been implemented.
 ```ts
+import "frida-il2cpp-bridge";
+
 Il2Cpp.perform(() => {
     const classes = Il2Cpp.Image.corlib.classes;
 
@@ -471,16 +481,21 @@ There's not a nice way to handle overloading yet (there's no such `.overload(...
 renamed. Consider the following `System.String` methods:
 
 ```cs
-System.Boolean Equals(System.Object obj); // SystemString.methods.Equals
-System.Boolean Equals(System.String value); // SystemString.methods.Equals_
-System.Boolean Equals(System.String value, System.StringComparison comparisonType); // SystemString.methods.Equals__
+ // SystemString.methods.Equals
+System.Boolean Equals(System.Object obj);
+
+// SystemString.methods.Equals_
+System.Boolean Equals(System.String value);
+
+// SystemString.methods.Equals__
+System.Boolean Equals(System.String value, System.StringComparison comparisonType); 
 ```
 
 Basically, an underscore is appended to the method name (key) until the key can be used.
 
 ### Ghidra script
 
-The following script parses the file produced by `Il2Cpp.Dumper.emitMethodsAnd` and renames the functions.
+The following script parses the dumped methods and renames the library functions.
 
 ```py
 from ghidra.program.model.address import AddressFactory

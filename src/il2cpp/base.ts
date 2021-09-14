@@ -1,6 +1,5 @@
 import { cache } from "decorator-cache-getter";
 
-import { isEqualOrAbove } from "./decorators";
 import { UnityVersion } from "./version";
 
 import { platformNotSupported, raise, warn } from "../utils/console";
@@ -11,7 +10,6 @@ class Il2CppBase {
     protected constructor() {}
 
     /** */
-    @isEqualOrAbove("2019.3.0")
     static get allocationGranularity(): number {
         return Il2Cpp.Api._allocationGranularity();
     }

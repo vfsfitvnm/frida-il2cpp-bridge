@@ -1,6 +1,7 @@
 import { cache } from "decorator-cache-getter";
 
 import { NonNullNativeStruct } from "../../utils/native-struct";
+import { readGString } from "../utils";
 
 /** Represents a `ParameterInfo`. */
 class Il2CppParameter extends NonNullNativeStruct {
@@ -23,7 +24,7 @@ class Il2CppParameter extends NonNullNativeStruct {
     }
 
     override toString(): string {
-        return this.type.name + " " + this.name;
+        return readGString(Il2Cpp.Api._toString(this, Il2Cpp.Api._parameterToString))!;
     }
 }
 

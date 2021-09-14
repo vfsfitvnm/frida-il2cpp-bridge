@@ -107,7 +107,7 @@ class Il2CppDumper {
 
         file.flush();
         file.close();
-        ok(`Dump saved to ${destinationPath}.`);
+        ok(`Dump saved to ${destinationPath}`);
     }
 }
 

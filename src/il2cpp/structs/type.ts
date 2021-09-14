@@ -71,12 +71,6 @@ class Il2CppType extends NonNullNativeStruct {
         }
     }
 
-    /** */
-    @cache
-    get genericClass(): Il2Cpp.GenericClass {
-        return new Il2Cpp.GenericClass(Il2Cpp.Api._typeGetGenericClass(this));
-    }
-
     /** Determines whether this type is passed by reference. */
     @cache
     get isByReference(): boolean {
@@ -86,7 +80,13 @@ class Il2CppType extends NonNullNativeStruct {
     /** Gets the name of this type. */
     @cache
     get name(): string {
-        return Il2Cpp.Api._typeGetName(this).readUtf8String()!;
+        const handle = Il2Cpp.Api._typeGetName(this);
+
+        try {
+            return handle.readUtf8String()!;
+        } finally {
+            Il2Cpp.free(handle);
+        }
     }
 
     /** Gets the encompassing object of the current type. */

@@ -13,11 +13,7 @@ class Il2CppAssembly extends NonNullNativeStruct {
     /** Gets the name of this assembly. */
     @cache
     get name(): string {
-        if (Il2Cpp.unityVersion.isBefore2018_3_0) {
-            return this.image.name.replace(".dll", "");
-        } else {
-            return Il2Cpp.Api._assemblyGetName(this).readUtf8String()!;
-        }
+        return this.image.name.replace(".dll", "");
     }
 }
 

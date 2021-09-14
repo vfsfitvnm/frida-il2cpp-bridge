@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
 
 import { shouldBeInstance } from "../decorators";
-import { read, write } from "../utils";
+import { read, readGString, write } from "../utils";
 
 import { warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
@@ -66,7 +66,7 @@ class Il2CppField extends NonNullNativeStruct {
     @shouldBeInstance(false)
     get valueHandle(): NativePointer {
         if (this.isThreadStatic || this.isLiteral) {
-            let valueHandle = Memory.alloc(Process.pointerSize);
+            const valueHandle = Memory.alloc(Process.pointerSize);
             Il2Cpp.Api._fieldGetStaticValue(this.handle, valueHandle);
             
             return valueHandle;
@@ -97,15 +97,7 @@ class Il2CppField extends NonNullNativeStruct {
     }
 
     override toString(): string {
-        return (
-            (this.isStatic ? "static " : "") +
-            this.type.name +
-            " " +
-            this.name +
-            (this.isLiteral
-                ? " = " + (this.type.class.isEnum ? this.valueHandle.readS32() : this.value) + ";"
-                : "; // 0x" + this.offset.toString(16))
-        );
+        return readGString(Il2Cpp.Api._toString(this, Il2Cpp.Api._fieldToString))!;
     }
 }
 

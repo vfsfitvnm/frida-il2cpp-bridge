@@ -44,7 +44,7 @@ function assertVersion(block: (other: string) => boolean, version: string): Meth
         descriptor[key] = function (...args: any[]): any {
             if (!block.call(Il2Cpp.unityVersion, version)) {
                 const prop = `${("prototype" in target ? target.prototype : target).constructor.name}.${propertyKey.toString()}`;
-                raise(`Cannot invoke ${prop}: the curren unity version "${Il2Cpp.unityVersion}" ${getName()} version "${version}".`);
+                raise(`Cannot invoke ${prop}: the current unity version "${Il2Cpp.unityVersion}" ${getName()} version "${version}".`);
             }
             Reflect.defineProperty(target, propertyKey, {
                 ...descriptor,

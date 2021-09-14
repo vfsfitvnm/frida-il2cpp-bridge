@@ -1,9 +1,9 @@
 import { cache } from "decorator-cache-getter";
 
 import { shouldBeInstance } from "../decorators";
-import { fromFridaValue, toFridaValue } from "../utils";
+import { fromFridaValue, readGString, toFridaValue } from "../utils";
 
-import { addLevenshtein, formatNativePointer, makeIterable, overridePropertyValue } from "../../utils/utils";
+import { addLevenshtein, makeIterable, overridePropertyValue } from "../../utils/utils";
 import { raise, warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 
@@ -250,16 +250,7 @@ class Il2CppMethod extends NonNullNativeStruct {
     }
 
     override toString(): string {
-        return (
-            (this.isStatic ? "static " : "") +
-            this.returnType.name +
-            " " +
-            this.name +
-            "(" +
-            Object.values(this.parameters).join(", ") +
-            ");" +
-            (this.virtualAddress.isNull() ? "" : " // " + formatNativePointer(this.relativeVirtualAddress))
-        );
+        return readGString(Il2Cpp.Api._toString(this, Il2Cpp.Api._methodToString))!;
     }
 }
 

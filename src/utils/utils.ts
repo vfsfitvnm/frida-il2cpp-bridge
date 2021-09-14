@@ -114,7 +114,7 @@ export function overridePropertyValue<T extends object, K extends keyof T>(targe
 export function redefineProperty<T extends object, K extends keyof T>(
     target: T,
     property: K,
-    descriptor: RequireAtLeastOne<{ get?: () => T[K]; set?: (value: T[K]) => void }>
+    descriptor: { get?: () => T[K]; set?: (value: T[K]) => void }
 ): T {
     Reflect.defineProperty(target, property, descriptor);
     return target;
@@ -129,3 +129,4 @@ export function formatNativePointer(nativePointer: NativePointer): string {
 export function getOrNull<T extends ObjectWrapper>(handle: NativePointer, Class: new (handle: NativePointer) => T): T | null {
     return handle.isNull() ? null : new Class(handle);
 }
+

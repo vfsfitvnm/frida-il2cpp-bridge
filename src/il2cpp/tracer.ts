@@ -212,13 +212,15 @@ class Il2CppTracer {
 
             return {
                 onEnter(...parameters: Il2Cpp.Parameter.Type[]): void {
+                    const thisText = target.isStatic ? "" : `${kleur.yellow("this")} = ${kleur.cyan(this + "")}${parameters.length > 0 ? ", " : ""}`;
                     const parametersText = parametersInfo
                         .map(({ type, name }, index) => {
                             return `${kleur.blue(type.name)} ${kleur.yellow(name)} = ${kleur.cyan(parameters[index] + "")}`;
                         })
                         .join(", ");
 
-                    inform(`${at} ${"│ ".repeat(counter)}┌─${kleur.red(sign)}${kleur.yellow("(")}${parametersText}${kleur.yellow(")")}`);
+
+                    inform(`${at} ${"│ ".repeat(counter)}┌─${kleur.red(sign)}${kleur.yellow("(")}${thisText}${parametersText}${kleur.yellow(")")}`);
                     counter += 1;
                 },
                 onLeave(returnValue: Il2Cpp.Method.ReturnType): void {
@@ -250,11 +252,11 @@ class Il2CppTracer {
             const { onEnter, onLeave } = this.#generator!(target);
 
             target.implementation = function (...parameters: Il2Cpp.Parameter.Type[]): Il2Cpp.Method.ReturnType {
-                onEnter?.apply(null, parameters);
+                onEnter?.apply(this, parameters);
 
                 const returnValue = (this instanceof Il2Cpp.Object ? target.withHolder(this) : target).invoke(...parameters);
 
-                onLeave?.call(null, returnValue);
+                onLeave?.call(this, returnValue);
 
                 return returnValue;
             };
@@ -280,8 +282,8 @@ declare global {
 
         namespace Tracer {
             type Callbacks = {
-                onEnter?: (...parameters: Il2Cpp.Parameter.Type[]) => void;
-                onLeave?: (returnValue: Il2Cpp.Method.ReturnType) => void;
+                onEnter?: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: Il2Cpp.Parameter.Type[]) => void;
+                onLeave?: (this: Il2Cpp.Class | Il2Cpp.Object, returnValue: Il2Cpp.Method.ReturnType) => void;
             };
         }
     }

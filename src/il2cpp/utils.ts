@@ -239,3 +239,12 @@ function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueT
 
     return new Il2Cpp.ValueType(valueType, type);
 }
+
+/** @internal */
+export function readGString(handle: NativePointer): string | null {
+    try {
+        return handle.readUtf8String();
+    } finally {
+        Il2Cpp.Api._gLibFree(handle);
+    }
+}

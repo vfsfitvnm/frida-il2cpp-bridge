@@ -5,6 +5,7 @@ import { isEqualOrAbove } from "../decorators";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { addLevenshtein, getOrNull, makeIterable, preventKeyClash } from "../../utils/utils";
 import { raise } from "../../utils/console";
+import { readGString } from "../utils";
 
 /** Represents a `Il2CppClass`. */
 class Il2CppClass extends NonNullNativeStruct {
@@ -278,28 +279,7 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     override toString(): string {
-        let fieldsString = "";
-        let methodsString = "";
-
-        for (const field of this.fields) fieldsString += "\n    " + field;
-        for (const method of this.methods) methodsString += "\n    " + method;
-
-        return (
-            "// " +
-            this.image.name +
-            "\n" +
-            (this.isEnum ? "enum" : this.isValueType ? "struct" : this.isInterface ? "interface" : "class") +
-            " " +
-            this.type.name +
-            (this.parent != null || this.interfaceCount > 0 ? " : " : "") +
-            (this.parent != null ? this.parent.type.name + (this.interfaceCount > 0 ? ", " : "") : "") +
-            (this.interfaceCount > 0 ? Object.keys(this.interfaces).join(", ") : "") +
-            "\n{" +
-            fieldsString +
-            (this.fieldCount.toNumber() > 0 && this.methodCount > 0 ? "\n" : "") +
-            methodsString +
-            "\n}\n\n"
-        );
+        return readGString(Il2Cpp.Api._toString(this, Il2Cpp.Api._classToString))!;
     }
 
     /** */
