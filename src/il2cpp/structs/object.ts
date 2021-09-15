@@ -1,7 +1,5 @@
 import { cache } from "decorator-cache-getter";
-
 import { checkNull } from "../decorators";
-
 import { NativeStruct } from "../../utils/native-struct";
 import { addLevenshtein, filterMap, getOrNull, makeIterable, overridePropertyValue } from "../../utils/utils";
 
@@ -58,7 +56,7 @@ class Il2CppObject extends NativeStruct {
         );
     }
 
-    /** */
+    /** Gets the size of the current object. */
     @cache
     get size(): number {
         return Il2Cpp.Api._objectGetSize(this);

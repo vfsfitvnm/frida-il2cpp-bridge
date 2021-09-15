@@ -1,5 +1,3 @@
-import { raise } from "./console";
-
 /** Scaffold class. */
 export class NativeStruct implements ObjectWrapper {
     readonly handle: NativePointer;
@@ -31,7 +29,7 @@ export class NonNullNativeStruct extends NativeStruct {
         super(handle);
 
         if (handle.isNull()) {
-            raise(`Handle for "${this.constructor.name}" cannot be NULL.`);
+            throw new Error(`Handle for "${this.constructor.name}" cannot be NULL.`);
         }
     }
 }

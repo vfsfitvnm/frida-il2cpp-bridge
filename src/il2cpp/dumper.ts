@@ -3,14 +3,14 @@ import { formatNativePointer, getUntilFound } from "../utils/utils";
 
 /** Dumping utilities. */
 class Il2CppDumper {
-    /** */
+    /** Gets the default directory path where the dump will be saved to. */
     static get defaultDirectoryPath(): string {
         const UnityEngine = getUntilFound(Il2Cpp.Domain.assemblies, "UnityEngine.CoreModule", "UnityEngine")!.image;
         const Application = UnityEngine.classes["UnityEngine.Application"];
         return Application.methods.get_persistentDataPath.invoke<Il2Cpp.String>().content!;
     }
 
-    /** */
+    /** Gets the default file name. */
     static get defaultFileName(): string {
         const UnityEngine = getUntilFound(Il2Cpp.Domain.assemblies, "UnityEngine.CoreModule", "UnityEngine")!.image;
         const Application = UnityEngine.classes["UnityEngine.Application"];
@@ -50,25 +50,25 @@ class Il2CppDumper {
         this.#generator = function* (): Generator<string> {
             for (const assembly of Il2Cpp.Domain.assemblies) {
                 inform(`Dumping \x1b[1m${assembly.name}\x1b[0m...`);
-                
+
                 for (const klass of assembly.image.classes) {
                     yield klass.toString();
                 }
             }
-        }
+        };
 
         this.#extension = "cs";
         return this;
     }
 
     methods(): Pick<Il2Cpp.Dumper, "build"> {
-        const SystemType = Il2Cpp.Image.corlib.classes["System.Type"];
-        const SystemObject = Il2Cpp.Image.corlib.classes["System.Object"].type.object;
-
-        const getTypeArray = (genericParameterCount: number): Il2Cpp.Array<Il2Cpp.Object> =>
-            Il2Cpp.Array.from(SystemType, Array(genericParameterCount).fill(SystemObject));
-
         this.#generator = function* (): Generator<string> {
+            const SystemType = Il2Cpp.Image.corlib.classes["System.Type"];
+            const SystemObject = Il2Cpp.Image.corlib.classes["System.Object"].type.object;
+
+            const getTypeArray = (genericParameterCount: number): Il2Cpp.Array<Il2Cpp.Object> =>
+                Il2Cpp.Array.from(SystemType, Array(genericParameterCount).fill(SystemObject));
+
             for (const assembly of Il2Cpp.Domain.assemblies) {
                 inform(`Dumping methods from \x1b[1m${assembly.name}\x1b[0m...`);
 
@@ -76,7 +76,7 @@ class Il2CppDumper {
                     if (klass.isGeneric) {
                         klass = klass.inflateRaw(getTypeArray(klass.genericParameterCount));
                     }
-                    
+
                     for (let method of klass.methods) {
                         if (method.isGeneric && !klass.isGeneric) {
                             method = method.inflateRaw(getTypeArray(method.genericParameterCount));
@@ -88,7 +88,7 @@ class Il2CppDumper {
                     }
                 }
             }
-        }
+        };
 
         this.#extension = "ms";
         return this;
@@ -98,7 +98,7 @@ class Il2CppDumper {
         const directoryPath = (this.#directoryPath) ?? Il2Cpp.Dumper.defaultDirectoryPath;
         const fileName = (this.#fileName) ?? Il2Cpp.Dumper.defaultFileName;
 
-        const destinationPath = `${directoryPath}/${fileName}.${this.#extension ?? "dump"}`;
+        const destinationPath = `${directoryPath}/${fileName}.${(this.#extension) ?? "dump"}`;
         const file = new File(destinationPath, "w");
 
         for (const chunk of this.#generator!()) {

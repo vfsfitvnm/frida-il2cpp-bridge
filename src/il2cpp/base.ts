@@ -1,82 +1,56 @@
 import { cache } from "decorator-cache-getter";
-
-import { UnityVersion } from "./version";
-
-import { platformNotSupported, raise, warn } from "../utils/console";
+import { platformNotSupported, warn } from "../utils/console";
 import { forModule } from "../utils/native-wait";
 
 /** */
 class Il2CppBase {
     protected constructor() {}
 
-    /** */
+    /** Gets the allocation granularity. */
+    @cache
     static get allocationGranularity(): number {
         return Il2Cpp.Api._allocationGranularity();
     }
 
-    /** @internal */
-    private static get il2CppModuleName(): string {
+    /** @internal Gets the Il2Cpp module name. */
+    private static get moduleName(): string {
         return Process.platform == "linux" ? "libil2cpp.so" : Process.platform == "windows" ? "GameAssembly.dll" : platformNotSupported();
     }
 
-    /** The Il2Cpp module. */
+    /** Gets the Il2Cpp module as a Frida module. */
     @cache
     static get module(): Module {
-        return Process.getModuleByName(this.il2CppModuleName);
+        return Process.getModuleByName(this.moduleName);
     }
 
-    /** @internal */
-    private static get unityModuleName(): string {
-        return Process.platform == "linux" ? "libunity.so" : Process.platform == "windows" ? "UnityPlayer.dll" : platformNotSupported();
-    }
-
-    /** The Unity version of the current application. */
-    @cache
-    static get unityVersion(): UnityVersion {
-        const unityModule = Process.getModuleByName(this.unityModuleName);
-        const ranges = [...unityModule.enumerateRanges("r--"), Process.getRangeByAddress(unityModule.base)];
-
-        for (const range of ranges) {
-            const scan = Memory.scanSync(range.base, range.size, "45787065637465642076657273696f6e3a")[0];
-
-            if (scan != undefined) {
-                const unityVersion = new UnityVersion(scan.address.readUtf8String()!);
-
-                if (unityVersion.isBelow("5.3.0") || unityVersion.isEqualOrAbove("2021.2.0")) {
-                    raise(`Unity version "${unityVersion}" is not valid or supported.`);
-                }
-
-                return unityVersion;
-            }
-        }
-
-        raise("Couldn't obtain the Unity version.");
-    }
-
+    /** Allocates the given amount of bytes. */
     static alloc(size: number | UInt64 = Process.pointerSize): NativePointer {
         return Il2Cpp.Api._alloc(size);
     }
 
+    /** Creates a new `Il2Cpp.Dumper` instance. */
     static dump(): Pick<Il2Cpp.Dumper, "directoryPath" | "fileName" | "classes" | "methods"> {
         return new Il2Cpp.Dumper();
     }
 
+    /** Frees memory. */
     static free(pointer: NativePointerValue): void {
         return Il2Cpp.Api._free(pointer);
     }
 
+    /** Creates a new `Il2Cpp.Tracer` instance. */
     static trace(): Pick<Il2Cpp.Tracer, "domain" | "assemblies" | "classes" | "methods"> {
         return new Il2Cpp.Tracer();
     }
 
-    /** @internal Waits for Il2Cpp native libraries to be loaded and initialized. */
+    /** @internal Waits for Unity and Il2Cpp native libraries to be loaded and initialized. */
     private static async initialize(): Promise<void> {
         if (Script.runtime != "V8") {
             warn("Frida's JavaScript runtime is not V8 (--runtime=v8). Proceed with caution.");
         }
 
-        await forModule(this.unityModuleName);
-        await forModule(this.il2CppModuleName);
+        await forModule(Unity.moduleName);
+        await forModule(this.moduleName);
 
         if (Il2Cpp.Api._getCorlib().isNull()) {
             await new Promise<void>(resolve => {

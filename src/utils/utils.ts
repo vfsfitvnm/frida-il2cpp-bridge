@@ -1,7 +1,5 @@
 import { closest } from "fastest-levenshtein";
 
-import { raise } from "./console";
-
 /** @internal */
 export function preventKeyClash<T extends PropertyKey, V>(object: Record<T, V>): Record<T, V> {
     return new Proxy(object, {
@@ -28,9 +26,9 @@ export function addLevenshtein<T extends PropertyKey, V>(object: Record<T, V>): 
 
             const closestMatch = closest(key, Object.keys(target));
             if (closestMatch) {
-                raise(`Couldn't find property "${key}", did you mean "${closestMatch}"?`);
+                throw new Error(`Couldn't find property "${key}", did you mean "${closestMatch}"?`);
             } else {
-                raise(`Couldn't find property "${key}".`);
+                throw new Error(`Couldn't find property "${key}".`);
             }
         }
     });
@@ -129,4 +127,3 @@ export function formatNativePointer(nativePointer: NativePointer): string {
 export function getOrNull<T extends ObjectWrapper>(handle: NativePointer, Class: new (handle: NativePointer) => T): T | null {
     return handle.isNull() ? null : new Class(handle);
 }
-

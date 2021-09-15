@@ -1,6 +1,6 @@
 import { raise, warn } from "../utils/console";
-import { mapToArray } from "../utils/utils";
 import { NativeStruct } from "../utils/native-struct";
+import { mapToArray } from "../utils/utils";
 
 /** @internal */
 export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Type {
@@ -160,7 +160,10 @@ function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueT
         for (const field of Object.values(type.class.fields)) {
             if (!field.isStatic) {
                 const offset = startOffset + field.offset - Il2Cpp.Object.headerSize;
-                if (field.type.typeEnum == Il2Cpp.Type.Enum.ValueType || (field.type.typeEnum == Il2Cpp.Type.Enum.GenericInstance && field.type.class.isValueType)) {
+                if (
+                    field.type.typeEnum == Il2Cpp.Type.Enum.ValueType ||
+                    (field.type.typeEnum == Il2Cpp.Type.Enum.GenericInstance && field.type.class.isValueType)
+                ) {
                     arr.push(...iter(field.type, offset));
                 } else {
                     arr.push([field.type.typeEnum, offset]);
@@ -171,8 +174,7 @@ function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueT
         return arr;
     }
 
-    // TODO: check if it's equal to (type.class.instanceSize - Il2Cpp.Object.headerSize)
-    const valueType = Memory.alloc(type.class.valueSize); 
+    const valueType = Memory.alloc(type.class.valueSize);
 
     nativeValues = nativeValues.flat(Infinity);
     const typesAndOffsets = iter(type);

@@ -1,7 +1,5 @@
 import { cache } from "decorator-cache-getter";
 
-import { platformNotSupported } from "./console";
-
 type StringEncoding = "utf8" | "utf16" | "ansi";
 
 class Target {
@@ -13,7 +11,7 @@ class Target {
 
     @cache
     static get targets(): Target[] {
-        function info(): [string | null, ...[string, StringEncoding][]] {
+        function info(): [string | null, ...[string, StringEncoding][]] | undefined {
             switch (Process.platform) {
                 case "linux":
                     try {
@@ -27,13 +25,10 @@ class Target {
                 case "windows":
                     const ll = "LoadLibrary";
                     return ["kernel32.dll", [`${ll}W`, "utf16"], [`${ll}ExW`, "utf16"], [`${ll}A`, "ansi"], [`${ll}ExA`, "ansi"]];
-                case "qnx":
-                default:
-                    platformNotSupported();
             }
         }
 
-        const [responsible, ...targets] = info();
+        const [responsible, ...targets] = info()!;
         return targets.map(([name, encoding]) => new Target(responsible, name, encoding)).filter(target => !target.address.isNull());
     }
 

@@ -1,5 +1,4 @@
 import { cache } from "decorator-cache-getter";
-
 import { addLevenshtein, getOrNull, makeIterable } from "../../utils/utils";
 
 /** Represents a `Il2CppDomain`. */
@@ -28,7 +27,7 @@ class Il2CppDomain {
                 const assemblyName = assemblyObject.base.base.methods.GetSimpleName.invoke<Il2Cpp.String>().content;
 
                 if (assemblyName != null) {
-                    const assembly = Il2Cpp.Domain.open(assemblyName);
+                    const assembly = this.open(assemblyName);
 
                     if (assembly != null) {
                         record[assembly.name] = assembly;
@@ -47,8 +46,7 @@ class Il2CppDomain {
     }
 
     /** Gets the name of the application domain. */
-    @cache
-    // @ts-ignore
+    @cache // @ts-ignore
     static get name(): string {
         return Il2Cpp.Api._domainGetName(this).readUtf8String()!;
     }

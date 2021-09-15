@@ -1,11 +1,7 @@
-import { cache } from "decorator-cache-getter";
+/** A version utility class. */
+export class Version {
+    static pattern?: RegExp;
 
-import { warn } from "../utils/console";
-
-const matchPattern = /(20\d{2}|\d)\.(\d)\.(\d{1,2})([abcfp]|rc){0,2}\d?/;
-
-/** Represent the Unity version of the current application. */
-export class UnityVersion {
     /** @internal */
     readonly #source: string;
 
@@ -20,21 +16,19 @@ export class UnityVersion {
 
     /** @internal */
     constructor(source: string) {
-        const matches = source.match(matchPattern);
+        if (Version.pattern == undefined) {
+            throw new Error(`The version match pattern has not been set.`);
+        }
+
+        const matches = source.match(Version.pattern);
         this.#source = matches ? matches[0] : source;
         this.#major = matches ? Number(matches[1]) : -1;
         this.#minor = matches ? Number(matches[2]) : -1;
         this.#revision = matches ? Number(matches[3]) : -1;
 
         if (matches == null) {
-            warn(`"${source}" is not a valid Unity version.`);
+            throw new Error(`"${source}" is not a valid version.`);
         }
-    }
-
-    /** @internal */
-    @cache
-    get isBefore2018_3_0(): boolean {
-        return this.isBelow("2018.3.0");
     }
 
     isEqual(other: string): boolean {
@@ -59,7 +53,7 @@ export class UnityVersion {
 
     /** @internal */
     private compare(otherSource: string): -1 | 0 | 1 {
-        const other = new UnityVersion(otherSource);
+        const other = new Version(otherSource);
 
         if (this.#major > other.#major) return 1;
         if (this.#major < other.#major) return -1;

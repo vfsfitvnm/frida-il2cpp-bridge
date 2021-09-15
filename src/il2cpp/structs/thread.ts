@@ -1,6 +1,8 @@
+import { cache } from "decorator-cache-getter";
 import { NativeStruct } from "../../utils/native-struct";
 import { getOrNull } from "../../utils/utils";
 
+/** Represents a `Il2CppThread`. */
 class Il2CppThread extends NativeStruct {
     /** Gets the attached threads. */
     static get all(): Il2CppThread[] {
@@ -14,7 +16,7 @@ class Il2CppThread extends NativeStruct {
         for (let i = 0; i < size; i++) {
             array.push(new Il2Cpp.Thread(startPointer.add(i * Process.pointerSize).readPointer()));
         }
-        
+
         return array;
     }
 
@@ -23,9 +25,15 @@ class Il2CppThread extends NativeStruct {
         return getOrNull(Il2Cpp.Api._threadCurrent(), Il2CppThread);
     }
 
-    /** */
-    get isVmThread(): boolean {
-        return !!Il2Cpp.Api._threadIsVm(this);
+    /** Determines whether the current thread is the garbage collector finalizer one. */
+    get isFinalizer(): boolean {
+        return !Il2Cpp.Api._threadIsVm(this);
+    }
+
+    /** Gets the encompassing object of the current thread. */
+    @cache
+    get object(): Il2Cpp.Object {
+        return new Il2Cpp.Object(this);
     }
 
     /** Detaches the thread from the application domain. */

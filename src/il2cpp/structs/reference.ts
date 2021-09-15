@@ -1,6 +1,5 @@
 import { checkNull } from "../decorators";
 import { read, write } from "../utils";
-
 import { NativeStruct } from "../../utils/native-struct";
 
 /** Represent a parameter passed by reference. */
@@ -10,12 +9,12 @@ class Il2CppReference<T extends Il2Cpp.Field.Type> extends NativeStruct {
         super(handle);
     }
 
-    /** */
+    /** Gets the element referenced by the current reference. */
     get value(): T {
         return read(this.handle, this.type) as T;
     }
 
-    /** */
+    /** Sets the element referenced by the current reference. */
     set value(value: T) {
         write(this.handle, value, this.type);
     }

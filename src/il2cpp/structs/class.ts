@@ -1,11 +1,9 @@
 import { cache } from "decorator-cache-getter";
-
 import { isEqualOrAbove } from "../decorators";
-
+import { readGString } from "../utils";
+import { raise } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { addLevenshtein, getOrNull, makeIterable, preventKeyClash } from "../../utils/utils";
-import { raise } from "../../utils/console";
-import { readGString } from "../utils";
 
 /** Represents a `Il2CppClass`. */
 class Il2CppClass extends NonNullNativeStruct {
@@ -92,7 +90,7 @@ class Il2CppClass extends NonNullNativeStruct {
         return new Il2Cpp.Image(Il2Cpp.Api._classGetImage(this));
     }
 
-    /** Gets the size of the instances of the current class. */
+    /** Gets the size of the instance of the current class. */
     @cache
     get instanceSize(): number {
         return Il2Cpp.Api._classGetInstanceSize(this);
@@ -221,7 +219,7 @@ class Il2CppClass extends NonNullNativeStruct {
         return Il2Cpp.Api._classGetStaticFieldData(this);
     }
 
-    /** */
+    /** Gets the size of the instance - as a value type - of the current class. */
     @cache
     get valueSize(): number {
         return Il2Cpp.Api._classGetValueSize(this, NULL);
@@ -233,12 +231,12 @@ class Il2CppClass extends NonNullNativeStruct {
         return new Il2Cpp.Type(Il2Cpp.Api._classGetType(this));
     }
 
-    /** */
-    getMethod(name: string, parametersCount: number = -1): Il2Cpp.Method | null {
-        return getOrNull(Il2Cpp.Api._classGetMethodFromName(this, Memory.allocUtf8String(name), parametersCount), Il2Cpp.Method);
+    /** Gets the method identified by the given name and parameter count. */
+    getMethod(name: string, parameterCount: number = -1): Il2Cpp.Method | null {
+        return getOrNull(Il2Cpp.Api._classGetMethodFromName(this, Memory.allocUtf8String(name), parameterCount), Il2Cpp.Method);
     }
 
-    /** */
+    /** Builds a generic instance of the current generic class. */
     inflate(...classes: Il2Cpp.Class[]): Il2Cpp.Class {
         if (!this.isGeneric) {
             raise(`Cannot inflate ${this.type.name} because it's not generic.`);
@@ -246,14 +244,14 @@ class Il2CppClass extends NonNullNativeStruct {
 
         const types = classes.map(klass => klass.type.object);
         const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.classes["System.Type"], types);
-        
+
         // TODO: typeArray leaks
         return this.inflateRaw(typeArray);
     }
 
     /** @internal */
     inflateRaw(typeArray: Il2Cpp.Array<Il2Cpp.Object>): Il2Cpp.Class {
-        const MakeGenericType = this.type.object.class.getMethod("MakeGenericType", 1)!
+        const MakeGenericType = this.type.object.class.getMethod("MakeGenericType", 1)!;
 
         let object = this.type.object;
         while (!object.class.equals(MakeGenericType.class)) object = object.base;
@@ -282,7 +280,7 @@ class Il2CppClass extends NonNullNativeStruct {
         return readGString(Il2Cpp.Api._toString(this, Il2Cpp.Api._classToString))!;
     }
 
-    /** */
+    /** Executes a callback for every defined class. */
     @isEqualOrAbove("2019.3.0")
     static enumerate(block: (klass: Il2Cpp.Class) => void): void {
         const callback = new NativeCallback(

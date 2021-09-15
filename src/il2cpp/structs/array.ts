@@ -1,7 +1,5 @@
 import { cache } from "decorator-cache-getter";
-
 import { checkNull } from "../decorators";
-
 import { raise } from "../../utils/console";
 import { NativeStruct } from "../../utils/native-struct";
 

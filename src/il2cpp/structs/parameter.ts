@@ -1,5 +1,4 @@
 import { cache } from "decorator-cache-getter";
-
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { readGString } from "../utils";
 

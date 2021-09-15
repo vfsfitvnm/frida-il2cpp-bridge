@@ -1,18 +1,15 @@
 import { cache } from "decorator-cache-getter";
-
 import { checkNull } from "../decorators";
-
 import { NativeStruct } from "../../utils/native-struct";
 import { addLevenshtein, filterMap, makeIterable } from "../../utils/utils";
 
-/** */
+/** Value type class utility. */
 class Il2CppValueType extends NativeStruct {
-    /** */
     constructor(handle: NativePointer, readonly type: Il2Cpp.Type) {
         super(handle);
     }
 
-    /** */
+    /** Gets the fields of this value type. */
     @cache
     get fields(): IterableRecord<Il2Cpp.Field> {
         return makeIterable(
@@ -26,7 +23,7 @@ class Il2CppValueType extends NativeStruct {
         );
     }
 
-    /** */
+    /** Boxes the current value type in a object. */
     box(): Il2Cpp.Object {
         return new Il2Cpp.Object(Il2Cpp.Api._valueBox(this.type.class, this));
     }

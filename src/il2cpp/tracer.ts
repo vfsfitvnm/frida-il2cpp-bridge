@@ -1,5 +1,4 @@
 import kleur from "kleur";
-
 import { inform } from "../utils/console";
 import { formatNativePointer } from "../utils/utils";
 
@@ -212,15 +211,20 @@ class Il2CppTracer {
 
             return {
                 onEnter(...parameters: Il2Cpp.Parameter.Type[]): void {
-                    const thisText = target.isStatic ? "" : `${kleur.yellow("this")} = ${kleur.cyan(this + "")}${parameters.length > 0 ? ", " : ""}`;
+                    const thisText = target.isStatic
+                        ? ""
+                        : `${kleur.yellow("this")} = ${kleur.cyan(this + "")}${parameters.length > 0 ? ", " : ""}`;
                     const parametersText = parametersInfo
                         .map(({ type, name }, index) => {
                             return `${kleur.blue(type.name)} ${kleur.yellow(name)} = ${kleur.cyan(parameters[index] + "")}`;
                         })
                         .join(", ");
 
-
-                    inform(`${at} ${"│ ".repeat(counter)}┌─${kleur.red(sign)}${kleur.yellow("(")}${thisText}${parametersText}${kleur.yellow(")")}`);
+                    inform(
+                        `${at} ${"│ ".repeat(counter)}┌─${kleur.red(sign)}${kleur.yellow("(")}${thisText}${parametersText}${kleur.yellow(
+                            ")"
+                        )}`
+                    );
                     counter += 1;
                 },
                 onLeave(returnValue: Il2Cpp.Method.ReturnType): void {

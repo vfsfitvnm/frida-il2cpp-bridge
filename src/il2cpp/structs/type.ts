@@ -1,8 +1,7 @@
 import { cache } from "decorator-cache-getter";
-
+import { warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { filterMapArray, getOrNull } from "../../utils/utils";
-import { warn } from "../../utils/console";
 
 /** Represents a `Il2CppType`. */
 class Il2CppType extends NonNullNativeStruct {
@@ -95,7 +94,7 @@ class Il2CppType extends NonNullNativeStruct {
         return new Il2Cpp.Object(Il2Cpp.Api._typeGetObject(this));
     }
 
-    /** */
+    /** Gets the type enum of the current type. */
     @cache
     get typeEnum(): Il2Cpp.Type.Enum {
         return Il2Cpp.Api._typeGetTypeEnum(this);

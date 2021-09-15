@@ -1,8 +1,6 @@
 import { cache } from "decorator-cache-getter";
-
 import { shouldBeInstance } from "../decorators";
 import { read, readGString, write } from "../utils";
-
 import { warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { overridePropertyValue } from "../../utils/utils";
@@ -36,7 +34,7 @@ class Il2CppField extends NonNullNativeStruct {
     /** Determines whether this field is thread static. */
     @cache
     get isThreadStatic(): boolean {
-        return !!Il2Cpp.Api._fieldIsThreadStatic(this);;
+        return !!Il2Cpp.Api._fieldIsThreadStatic(this);
     }
 
     /** Gets the name of this field. */
@@ -68,7 +66,7 @@ class Il2CppField extends NonNullNativeStruct {
         if (this.isThreadStatic || this.isLiteral) {
             const valueHandle = Memory.alloc(Process.pointerSize);
             Il2Cpp.Api._fieldGetStaticValue(this.handle, valueHandle);
-            
+
             return valueHandle;
         }
 
@@ -81,7 +79,7 @@ class Il2CppField extends NonNullNativeStruct {
             warn(`${this.class.type.name}.${this.name} is a thread static or literal field, its value won't be modified.`);
             return;
         }
-        
+
         write(this.valueHandle, value, this.type);
     }
 
@@ -106,7 +104,7 @@ Reflect.set(Il2Cpp, "Field", Il2CppField);
 declare global {
     namespace Il2Cpp {
         class Field extends Il2CppField {}
-        
+
         namespace Field {
             type Type =
                 | boolean

@@ -1,11 +1,9 @@
 import { cache } from "decorator-cache-getter";
-
 import { shouldBeInstance } from "../decorators";
 import { fromFridaValue, readGString, toFridaValue } from "../utils";
-
-import { addLevenshtein, makeIterable, overridePropertyValue } from "../../utils/utils";
 import { raise, warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
+import { addLevenshtein, makeIterable, overridePropertyValue } from "../../utils/utils";
 
 /** Represents a `MethodInfo`. */
 class Il2CppMethod extends NonNullNativeStruct {
@@ -39,7 +37,7 @@ class Il2CppMethod extends NonNullNativeStruct {
             types.push(parameter.type.fridaAlias);
         }
 
-        if (!this.isStatic || Il2Cpp.unityVersion.isBefore2018_3_0) {
+        if (!this.isStatic || Unity.isBelow2018_3_0) {
             types.unshift("pointer"); // TODO or this.class.type.aliasForFrida?, check structs
         }
 
@@ -151,7 +149,7 @@ class Il2CppMethod extends NonNullNativeStruct {
         }
 
         const replaceCallback: NativeCallbackImplementation<any, any> = (...args: any[]): any => {
-            const startIndex = +!this.isStatic | +Il2Cpp.unityVersion.isBefore2018_3_0;
+            const startIndex = +!this.isStatic | +Unity.isBelow2018_3_0;
             // TODO check inflated
 
             const result = block.call(
@@ -177,7 +175,7 @@ class Il2CppMethod extends NonNullNativeStruct {
         }
     }
 
-    /** */
+    /** Creates a generic instance of the current generic method. */
     inflate(...classes: Il2Cpp.Class[]): Il2Cpp.Method {
         if (!this.isGeneric) {
             raise(`${this.name} it's not generic, so it cannot be inflated.`);
@@ -220,7 +218,7 @@ class Il2CppMethod extends NonNullNativeStruct {
 
         const allocatedParameters = parameters.map(toFridaValue);
 
-        if (!this.isStatic || Il2Cpp.unityVersion.isBefore2018_3_0) {
+        if (!this.isStatic || Unity.isBelow2018_3_0) {
             allocatedParameters.unshift(instance);
         }
 
@@ -231,7 +229,7 @@ class Il2CppMethod extends NonNullNativeStruct {
         return fromFridaValue(this.nativeFunction(...allocatedParameters), this.returnType) as Il2Cpp.Method.ReturnType;
     }
 
-    /** */
+    /** Restore the original method implementation. */
     restoreImplementation(): void {
         Interceptor.revert(this.virtualAddress);
         Interceptor.flush();

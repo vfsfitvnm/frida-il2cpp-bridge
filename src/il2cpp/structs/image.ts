@@ -1,5 +1,4 @@
 import { cache } from "decorator-cache-getter";
-
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { addLevenshtein, getOrNull, makeIterable } from "../../utils/utils";
 
@@ -27,7 +26,7 @@ class Il2CppImage extends NonNullNativeStruct {
     get classes(): IterableRecord<Il2Cpp.Class> {
         const record: Record<string, Il2Cpp.Class> = {};
 
-        if (Il2Cpp.unityVersion.isBefore2018_3_0) {
+        if (Unity.isBelow2018_3_0) {
             const start = this.classStart;
             const end = start + this.classCount;
 

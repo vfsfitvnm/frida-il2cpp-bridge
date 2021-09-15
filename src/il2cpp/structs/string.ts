@@ -1,5 +1,4 @@
 import { checkNull } from "../decorators";
-
 import { NativeStruct } from "../../utils/native-struct";
 
 /** Represents a `Il2CppString`. */
