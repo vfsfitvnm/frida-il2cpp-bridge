@@ -27,7 +27,7 @@ declare global {
                 GenericInstance = 0x15,
                 TypedReference = 0x16,
                 NativeInteger = 0x18,
-                NativeUnsignedInteger = 0x19,
+                UnsignedNativeInteger = 0x19,
                 FunctionPointer = 0x1b,
                 Object = 0x1c,
                 SingleDimensionalZeroLowerBoundArray = 0x1d,

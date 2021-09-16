@@ -30,7 +30,7 @@ export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Ty
         case Il2Cpp.Type.Enum.R8:
             return pointer.readDouble();
         case Il2Cpp.Type.Enum.NativeInteger:
-        case Il2Cpp.Type.Enum.NativeUnsignedInteger:
+        case Il2Cpp.Type.Enum.UnsignedNativeInteger:
             return pointer.readPointer();
         case Il2Cpp.Type.Enum.Pointer:
             return new Il2Cpp.Pointer(pointer.readPointer(), type.dataType!);
@@ -83,7 +83,7 @@ export function write(pointer: NativePointer, value: any, type: Il2Cpp.Type): Na
         case Il2Cpp.Type.Enum.R8:
             return pointer.writeDouble(value);
         case Il2Cpp.Type.Enum.NativeInteger:
-        case Il2Cpp.Type.Enum.NativeUnsignedInteger:
+        case Il2Cpp.Type.Enum.UnsignedNativeInteger:
         case Il2Cpp.Type.Enum.Pointer:
         case Il2Cpp.Type.Enum.ValueType:
         case Il2Cpp.Type.Enum.String:
@@ -222,7 +222,7 @@ function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueT
                 pointer.writeDouble(value);
                 break;
             case Il2Cpp.Type.Enum.NativeInteger:
-            case Il2Cpp.Type.Enum.NativeUnsignedInteger:
+            case Il2Cpp.Type.Enum.UnsignedNativeInteger:
             case Il2Cpp.Type.Enum.Pointer:
             case Il2Cpp.Type.Enum.SingleDimensionalZeroLowerBoundArray:
             case Il2Cpp.Type.Enum.Array:

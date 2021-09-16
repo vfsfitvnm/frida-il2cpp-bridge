@@ -54,7 +54,7 @@ class Il2CppType extends NonNullNativeStruct {
             case Il2Cpp.Type.Enum.ValueType:
                 return getValueTypeFields(this);
             case Il2Cpp.Type.Enum.NativeInteger:
-            case Il2Cpp.Type.Enum.NativeUnsignedInteger:
+            case Il2Cpp.Type.Enum.UnsignedNativeInteger:
             case Il2Cpp.Type.Enum.Pointer:
             case Il2Cpp.Type.Enum.String:
             case Il2Cpp.Type.Enum.SingleDimensionalZeroLowerBoundArray:
