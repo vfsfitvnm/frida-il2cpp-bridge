@@ -76,6 +76,12 @@ class Il2CppType extends NonNullNativeStruct {
         return !!Il2Cpp.Api._typeIsByReference(this);
     }
 
+    /** Determines whether this type is primitive. */
+    @cache
+    get isPrimitive(): boolean {
+        return !!Il2Cpp.Api._typeIsPrimitive(this);
+    }
+
     /** Gets the name of this type. */
     @cache
     get name(): string {

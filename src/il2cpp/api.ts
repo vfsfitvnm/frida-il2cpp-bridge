@@ -795,6 +795,11 @@ class Il2CppApi {
         return this.r("type_is_byref", "bool", ["pointer"]);
     }
 
+    @cache
+    static get _typeIsPrimitive() {
+        return this.r("type_is_primitive", "bool", ["pointer"]);
+    }
+
     /** @internal */
     @cache
     static get _gLibFree() {
@@ -1135,6 +1140,20 @@ il2cpp_type_is_byref (const Il2CppType * type)
     return type->byref;
 }
 #endif
+
+uint8_t
+il2cpp_type_is_primitive (const Il2CppType * type)
+{
+    Il2CppTypeEnum type_enum;
+
+    type_enum = type->type;
+
+    return ((type_enum >= IL2CPP_TYPE_BOOLEAN && 
+        type_enum <= IL2CPP_TYPE_R8) || 
+        type_enum == IL2CPP_TYPE_I || 
+        type_enum == IL2CPP_TYPE_U
+    );
+}
 
 struct _VirtualInvokeData
 {
