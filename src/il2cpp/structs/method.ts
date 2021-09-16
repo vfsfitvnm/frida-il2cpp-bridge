@@ -38,11 +38,11 @@ class Il2CppMethod extends NonNullNativeStruct {
         }
 
         if (!this.isStatic || Unity.isBelow2018_3_0) {
-            types.unshift("pointer"); // TODO or this.class.type.aliasForFrida?, check structs
+            types.unshift("pointer");
         }
 
         if (this.isInflated) {
-            types.unshift("pointer");
+            types.push("pointer");
         }
 
         return types;
@@ -150,7 +150,6 @@ class Il2CppMethod extends NonNullNativeStruct {
 
         const replaceCallback: NativeCallbackImplementation<any, any> = (...args: any[]): any => {
             const startIndex = +!this.isStatic | +Unity.isBelow2018_3_0;
-            // TODO check inflated
 
             const result = block.call(
                 this.isStatic ? this.class : overridePropertyValue(new Il2Cpp.Object(args[0]), "class", this.class),
@@ -223,7 +222,7 @@ class Il2CppMethod extends NonNullNativeStruct {
         }
 
         if (this.isInflated) {
-            allocatedParameters.push(this);
+            allocatedParameters.push(this.handle);
         }
 
         return fromFridaValue(this.nativeFunction(...allocatedParameters), this.returnType) as Il2Cpp.Method.ReturnType;
