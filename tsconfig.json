@@ -8,7 +8,6 @@
     "module": "commonjs",
     "declaration": true,
     "outDir": "dist",
-    "removeComments": true,
     "stripInternal": true,
     "esModuleInterop": true,
     "strict": true,
