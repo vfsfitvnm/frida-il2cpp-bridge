@@ -1825,7 +1825,7 @@ il2cpp_parameter_to_string (const Il2CppParameter * param,
 {
     g_string_append_type_name (text, param->type);
     g_string_append_c (text, ' ');
-    g_string_append (text, param->name);
+    g_string_append (text, param->name == null ? "null" : param->name);
 }
 
 void
