@@ -5,12 +5,6 @@ import { addLevenshtein, filterMap, getOrNull, makeIterable, overridePropertyVal
 
 /** Represents a `Il2CppObject`. */
 class Il2CppObject extends NativeStruct {
-    /** Gets the size of the `Il2CppObject` C struct. */
-    @cache
-    static get headerSize(): number {
-        return Il2Cpp.Api._objectGetHeaderSize();
-    }
-
     /** Allocates a new object of the specified class. */
     static from(klass: Il2Cpp.Class): Il2Cpp.Object {
         return new Il2Cpp.Object(Il2Cpp.Api._objectNew(klass));

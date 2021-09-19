@@ -6,12 +6,6 @@ import { forModule } from "../utils/native-wait";
 class Il2CppBase {
     protected constructor() {}
 
-    /** Gets the allocation granularity. */
-    @cache
-    static get allocationGranularity(): number {
-        return Il2Cpp.Api._allocationGranularity();
-    }
-
     /** @internal Gets the Il2Cpp module name. */
     private static get moduleName(): string {
         return Process.platform == "linux" ? "libil2cpp.so" : Process.platform == "windows" ? "GameAssembly.dll" : platformNotSupported();

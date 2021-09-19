@@ -3,6 +3,7 @@ import "./api";
 import "./dumper";
 import "./filtering";
 import "./metadata";
+import "./runtime";
 import "./tracer";
 import "./structs/array";
 import "./structs/assembly";

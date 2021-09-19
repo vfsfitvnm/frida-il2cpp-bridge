@@ -11,11 +11,6 @@ class Il2CppApi {
     }
 
     @cache
-    static get _allocationGranularity() {
-        return this.r("allocation_granularity", "uint32", []);
-    }
-
-    @cache
     static get _arrayGetElements() {
         return this.r("array_elements", "pointer", ["pointer"]);
     }
@@ -661,11 +656,6 @@ class Il2CppApi {
     }
 
     @cache
-    static get _objectGetHeaderSize() {
-        return this.r("object_header_size", "uint", []);
-    }
-
-    @cache
     static get _objectGetVirtualMethod() {
         return this.r("object_get_virtual_method", "pointer", ["pointer", "pointer"]);
     }
@@ -703,6 +693,11 @@ class Il2CppApi {
     @cache
     static get _parameterToString() {
         return this.r("parameter_to_string", "void", ["pointer", "pointer"]);
+    }
+
+    @cache
+    static get _runtimeGetInformation() {
+        return this.r("runtime_get_information", ["uint32", "uint32", "uint32", "uint32", "uint32", "uint32"], []);
     }
 
     @cache
@@ -1735,27 +1730,25 @@ struct _Il2CppManagedMemorySnapshot
     void * additional_user_information;
 };
 
-#if ${isBelow_2019_3_0}
-uint32_t
-il2cpp_allocation_granularity ()
+Il2CppRuntimeInformation
+il2cpp_runtime_get_information ()
 {   
     Il2CppManagedMemorySnapshot * (*il2cpp_capture_memory_snapshot) (void);
     void (*il2cpp_free_captured_memory_snapshot) (Il2CppManagedMemorySnapshot * snapshot);
 
     Il2CppManagedMemorySnapshot * snapshot;
-    uint32_t allocation_granularity;
+    Il2CppRuntimeInformation runtime_information;
 
-    il2cpp_capture_memory_snapshot = GUINT_TO_POINTER (${this._memorySnapshotCapture});
-    il2cpp_free_captured_memory_snapshot = GUINT_TO_POINTER (${this._memorySnapshotFree});
+    il2cpp_capture_memory_snapshot = (void *) ${this._memorySnapshotCapture};
+    il2cpp_free_captured_memory_snapshot = (void *) ${this._memorySnapshotFree};
 
     snapshot = il2cpp_capture_memory_snapshot ();
-    allocation_granularity = snapshot->runtime_information.allocation_granularity;
+    runtime_information = snapshot->runtime_information;
 
     il2cpp_free_captured_memory_snapshot (snapshot);
 
-    return allocation_granularity;
+    return runtime_information;
 }
-#endif
 
 Il2CppMetadataSnapshot *
 il2cpp_memory_snapshot_get_metadata_snapshot (Il2CppManagedMemorySnapshot * snapshot)
