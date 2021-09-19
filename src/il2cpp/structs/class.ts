@@ -1,9 +1,9 @@
 import { cache } from "decorator-cache-getter";
-import { isEqualOrAbove } from "../decorators";
-import { readGString } from "../utils";
 import { raise } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { addLevenshtein, getOrNull, makeIterable, preventKeyClash } from "../../utils/utils";
+import { getOrNull, makeRecordFromNativeIterator } from "../../utils/utils";
+import { isEqualOrAbove } from "../decorators";
+import { readGString } from "../utils";
 
 /** Represents a `Il2CppClass`. */
 class Il2CppClass extends NonNullNativeStruct {
@@ -46,18 +46,7 @@ class Il2CppClass extends NonNullNativeStruct {
     /** Gets the fields of the current class. */
     @cache
     get fields(): IterableRecord<Il2Cpp.Field> {
-        const iterator = Memory.alloc(Process.pointerSize);
-        const record: Record<string, Il2Cpp.Field> = {};
-
-        let handle: NativePointer;
-        let field: Il2Cpp.Field;
-
-        while (!(handle = Il2Cpp.Api._classGetFields(this, iterator)).isNull()) {
-            field = new Il2Cpp.Field(handle);
-            record[field.name!] = field;
-        }
-
-        return makeIterable(addLevenshtein(record));
+        return makeRecordFromNativeIterator(this, Il2Cpp.Api._classGetFields, Il2Cpp.Field, field => field.name);
     }
 
     /** Gets the flags of the current class. */
@@ -152,18 +141,7 @@ class Il2CppClass extends NonNullNativeStruct {
     /** Gets the interfaces implemented or inherited by the current class. */
     @cache
     get interfaces(): IterableRecord<Il2Cpp.Class> {
-        const iterator = Memory.alloc(Process.pointerSize);
-        const record: Record<string, Il2Cpp.Class> = {};
-
-        let handle: NativePointer;
-        let klass: Il2Cpp.Class;
-
-        while (!(handle = Il2Cpp.Api._classGetInterfaces(this, iterator)).isNull()) {
-            klass = new Il2Cpp.Class(handle);
-            record[klass.type.name] = klass;
-        }
-
-        return makeIterable(addLevenshtein(record));
+        return makeRecordFromNativeIterator(this, Il2Cpp.Api._classGetInterfaces, Il2Cpp.Class, klass => klass.type.name);
     }
 
     /** Gets the amount of the implemented methods by the current class. */
@@ -175,18 +153,7 @@ class Il2CppClass extends NonNullNativeStruct {
     /** Gets the methods implemented by the current class. */
     @cache
     get methods(): IterableRecord<Il2Cpp.Method> {
-        const iterator = Memory.alloc(Process.pointerSize);
-        const record: Record<string, Il2Cpp.Method> = preventKeyClash({});
-
-        let handle: NativePointer;
-        let method: Il2Cpp.Method;
-
-        while (!(handle = Il2Cpp.Api._classGetMethods(this, iterator)).isNull()) {
-            method = new Il2Cpp.Method(handle);
-            record[method.name] = method;
-        }
-
-        return makeIterable(addLevenshtein(record));
+        return makeRecordFromNativeIterator(this, Il2Cpp.Api._classGetMethods, Il2Cpp.Method, method => method.name, true);
     }
 
     /** Gets the name of the current class. */

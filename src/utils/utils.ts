@@ -127,3 +127,24 @@ export function formatNativePointer(nativePointer: NativePointer): string {
 export function getOrNull<T extends ObjectWrapper>(handle: NativePointer, Class: new (handle: NativePointer) => T): T | null {
     return handle.isNull() ? null : new Class(handle);
 }
+
+/** @internal */
+export function makeRecordFromNativeIterator<T extends ObjectWrapper>(
+    holder: NativePointerValue,
+    nativeFunction: NativeFunction<NativePointer, [NativePointerValue, NativePointer]>,
+    Class: new (handle: NativePointer) => T,
+    keyGetter: (value: T) => string,
+    keyClashPrevention: boolean = false
+): IterableRecord<T> {
+    const iterator = Memory.alloc(Process.pointerSize);
+    const record: Record<string, T> = keyClashPrevention ? preventKeyClash({}) : {};
+
+    let handle: NativePointer;
+
+    while (!(handle = nativeFunction(holder, iterator)).isNull()) {
+        const value = new Class(handle);
+        record[keyGetter(value)] = value;
+    }
+
+    return makeIterable(addLevenshtein(record));
+}

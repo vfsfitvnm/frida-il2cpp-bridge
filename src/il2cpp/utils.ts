@@ -159,7 +159,7 @@ function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueT
 
         for (const field of Object.values(type.class.fields)) {
             if (!field.isStatic) {
-                const offset = startOffset + field.offset - Il2Cpp.Object.headerSize;
+                const offset = startOffset + field.offset - Il2Cpp.Runtime.objectHeaderSize;
                 if (
                     field.type.typeEnum == Il2Cpp.Type.Enum.ValueType ||
                     (field.type.typeEnum == Il2Cpp.Type.Enum.GenericInstance && field.type.class.isValueType)

@@ -1,7 +1,8 @@
 import { cache } from "decorator-cache-getter";
 import { NonNullNativeStruct } from "../../utils/native-struct";
+import { makeRecordFromNativeIterator } from "../../utils/utils";
 
-/** Represents a `Il2CppMemorySnapshot`. */
+/** Represents a `Il2CppManagedMemorySnapshot`. */
 class Il2CppMemorySnapshot extends NonNullNativeStruct {
     /** Captures a memory snapshot. */
     static capture(): Il2Cpp.MemorySnapshot {
@@ -13,10 +14,10 @@ class Il2CppMemorySnapshot extends NonNullNativeStruct {
         super(handle);
     }
 
-    /** */
+    /** Gets any initialized class. */
     @cache
-    get metadataSnapshot(): Il2Cpp.MetadataSnapshot {
-        return new Il2Cpp.MetadataSnapshot(Il2Cpp.Api._memorySnapshotGetMetadataSnapshot(this));
+    get classes(): IterableRecord<Il2Cpp.Class> {
+        return makeRecordFromNativeIterator(this, Il2Cpp.Api._memorySnapshotGetClasses, Il2Cpp.Class, klass => klass.type.name);
     }
 
     /** Gets the objects tracked by this memory snapshot. */
@@ -24,20 +25,13 @@ class Il2CppMemorySnapshot extends NonNullNativeStruct {
     get objects(): Il2Cpp.Object[] {
         const array: Il2Cpp.Object[] = [];
 
-        const count = this.trackedObjectCount.toNumber();
-        const start = Il2Cpp.Api._memorySnapshotGetObjects(this);
+        const [count, start] = Il2Cpp.Api._memorySnapshotGetGCHandles(this);
 
         for (let i = 0; i < count; i++) {
             array.push(new Il2Cpp.Object(start.add(i * Process.pointerSize).readPointer()));
         }
 
         return array;
-    }
-
-    /** Gets the amount of objects tracked in this memory snapshot. */
-    @cache
-    get trackedObjectCount(): UInt64 {
-        return Il2Cpp.Api._memorySnapshotGetTrackedObjectCount(this);
     }
 
     /** Frees this memory snapshot. */

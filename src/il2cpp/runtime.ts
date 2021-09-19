@@ -17,7 +17,13 @@ class Il2CppRuntime {
     /** @internal */
     @cache
     static get information(): [number, number, number, number, number, number] {
-        return Il2Cpp.Api._runtimeGetInformation();
+        const snapshot = Il2Cpp.MemorySnapshot.capture();
+        
+        try {
+            return Il2Cpp.Api._memorySnapshotGetRuntimeInformation(snapshot);
+        } finally {
+            Il2Cpp.Api._memorySnapshotFree(snapshot);
+        }
     }
 
     /** Gets the pointer size. */

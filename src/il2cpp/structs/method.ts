@@ -3,7 +3,7 @@ import { shouldBeInstance } from "../decorators";
 import { fromFridaValue, readGString, toFridaValue } from "../utils";
 import { raise, warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { addLevenshtein, makeIterable, overridePropertyValue } from "../../utils/utils";
+import { makeRecordFromNativeIterator, overridePropertyValue } from "../../utils/utils";
 
 /** Represents a `MethodInfo`. */
 class Il2CppMethod extends NonNullNativeStruct {
@@ -111,17 +111,7 @@ class Il2CppMethod extends NonNullNativeStruct {
     /** Gets the parameters of this method. */
     @cache
     get parameters(): IterableRecord<Il2Cpp.Parameter> {
-        const iterator = Memory.alloc(Process.pointerSize);
-        const accessor: Record<string, Il2Cpp.Parameter> = {};
-
-        let handle: NativePointer;
-
-        while (!(handle = Il2Cpp.Api._methodGetParameters(this, iterator)).isNull()) {
-            const parameter = new Il2Cpp.Parameter(handle);
-            accessor[parameter.name!] = parameter;
-        }
-
-        return makeIterable(addLevenshtein(accessor));
+        return makeRecordFromNativeIterator(this, Il2Cpp.Api._methodGetParameters, Il2Cpp.Parameter, param => param.name);
     }
 
     /** Gets the relative virtual address (RVA) of this method. */

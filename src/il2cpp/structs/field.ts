@@ -88,7 +88,7 @@ class Il2CppField extends NonNullNativeStruct {
     withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Field {
         let valueHandle = instance.handle.add(this.offset);
         if (instance instanceof Il2Cpp.ValueType) {
-            valueHandle = valueHandle.sub(Il2Cpp.Object.headerSize);
+            valueHandle = valueHandle.sub(Il2Cpp.Runtime.objectHeaderSize);
         }
 
         return overridePropertyValue(new Il2Cpp.Field(this.handle), "valueHandle", valueHandle);
