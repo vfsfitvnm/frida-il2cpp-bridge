@@ -759,7 +759,7 @@ class Il2CppApi {
     /** @internal */
     @cache
     private static get cModule(): Record<string, NativePointer | null> {
-        if (!Unity.mayBeUnsupported) {
+        if (Unity.mayBeUnsupported) {
             warn(`Unity version "${Unity.version}" may be unsupported, continue with caution.`);
         }
 

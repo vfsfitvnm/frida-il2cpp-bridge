@@ -18,7 +18,7 @@ class UnityBase {
     /** Determines whether the Unity version is fully supported by this module. */
     @cache
     static get mayBeUnsupported(): boolean {
-        return this.version.isEqualOrAbove("5.3.0") && this.version.isBelow("2021.2.0");
+        return this.version.isBelow("5.3.0") || this.version.isEqualOrAbove("2021.2.0");
     }
 
     /** Gets the Unity version of the current application. */
