@@ -1010,7 +1010,15 @@ struct _Il2CppType
         const struct Il2CppTypeDefinition * type_handle;
 #endif
         const Il2CppType * type;
-        struct Il2CppArrayType * array;
+        struct Il2CppArrayType
+        {
+            const Il2CppType * type;
+            uint8_t rank;
+            uint8_t num_sizes;
+            uint8_t num_lo_bounds;
+            int * sizes;
+            int * lo_bounds;
+        } * array;
         int32_t generic_parameter_index;
 #if ${isEqualOrAbove_2020_2_0}
         const struct Il2CppMetadataGenericParameterHandle * generic_parameter_handle;
@@ -1408,10 +1416,19 @@ il2cpp_image_set_entry_point_index (Il2CppImage * image,
 const Il2CppType *
 il2cpp_type_get_data_type (const Il2CppType * type)
 {
-    if (type->type == IL2CPP_TYPE_PTR
-        || type->type == IL2CPP_TYPE_SZARRAY)
+    Il2CppTypeEnum type_enum;
+
+    type_enum = type->type;
+
+    if (type_enum == IL2CPP_TYPE_PTR
+        || type_enum == IL2CPP_TYPE_SZARRAY)
     {
         return type->data.type;
+    }
+
+    if (type_enum == IL2CPP_TYPE_ARRAY)
+    {
+        return type->data.array->type;
     }
     
     return NULL;

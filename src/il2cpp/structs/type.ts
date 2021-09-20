@@ -11,7 +11,7 @@ class Il2CppType extends NonNullNativeStruct {
         return new Il2Cpp.Class(Il2Cpp.Api._classFromType(this));
     }
 
-    /** Gets the encompassed type of this single dimensional array or pointer type. */
+    /** Gets the encompassed type of this array or pointer type. */
     @cache
     get dataType(): Il2Cpp.Type | null {
         return getOrNull(Il2Cpp.Api._typeGetDataType(this), Il2Cpp.Type);
