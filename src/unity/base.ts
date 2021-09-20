@@ -15,6 +15,12 @@ class UnityBase {
         return this.version.isBelow("2018.3.0");
     }
 
+    /** Determines whether the Unity version is fully supported by this module. */
+    @cache
+    static get mayBeUnsupported(): boolean {
+        return this.version.isEqualOrAbove("5.3.0") && this.version.isBelow("2021.2.0");
+    }
+
     /** Gets the Unity version of the current application. */
     @cache
     static get version(): Version {
@@ -27,13 +33,7 @@ class UnityBase {
             const scan = Memory.scanSync(range.base, range.size, "45787065637465642076657273696f6e3a")[0];
 
             if (scan != undefined) {
-                const unityVersion = new Version(scan.address.readUtf8String()!);
-
-                if (unityVersion.isBelow("5.3.0") || unityVersion.isEqualOrAbove("2021.2.0")) {
-                    raise(`Unity version "${unityVersion}" is not valid or supported.`);
-                }
-
-                return unityVersion;
+                return new Version(scan.address.readUtf8String()!);
             }
         }
 

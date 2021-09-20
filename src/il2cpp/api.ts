@@ -1,6 +1,6 @@
 import { cache } from "decorator-cache-getter";
 import { read } from "./utils";
-import { raise } from "../utils/console";
+import { raise, warn } from "../utils/console";
 
 class Il2CppApi {
     protected constructor() {}
@@ -759,6 +759,10 @@ class Il2CppApi {
     /** @internal */
     @cache
     private static get cModule(): Record<string, NativePointer | null> {
+        if (!Unity.mayBeUnsupported) {
+            warn(`Unity version "${Unity.version}" may be unsupported, continue with caution.`);
+        }
+
         const isEqualOrAbove_5_3_2 = +Unity.version.isEqualOrAbove("5.3.2");
         const isEqualOrAbove_5_3_3 = +Unity.version.isEqualOrAbove("5.3.3");
         const isEqualOrAbove_5_3_6 = +Unity.version.isEqualOrAbove("5.3.6");
