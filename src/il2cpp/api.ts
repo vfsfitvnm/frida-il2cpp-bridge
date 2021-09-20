@@ -774,6 +774,7 @@ class Il2CppApi {
         const isEqualOrAbove_2019_1_0 = +Unity.version.isEqualOrAbove("2019.1.0");
         const isEqualOrAbove_2019_3_0 = +Unity.version.isEqualOrAbove("2019.3.0");
         const isEqualOrAbove_2020_2_0 = +Unity.version.isEqualOrAbove("2020.2.0");
+        const isEqualOrAbove_2021_1_0 = +Unity.version.isEqualOrAbove("2021.1.0");
 
         const isBelow_5_3_3 = +!isEqualOrAbove_5_3_3;
         const isBelow_5_3_6 = +!isEqualOrAbove_5_3_6;
@@ -784,6 +785,7 @@ class Il2CppApi {
         const isBelow_2018_3_0 = +!isEqualOrAbove_2018_3_0;
         const isBelow_2019_3_0 = +!isEqualOrAbove_2019_3_0;
         const isBelow_2020_2_0 = +!isEqualOrAbove_2020_2_0;
+        const isBelow_2021_1_0 = +!isEqualOrAbove_2021_1_0;
 
         const isNotEqual_2017_2_0 = +!Unity.version.isEqual("2017.2.0");
         const isNotEqual_5_5_0 = +!Unity.version.isEqual("5.5.0");
@@ -1027,9 +1029,16 @@ struct _Il2CppType
     } data;
     unsigned int attrs: 16;
     Il2CppTypeEnum type: 8;
+#if ${isEqualOrAbove_2021_1_0}
+    unsigned int num_mods: 5;
+#else
     unsigned int num_mods: 6;
+#endif
     unsigned int byref: 1;
     unsigned int pinned: 1;
+#if ${isEqualOrAbove_2021_1_0}
+    uint8_t valuetype: 1;
+#endif
 };
 
 struct _VirtualInvokeData
@@ -1132,7 +1141,9 @@ struct _Il2CppClass
 #if ${isEqualOrAbove_2018_3_0}
     uint8_t initialized_and_no_error: 1;
 #endif
+#if ${isBelow_2021_1_0}
     uint8_t valuetype: 1;
+#endif
     uint8_t initialized: 1;
     uint8_t enumtype: 1;
     uint8_t is_generic: 1;
@@ -1316,6 +1327,8 @@ const Il2CppClass * (*il2cpp_class_from_type) (const Il2CppType *) = (void *) ${
 const Il2CppType * (*il2cpp_class_get_type) (const Il2CppClass *) = (void *) ${this._classGetType};
 
 uint8_t (*il2cpp_class_is_interface) (const Il2CppClass *) = (void *) ${this._classIsInterface};
+
+uint8_t (*il2cpp_class_is_valuetype) (const Il2CppClass *) = (void *) ${this._classIsValueType};
 
 void (*il2cpp_field_get_static_value) (const Il2CppField *, void *) = (void *) ${this._fieldGetStaticValue};
 
@@ -1567,7 +1580,7 @@ il2cpp_class_to_string (const Il2CppClass * class,
     {
         g_string_append_len (text, "enum", 4);
     }
-    else if (class->valuetype != false)
+    else if (il2cpp_class_is_valuetype (class) != false)
     {
         g_string_append_len (text, "struct", 6);
     }
