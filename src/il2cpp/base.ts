@@ -8,7 +8,19 @@ class Il2CppBase {
 
     /** @internal Gets the Il2Cpp module name. */
     private static get moduleName(): string {
-        return Process.platform == "linux" ? "libil2cpp.so" : Process.platform == "windows" ? "GameAssembly.dll" : platformNotSupported();
+        switch (Process.platform) {
+            case "linux":
+                try {
+                    const _ = Java.androidVersion;
+                    return "libil2cpp.so";
+                } catch (e) {
+                    return "GameAssembly.so";
+                }
+            case "windows":
+                return "GameAssembly.dll";
+        }
+
+        platformNotSupported();
     }
 
     /** Gets the Il2Cpp module as a Frida module. */

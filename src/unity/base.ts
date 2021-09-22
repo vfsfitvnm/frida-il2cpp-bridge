@@ -6,7 +6,19 @@ import { Version } from "../utils/version";
 class UnityBase {
     /** Gets the Unity module name. */
     static get moduleName(): string {
-        return Process.platform == "linux" ? "libunity.so" : Process.platform == "windows" ? "UnityPlayer.dll" : platformNotSupported();
+        switch (Process.platform) {
+            case "linux":
+                try {
+                    const _ = Java.androidVersion;
+                    return "libunity.so";
+                } catch (e) {
+                    return "UnityPlayer.so";
+                }
+            case "windows":
+                return "UnityPlayer.dll";
+        }
+
+        platformNotSupported();
     }
 
     /** @internal */
