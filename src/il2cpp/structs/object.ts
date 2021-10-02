@@ -5,11 +5,6 @@ import { addLevenshtein, filterMap, getOrNull, makeIterable, overridePropertyVal
 
 /** Represents a `Il2CppObject`. */
 class Il2CppObject extends NativeStruct {
-    /** Allocates a new object of the specified class. */
-    static from(klass: Il2Cpp.Class): Il2Cpp.Object {
-        return new Il2Cpp.Object(Il2Cpp.Api._objectNew(klass));
-    }
-
     /** Gets this object casted to its base type. */
     @cache
     get base(): Il2Cpp.Object {

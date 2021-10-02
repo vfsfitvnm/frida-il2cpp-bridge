@@ -591,6 +591,11 @@ class Il2CppApi {
     }
 
     @cache
+    static get _objectInit() {
+        return this.r("runtime_object_init_exception", "void", ["pointer", "pointer"]);
+    }
+
+    @cache
     static get _objectNew() {
         return this.r("object_new", "pointer", ["pointer"]);
     }
@@ -604,11 +609,6 @@ class Il2CppApi {
     static get _objectUnbox() {
         return this.r("object_unbox", "pointer", ["pointer"]);
     }
-
-    // @cache
-    // static get _runtimeInvoke() {
-    //     return this.r("runtime_invoke", "pointer", ["pointer", "pointer", "pointer", "pointer"]);
-    // }
 
     @cache
     static get _stringChars() {

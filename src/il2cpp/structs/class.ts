@@ -199,6 +199,11 @@ class Il2CppClass extends NonNullNativeStruct {
         return new Il2Cpp.Type(Il2Cpp.Api._classGetType(this));
     }
 
+    /** Allocates a new object of the current class. */
+    alloc(): Il2Cpp.Object {
+        return new Il2Cpp.Object(Il2Cpp.Api._objectNew(this));
+    }
+
     /** Gets the field identified by the given name. */
     getField(name: string): Il2Cpp.Field | null {
         return getOrNull(Il2Cpp.Api._classGetFieldFromName(this, Memory.allocUtf8String(name)), Il2Cpp.Field);
@@ -247,6 +252,23 @@ class Il2CppClass extends NonNullNativeStruct {
     /** Determines whether the current class derives from `other` class. */
     isSubclassOf(other: Il2Cpp.Class, checkInterfaces: boolean): boolean {
         return !!Il2Cpp.Api._classIsSubclassOf(this, other, +checkInterfaces);
+    }
+
+    /** Allocates a new object of the current class and calls its default constructor. */
+    new(): Il2Cpp.Object {
+        const object = this.alloc();
+
+        const exceptionArray = Memory.alloc(Process.pointerSize);
+
+        Il2Cpp.Api._objectInit(object, exceptionArray);
+
+        const exception = exceptionArray.readPointer();
+
+        if (!exception.isNull()) {
+            raise(new Il2Cpp.Object(exception).toString()!);
+        }
+
+        return object;
     }
 
     override toString(): string {
