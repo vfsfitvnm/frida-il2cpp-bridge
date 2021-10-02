@@ -723,10 +723,10 @@ OFFSET_OF (offset_of_pointer, void *)
         const offsetOfInt32 = new NativeFunction(offsetsFinderCModule.offset_of_int32, "int16", ["pointer", "int32"]);
         const offsetOfPointer = new NativeFunction(offsetsFinderCModule.offset_of_pointer, "int16", ["pointer", "pointer"]);
 
-        const SystemString = Il2Cpp.Image.corlib.getClassFromName("System", "String")!;
-        const SystemValueType = Il2Cpp.Image.corlib.getClassFromName("System", "ValueType")!;
-        const SystemDateTime = Il2Cpp.Image.corlib.getClassFromName("System", "DateTime")!;
-        const SystemReflectionModule = Il2Cpp.Image.corlib.getClassFromName("System.Reflection", "Module")!;
+        const SystemString = Il2Cpp.Image.corlib.getClass("System", "String")!;
+        const SystemValueType = Il2Cpp.Image.corlib.getClass("System", "ValueType")!;
+        const SystemDateTime = Il2Cpp.Image.corlib.getClass("System", "DateTime")!;
+        const SystemReflectionModule = Il2Cpp.Image.corlib.getClass("System.Reflection", "Module")!;
 
         SystemDateTime.initialize();
         SystemReflectionModule.initialize();

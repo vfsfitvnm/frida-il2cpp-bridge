@@ -58,7 +58,7 @@ class Il2CppImage extends NonNullNativeStruct {
     }
 
     /** Gets the class with the specified namespace and name defined in this image. */
-    getClassFromName(namespace: string, name: string): Il2Cpp.Class | null {
+    getClass(namespace: string, name: string): Il2Cpp.Class | null {
         return getOrNull(Il2Cpp.Api._classFromName(this, Memory.allocUtf8String(namespace), Memory.allocUtf8String(name)), Il2Cpp.Class);
     }
 }

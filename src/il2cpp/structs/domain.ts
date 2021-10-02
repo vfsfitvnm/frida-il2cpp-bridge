@@ -46,7 +46,7 @@ class Il2CppDomain {
     /** Gets the encompassing object of the application domain. */
     @cache
     static get object(): Il2Cpp.Object {
-        return Il2Cpp.Image.corlib.getClassFromName("System", "AppDomain")!.methods.get_CurrentDomain.invoke<Il2Cpp.Object>();
+        return Il2Cpp.Image.corlib.getClass("System", "AppDomain")!.methods.get_CurrentDomain.invoke<Il2Cpp.Object>();
     }
 
     /** Attached a new thread to the application domain. */

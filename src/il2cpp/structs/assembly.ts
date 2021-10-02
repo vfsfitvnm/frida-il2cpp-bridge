@@ -19,7 +19,7 @@ class Il2CppAssembly extends NonNullNativeStruct {
     @cache
     get object(): Il2Cpp.Object {
         return Il2Cpp.Image.corlib
-            .getClassFromName("System.Reflection", "Assembly")!
+            .getClass("System.Reflection", "Assembly")!
             .methods.Load.invoke<Il2Cpp.Object>(Il2Cpp.String.from(this.name));
     }
 }
