@@ -16,6 +16,12 @@ class UnityBase {
                 }
             case "windows":
                 return "UnityPlayer.dll";
+            case "darwin":
+                try {
+                    return "UnityFramework";
+                } catch (e) {
+                    return "UnityPlayer.dylib";
+                }
         }
 
         platformNotSupported();

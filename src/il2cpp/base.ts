@@ -18,6 +18,12 @@ class Il2CppBase {
                 }
             case "windows":
                 return "GameAssembly.dll";
+            case "darwin":
+                try {
+                    return "UnityFramework";
+                } catch (e) {
+                    return "GameAssembly.dylib";
+                }
         }
 
         platformNotSupported();
@@ -55,8 +61,21 @@ class Il2CppBase {
             warn("Frida's JavaScript runtime is not V8 (--runtime=v8). Proceed with caution.");
         }
 
-        await forModule(Unity.moduleName);
-        await forModule(this.moduleName);
+        if (Process.platform == "darwin") {
+            let il2cppModuleName = Process.findModuleByAddress(Module.findExportByName(null, "il2cpp_init") || NULL)?.name;
+            let unityModuleName = il2cppModuleName;
+
+            if (il2cppModuleName == undefined) {
+                unityModuleName = await forModule("UnityFramework", "UnityPlayer.dylib");
+                il2cppModuleName = await forModule("UnityFramework", "GameAssembly.dylib");
+            }
+
+            (Unity as any).moduleName = unityModuleName;
+            (Il2Cpp as any).moduleName = il2cppModuleName;
+        } else {
+            await forModule(Unity.moduleName);
+            await forModule(this.moduleName);
+        }
 
         if (Il2Cpp.Api._getCorlib().isNull()) {
             await new Promise<void>(resolve => {

@@ -45,25 +45,32 @@ class Target {
 }
 
 /** @internal */
-export function forModule(moduleName: string): Promise<void> {
-    return new Promise<void>(resolve => {
-        const module = Process.findModuleByName(moduleName);
-        if (module != null) {
-            resolve();
-        } else {
-            const interceptors = Target.targets.map(target =>
-                Interceptor.attach(target.address, {
-                    onEnter(args: InvocationArguments) {
-                        this.modulePath = target.readString(args[0]) || "";
-                    },
-                    onLeave(returnValue: InvocationReturnValue) {
-                        if (!returnValue.isNull() && this.modulePath.endsWith(moduleName)) {
-                            setTimeout(() => interceptors.forEach(i => i.detach()));
-                            resolve();
-                        }
-                    }
-                })
-            );
+export function forModule(...moduleNames: string[]): Promise<string> {
+    return new Promise<string>(resolve => {
+        for (const moduleName of moduleNames) {
+            const module = Process.findModuleByName(moduleName);
+            if (module != null) {
+                resolve(moduleName);
+                return;
+            }
         }
+
+        const interceptors = Target.targets.map(target =>
+            Interceptor.attach(target.address, {
+                onEnter(args: InvocationArguments) {
+                    this.modulePath = target.readString(args[0]) || "";
+                },
+                onLeave(returnValue: InvocationReturnValue) {
+                    if (returnValue.isNull()) return;
+
+                    for (const moduleName of moduleNames) {
+                        if (!this.modulePath.endsWith(moduleName)) continue;
+
+                        setImmediate(() => interceptors.forEach(i => i.detach()));
+                        resolve(moduleName);
+                    }
+                }
+            })
+        );
     });
 }
