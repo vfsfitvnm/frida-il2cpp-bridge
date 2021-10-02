@@ -4,7 +4,6 @@ import { NativeStruct } from "../../utils/native-struct";
 
 /** Represent a parameter passed by reference. */
 class Il2CppReference<T extends Il2Cpp.Field.Type> extends NativeStruct {
-    /** @internal */
     constructor(handle: NativePointer, readonly type: Il2Cpp.Type) {
         super(handle);
     }

@@ -3,7 +3,7 @@ import { shouldBeInstance } from "../decorators";
 import { fromFridaValue, readGString, toFridaValue } from "../utils";
 import { raise, warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { makeRecordFromNativeIterator, overridePropertyValue } from "../../utils/utils";
+import { addLevenshtein, makeIterable, overridePropertyValue } from "../../utils/utils";
 
 /** Represents a `MethodInfo`. */
 class Il2CppMethod extends NonNullNativeStruct {
@@ -51,7 +51,14 @@ class Il2CppMethod extends NonNullNativeStruct {
     /** Gets the amount of generic parameters of this generic method. */
     @cache
     get genericParameterCount(): number {
-        return Il2Cpp.Api._methodGetGenericParameterCount(this);
+        if (!this.isGeneric) {
+            return 0;
+        }
+
+        let object = this.object;
+        while (!("GetGenericArguments" in object.methods)) object = object.base;
+
+        return object.methods.GetGenericArguments.invoke<Il2Cpp.Array>().length;
     }
 
     /** Determines whether this method is external. */
@@ -111,7 +118,14 @@ class Il2CppMethod extends NonNullNativeStruct {
     /** Gets the parameters of this method. */
     @cache
     get parameters(): IterableRecord<Il2Cpp.Parameter> {
-        return makeRecordFromNativeIterator(this, Il2Cpp.Api._methodGetParameters, Il2Cpp.Parameter, param => param.name);
+        const record: Record<string, Il2Cpp.Parameter> = {};
+        for (let i = 0; i < this.parameterCount; i++) {
+            const parameterName = Il2Cpp.Api._methodGetParameterName(this, i).readUtf8String()!;
+            const parameterType = Il2Cpp.Api._methodGetParameterType(this, i);
+            record[parameterName] = new Il2Cpp.Parameter(parameterName, i, new Il2Cpp.Type(parameterType));
+        }
+
+        return makeIterable(addLevenshtein(record));
     }
 
     /** Gets the relative virtual address (RVA) of this method. */

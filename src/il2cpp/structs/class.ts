@@ -31,6 +31,12 @@ class Il2CppClass extends NonNullNativeStruct {
         return getOrNull(Il2Cpp.Api._classGetDeclaringType(this), Il2Cpp.Class);
     }
 
+    /** Gets the encompassed type of this array, reference, pointer or enum type. */
+    @cache
+    get baseType(): Il2Cpp.Type | null {
+        return getOrNull(Il2Cpp.Api._classGetBaseType(this), Il2Cpp.Type);
+    }
+
     /** Gets the class of the object encompassed or referred to by the current array, pointer or reference class. */
     @cache
     get elementClass(): Il2Cpp.Class | null {
@@ -58,13 +64,11 @@ class Il2CppClass extends NonNullNativeStruct {
     /** Gets the amount of generic parameters of this generic class. */
     @cache
     get genericParameterCount(): number {
-        return Il2Cpp.Api._classGetGenericParameterCount(this);
-    }
+        if (!this.isGeneric) {
+            return 0;
+        }
 
-    /** Determines whether the current class has a class constructor. */
-    @cache
-    get hasClassConstructor(): boolean {
-        return !!Il2Cpp.Api._classHasClassConstructor(this);
+        return this.type.object.methods.GetGenericArguments.invoke<Il2Cpp.Array>().length;
     }
 
     /** Determines whether the GC has tracking references to the current class instances. */
@@ -93,6 +97,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Determines whether the current class is blittable. */
     @cache
+    @isEqualOrAbove("2017.1.0")
     get isBlittable(): boolean {
         return !!Il2Cpp.Api._classIsBlittable(this);
     }
@@ -119,11 +124,6 @@ class Il2CppClass extends NonNullNativeStruct {
     @cache
     get isInterface(): boolean {
         return !!Il2Cpp.Api._classIsInterface(this);
-    }
-
-    /** Determines whether the static constructor of the current class has been invoked. */
-    get isStaticConstructorFinished(): boolean {
-        return !!Il2Cpp.Api._classIsStaticConstructorFinished(this);
     }
 
     /** Determines whether the current class is a value type. */
@@ -181,6 +181,7 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     /** Gets a pointer to the static fields of the current class. */
+    @isEqualOrAbove("2019.3.0")
     @cache
     get staticFieldsData(): NativePointer {
         return Il2Cpp.Api._classGetStaticFieldData(this);
@@ -196,6 +197,11 @@ class Il2CppClass extends NonNullNativeStruct {
     @cache
     get type(): Il2Cpp.Type {
         return new Il2Cpp.Type(Il2Cpp.Api._classGetType(this));
+    }
+
+    /** Gets the field identified by the given name. */
+    getField(name: string): Il2Cpp.Field | null {
+        return getOrNull(Il2Cpp.Api._classGetFieldFromName(this, Memory.allocUtf8String(name)), Il2Cpp.Field);
     }
 
     /** Gets the method identified by the given name and parameter count. */

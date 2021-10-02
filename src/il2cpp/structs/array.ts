@@ -27,7 +27,7 @@ class Il2CppArray<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Nativ
     /** Gets the type of the object encompassed by the current array. */
     @cache
     get elementType(): Il2Cpp.Type {
-        return this.object.class.type.dataType!;
+        return this.object.class.type.class.baseType!;
     }
 
     /** Gets the total number of elements in all the dimensions of the current array. */

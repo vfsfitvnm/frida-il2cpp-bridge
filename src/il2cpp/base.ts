@@ -62,10 +62,8 @@ class Il2CppBase {
             await new Promise<void>(resolve => {
                 const interceptor = Interceptor.attach(Il2Cpp.Api._init, {
                     onLeave() {
-                        setImmediate(() => {
-                            interceptor.detach();
-                            resolve();
-                        });
+                        interceptor.detach();
+                        resolve();
                     }
                 });
             });

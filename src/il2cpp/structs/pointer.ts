@@ -3,7 +3,6 @@ import { NativeStruct } from "../../utils/native-struct";
 
 /** */
 class Il2CppPointer<T extends Il2Cpp.Field.Type> extends NativeStruct implements Iterable<T> {
-    /** @internal */
     constructor(handle: NativePointer, readonly type: Il2Cpp.Type) {
         super(handle);
     }

@@ -12,7 +12,7 @@ class Il2CppApi {
 
     @cache
     static get _arrayGetElements() {
-        return this.r("array_elements", "pointer", ["pointer"]);
+        return this.r("array_get_elements", "pointer", ["pointer"]);
     }
 
     @cache
@@ -66,6 +66,11 @@ class Il2CppApi {
     }
 
     @cache
+    static get _classGetBaseType() {
+        return this.r("class_enum_basetype", "pointer", ["pointer"]);
+    }
+
+    @cache
     static get _classGetDeclaringType() {
         return this.r("class_get_declaring_type", "pointer", ["pointer"]);
     }
@@ -81,6 +86,11 @@ class Il2CppApi {
     }
 
     @cache
+    static get _classGetFieldFromName() {
+        return this.r("class_get_field_from_name", "pointer", ["pointer", "pointer"]);
+    }
+
+    @cache
     static get _classGetFields() {
         return this.r("class_get_fields", "pointer", ["pointer", "pointer"]);
     }
@@ -88,11 +98,6 @@ class Il2CppApi {
     @cache
     static get _classGetFlags() {
         return this.r("class_get_fields", "int", ["pointer"]);
-    }
-
-    @cache
-    static get _classGetGenericParameterCount() {
-        return this.r("class_get_generic_parameter_count", "int32", ["pointer"]);
     }
 
     @cache
@@ -166,11 +171,6 @@ class Il2CppApi {
     }
 
     @cache
-    static get _classHasClassConstructor() {
-        return this.r("class_has_class_constructor", "bool", ["pointer"]);
-    }
-
-    @cache
     static get _classHasReferences() {
         return this.r("class_has_references", "bool", ["pointer"]);
     }
@@ -216,11 +216,6 @@ class Il2CppApi {
     }
 
     @cache
-    static get _classIsStaticConstructorFinished() {
-        return this.r("class_is_class_constructor_finished", "bool", ["pointer"]);
-    }
-
-    @cache
     static get _classIsSubclassOf() {
         return this.r("class_is_subclass_of", "bool", ["pointer", "pointer", "bool"]);
     }
@@ -251,11 +246,6 @@ class Il2CppApi {
     }
 
     @cache
-    static get _domainGetName() {
-        return this.r("domain_get_name", "pointer", ["pointer"]);
-    }
-
-    @cache
     static get _fieldGetClass() {
         return this.r("field_get_parent", "pointer", ["pointer"]);
     }
@@ -283,11 +273,6 @@ class Il2CppApi {
     @cache
     static get _fieldGetType() {
         return this.r("field_get_type", "pointer", ["pointer"]);
-    }
-
-    @cache
-    static get _fieldGetValue() {
-        return this.r("field_get_value", "void", ["pointer", "pointer", "pointer"]);
     }
 
     @cache
@@ -426,23 +411,8 @@ class Il2CppApi {
     }
 
     @cache
-    static get _imageGetClassStart() {
-        return this.r("image_get_class_start", "uint32", ["pointer"]);
-    }
-
-    @cache
-    static get _imageGetEntryPoint() {
-        return this.r("image_get_entry_point", "pointer", ["pointer"]);
-    }
-
-    @cache
     static get _imageGetName() {
         return this.r("image_get_name", "pointer", ["pointer"]);
-    }
-
-    @cache
-    static get _imageSetEntryPointIndex() {
-        return this.r("image_set_entry_point_index", "void", ["pointer", "int32"]);
     }
 
     @cache
@@ -506,11 +476,6 @@ class Il2CppApi {
     }
 
     @cache
-    static get _methodGetGenericParameterCount() {
-        return this.r("method_get_generic_parameter_count", "int32", ["pointer"]);
-    }
-
-    @cache
     static get _methodGetName() {
         return this.r("method_get_name", "pointer", ["pointer"]);
     }
@@ -518,11 +483,6 @@ class Il2CppApi {
     @cache
     static get _methodGetObject() {
         return this.r("method_get_object", "pointer", ["pointer", "pointer"]);
-    }
-
-    @cache
-    static get _methodGetParameter() {
-        return this.r("method_get_param", "pointer", ["pointer", "uint32"]);
     }
 
     @cache
@@ -538,6 +498,11 @@ class Il2CppApi {
     @cache
     static get _methodGetParameters() {
         return this.r("method_get_parameters", "pointer", ["pointer", "pointer"]);
+    }
+
+    @cache
+    static get _methodGetParameterType() {
+        return this.r("method_get_param", "pointer", ["pointer", "uint32"]);
     }
 
     @cache
@@ -640,25 +605,10 @@ class Il2CppApi {
         return this.r("object_unbox", "pointer", ["pointer"]);
     }
 
-    @cache
-    static get _parameterGetName() {
-        return this.r("parameter_get_name", "pointer", ["pointer"]);
-    }
-
-    @cache
-    static get _parameterGetPosition() {
-        return this.r("parameter_get_position", "int32", ["pointer"]);
-    }
-
-    @cache
-    static get _parameterGetType() {
-        return this.r("parameter_get_type", "pointer", ["pointer"]);
-    }
-
-    @cache
-    static get _parameterToString() {
-        return this.r("parameter_to_string", "void", ["pointer", "pointer"]);
-    }
+    // @cache
+    // static get _runtimeInvoke() {
+    //     return this.r("runtime_invoke", "pointer", ["pointer", "pointer", "pointer", "pointer"]);
+    // }
 
     @cache
     static get _stringChars() {
@@ -716,16 +666,6 @@ class Il2CppApi {
     }
 
     @cache
-    static get _typeGetClassOrElementClass() {
-        return this.r("type_get_class_or_element_class", "pointer", ["pointer"]);
-    }
-
-    @cache
-    static get _typeGetDataType() {
-        return this.r("type_get_data_type", "pointer", ["pointer"]);
-    }
-
-    @cache
     static get _typeGetName() {
         return this.r("type_get_name", "pointer", ["pointer"]);
     }
@@ -763,58 +703,50 @@ class Il2CppApi {
             warn(`Unity version "${Unity.version}" may be unsupported, continue with caution.`);
         }
 
-        const isEqualOrAbove_5_3_2 = +Unity.version.isEqualOrAbove("5.3.2");
-        const isEqualOrAbove_5_3_3 = +Unity.version.isEqualOrAbove("5.3.3");
-        const isEqualOrAbove_5_3_6 = +Unity.version.isEqualOrAbove("5.3.6");
-        const isEqualOrAbove_5_4_4 = +Unity.version.isEqualOrAbove("5.4.4");
-        const isEqualOrAbove_5_5_0 = +Unity.version.isEqualOrAbove("5.5.0");
-        const isEqualOrAbove_5_6_0 = +Unity.version.isEqualOrAbove("5.6.0");
-        const isEqualOrAbove_2017_1_0 = +Unity.version.isEqualOrAbove("2017.1.0");
-        const isEqualOrAbove_2017_1_3 = +Unity.version.isEqualOrAbove("2017.1.3");
-        const isEqualOrAbove_2018_1_0 = +Unity.version.isEqualOrAbove("2018.1.0");
-        const isEqualOrAbove_2018_2_0 = +Unity.version.isEqualOrAbove("2018.2.0");
-        const isEqualOrAbove_2018_3_0 = +Unity.version.isEqualOrAbove("2018.3.0");
-        const isEqualOrAbove_2018_3_8 = +Unity.version.isEqualOrAbove("2018.3.8");
-        const isEqualOrAbove_2019_1_0 = +Unity.version.isEqualOrAbove("2019.1.0");
-        const isEqualOrAbove_2019_3_0 = +Unity.version.isEqualOrAbove("2019.3.0");
-        const isEqualOrAbove_2020_2_0 = +Unity.version.isEqualOrAbove("2020.2.0");
-        const isEqualOrAbove_2021_1_0 = +Unity.version.isEqualOrAbove("2021.1.0");
+        const offsetsFinderCModule = new CModule(`\
+#include <stdint.h>
 
-        const isBelow_5_3_3 = +!isEqualOrAbove_5_3_3;
-        const isBelow_5_3_6 = +!isEqualOrAbove_5_3_6;
-        const isBelow_5_5_0 = +!isEqualOrAbove_5_5_0;
-        const isBelow_2017_1_0 = +!isEqualOrAbove_2017_1_0;
-        const isBelow_2018_1_0 = +!isEqualOrAbove_2018_1_0;
-        const isBelow_2018_2_0 = +!isEqualOrAbove_2018_2_0;
-        const isBelow_2018_3_0 = +!isEqualOrAbove_2018_3_0;
-        const isBelow_2019_3_0 = +!isEqualOrAbove_2019_3_0;
-        const isBelow_2020_2_0 = +!isEqualOrAbove_2020_2_0;
-        const isBelow_2021_1_0 = +!isEqualOrAbove_2021_1_0;
+#define OFFSET_OF(name, type) \
+    int16_t name (char * p,\
+                  type e)\
+    {\
+        for (int16_t i = 0; i < 512; i++) if (* ((type *) p + i) == e) return i;\
+        return -1;\
+    }
 
-        const isNotEqual_2017_2_0 = +!Unity.version.isEqual("2017.2.0");
-        const isNotEqual_5_5_0 = +!Unity.version.isEqual("5.5.0");
+OFFSET_OF (offset_of_uint16, uint16_t)
+OFFSET_OF (offset_of_int32, int32_t)
+OFFSET_OF (offset_of_pointer, void *)
+            `);
+
+        const offsetOfUInt16 = new NativeFunction(offsetsFinderCModule.offset_of_uint16, "int16", ["pointer", "uint16"]);
+        const offsetOfInt32 = new NativeFunction(offsetsFinderCModule.offset_of_int32, "int16", ["pointer", "int32"]);
+        const offsetOfPointer = new NativeFunction(offsetsFinderCModule.offset_of_pointer, "int16", ["pointer", "pointer"]);
+
+        const SystemString = Il2Cpp.Image.corlib.getClassFromName("System", "String")!;
+        const SystemValueType = Il2Cpp.Image.corlib.getClassFromName("System", "ValueType")!;
+        const SystemDateTime = Il2Cpp.Image.corlib.getClassFromName("System", "DateTime")!;
+        const SystemReflectionModule = Il2Cpp.Image.corlib.getClassFromName("System.Reflection", "Module")!;
+
+        SystemDateTime.initialize();
+        SystemReflectionModule.initialize();
+
+        const DaysToMonth365 = (SystemDateTime.getField("daysmonth") || SystemDateTime.getField("DaysToMonth365"))!
+            .value as Il2Cpp.Array<number>;
+
+        const filter_by_type_name = SystemReflectionModule.getMethod("filter_by_type_name", 2)!;
+        const FilterTypeName = SystemReflectionModule.getField("FilterTypeName")!.value as Il2Cpp.Object;
+        const method_ptr = FilterTypeName.class.getField("method_ptr")!;
+        const FilterTypeNamePointer = FilterTypeName.handle.add(method_ptr.offset).readPointer();
 
         const source = `\
 #include <stdint.h>
+#include <string.h>
 #include "glib.h"
 
 
 typedef struct _Il2CppObject Il2CppObject;
-typedef struct _Il2CppString Il2CppString;
-typedef struct _Il2CppArray Il2CppArray;
-typedef struct _Il2CppDomain Il2CppDomain;
-typedef struct _Il2CppAssembly Il2CppAssembly;
-typedef struct _Il2CppImage Il2CppImage;
 typedef enum _Il2CppTypeEnum Il2CppTypeEnum;
-typedef struct _Il2CppType Il2CppType;
-typedef struct _VirtualInvokeData VirtualInvokeData;
-typedef struct _Il2CppClass Il2CppClass;
-typedef struct _Il2CppField Il2CppField;
-typedef struct _Il2CppMethod Il2CppMethod;
-typedef struct _Il2CppParameter Il2CppParameter;
-typedef struct _Il2CppGenericMethod Il2CppGenericMethod;
-typedef struct _Il2CppGenericInst Il2CppGenericInst;
-typedef struct _Il2CppGenericContainer Il2CppGenericContainer;
 typedef struct _Il2CppReflectionMethod Il2CppReflectionMethod;
 typedef struct _Il2CppManagedMemorySnapshot Il2CppManagedMemorySnapshot;
 typedef struct _Il2CppMetadataType Il2CppMetadataType;
@@ -822,148 +754,8 @@ typedef struct _Il2CppMetadataType Il2CppMetadataType;
 
 struct _Il2CppObject
 {
-#if ${isEqualOrAbove_2018_1_0}
-    union
-    {
-        Il2CppClass * class;
-        struct Il2CppVTable * v_table;
-    };
-#else
-    Il2CppClass * class;
-#endif
-    struct MonitorData * monitor;
-};
-
-struct _Il2CppString
-{
-    Il2CppObject object;
-    int32_t length;
-    uint16_t chars[32];
-};
-
-struct _Il2CppArray
-{   
-    Il2CppObject obj;
-    struct Il2CppArrayBounds * bounds;
-    uint32_t max_length;
-#if ${isEqualOrAbove_2018_1_0}
-    __attribute__((aligned(8))) void * vector[32];
-#elif ${isBelow_5_3_3}
-    double vector[32];
-#else
-    __attribute__((aligned(8))) void * vector;
-#endif
-};
-
-struct _Il2CppDomain
-{
-    struct Il2CppAppDomain * domain;
-#if ${isEqualOrAbove_5_5_0}
-    struct Il2CppAppDomainSetup * setup;
-#else
-    Il2CppObject * setup;
-#endif
-    struct Il2CppAppContext * default_context;
-    const char * friendly_name;
-    uint32_t domain_id;
-#if ${isEqualOrAbove_5_5_0}
-    volatile int threadpool_jobs;
-#endif
-#if ${isEqualOrAbove_2018_1_0}
-    void * agent_info;
-#endif
-};
-
-struct _Il2CppAssembly
-{
-#if ${isEqualOrAbove_2018_1_0}
-    Il2CppImage * image;
-#else
-    int32_t image_index;
-#endif
-#if ${isEqualOrAbove_2018_3_0}
-    uint32_t token;
-#else
-    int32_t custom_attribute_index;
-#endif
-#if ${isEqualOrAbove_5_3_3}
-    int32_t referenced_assembly_start;
-    int32_t referenced_assembly_count;
-#endif
-    struct Il2CppAssemblyName
-    {
-#if ${isEqualOrAbove_2018_1_0}
-        const char * name;
-        const char * culture;
-        const char * hash_value;
-        const char * public_key;
-#else
-        int32_t name_index;
-        int32_t culture_index;
-        int32_t hash_value_index;
-        int32_t public_key_index;
-#endif
-        uint32_t hash_alg;
-        int32_t hash_len;
-        uint32_t flags;
-        int32_t major;
-        int32_t minor;
-        int32_t build;
-        int32_t revision;
-        uint8_t public_key_token[8];
-    } name;
-};
-
-struct _Il2CppImage
-{
-    const char * name;
-#if ${isEqualOrAbove_2017_1_3 && isNotEqual_2017_2_0}
-    const char * name_no_ext;
-#endif
-#if ${isEqualOrAbove_2018_1_0}
-    Il2CppAssembly * assembly;
-#else
-    int32_t assembly_index;
-#endif
-#if ${isBelow_2020_2_0}
-    int32_t type_start;
-#endif
-    uint32_t type_count;
-#if ${isEqualOrAbove_2017_1_0}
-#if ${isBelow_2020_2_0}
-    int32_t exported_type_start;
-#endif
-    uint32_t exported_type_count;
-#endif
-#if ${isEqualOrAbove_2018_3_0}
-#if ${isBelow_2020_2_0}
-    int32_t custom_attribute_start;
-#endif
-    uint32_t custom_attribute_count;
-#endif
-#if ${isEqualOrAbove_2020_2_0}
-    struct Il2CppMetadataImageHandle
-    {
-        int32_t type_start;
-        int32_t exported_type_start;
-        int32_t custom_attribute_start;
-        int32_t entry_point_index;
-        const Il2CppImage * image;
-    } * metadata_handle;
-    struct Il2CppNameToTypeHandleHashTable * name_to_class_hash_table;
-#else
-    int32_t entry_point_index;
-    struct Il2CppNameToTypeDefinitionIndexHashTable * name_to_class_hash_table;
-#endif
-#if ${isEqualOrAbove_2019_1_0}
-    const struct Il2CppCodeGenModule * code_gen_module;
-#endif
-#if ${isEqualOrAbove_5_3_2}
-    uint32_t token;
-#endif
-#if ${isEqualOrAbove_2018_1_0}
-    uint8_t dynamic;
-#endif
+    void * class;
+    void * monitor;
 };
 
 enum _Il2CppTypeEnum
@@ -1006,260 +798,12 @@ enum _Il2CppTypeEnum
     IL2CPP_TYPE_ENUM = 0x55
 };
 
-struct _Il2CppType
-{
-    union
-    {
-        void * dummy;
-        int32_t class_index;
-#if ${isEqualOrAbove_2020_2_0}
-        const struct Il2CppTypeDefinition * type_handle;
-#endif
-        const Il2CppType * type;
-        struct Il2CppArrayType
-        {
-            const Il2CppType * type;
-            uint8_t rank;
-            uint8_t num_sizes;
-            uint8_t num_lo_bounds;
-            int * sizes;
-            int * lo_bounds;
-        } * array;
-        int32_t generic_parameter_index;
-#if ${isEqualOrAbove_2020_2_0}
-        const struct Il2CppMetadataGenericParameterHandle * generic_parameter_handle;
-#endif
-        struct Il2CppGenericClass * generic_class;
-    } data;
-    unsigned int attrs: 16;
-    Il2CppTypeEnum type: 8;
-#if ${isEqualOrAbove_2021_1_0}
-    unsigned int num_mods: 5;
-#else
-    unsigned int num_mods: 6;
-#endif
-    unsigned int byref: 1;
-    unsigned int pinned: 1;
-#if ${isEqualOrAbove_2021_1_0}
-    uint8_t valuetype: 1;
-#endif
-};
-
-struct _VirtualInvokeData
-{
-    void * method_ptr;
-    const Il2CppMethod * method;
-};
-
-struct _Il2CppClass
-{
-    const Il2CppImage * image;
-    void * gc_desc;
-    const char * name;
-    const char * namespace;
-#if ${isEqualOrAbove_2018_1_0}
-    Il2CppType byval_arg;
-    Il2CppType this_arg;
-#else
-    const Il2CppType * byval_arg;
-    const Il2CppType * this_arg;
-#endif
-    Il2CppClass * element_class;
-    Il2CppClass * cast_class;
-    Il2CppClass * declaring_type;
-    Il2CppClass * parent;
-    struct Il2CppGenericClass * generic_class;
-    const struct Il2CppTypeDefinition * type_definition;
-#if ${isEqualOrAbove_5_6_0}
-    const struct Il2CppInteropData * interop_data;
-#endif
-#if ${isEqualOrAbove_2018_1_0}
-    Il2CppClass * class;
-#endif
-    Il2CppField * fields;
-    const struct EventInfo * events;
-    const struct PropertyInfo * properties;
-    const Il2CppMethod ** methods;
-    Il2CppClass ** nested_types;
-    Il2CppClass ** implemented_interfaces;
-#if ${isEqualOrAbove_5_3_6 && isBelow_5_5_0}
-    VirtualInvokeData * v_table;
-#endif
-#if ${isBelow_5_3_6}
-    const Il2CppMethod ** v_table;
-#endif
-    struct Il2CppRuntimeInterfaceOffsetPair * interface_offsets;
-    void * static_fields;
-    const struct Il2CppRGCTXData * rgctx_data;
-    Il2CppClass ** type_hierarchy;
-#if ${isEqualOrAbove_2019_1_0}
-    void * unity_user_data;
-#endif
-#if ${isEqualOrAbove_2018_2_0}
-    uint32_t initialization_exception_gc_handle;
-#endif
-    uint32_t cctor_started;
-    uint32_t cctor_finished;
-#if ${isEqualOrAbove_2019_1_0}
-    __attribute__((aligned(8))) size_t cctor_thread;
-#else
-    __attribute__((aligned(8))) uint64_t cctor_thread;
-#endif
-#if ${isEqualOrAbove_2020_2_0}
-    const Il2CppGenericContainer * generic_container;
-#else
-    int32_t generic_container_index;
-#endif
-#if ${isBelow_2018_3_0}
-    int32_t custom_attribute_index;
-#endif
-    uint32_t instance_size;
-    uint32_t actual_size;
-    uint32_t element_size;
-    int32_t native_size;
-    uint32_t static_fields_size;
-    uint32_t thread_static_fields_size;
-    int32_t thread_static_fields_offset;
-    uint32_t flags;
-#if ${isEqualOrAbove_5_3_2}
-    uint32_t token;
-#endif
-    uint16_t method_count;
-    uint16_t property_count;
-    uint16_t field_count;
-    uint16_t event_count;
-    uint16_t nested_type_count;
-    uint16_t vtable_count;
-    uint16_t interfaces_count;
-    uint16_t interface_offsets_count;
-    uint8_t type_hierarchy_depth;
-#if ${isEqualOrAbove_5_4_4 && isNotEqual_5_5_0}
-    uint8_t generic_recursion_depth;
-#endif
-    uint8_t rank;
-    uint8_t minimum_alignment;
-#if ${isEqualOrAbove_2018_3_8}
-    uint8_t natural_aligment;
-#endif
-    uint8_t packing_size;
-#if ${isEqualOrAbove_2018_3_0}
-    uint8_t initialized_and_no_error: 1;
-#endif
-#if ${isBelow_2021_1_0}
-    uint8_t valuetype: 1;
-#endif
-    uint8_t initialized: 1;
-    uint8_t enumtype: 1;
-    uint8_t is_generic: 1;
-    uint8_t has_references: 1;
-    uint8_t init_pending: 1;
-    uint8_t size_inited: 1;
-    uint8_t has_finalize: 1;
-    uint8_t has_cctor: 1;
-    uint8_t is_blittable: 1;
-#if ${isEqualOrAbove_5_3_3}
-    uint8_t is_import_or_windows_runtime: 1;
-#endif
-#if ${isEqualOrAbove_5_5_0}
-    uint8_t is_vtable_initialized: 1;
-#endif
-#if ${isEqualOrAbove_2018_2_0}
-    uint8_t has_initialization_error: 1;
-#endif
-#if ${isEqualOrAbove_5_5_0}
-    VirtualInvokeData v_table[32];
-#endif
-};
-
-struct _Il2CppField
-{
-    const char * name;
-    const Il2CppType * type;
-    Il2CppClass * class;
-    int32_t offset;
-#if ${isBelow_2018_3_0}
-    int32_t custom_attribute_index;
-#endif
-#if ${isEqualOrAbove_5_3_2}
-    uint32_t token;
-#endif
-};
-
-struct _Il2CppMethod
-{
-    void * pointer;
-    void * invoker_method;
-    const char * name;
-    Il2CppClass * class;
-    const Il2CppType * return_type;
-    const Il2CppParameter * parameters;
-    union
-    {
-        const struct Il2CppRGCTXData * rgctx_data;
-        const struct Il2CppMethodDefinition * method_definition;
-    };
-    union
-    {
-        const Il2CppGenericMethod * generic_method;
-        const Il2CppGenericContainer * generic_container;
-    };
-#if ${isBelow_2018_3_0}
-    int32_t custom_attribute_index;
-#endif
-    uint32_t token;
-    uint16_t flags;
-    uint16_t iflags;
-    uint16_t slot;
-    uint8_t parameter_count;
-    uint8_t is_generic: 1;
-    uint8_t is_inflated: 1;
-#if ${isEqualOrAbove_2018_1_0}
-    uint8_t wrapper_type: 1;
-    uint8_t is_marshaled_from_native: 1;
-#endif
-};
-
-struct _Il2CppParameter
-{
-    const char * name;
-    int32_t position;
-    uint32_t token;
-#if ${isBelow_2018_3_0}
-    int32_t custom_attribute_index;
-#endif
-    const Il2CppType * type;
-};
-
-struct _Il2CppGenericMethod
-{
-    const Il2CppMethod * method_definition;
-    struct Il2CppGenericContext
-    {
-        const Il2CppGenericInst * class_inst;
-        const Il2CppGenericInst * method_inst;
-    } context;
-};
-
-struct _Il2CppGenericInst
-{
-    uint32_t type_argc;
-    const Il2CppType ** type_argv;
-};
-
-struct _Il2CppGenericContainer
-{
-    int32_t owner_index;
-    int32_t type_argc;
-    int32_t is_method;
-    int32_t generic_parameter_start;
-};
-
 struct _Il2CppReflectionMethod
 {
     Il2CppObject object;
-    const Il2CppMethod * method;
-    Il2CppString * name;
-    struct Il2CppReflectionType * reftype;
+    void * method;
+    void * name;
+    void * reftype;
 };
 
 struct _Il2CppManagedMemorySnapshot
@@ -1267,12 +811,12 @@ struct _Il2CppManagedMemorySnapshot
     struct Il2CppManagedHeap
     {
         uint32_t section_count;
-        struct Il2CppManagedMemorySection * sections;
+        void * sections;
     } heap;
     struct Il2CppStacks
     {
         uint32_t stack_count;
-        struct Il2CppManagedMemorySection * stacks;
+        void * stacks;
     } stacks;
     struct Il2CppMetadataSnapshot
     {
@@ -1299,7 +843,7 @@ struct _Il2CppManagedMemorySnapshot
 struct _Il2CppMetadataType
 {
     uint32_t flags;
-    struct Il2CppMetadataField * fields;
+    void * fields;
     uint32_t field_count;
     uint32_t statics_size;
     uint8_t * statics;
@@ -1318,41 +862,54 @@ struct _Il2CppMetadataType
 #define METHOD_IMPL_ATTRIBUTE_INTERNAL_CALL 0x1000
 #define METHOD_IMPL_ATTRIBUTE_SYNCHRONIZED 0x0020
 
-const int zero = 0;
-const int false = 0;
-const void * null = NULL;
 
+extern const char * il2cpp_value_to_string (void *, void *);
 
-extern const char * il2cpp_value_to_string (void *, const Il2CppType *);
-
-
-const Il2CppClass * (*il2cpp_class_from_type) (const Il2CppType *) = (void *) ${this._classFromType};
-
-const Il2CppType * (*il2cpp_class_get_type) (const Il2CppClass *) = (void *) ${this._classGetType};
-
-uint8_t (*il2cpp_class_is_interface) (const Il2CppClass *) = (void *) ${this._classIsInterface};
-
-uint8_t (*il2cpp_class_is_valuetype) (const Il2CppClass *) = (void *) ${this._classIsValueType};
-
-void (*il2cpp_field_get_static_value) (const Il2CppField *, void *) = (void *) ${this._fieldGetStaticValue};
-
+const char * (*il2cpp_image_get_name) (void *) = (void *) ${this._imageGetName};
+void * (*il2cpp_class_from_type) (void *) = (void *) ${this._classFromType};
+void * (*il2cpp_class_get_base_type) (void *) = (void *) ${this._classGetBaseType};
+void * (*il2cpp_class_get_declaring_type) (void *) = (void *) ${this._classGetDeclaringType};
+uint16_t (*il2cpp_class_get_field_count) (void *) = (void *) ${this._classGetFieldCount};
+void * (*il2cpp_class_get_image) (void *) = (void *) ${this._classGetImage};
+void * (*il2cpp_class_get_interfaces) (void *, void **) = (void *) ${this._classGetInterfaces};
+void * (*il2cpp_class_get_fields) (void *, void **) = (void *) ${this._classGetFields};
+void * (*il2cpp_class_get_methods) (void *, void **) = (void *) ${this._classGetMethods};
+const char * (*il2cpp_class_get_name) (void *) = (void *) ${this._classGetName};
+void * (*il2cpp_class_get_parent) (void *) = (void *) ${this._classGetParent};
+void * (*il2cpp_class_get_type) (void *) = (void *) ${this._classGetType};
+uint8_t (*il2cpp_class_is_enum) (void *) = (void *) ${this._classIsEnum};
+uint8_t (*il2cpp_class_is_interface) (void *) = (void *) ${this._classIsInterface};
+uint8_t (*il2cpp_class_is_generic) (void *) = (void *) ${this._classIsGeneric};
+uint8_t (*il2cpp_class_is_valuetype) (void *) = (void *) ${this._classIsValueType};
+int (*il2cpp_field_get_flags) (void *) = (void *) ${this._fieldGetFlags};
+size_t (*il2cpp_field_get_offset) (void *) = (void *) ${this._fieldGetOffset};
+const char * (*il2cpp_field_get_name) (void *) = (void *) ${this._fieldGetName};
+void (*il2cpp_field_get_static_value) (void *, void *) = (void *) ${this._fieldGetStaticValue};
+void * (*il2cpp_field_get_type) (void *) = (void *) ${this._fieldGetType};
+uint32_t (*il2cpp_method_get_flags) (void *, uint32_t *) = (void *) ${this._methodGetFlags};
+const char * (*il2cpp_method_get_name) (void *) = (void *) ${this._methodGetName};
+int32_t (*il2cpp_method_get_parameter_count) (void *) = (void *) ${this._methodGetParameterCount};
+const char * (*il2cpp_method_get_parameter_name) (void *, uint32_t) = (void *) ${this._methodGetParameterName};
+void * (*il2cpp_method_get_parameter_type) (void *, uint32_t) = (void *) ${this._methodGetParameterType};
+void * (*il2cpp_method_get_return_type) (void *) = (void *) ${this._methodGetReturnType};
+uint8_t (*il2cpp_method_is_generic) (void *) = (void *) ${this._methodIsGeneric};
+uint8_t (*il2cpp_method_is_inflated) (void *) = (void *) ${this._methodIsInflated};
+uint8_t (*il2cpp_method_is_instance) (void *) = (void *) ${this._methodIsInstance};
+char * (*il2cpp_type_get_name) (void *) = (void *) ${this._typeGetName};
+Il2CppTypeEnum (*il2cpp_type_get_type_enum) (void *) = (void *) ${this._typeGetTypeEnum};
 void (*il2cpp_free) (void * pointer) = (void *) ${this._free};
 
-char * (*il2cpp_type_get_name) (const Il2CppType *) = (void *) ${this._typeGetName};
 
+void il2cpp_class_to_string (void *, GString *);
 
-void il2cpp_class_to_string (const Il2CppClass *, GString *);
+void il2cpp_field_to_string (void *, GString *);
 
-void il2cpp_field_to_string (const Il2CppField *, GString *);
-
-void il2cpp_method_to_string (const Il2CppMethod *, GString *);
-
-void il2cpp_parameter_to_string (const Il2CppParameter *, GString *);
+void il2cpp_method_to_string (void *, GString *);
 
 
 void
 g_string_append_type_name (GString * string,
-                           const Il2CppType * type)
+                           void * type)
 {   
     char * type_name;
     
@@ -1383,88 +940,37 @@ il2cpp_to_string (const void * target,
 }
 
 void
-il2cpp_string_set_length (Il2CppString * string,
+il2cpp_string_set_length (int32_t * string,
                           int32_t length)
 {
-    string->length = length;
+    *(string + ${offsetOfInt32(Il2Cpp.String.from("vfsfitvnm"), 9)}) = length;
 }
 
 void *
-il2cpp_array_elements (const Il2CppArray * array)
-{
-    return array->vector;
+il2cpp_array_get_elements (int32_t * array)
+{ 
+    return array + ${offsetOfInt32(DaysToMonth365, 31) - 1};
 }
-
-const char *
-il2cpp_domain_get_name (const Il2CppDomain * domain)
-{
-    return domain->friendly_name;
-}
-
-#if ${isBelow_2018_3_0}
-uint32_t
-il2cpp_image_get_class_count (const Il2CppImage * image)
-{
-    return image->type_count;
-}
-#endif
-
-int32_t
-il2cpp_image_get_class_start (const Il2CppImage * image)
-{
-#if ${isEqualOrAbove_2020_2_0}
-    return image->metadata_handle->type_start;
-#else
-    return image->type_start;
-#endif
-}
-
-void
-il2cpp_image_set_entry_point_index (Il2CppImage * image,
-                                    int32_t entry_point_index)
-{
-#if ${isEqualOrAbove_2020_2_0}
-    image->metadata_handle->entry_point_index = entry_point_index;
-#else
-    image->entry_point_index = entry_point_index;
-#endif
-}
-
-const Il2CppType *
-il2cpp_type_get_data_type (const Il2CppType * type)
-{
-    Il2CppTypeEnum type_enum;
-
-    type_enum = type->type;
-
-    if (type_enum == IL2CPP_TYPE_PTR
-        || type_enum == IL2CPP_TYPE_SZARRAY)
-    {
-        return type->data.type;
-    }
-
-    if (type_enum == IL2CPP_TYPE_ARRAY)
-    {
-        return type->data.array->type;
-    }
-    
-    return NULL;
-}
-
-#if ${isBelow_2018_1_0}
-unsigned int
-il2cpp_type_is_byref (const Il2CppType * type)
-{
-    return type->byref;
-}
-#endif
 
 uint8_t
-il2cpp_type_is_primitive (const Il2CppType * type)
+il2cpp_type_is_byref (void * type)
+{   
+    char * name;
+    char last_char;
+
+    name = il2cpp_type_get_name (type);
+    last_char = name[strlen (name) - 1];
+
+    il2cpp_free (name);
+    return last_char == '&';
+}
+
+uint8_t
+il2cpp_type_is_primitive (void * type)
 {
     Il2CppTypeEnum type_enum;
 
-    type_enum = type->type;
+    type_enum = il2cpp_type_get_type_enum (type);
 
     return ((type_enum >= IL2CPP_TYPE_BOOLEAN && 
         type_enum <= IL2CPP_TYPE_R8) || 
@@ -1473,122 +979,69 @@ il2cpp_type_is_primitive (const Il2CppType * type)
     );
 }
 
-int32_t
-il2cpp_class_get_generic_parameter_count (const Il2CppClass * class)
-{   
-    if (class->is_generic == false)
-    {
-        return 0;
-    }
+uint16_t
+il2cpp_class_get_interface_count (uint16_t * class)
+{
+    return *(class + ${offsetOfUInt16(SystemString, 7)});
+}
 
-#if ${isEqualOrAbove_2020_2_0}
-    return class->generic_container->type_argc;
-#else
-    const char * name = class->name;
-    int count = 0;
+uint16_t
+il2cpp_class_get_method_count (uint16_t * class)
+{
+    return *(class + ${offsetOfUInt16(SystemValueType, 7)});
+}
 
-    for (int i = 0; ; i++)
+uint8_t
+il2cpp_class_get_rank (void * class)
+{
+    uint8_t rank;
+    const char * name;
+    
+    rank = 0;
+    name = il2cpp_class_get_name (class);
+
+    for (uint16_t i = strlen (name) - 1; i > 0; i--)
     {
         char c = name[i];
 
-        if (c == '\\0')
-        {
-            break;
-        }
-
-        if (count > 0 && c >= '0' && c <= '9')
-        {
-            count *= 10;
-            count += c - '0';
-            
-            continue;
-        }
-
-        if (c == '\`')
-        {
-            c = name[++i];
-
-            if (c != '\\0' && c >= '0' && c <= '9')
-            {
-                count = c - '0';
-            }
-        }
+        if (c == ']') rank++;
+        else if (c == '[' || rank == 0) break;
+        else if (c == ',') rank++;
+        else break;
     }
 
-    if (class->declaring_type != null)
-    {
-        count += il2cpp_class_get_generic_parameter_count (class->declaring_type);
-    }
-
-    return count;
-#endif
+    return rank;
 }
-
-uint16_t
-il2cpp_class_get_interface_count (const Il2CppClass * class)
-{
-    return class->interfaces_count;
-}
-
-uint16_t
-il2cpp_class_get_method_count (const Il2CppClass * class)
-{
-    return class->method_count;
-}
-
-#if ${isBelow_2018_1_0}
-uint8_t
-il2cpp_class_get_rank (const Il2CppClass * class)
-{
-    return class->rank;
-}
-#endif
-
-#if ${isBelow_2019_3_0}
-void *
-il2cpp_class_get_static_field_data (const Il2CppClass * class)
-{
-    return class->static_fields;
-}
-#endif
-
-uint8_t
-il2cpp_class_has_class_constructor (const Il2CppClass * class)
-{
-    return class->has_cctor;
-}
-
-uint32_t
-il2cpp_class_is_class_constructor_finished (const Il2CppClass * class)
-{
-    return class->cctor_finished;
-}
-
-#if ${isBelow_2017_1_0}
-uint8_t
-il2cpp_class_is_blittable (const Il2CppClass * class)
-{
-    return class->is_blittable;
-}
-#endif
 
 void
-il2cpp_class_to_string (const Il2CppClass * class,
+il2cpp_class_to_string (void * class,
                         GString * text)
 {
+    void * parent;
+    uint16_t interface_count;
+    uint16_t field_count;
+    uint16_t method_count;
+    void * iter;
+
+    parent = il2cpp_class_get_parent (class);
+    interface_count = il2cpp_class_get_interface_count (class);
+    field_count = il2cpp_class_get_field_count (class);
+    method_count = il2cpp_class_get_method_count (class);
+    iter = NULL;
+
     g_string_append_len (text, "// ", 3);
-    g_string_append (text, class->image->name);
+    g_string_append (text, il2cpp_image_get_name (il2cpp_class_get_image (class)));
     g_string_append_c (text, '\n');
     
-    if (class->enumtype != false)
+    if (il2cpp_class_is_enum (class))
     {
         g_string_append_len (text, "enum", 4);
     }
-    else if (il2cpp_class_is_valuetype (class) != false)
+    else if (il2cpp_class_is_valuetype (class))
     {
         g_string_append_len (text, "struct", 6);
     }
-    else if (il2cpp_class_is_interface (class) != false)
+    else if (il2cpp_class_is_interface (class))
     {
         g_string_append_len (text, "interface", 9);
     }
@@ -1600,75 +1053,79 @@ il2cpp_class_to_string (const Il2CppClass * class,
     g_string_append_c (text, ' ');
     g_string_append_type_name (text, il2cpp_class_get_type (class));
 
-    if (class->parent != null || class->interfaces_count > zero)
+    if (parent != NULL || interface_count > 0)
     {
         g_string_append_len (text, " : ", 3);
 
-        if (class->parent != null)
+        if (parent != NULL)
         {
-            g_string_append_type_name (text, il2cpp_class_get_type (class->parent));
+            g_string_append_type_name (text, il2cpp_class_get_type (parent));
         }
 
-        for (uint16_t i = 0; class->interfaces_count > i; i++)
+        for (uint16_t i = 0; i < interface_count; i++)
         {   
-            if (i > 0 || class->parent != null)
+            if (i > 0 || parent != NULL)
             {
                 g_string_append_len (text, ", ", 2);
             }
 
-            g_string_append_type_name (text, il2cpp_class_get_type (class->implemented_interfaces[i]));
+            g_string_append_type_name (text, il2cpp_class_get_type (il2cpp_class_get_interfaces (class, &iter)));
         }
     }
 
     g_string_append_len (text, "\n{", 2);
     
-    for (uint16_t i = 0; class->field_count > i; i++)
+    iter = NULL;
+    for (uint16_t i = 0;  i < field_count; i++)
     {   
         g_string_append_len (text, "\n    ", 5);
-        il2cpp_field_to_string (class->fields + i, text);
+        il2cpp_field_to_string (il2cpp_class_get_fields (class, &iter), text);
     }
 
-    if (class->field_count > zero && class->method_count > zero)
+    if (field_count > 0 && method_count > 0)
     {
         g_string_append_c (text, '\n');
     }
 
-    for (uint16_t i = 0; class->method_count > i; i++)
+    iter = NULL;
+    for (uint16_t i = 0; i < method_count; i++)
     {   
         g_string_append_len (text, "\n    ", 5);
-        il2cpp_method_to_string (class->methods[i], text);
+        il2cpp_method_to_string (il2cpp_class_get_methods (class, &iter), text);
     }
 
     g_string_append_len (text, "\n}\n\n", 4);
 }
 
 uint8_t
-il2cpp_field_is_literal (const Il2CppField * field)
+il2cpp_field_is_literal (void * field)
 {
-    return field->type->attrs & FIELD_ATTRIBUTE_LITERAL;
+    return il2cpp_field_get_flags (field) & FIELD_ATTRIBUTE_LITERAL;
 }
 
 uint8_t
-il2cpp_field_is_static (const Il2CppField * field)
+il2cpp_field_is_static (void * field)
 {
-    return field->type->attrs & FIELD_ATTRIBUTE_STATIC;
+    return il2cpp_field_get_flags (field) & FIELD_ATTRIBUTE_STATIC;
 }
 
 uint8_t
-il2cpp_field_is_thread_static (const Il2CppField * field)
+il2cpp_field_is_thread_static (void * field)
 {
-    return field->offset == THREAD_STATIC_FIELD_OFFSET;
+    return il2cpp_field_get_offset (field) == THREAD_STATIC_FIELD_OFFSET;
 }
 
 void
-il2cpp_field_to_string (const Il2CppField * field,
+il2cpp_field_to_string (void * field,
                         GString * text)
 {
     void * value;
-    const Il2CppClass * class;
+    void * type;
+    void * class;
     uint8_t has_offset;
 
     has_offset = 1;
+    type = il2cpp_field_get_type (field);
 
     if (il2cpp_field_is_thread_static (field))
     {   
@@ -1682,28 +1139,28 @@ il2cpp_field_to_string (const Il2CppField * field,
         g_string_append_len (text, "static ", 7);
     }
 
-    g_string_append_type_name (text, field->type);
+    g_string_append_type_name (text, type);
     g_string_append_c (text, ' ');
-    g_string_append (text, field->name);
+    g_string_append (text, il2cpp_field_get_name (field));
 
     if (il2cpp_field_is_literal (field))
     {       
         has_offset = 0;
 
         value = g_malloc (sizeof (void *));
-        class = il2cpp_class_from_type (field->type);
+        class = il2cpp_class_from_type (type);
 
         il2cpp_field_get_static_value (field, value);
 
         g_string_append_len (text, " = ", 3);
 
-        if (class->enumtype != false)
+        if (il2cpp_class_is_enum (class))
         {
-            g_string_append (text, il2cpp_value_to_string (value, class->fields->type));
+            g_string_append (text, il2cpp_value_to_string (value, il2cpp_class_get_base_type (class)));
         } 
         else
         {
-            g_string_append (text, il2cpp_value_to_string (value, field->type));
+            g_string_append (text, il2cpp_value_to_string (value, type));
         }
 
         g_free (value);
@@ -1713,147 +1170,104 @@ il2cpp_field_to_string (const Il2CppField * field,
 
     if (has_offset)
     {
-        g_string_append_printf (text, " // 0x%x", field->offset);
+        g_string_append_printf (text, " // 0x%x", il2cpp_field_get_offset (field));
     }
 }
 
-#if ${isBelow_2018_2_0}
-const Il2CppMethod *
+void *
 il2cpp_method_get_from_reflection (const Il2CppReflectionMethod * method)
 {
     return method->method;
 }
-#endif
-
-int32_t
-il2cpp_method_get_generic_parameter_count (const Il2CppMethod * method)
-{   
-    if (method->is_generic != false)
-    {   
-        if (method->is_inflated != false)
-        {
-            return il2cpp_method_get_generic_parameter_count (method->generic_method->method_definition);
-        }
-
-        return method->generic_container->type_argc;
-    }
-
-    return 0;   
-}
-
-const Il2CppParameter *
-il2cpp_method_get_parameters (const Il2CppMethod * method,
-                              void ** iter)
-{
-    if (iter != NULL && method->parameter_count > zero)
-    {
-        if (*iter == null)
-        {
-            *iter = (void **) method->parameters;
-            return method->parameters;
-        }
-        else
-        {
-            const Il2CppParameter * parameter = (Il2CppParameter *) *iter + 1;
-
-            if (parameter < method->parameters + method->parameter_count)
-            {
-                *iter = (void *) parameter;
-                return parameter;
-            }
-        }
-    }
-
-    return NULL;
-}
 
 void *
-il2cpp_method_get_pointer (const Il2CppMethod * method)
+il2cpp_method_get_pointer (void ** method)
 {
-    return method->pointer;
+    return * (method + ${offsetOfPointer(filter_by_type_name, FilterTypeNamePointer)});
 }
 
 uint8_t
-il2cpp_method_is_external (const Il2CppMethod * method)
+il2cpp_method_is_external (void * method)
 {
-    return method->iflags & METHOD_IMPL_ATTRIBUTE_INTERNAL_CALL;
+    uint8_t is_external;
+    uint32_t * implementation_flags;
+
+    implementation_flags = g_malloc (sizeof (void *));
+
+    il2cpp_method_get_flags (method, implementation_flags);
+
+    is_external = (* implementation_flags) & METHOD_IMPL_ATTRIBUTE_INTERNAL_CALL;
+
+    g_free (implementation_flags);
+    return is_external;
 }
 
 uint8_t
-il2cpp_method_is_synchronized (const Il2CppMethod * method)
+il2cpp_method_is_synchronized (void * method)
 {
-    return method->iflags & METHOD_IMPL_ATTRIBUTE_SYNCHRONIZED;
+    uint8_t is_synchronized;
+    uint32_t * implementation_flags;
+
+    implementation_flags = g_malloc (sizeof (void *));
+
+    il2cpp_method_get_flags (method, implementation_flags);
+
+    is_synchronized = (* implementation_flags) & METHOD_IMPL_ATTRIBUTE_SYNCHRONIZED;
+
+    g_free (implementation_flags);
+    return is_synchronized;
 }
 
 void
-il2cpp_method_to_string (const Il2CppMethod * method,
+il2cpp_method_to_string (void * method,
                          GString * text)
 {    
-    if ((method->flags & METHOD_ATTRIBUTE_STATIC) != false)
+    int32_t parameter_count;
+    void * pointer;
+
+    parameter_count = il2cpp_method_get_parameter_count (method);
+    pointer = il2cpp_method_get_pointer ((void **) method);
+
+    if (!il2cpp_method_is_instance (method))
     {
         g_string_append_len (text, "static ", 7);
     }
 
-    g_string_append_type_name (text, method->return_type);
+    g_string_append_type_name (text, il2cpp_method_get_return_type (method));
     g_string_append_c (text, ' ');
-    g_string_append (text, method->name);
+    g_string_append (text, il2cpp_method_get_name (method));
     g_string_append_c (text, '(');
 
-    for (uint16_t i = 0; method->parameter_count > i; i++)
+    for (uint32_t i = 0; i < parameter_count; i++)
     {
-        if (i > 0)
-        {
-            g_string_append_len (text, ", ", 2);
-        }
-
-        il2cpp_parameter_to_string (method->parameters + i, text);
+        if (i > 0) g_string_append_len (text, ", ", 2);
+        
+        g_string_append_type_name (text, il2cpp_method_get_parameter_type (method, i));
+        g_string_append_c (text, ' ');
+        g_string_append (text, il2cpp_method_get_parameter_name (method, i));
     }
 
     g_string_append_len (text, ");", 2);
 
-    if (method->pointer != null)
+    if (pointer != NULL)
     {
-        g_string_append_printf (text, " // 0x%.8x", GPOINTER_TO_INT (method->pointer) - ${Il2Cpp.module.base});
+        g_string_append_printf (text, " // 0x%.8x", GPOINTER_TO_INT (pointer) - ${Il2Cpp.module.base});
     }
 }
 
-const char *
-il2cpp_parameter_get_name(const Il2CppParameter * parameter)
-{
-    return parameter->name;
-}
-
-const Il2CppType *
-il2cpp_parameter_get_type (const Il2CppParameter * parameter)
-{
-    return parameter->type;
-}
-
-int32_t
-il2cpp_parameter_get_position (const Il2CppParameter * parameter)
-{
-    return parameter->position;
-}
-
-void
-il2cpp_parameter_to_string (const Il2CppParameter * param,
-                            GString * text)
-{
-    g_string_append_type_name (text, param->type);
-    g_string_append_c (text, ' ');
-    g_string_append (text, param->name == null ? "null" : param->name);
-}
-
-Il2CppClass *
+uintptr_t
 il2cpp_memory_snapshot_get_classes (const Il2CppManagedMemorySnapshot * snapshot,
-                                      Il2CppMetadataType ** iter)
+                                    Il2CppMetadataType ** iter)
 {
+    const int zero;
+    const void * null;
+
     if (iter != NULL && snapshot->metadata_snapshot.type_count > zero)
     {
         if (*iter == null)
         {
             *iter = snapshot->metadata_snapshot.types;
-            return (Il2CppClass *) (uintptr_t) (*iter)->type_info_address;
+            return (uintptr_t) (*iter)->type_info_address;
         }
         else
         {
@@ -1862,11 +1276,11 @@ il2cpp_memory_snapshot_get_classes (const Il2CppManagedMemorySnapshot * snapshot
             if (metadata_type < snapshot->metadata_snapshot.types + snapshot->metadata_snapshot.type_count)
             {
                 *iter = metadata_type;
-                return (Il2CppClass *) (uintptr_t) (*iter)->type_info_address;
+                return (uintptr_t) (*iter)->type_info_address;
             }
         }
     }
-    return NULL;
+    return 0;
 }
 
 struct Il2CppGCHandles
@@ -1881,6 +1295,8 @@ il2cpp_memory_snapshot_get_runtime_information (const Il2CppManagedMemorySnapsho
     return snapshot->runtime_information;
 }
         `;
+
+        offsetsFinderCModule.dispose();
 
         return new CModule(source, {
             il2cpp_value_to_string: new NativeCallback(
@@ -1899,7 +1315,6 @@ il2cpp_memory_snapshot_get_runtime_information (const Il2CppManagedMemorySnapsho
         retType: RetType,
         argTypes: ArgTypes,
         options?: NativeFunctionOptions
-        // options: NativeFunctionOptions = { exceptions: "propagate" }
     ) {
         exportName = "il2cpp_" + exportName;
         const exportPointer = Il2Cpp.module.findExportByName(exportName) || this.cModule[exportName];

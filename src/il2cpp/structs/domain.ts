@@ -21,9 +21,7 @@ class Il2CppDomain {
         }
 
         if (count == 0) {
-            const AppDomain = Il2Cpp.Image.corlib.classes["System.AppDomain"].methods.get_CurrentDomain.invoke<Il2Cpp.Object>();
-
-            for (const assemblyObject of AppDomain.methods.GetAssemblies_.invoke<Il2Cpp.Array<Il2Cpp.Object>>()) {
+            for (const assemblyObject of this.object.methods.GetAssemblies_.invoke<Il2Cpp.Array<Il2Cpp.Object>>()) {
                 const assemblyName = assemblyObject.base.base.methods.GetSimpleName.invoke<Il2Cpp.String>().content;
 
                 if (assemblyName != null) {
@@ -45,10 +43,10 @@ class Il2CppDomain {
         return Il2Cpp.Api._domainGet();
     }
 
-    /** Gets the name of the application domain. */
-    @cache // @ts-ignore
-    static get name(): string {
-        return Il2Cpp.Api._domainGetName(this).readUtf8String()!;
+    /** Gets the encompassing object of the application domain. */
+    @cache
+    static get object(): Il2Cpp.Object {
+        return Il2Cpp.Image.corlib.getClassFromName("System", "AppDomain")!.methods.get_CurrentDomain.invoke<Il2Cpp.Object>();
     }
 
     /** Attached a new thread to the application domain. */

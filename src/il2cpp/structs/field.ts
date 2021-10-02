@@ -1,9 +1,7 @@
 import { cache } from "decorator-cache-getter";
-import { shouldBeInstance } from "../decorators";
 import { read, readGString, write } from "../utils";
 import { warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { overridePropertyValue } from "../../utils/utils";
 
 /** Represents a `FieldInfo`. */
 class Il2CppField extends NonNullNativeStruct {
@@ -57,20 +55,10 @@ class Il2CppField extends NonNullNativeStruct {
 
     /** Gets the value of this field. */
     get value(): Il2Cpp.Field.Type {
-        return read(this.valueHandle, this.type);
-    }
+        const handle = Memory.alloc(Process.pointerSize);
+        Il2Cpp.Api._fieldGetStaticValue(this.handle, handle);
 
-    /** @internal */
-    @shouldBeInstance(false)
-    get valueHandle(): NativePointer {
-        if (this.isThreadStatic || this.isLiteral) {
-            const valueHandle = Memory.alloc(Process.pointerSize);
-            Il2Cpp.Api._fieldGetStaticValue(this.handle, valueHandle);
-
-            return valueHandle;
-        }
-
-        return this.class.staticFieldsData.add(this.offset);
+        return read(handle, this.type);
     }
 
     /** Sets the value of this field. Thread static or literal values cannot be altered yet. */
@@ -80,18 +68,31 @@ class Il2CppField extends NonNullNativeStruct {
             return;
         }
 
-        write(this.valueHandle, value, this.type);
+        const handle = Memory.alloc(Process.pointerSize);
+        write(handle, value, this.type);
+
+        Il2Cpp.Api._fieldSetStaticValue(this.handle, handle);
     }
 
     /** @internal */
-    @shouldBeInstance(true)
     withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Field {
+        const newField = new Il2Cpp.Field(this.handle);
+
         let valueHandle = instance.handle.add(this.offset);
         if (instance instanceof Il2Cpp.ValueType) {
             valueHandle = valueHandle.sub(Il2Cpp.Runtime.objectHeaderSize);
         }
 
-        return overridePropertyValue(new Il2Cpp.Field(this.handle), "valueHandle", valueHandle);
+        Reflect.defineProperty(newField, "value", {
+            get(): Il2Cpp.Field.Type {
+                return read(valueHandle, newField.type);
+            },
+            set(value: Il2Cpp.Field.Type): void {
+                write(valueHandle, value, newField.type);
+            }
+        });
+
+        return newField;
     }
 
     override toString(): string {

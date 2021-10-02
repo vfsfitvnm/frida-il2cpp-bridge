@@ -1,10 +1,12 @@
 import { cache } from "decorator-cache-getter";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { addLevenshtein, getOrNull, makeIterable } from "../../utils/utils";
+import { isEqualOrAbove } from "../decorators";
 
 /** Represents a `Il2CppImage`. */
 class Il2CppImage extends NonNullNativeStruct {
     /** Gets the COR library. */
+    @cache
     static get corlib(): Il2Cpp.Image {
         return new Il2Cpp.Image(Il2Cpp.Api._getCorlib());
     }
@@ -17,6 +19,7 @@ class Il2CppImage extends NonNullNativeStruct {
 
     /** Gets the amount of classes defined in this image. */
     @cache
+    @isEqualOrAbove("2018.3.0")
     get classCount(): number {
         return Il2Cpp.Api._imageGetClassCount(this);
     }
@@ -27,11 +30,13 @@ class Il2CppImage extends NonNullNativeStruct {
         const record: Record<string, Il2Cpp.Class> = {};
 
         if (Unity.isBelow2018_3_0) {
-            const start = this.classStart;
-            const end = start + this.classCount;
+            let object = this.assembly.object;
+            while (!("GetTypes" in object.methods)) object = object.base;
 
-            for (let i = start; i < end; i++) {
-                const klass = Il2Cpp.Metadata.getClass(i)!;
+            const types = object.methods.GetTypes.invoke<Il2Cpp.Array<Il2Cpp.Object>>(false);
+
+            for (const type of types) {
+                const klass = new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(type));
                 record[klass.type.name] = klass;
             }
         } else {
@@ -44,18 +49,6 @@ class Il2CppImage extends NonNullNativeStruct {
         }
 
         return makeIterable(addLevenshtein(record));
-    }
-
-    /** Gets the index of the first class defined in this image. */
-    @cache
-    get classStart(): number {
-        return Il2Cpp.Api._imageGetClassStart(this);
-    }
-
-    /** */
-    @cache
-    get entryPoint(): Il2Cpp.Method | null {
-        return getOrNull(Il2Cpp.Api._imageGetEntryPoint(this), Il2Cpp.Method);
     }
 
     /** Gets the name of this image. */

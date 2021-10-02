@@ -1,29 +1,22 @@
-import { cache } from "decorator-cache-getter";
-import { NonNullNativeStruct } from "../../utils/native-struct";
-import { readGString } from "../utils";
-
 /** Represents a `ParameterInfo`. */
-class Il2CppParameter extends NonNullNativeStruct {
-    /** Gets the name of this parameter. */
-    @cache
-    get name(): string {
-        return Il2Cpp.Api._parameterGetName(this).readUtf8String()!;
+class Il2CppParameter {
+    /** Name of this parameter. */
+    readonly name: string;
+
+    /** Position of this parameter. */
+    readonly position: number;
+
+    /** Type of this parameter. */
+    readonly type: Il2Cpp.Type;
+
+    constructor(name: string, position: number, type: Il2Cpp.Type) {
+        this.name = name;
+        this.position = position;
+        this.type = type;
     }
 
-    /** Gets the position of this parameter. */
-    @cache
-    get position(): number {
-        return Il2Cpp.Api._parameterGetPosition(this);
-    }
-
-    /** Gets the type of this parameter. */
-    @cache
-    get type(): Il2Cpp.Type {
-        return new Il2Cpp.Type(Il2Cpp.Api._parameterGetType(this));
-    }
-
-    override toString(): string {
-        return readGString(Il2Cpp.Api._toString(this, Il2Cpp.Api._parameterToString))!;
+    toString(): string {
+        return `${this.type} ${this.name}`;
     }
 }
 
@@ -37,3 +30,5 @@ declare global {
         }
     }
 }
+
+export {};

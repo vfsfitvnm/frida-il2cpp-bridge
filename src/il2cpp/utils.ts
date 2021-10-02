@@ -33,7 +33,7 @@ export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Ty
         case Il2Cpp.Type.Enum.UnsignedNativeInteger:
             return pointer.readPointer();
         case Il2Cpp.Type.Enum.Pointer:
-            return new Il2Cpp.Pointer(pointer.readPointer(), type.dataType!);
+            return new Il2Cpp.Pointer(pointer.readPointer(), type.class.baseType!);
         case Il2Cpp.Type.Enum.ValueType:
             return new Il2Cpp.ValueType(pointer, type);
         case Il2Cpp.Type.Enum.Object:
@@ -109,7 +109,7 @@ export function fromFridaValue(value: NativeFunctionReturnValue, type: Il2Cpp.Ty
 
         switch (type.typeEnum) {
             case Il2Cpp.Type.Enum.Pointer:
-                return new Il2Cpp.Pointer(value, type.dataType!);
+                return new Il2Cpp.Pointer(value, type.class.baseType!);
             case Il2Cpp.Type.Enum.String:
                 return new Il2Cpp.String(value);
             case Il2Cpp.Type.Enum.Class:
