@@ -31,13 +31,20 @@ class Il2CppPointer<T extends Il2Cpp.Field.Type> extends NativeStruct implements
     read(offset: number = 0, length: number = Number.MAX_SAFE_INTEGER): T[] {
         const value: T[] = [];
 
-        for (let i = offset; i < length; i++) {
-            const elementHandle = this.getElementHandle(i);
-            if (elementHandle.readPointer().isNull()) {
-                break;
+        if (length == Number.MAX_SAFE_INTEGER) {
+            for (let i = offset; i < length; i++) {
+                const elementHandle = this.getElementHandle(i);
+
+                if (elementHandle.readPointer().isNull()) break;
+
+                value.push(read(elementHandle, this.type) as T);
             }
-            value.push(read(elementHandle, this.type) as T);
+        } else {
+            for (let i = offset; i < length; i++) {
+                value.push(read(this.getElementHandle(i), this.type) as T);
+            }
         }
+ 
         return value;
     }
 
