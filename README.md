@@ -6,25 +6,28 @@
 A Frida module to dump, trace or hijack any Il2Cpp application at runtime, without needing the `global-metadata.dat` file.
 
 ![Screenshot_20210911_121628](https://user-images.githubusercontent.com/46219656/132944635-6fb7d70b-ff4d-457f-9cd5-d9b98f40af9c.png)
+
+## Features
+
+- Dump classes, methods, fields and so on
+- Trace, intercept and replace method calls
+- Mess around with C# runtime
+- Il2Cpp structs and global metadata free
+- (TODO) Emit C scaffold code to improve static analysis
+- (TODO) Display C# exceptions instead of abort errors
+
 ## Compatibility
 
 #### Unity version
-It should work for any Unity version in the inclusive range **5.3.0** - **2021.2.0**.
+It should work for any Unity version in the range **5.3.0** - **2021.1.x**.
 
 #### Platforms
-**Android** is supported; **Linux** and **Windows** are not tested; **iOS** is not supported yet 
-([#15](https://github.com/vfsfitvnm/frida-il2cpp-bridge/issues/15)).
-
-## What's next
-
-- Provide iOS/macOS support
-- Emit C scaffold code to improve static analysis
-- Do something about modified Il2Cpp structs
+**Android**, **Linux**, **Windows**, **iOS**, **macOS** are supported.
 
 ## Acknowledgements
 Thanks to [meme](https://github.com/meme) and [tryso](https://github.com/tryso) for helping and getting me into this, 
-and to [djkaty](https://github.com/djkaty) and [nneonneo](https://github.com/nneonneo) for providing the IL2CPP C
-headers.
+and to [djkaty](https://github.com/djkaty) and [nneonneo](https://github.com/nneonneo) for providing the Il2Cpp
+api.
 
 ## Problems?
 
