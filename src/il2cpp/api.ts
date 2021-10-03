@@ -32,7 +32,7 @@ class Il2CppApi {
 
     @cache
     static get _classForEach() {
-        return this.r("class_for_each", "void", ["pointer", "pointer"]);
+        return this.r("class_for_each", "void", ["pointer", "pointer"], "2019.3.0");
     }
 
     @cache
@@ -157,7 +157,7 @@ class Il2CppApi {
 
     @cache
     static get _classGetStaticFieldData() {
-        return this.r("class_get_static_field_data", "pointer", ["pointer"]);
+        return this.r("class_get_static_field_data", "pointer", ["pointer"], "2019.3.0");
     }
 
     @cache
@@ -192,7 +192,7 @@ class Il2CppApi {
 
     @cache
     static get _classIsBlittable() {
-        return this.r("class_is_blittable", "bool", ["pointer"]);
+        return this.r("class_is_blittable", "bool", ["pointer"], "2017.1.0");
     }
 
     @cache
@@ -312,17 +312,17 @@ class Il2CppApi {
 
     @cache
     static get _gcCollectALittle() {
-        return this.r("gc_collect_a_little", "void", []);
+        return this.r("gc_collect_a_little", "void", [], "5.3.5");
     }
 
     @cache
     static get _gcDisable() {
-        return this.r("gc_disable", "void", []);
+        return this.r("gc_disable", "void", [], "5.3.5");
     }
 
     @cache
     static get _gcEnable() {
-        return this.r("gc_enable", "void", []);
+        return this.r("gc_enable", "void", [], "5.3.5");
     }
 
     @cache
@@ -332,7 +332,7 @@ class Il2CppApi {
 
     @cache
     static get _gcGetMaxTimeSlice() {
-        return this.r("gc_get_max_time_slice_ns", "int64", []);
+        return this.r("gc_get_max_time_slice_ns", "int64", [], "2019.1.0");
     }
 
     @cache
@@ -362,32 +362,32 @@ class Il2CppApi {
 
     @cache
     static get _gcIsDisabled() {
-        return this.r("gc_is_disabled", "bool", []);
+        return this.r("gc_is_disabled", "bool", [], "2018.3.0");
     }
 
     @cache
     static get _gcIsIncremental() {
-        return this.r("gc_is_incremental", "bool", []);
+        return this.r("gc_is_incremental", "bool", [], "2019.1.0");
     }
 
     @cache
     static get _gcSetMaxTimeSlice() {
-        return this.r("gc_set_max_time_slice_ns", "void", ["int64"]);
+        return this.r("gc_set_max_time_slice_ns", "void", ["int64"], "2019.1.0");
     }
 
     @cache
     static get _gcStartIncrementalCollection() {
-        return this.r("gc_start_incremental_collection", "void", []);
+        return this.r("gc_start_incremental_collection", "void", [], "2020.2.0");
     }
 
     @cache
     static get _gcStartWorld() {
-        return this.r("start_gc_world", "void", []);
+        return this.r("start_gc_world", "void", [], "2019.3.0");
     }
 
     @cache
     static get _gcStopWorld() {
-        return this.r("stop_gc_world", "void", []);
+        return this.r("stop_gc_world", "void", [], "2019.3.0");
     }
 
     @cache
@@ -407,7 +407,7 @@ class Il2CppApi {
 
     @cache
     static get _imageGetClassCount() {
-        return this.r("image_get_class_count", "uint32", ["pointer"]);
+        return this.r("image_get_class_count", "uint32", ["pointer"], "2018.3.0");
     }
 
     @cache
@@ -1314,16 +1314,20 @@ il2cpp_memory_snapshot_get_runtime_information (const Il2CppManagedMemorySnapsho
         exportName: string,
         retType: RetType,
         argTypes: ArgTypes,
-        options?: NativeFunctionOptions
+        requiredUnityVersion?: string
     ) {
         exportName = "il2cpp_" + exportName;
         const exportPointer = Il2Cpp.module.findExportByName(exportName) || this.cModule[exportName];
 
         if (exportPointer == null) {
-            raise(`Couldn't find export "${exportName}".`);
+            if (requiredUnityVersion == null || Unity.version.isEqualOrAbove(requiredUnityVersion)) {
+                raise(`Couldn't find export "${exportName}".`);
+            }
+            
+            raise(`"${exportName}" requires a Unity version >= ${requiredUnityVersion}, but this application has ${Unity.version}.`);
         }
 
-        return new NativeFunction(exportPointer, retType, argTypes, options);
+        return new NativeFunction(exportPointer, retType, argTypes);
     }
 }
 

@@ -1,7 +1,6 @@
 import { cache } from "decorator-cache-getter";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { addLevenshtein, getOrNull, makeIterable } from "../../utils/utils";
-import { isEqualOrAbove } from "../decorators";
 
 /** Represents a `Il2CppImage`. */
 class Il2CppImage extends NonNullNativeStruct {
@@ -19,7 +18,6 @@ class Il2CppImage extends NonNullNativeStruct {
 
     /** Gets the amount of classes defined in this image. */
     @cache
-    @isEqualOrAbove("2018.3.0")
     get classCount(): number {
         return Il2Cpp.Api._imageGetClassCount(this);
     }

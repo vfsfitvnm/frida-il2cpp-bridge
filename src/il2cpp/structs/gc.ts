@@ -1,5 +1,3 @@
-import { isEqualOrAbove } from "../decorators";
-
 /** Garbage collector utility functions. */
 class Il2CppGC {
     protected constructor() {}
@@ -10,19 +8,16 @@ class Il2CppGC {
     }
 
     /** Determines whether the garbage collector is disabled. */
-    @isEqualOrAbove("2018.3.0")
     static get isEnabled(): boolean {
         return !Il2Cpp.Api._gcIsDisabled();
     }
 
     /** Determines whether the garbage collector is incremental. */
-    @isEqualOrAbove("2019.1.0")
     static get isIncremental(): boolean {
         return !!Il2Cpp.Api._gcIsIncremental();
     }
 
     /** Gets the number of nanoseconds the garbage collector can spend in a collection step. */
-    @isEqualOrAbove("2019.1.0")
     static get maxTimeSlice(): Int64 {
         return Il2Cpp.Api._gcGetMaxTimeSlice();
     }
@@ -68,25 +63,21 @@ class Il2CppGC {
     }
 
     /** Forces a garbage collection. */
-    @isEqualOrAbove("5.3.5")
     static collectALittle(): void {
         Il2Cpp.Api._gcCollectALittle();
     }
 
     /** Resumes all the previously stopped threads. */
-    @isEqualOrAbove("2019.3.0")
     static startWorld(): void {
         return Il2Cpp.Api._gcStartWorld();
     }
 
     /** Performs an incremental garbage collection. */
-    @isEqualOrAbove("2020.2.0")
     static startIncrementalCollection(): void {
         return Il2Cpp.Api._gcStartIncrementalCollection();
     }
 
     /** Stops all threads which may access the garbage collected heap, other than the caller. */
-    @isEqualOrAbove("2019.3.0")
     static stopWorld(): void {
         return Il2Cpp.Api._gcStopWorld();
     }
@@ -99,3 +90,5 @@ declare global {
         class GC extends Il2CppGC {}
     }
 }
+
+export {};

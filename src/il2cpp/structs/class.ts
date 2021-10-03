@@ -2,7 +2,6 @@ import { cache } from "decorator-cache-getter";
 import { raise } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { getOrNull, makeRecordFromNativeIterator } from "../../utils/utils";
-import { isEqualOrAbove } from "../decorators";
 import { readGString } from "../utils";
 
 /** Represents a `Il2CppClass`. */
@@ -97,7 +96,6 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Determines whether the current class is blittable. */
     @cache
-    @isEqualOrAbove("2017.1.0")
     get isBlittable(): boolean {
         return !!Il2Cpp.Api._classIsBlittable(this);
     }
@@ -181,7 +179,6 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     /** Gets a pointer to the static fields of the current class. */
-    @isEqualOrAbove("2019.3.0")
     @cache
     get staticFieldsData(): NativePointer {
         return Il2Cpp.Api._classGetStaticFieldData(this);
@@ -276,7 +273,6 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     /** Executes a callback for every defined class. */
-    @isEqualOrAbove("2019.3.0")
     static enumerate(block: (klass: Il2Cpp.Class) => void): void {
         const callback = new NativeCallback(
             function (klass: NativePointer, _: NativePointer): void {
