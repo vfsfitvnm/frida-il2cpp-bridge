@@ -6,6 +6,7 @@ kleur.enabled = true;
 export function raise(message: string): never {
     const error = new Error(message);
     error.stack = error.stack?.replace("Error:", kleur.red("[il2cpp]"));
+    (error as any).fromIl2CppModule = true;
     throw error;
 }
 

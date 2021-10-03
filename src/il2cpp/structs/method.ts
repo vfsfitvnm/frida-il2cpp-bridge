@@ -229,7 +229,36 @@ class Il2CppMethod extends NonNullNativeStruct {
             allocatedParameters.push(this.handle);
         }
 
-        return fromFridaValue(this.nativeFunction(...allocatedParameters), this.returnType) as Il2Cpp.Method.ReturnType;
+        let returnValue: NativeFunctionReturnValue;
+
+        try {
+            returnValue = this.nativeFunction(...allocatedParameters);
+        } catch (e: any) {
+            if (e.message != "abort was called") {
+                throw e;
+            }
+
+            const exception = Il2Cpp.Api._cxaGetGlobals().readPointer();
+            const dummyException = Il2Cpp.Api._cxaAllocateException(Process.pointerSize);
+
+            try {
+                Il2Cpp.Api._cxaThrow(dummyException, NULL, NULL);
+            } catch (e) {
+                const dummyExceptionHeader = Il2Cpp.Api._cxaGetGlobals().readPointer();
+
+                for (let i = 0; i < 256; i++) {
+                    if (dummyExceptionHeader.add(i).equals(dummyException)) {
+                        Il2Cpp.Api._cxaFreeException(dummyException);
+
+                        raise(new Il2Cpp.Object(exception.add(i).readPointer()).toString()!);
+                    }
+                }
+            }
+
+            throw e;
+        }
+
+        return fromFridaValue(returnValue, this.returnType) as Il2Cpp.Method.ReturnType;
     }
 
     /** Restore the original method implementation. */

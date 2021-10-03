@@ -82,7 +82,7 @@ class Il2CppBase {
                 const interceptor = Interceptor.attach(Il2Cpp.Api._init, {
                     onLeave() {
                         interceptor.detach();
-                        resolve();
+                        setImmediate(resolve);
                     }
                 });
             });
@@ -108,7 +108,13 @@ class Il2CppBase {
 
         this.initialize()
             .then(executor)
-            .catch(error => Script.nextTick(() => (globalThis as any).console.log(error.stack)));
+            .catch(error => {
+                if (error.fromIl2CppModule) {
+                    (globalThis as any).console.log(error.stack);
+                } else {
+                    throw error;
+                }
+            });
     }
 }
 

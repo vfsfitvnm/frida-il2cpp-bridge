@@ -698,6 +698,30 @@ class Il2CppApi {
 
     /** @internal */
     @cache
+    static get _cxaAllocateException() {
+        return this.r("__cxa_allocate_exception", "pointer", ["size_t"]);
+    }
+
+    /** @internal */
+    @cache
+    static get _cxaFreeException() {
+        return this.r("__cxa_free_exception", "void", ["pointer"]);
+    }
+
+    /** @internal */
+    @cache
+    static get _cxaGetGlobals() {
+        return this.r("__cxa_get_globals", "pointer", []);
+    }
+
+    /** @internal */
+    @cache
+    static get _cxaThrow() {
+        return this.r("__cxa_throw", "void", ["pointer", "pointer", "pointer"]);
+    }
+
+    /** @internal */
+    @cache
     private static get cModule(): Record<string, NativePointer | null> {
         if (Unity.mayBeUnsupported) {
             warn(`Unity version "${Unity.version}" may be unsupported, continue with caution.`);
