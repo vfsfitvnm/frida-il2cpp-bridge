@@ -70,8 +70,8 @@ class Il2CppBase {
                 il2cppModuleName = await forModule("UnityFramework", "GameAssembly.dylib");
             }
 
-            (Unity as any).moduleName = unityModuleName;
-            (Il2Cpp as any).moduleName = il2cppModuleName;
+            Reflect.defineProperty(Unity, "moduleName", { value: unityModuleName });
+            Reflect.defineProperty(Il2Cpp, "moduleName", { value: il2cppModuleName });
         } else {
             await forModule(Unity.moduleName);
             await forModule(this.moduleName);
