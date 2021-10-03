@@ -25,7 +25,7 @@ It should work for any Unity version in the range **5.3.0** - **2021.1.x**.
 **Android**, **Linux**, **Windows**, **iOS**, **macOS** are supported.
 
 ## Acknowledgements
-Thanks to [meme](https://github.com/meme) and [tryso](https://github.com/tryso) for helping and getting me into this, 
+Thanks to [meme](https://github.com/meme) and [knobse](https://github.com/knobse) for helping and getting me into this, 
 and to [djkaty](https://github.com/djkaty) and [nneonneo](https://github.com/nneonneo) for providing the Il2Cpp
 api.
 
