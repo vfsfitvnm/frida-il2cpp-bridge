@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
 import { warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { filterMapArray, getOrNull } from "../../utils/utils";
+import { filterMapArray } from "../../utils/utils";
 
 /** Represents a `Il2CppType`. */
 class Il2CppType extends NonNullNativeStruct {

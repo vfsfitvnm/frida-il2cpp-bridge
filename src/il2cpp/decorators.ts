@@ -1,6 +1,5 @@
 import { raise } from "../utils/console";
 import { NativeStruct } from "../utils/native-struct";
-import { Version } from "../utils/version";
 
 /** @internal */
 export function shouldBeInstance<T extends Il2Cpp.Field | Il2Cpp.Method>(shouldBeInstance: boolean): MethodDecorator {
