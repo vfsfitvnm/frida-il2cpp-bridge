@@ -7,693 +7,693 @@ class Il2CppApi {
 
     @cache
     static get _alloc() {
-        return this.r("alloc", "pointer", ["size_t"]);
+        return this.r("il2cpp_alloc", "pointer", ["size_t"]);
     }
 
     @cache
     static get _arrayGetElements() {
-        return this.r("array_get_elements", "pointer", ["pointer"]);
+        return this.r("il2cpp_array_get_elements", "pointer", ["pointer"]);
     }
 
     @cache
     static get _arrayGetLength() {
-        return this.r("array_length", "uint32", ["pointer"]);
+        return this.r("il2cpp_array_length", "uint32", ["pointer"]);
     }
 
     @cache
     static get _arrayNew() {
-        return this.r("array_new", "pointer", ["pointer", "uint32"]);
+        return this.r("il2cpp_array_new", "pointer", ["pointer", "uint32"]);
     }
 
     @cache
     static get _assemblyGetImage() {
-        return this.r("assembly_get_image", "pointer", ["pointer"]);
+        return this.r("il2cpp_assembly_get_image", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classForEach() {
-        return this.r("class_for_each", "void", ["pointer", "pointer"], "2019.3.0");
+        return this.r("il2cpp_class_for_each", "void", ["pointer", "pointer"], "2019.3.0");
     }
 
     @cache
     static get _classFromName() {
-        return this.r("class_from_name", "pointer", ["pointer", "pointer", "pointer"]);
+        return this.r("il2cpp_class_from_name", "pointer", ["pointer", "pointer", "pointer"]);
     }
 
     @cache
     static get _classFromSystemType() {
-        return this.r("class_from_system_type", "pointer", ["pointer"]);
+        return this.r("il2cpp_class_from_system_type", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classFromType() {
-        return this.r("class_from_type", "pointer", ["pointer"]);
+        return this.r("il2cpp_class_from_type", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetArrayClass() {
-        return this.r("array_class_get", "pointer", ["pointer", "uint32"]);
+        return this.r("il2cpp_array_class_get", "pointer", ["pointer", "uint32"]);
     }
 
     @cache
     static get _classGetArrayElementSize() {
-        return this.r("class_array_element_size", "int", ["pointer"]);
+        return this.r("il2cpp_class_array_element_size", "int", ["pointer"]);
     }
 
     @cache
     static get _classGetAssemblyName() {
-        return this.r("class_get_assemblyname", "pointer", ["pointer"]);
+        return this.r("il2cpp_class_get_assemblyname", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetBaseType() {
-        return this.r("class_enum_basetype", "pointer", ["pointer"]);
+        return this.r("il2cpp_class_enum_basetype", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetDeclaringType() {
-        return this.r("class_get_declaring_type", "pointer", ["pointer"]);
+        return this.r("il2cpp_class_get_declaring_type", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetElementClass() {
-        return this.r("class_get_element_class", "pointer", ["pointer"]);
+        return this.r("il2cpp_class_get_element_class", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetFieldCount() {
-        return this.r("class_num_fields", "size_t", ["pointer"]);
+        return this.r("il2cpp_class_num_fields", "size_t", ["pointer"]);
     }
 
     @cache
     static get _classGetFieldFromName() {
-        return this.r("class_get_field_from_name", "pointer", ["pointer", "pointer"]);
+        return this.r("il2cpp_class_get_field_from_name", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classGetFields() {
-        return this.r("class_get_fields", "pointer", ["pointer", "pointer"]);
+        return this.r("il2cpp_class_get_fields", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classGetFlags() {
-        return this.r("class_get_fields", "int", ["pointer"]);
+        return this.r("il2cpp_class_get_fields", "int", ["pointer"]);
     }
 
     @cache
     static get _classGetImage() {
-        return this.r("class_get_image", "pointer", ["pointer"]);
+        return this.r("il2cpp_class_get_image", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetInstanceSize() {
-        return this.r("class_instance_size", "int32", ["pointer"]);
+        return this.r("il2cpp_class_instance_size", "int32", ["pointer"]);
     }
 
     @cache
     static get _classGetInterfaceCount() {
-        return this.r("class_get_interface_count", "uint16", ["pointer"]);
+        return this.r("il2cpp_class_get_interface_count", "uint16", ["pointer"]);
     }
 
     @cache
     static get _classGetInterfaces() {
-        return this.r("class_get_interfaces", "pointer", ["pointer", "pointer"]);
+        return this.r("il2cpp_class_get_interfaces", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classGetMethodCount() {
-        return this.r("class_get_method_count", "uint16", ["pointer"]);
+        return this.r("il2cpp_class_get_method_count", "uint16", ["pointer"]);
     }
 
     @cache
     static get _classGetMethodFromName() {
-        return this.r("class_get_method_from_name", "pointer", ["pointer", "pointer", "int"]);
+        return this.r("il2cpp_class_get_method_from_name", "pointer", ["pointer", "pointer", "int"]);
     }
 
     @cache
     static get _classGetMethods() {
-        return this.r("class_get_methods", "pointer", ["pointer", "pointer"]);
+        return this.r("il2cpp_class_get_methods", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classGetName() {
-        return this.r("class_get_name", "pointer", ["pointer"]);
+        return this.r("il2cpp_class_get_name", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetNamespace() {
-        return this.r("class_get_namespace", "pointer", ["pointer"]);
+        return this.r("il2cpp_class_get_namespace", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetParent() {
-        return this.r("class_get_parent", "pointer", ["pointer"]);
+        return this.r("il2cpp_class_get_parent", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classGetRank() {
-        return this.r("class_get_rank", "int", ["pointer"]);
+        return this.r("il2cpp_class_get_rank", "int", ["pointer"]);
     }
 
     @cache
     static get _classGetStaticFieldData() {
-        return this.r("class_get_static_field_data", "pointer", ["pointer"], "2019.3.0");
+        return this.r("il2cpp_class_get_static_field_data", "pointer", ["pointer"], "2019.3.0");
     }
 
     @cache
     static get _classGetValueSize() {
-        return this.r("class_value_size", "int32", ["pointer", "pointer"]);
+        return this.r("il2cpp_class_value_size", "int32", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classGetType() {
-        return this.r("class_get_type", "pointer", ["pointer"]);
+        return this.r("il2cpp_class_get_type", "pointer", ["pointer"]);
     }
 
     @cache
     static get _classHasReferences() {
-        return this.r("class_has_references", "bool", ["pointer"]);
+        return this.r("il2cpp_class_has_references", "bool", ["pointer"]);
     }
 
     @cache
     static get _classInit() {
-        return this.r("runtime_class_init", "void", ["pointer"]);
+        return this.r("il2cpp_runtime_class_init", "void", ["pointer"]);
     }
 
     @cache
     static get _classIsAbstract() {
-        return this.r("class_is_abstract", "bool", ["pointer"]);
+        return this.r("il2cpp_class_is_abstract", "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsAssignableFrom() {
-        return this.r("class_is_assignable_from", "bool", ["pointer", "pointer"]);
+        return this.r("il2cpp_class_is_assignable_from", "bool", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classIsBlittable() {
-        return this.r("class_is_blittable", "bool", ["pointer"], "2017.1.0");
+        return this.r("il2cpp_class_is_blittable", "bool", ["pointer"], "2017.1.0");
     }
 
     @cache
     static get _classIsEnum() {
-        return this.r("class_is_enum", "bool", ["pointer"]);
+        return this.r("il2cpp_class_is_enum", "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsGeneric() {
-        return this.r("class_is_generic", "bool", ["pointer"]);
+        return this.r("il2cpp_class_is_generic", "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsInflated() {
-        return this.r("class_is_inflated", "bool", ["pointer"]);
+        return this.r("il2cpp_class_is_inflated", "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsInterface() {
-        return this.r("class_is_interface", "bool", ["pointer"]);
+        return this.r("il2cpp_class_is_interface", "bool", ["pointer"]);
     }
 
     @cache
     static get _classIsSubclassOf() {
-        return this.r("class_is_subclass_of", "bool", ["pointer", "pointer", "bool"]);
+        return this.r("il2cpp_class_is_subclass_of", "bool", ["pointer", "pointer", "bool"]);
     }
 
     @cache
     static get _classToString() {
-        return this.r("class_to_string", "void", ["pointer", "pointer"]);
+        return this.r("il2cpp_class_to_string", "void", ["pointer", "pointer"]);
     }
 
     @cache
     static get _classIsValueType() {
-        return this.r("class_is_valuetype", "bool", ["pointer"]);
+        return this.r("il2cpp_class_is_valuetype", "bool", ["pointer"]);
     }
 
     @cache
     static get _domainAssemblyOpen() {
-        return this.r("domain_assembly_open", "pointer", ["pointer", "pointer"]);
+        return this.r("il2cpp_domain_assembly_open", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _domainGet() {
-        return this.r("domain_get", "pointer", []);
+        return this.r("il2cpp_domain_get", "pointer", []);
     }
 
     @cache
     static get _domainGetAssemblies() {
-        return this.r("domain_get_assemblies", "pointer", ["pointer", "pointer"]);
+        return this.r("il2cpp_domain_get_assemblies", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _fieldGetClass() {
-        return this.r("field_get_parent", "pointer", ["pointer"]);
+        return this.r("il2cpp_field_get_parent", "pointer", ["pointer"]);
     }
 
     @cache
     static get _fieldGetFlags() {
-        return this.r("field_get_flags", "int", ["pointer"]);
+        return this.r("il2cpp_field_get_flags", "int", ["pointer"]);
     }
 
     @cache
     static get _fieldGetName() {
-        return this.r("field_get_name", "pointer", ["pointer"]);
+        return this.r("il2cpp_field_get_name", "pointer", ["pointer"]);
     }
 
     @cache
     static get _fieldGetOffset() {
-        return this.r("field_get_offset", "int32", ["pointer"]);
+        return this.r("il2cpp_field_get_offset", "int32", ["pointer"]);
     }
 
     @cache
     static get _fieldGetStaticValue() {
-        return this.r("field_static_get_value", "void", ["pointer", "pointer"]);
+        return this.r("il2cpp_field_static_get_value", "void", ["pointer", "pointer"]);
     }
 
     @cache
     static get _fieldGetType() {
-        return this.r("field_get_type", "pointer", ["pointer"]);
+        return this.r("il2cpp_field_get_type", "pointer", ["pointer"]);
     }
 
     @cache
     static get _fieldIsLiteral() {
-        return this.r("field_is_literal", "bool", ["pointer"]);
+        return this.r("il2cpp_field_is_literal", "bool", ["pointer"]);
     }
 
     @cache
     static get _fieldIsStatic() {
-        return this.r("field_is_static", "bool", ["pointer"]);
+        return this.r("il2cpp_field_is_static", "bool", ["pointer"]);
     }
 
     @cache
     static get _fieldIsThreadStatic() {
-        return this.r("field_is_thread_static", "bool", ["pointer"]);
+        return this.r("il2cpp_field_is_thread_static", "bool", ["pointer"]);
     }
 
     @cache
     static get _fieldSetStaticValue() {
-        return this.r("field_static_set_value", "void", ["pointer", "pointer"]);
+        return this.r("il2cpp_field_static_set_value", "void", ["pointer", "pointer"]);
     }
 
     @cache
     static get _fieldToString() {
-        return this.r("field_to_string", "void", ["pointer", "pointer"]);
+        return this.r("il2cpp_field_to_string", "void", ["pointer", "pointer"]);
     }
 
     @cache
     static get _free() {
-        return this.r("free", "void", ["pointer"]);
+        return this.r("il2cpp_free", "void", ["pointer"]);
     }
 
     @cache
     static get _gcCollect() {
-        return this.r("gc_collect", "void", ["int"]);
+        return this.r("il2cpp_gc_collect", "void", ["int"]);
     }
 
     @cache
     static get _gcCollectALittle() {
-        return this.r("gc_collect_a_little", "void", [], "5.3.5");
+        return this.r("il2cpp_gc_collect_a_little", "void", [], "5.3.5");
     }
 
     @cache
     static get _gcDisable() {
-        return this.r("gc_disable", "void", [], "5.3.5");
+        return this.r("il2cpp_gc_disable", "void", [], "5.3.5");
     }
 
     @cache
     static get _gcEnable() {
-        return this.r("gc_enable", "void", [], "5.3.5");
+        return this.r("il2cpp_gc_enable", "void", [], "5.3.5");
     }
 
     @cache
     static get _gcGetHeapSize() {
-        return this.r("gc_get_heap_size", "int64", []);
+        return this.r("il2cpp_gc_get_heap_size", "int64", []);
     }
 
     @cache
     static get _gcGetMaxTimeSlice() {
-        return this.r("gc_get_max_time_slice_ns", "int64", [], "2019.1.0");
+        return this.r("il2cpp_gc_get_max_time_slice_ns", "int64", [], "2019.1.0");
     }
 
     @cache
     static get _gcGetUsedSize() {
-        return this.r("gc_get_used_size", "int64", []);
+        return this.r("il2cpp_gc_get_used_size", "int64", []);
     }
 
     @cache
     static get _gcHandleGetTarget() {
-        return this.r("gchandle_get_target", "pointer", ["uint32"]);
+        return this.r("il2cpp_gchandle_get_target", "pointer", ["uint32"]);
     }
 
     @cache
     static get _gcHandleFree() {
-        return this.r("gchandle_free", "void", ["uint32"]);
+        return this.r("il2cpp_gchandle_free", "void", ["uint32"]);
     }
 
     @cache
     static get _gcHandleNew() {
-        return this.r("gchandle_new", "uint32", ["pointer", "bool"]);
+        return this.r("il2cpp_gchandle_new", "uint32", ["pointer", "bool"]);
     }
 
     @cache
     static get _gcHandleNewWeakRef() {
-        return this.r("gchandle_new_weakref", "uint32", ["pointer", "bool"]);
+        return this.r("il2cpp_gchandle_new_weakref", "uint32", ["pointer", "bool"]);
     }
 
     @cache
     static get _gcIsDisabled() {
-        return this.r("gc_is_disabled", "bool", [], "2018.3.0");
+        return this.r("il2cpp_gc_is_disabled", "bool", [], "2018.3.0");
     }
 
     @cache
     static get _gcIsIncremental() {
-        return this.r("gc_is_incremental", "bool", [], "2019.1.0");
+        return this.r("il2cpp_gc_is_incremental", "bool", [], "2019.1.0");
     }
 
     @cache
     static get _gcSetMaxTimeSlice() {
-        return this.r("gc_set_max_time_slice_ns", "void", ["int64"], "2019.1.0");
+        return this.r("il2cpp_gc_set_max_time_slice_ns", "void", ["int64"], "2019.1.0");
     }
 
     @cache
     static get _gcStartIncrementalCollection() {
-        return this.r("gc_start_incremental_collection", "void", [], "2020.2.0");
+        return this.r("il2cpp_gc_start_incremental_collection", "void", [], "2020.2.0");
     }
 
     @cache
     static get _gcStartWorld() {
-        return this.r("start_gc_world", "void", [], "2019.3.0");
+        return this.r("il2cpp_start_gc_world", "void", [], "2019.3.0");
     }
 
     @cache
     static get _gcStopWorld() {
-        return this.r("stop_gc_world", "void", [], "2019.3.0");
+        return this.r("il2cpp_stop_gc_world", "void", [], "2019.3.0");
     }
 
     @cache
     static get _getCorlib() {
-        return this.r("get_corlib", "pointer", []);
+        return this.r("il2cpp_get_corlib", "pointer", []);
     }
 
     @cache
     static get _imageGetAssembly() {
-        return this.r("image_get_assembly", "pointer", ["pointer"]);
+        return this.r("il2cpp_image_get_assembly", "pointer", ["pointer"]);
     }
 
     @cache
     static get _imageGetClass() {
-        return this.r("image_get_class", "pointer", ["pointer", "uint"]);
+        return this.r("il2cpp_image_get_class", "pointer", ["pointer", "uint"]);
     }
 
     @cache
     static get _imageGetClassCount() {
-        return this.r("image_get_class_count", "uint32", ["pointer"], "2018.3.0");
+        return this.r("il2cpp_image_get_class_count", "uint32", ["pointer"], "2018.3.0");
     }
 
     @cache
     static get _imageGetName() {
-        return this.r("image_get_name", "pointer", ["pointer"]);
+        return this.r("il2cpp_image_get_name", "pointer", ["pointer"]);
     }
 
     @cache
     static get _init() {
-        return this.r("init", "void", []);
+        return this.r("il2cpp_init", "void", []);
     }
 
     @cache
     static get _livenessCalculationBegin() {
-        return this.r("unity_liveness_calculation_begin", "pointer", ["pointer", "int", "pointer", "pointer", "pointer", "pointer"]);
+        return this.r("il2cpp_unity_liveness_calculation_begin", "pointer", ["pointer", "int", "pointer", "pointer", "pointer", "pointer"]);
     }
 
     @cache
     static get _livenessCalculationEnd() {
-        return this.r("unity_liveness_calculation_end", "void", ["pointer"]);
+        return this.r("il2cpp_unity_liveness_calculation_end", "void", ["pointer"]);
     }
 
     @cache
     static get _livenessCalculationFromStatics() {
-        return this.r("unity_liveness_calculation_from_statics", "void", ["pointer"]);
+        return this.r("il2cpp_unity_liveness_calculation_from_statics", "void", ["pointer"]);
     }
 
     @cache
     static get _memorySnapshotCapture() {
-        return this.r("capture_memory_snapshot", "pointer", []);
+        return this.r("il2cpp_capture_memory_snapshot", "pointer", []);
     }
 
     @cache
     static get _memorySnapshotFree() {
-        return this.r("free_captured_memory_snapshot", "void", ["pointer"]);
+        return this.r("il2cpp_free_captured_memory_snapshot", "void", ["pointer"]);
     }
 
     @cache
     static get _memorySnapshotGetClasses() {
-        return this.r("memory_snapshot_get_classes", "pointer", ["pointer", "pointer"]);
+        return this.r("il2cpp_memory_snapshot_get_classes", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _memorySnapshotGetGCHandles() {
-        return this.r("memory_snapshot_get_gc_handles", ["uint32", "pointer"], ["pointer"]);
+        return this.r("il2cpp_memory_snapshot_get_gc_handles", ["uint32", "pointer"], ["pointer"]);
     }
 
     @cache
     static get _memorySnapshotGetRuntimeInformation() {
-        return this.r("memory_snapshot_get_runtime_information", ["uint32", "uint32", "uint32", "uint32", "uint32", "uint32"], ["pointer"]);
+        return this.r("il2cpp_memory_snapshot_get_information", ["uint32", "uint32", "uint32", "uint32", "uint32", "uint32"], ["pointer"]);
     }
 
     @cache
     static get _methodGetClass() {
-        return this.r("method_get_class", "pointer", ["pointer"]);
+        return this.r("il2cpp_method_get_class", "pointer", ["pointer"]);
     }
 
     @cache
     static get _methodGetFlags() {
-        return this.r("method_get_flags", "uint32", ["pointer", "pointer"]);
+        return this.r("il2cpp_method_get_flags", "uint32", ["pointer", "pointer"]);
     }
 
     @cache
     static get _methodGetFromReflection() {
-        return this.r("method_get_from_reflection", "pointer", ["pointer"]);
+        return this.r("il2cpp_method_get_from_reflection", "pointer", ["pointer"]);
     }
 
     @cache
     static get _methodGetName() {
-        return this.r("method_get_name", "pointer", ["pointer"]);
+        return this.r("il2cpp_method_get_name", "pointer", ["pointer"]);
     }
 
     @cache
     static get _methodGetObject() {
-        return this.r("method_get_object", "pointer", ["pointer", "pointer"]);
+        return this.r("il2cpp_method_get_object", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _methodGetParameterCount() {
-        return this.r("method_get_param_count", "uint8", ["pointer"]);
+        return this.r("il2cpp_method_get_param_count", "uint8", ["pointer"]);
     }
 
     @cache
     static get _methodGetParameterName() {
-        return this.r("method_get_param_name", "pointer", ["pointer", "uint32"]);
+        return this.r("il2cpp_method_get_param_name", "pointer", ["pointer", "uint32"]);
     }
 
     @cache
     static get _methodGetParameters() {
-        return this.r("method_get_parameters", "pointer", ["pointer", "pointer"]);
+        return this.r("il2cpp_method_get_parameters", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _methodGetParameterType() {
-        return this.r("method_get_param", "pointer", ["pointer", "uint32"]);
+        return this.r("il2cpp_method_get_param", "pointer", ["pointer", "uint32"]);
     }
 
     @cache
     static get _methodGetPointer() {
-        return this.r("method_get_pointer", "pointer", ["pointer"]);
+        return this.r("il2cpp_method_get_pointer", "pointer", ["pointer"]);
     }
 
     @cache
     static get _methodGetReturnType() {
-        return this.r("method_get_return_type", "pointer", ["pointer"]);
+        return this.r("il2cpp_method_get_return_type", "pointer", ["pointer"]);
     }
 
     @cache
     static get _methodIsExternal() {
-        return this.r("method_is_external", "bool", ["pointer"]);
+        return this.r("il2cpp_method_is_external", "bool", ["pointer"]);
     }
 
     @cache
     static get _methodIsGeneric() {
-        return this.r("method_is_generic", "bool", ["pointer"]);
+        return this.r("il2cpp_method_is_generic", "bool", ["pointer"]);
     }
 
     @cache
     static get _methodIsInflated() {
-        return this.r("method_is_inflated", "bool", ["pointer"]);
+        return this.r("il2cpp_method_is_inflated", "bool", ["pointer"]);
     }
 
     @cache
     static get _methodIsInstance() {
-        return this.r("method_is_instance", "bool", ["pointer"]);
+        return this.r("il2cpp_method_is_instance", "bool", ["pointer"]);
     }
 
     @cache
     static get _methodIsSynchronized() {
-        return this.r("method_is_synchronized", "bool", ["pointer"]);
+        return this.r("il2cpp_method_is_synchronized", "bool", ["pointer"]);
     }
 
     @cache
     static get _methodToString() {
-        return this.r("method_to_string", "void", ["pointer", "pointer"]);
+        return this.r("il2cpp_method_to_string", "void", ["pointer", "pointer"]);
     }
 
     @cache
     static get _monitorEnter() {
-        return this.r("monitor_enter", "void", ["pointer"]);
+        return this.r("il2cpp_monitor_enter", "void", ["pointer"]);
     }
 
     @cache
     static get _monitorExit() {
-        return this.r("monitor_exit", "void", ["pointer"]);
+        return this.r("il2cpp_monitor_exit", "void", ["pointer"]);
     }
 
     @cache
     static get _monitorPulse() {
-        return this.r("monitor_pulse", "void", ["pointer"]);
+        return this.r("il2cpp_monitor_pulse", "void", ["pointer"]);
     }
 
     @cache
     static get _monitorPulseAll() {
-        return this.r("monitor_pulse_all", "void", ["pointer"]);
+        return this.r("il2cpp_monitor_pulse_all", "void", ["pointer"]);
     }
 
     @cache
     static get _monitorTryEnter() {
-        return this.r("monitor_try_enter", "bool", ["pointer", "uint32"]);
+        return this.r("il2cpp_monitor_try_enter", "bool", ["pointer", "uint32"]);
     }
 
     @cache
     static get _monitorTryWait() {
-        return this.r("monitor_try_wait", "bool", ["pointer", "uint32"]);
+        return this.r("il2cpp_monitor_try_wait", "bool", ["pointer", "uint32"]);
     }
 
     @cache
     static get _monitorWait() {
-        return this.r("monitor_wait", "void", ["pointer"]);
+        return this.r("il2cpp_monitor_wait", "void", ["pointer"]);
     }
 
     @cache
     static get _objectGetClass() {
-        return this.r("object_get_class", "pointer", ["pointer"]);
+        return this.r("il2cpp_object_get_class", "pointer", ["pointer"]);
     }
 
     @cache
     static get _objectGetVirtualMethod() {
-        return this.r("object_get_virtual_method", "pointer", ["pointer", "pointer"]);
+        return this.r("il2cpp_object_get_virtual_method", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _objectInit() {
-        return this.r("runtime_object_init_exception", "void", ["pointer", "pointer"]);
+        return this.r("il2cpp_runtime_object_init_exception", "void", ["pointer", "pointer"]);
     }
 
     @cache
     static get _objectNew() {
-        return this.r("object_new", "pointer", ["pointer"]);
+        return this.r("il2cpp_object_new", "pointer", ["pointer"]);
     }
 
     @cache
     static get _objectGetSize() {
-        return this.r("object_get_size", "uint32", ["pointer"]);
+        return this.r("il2cpp_object_get_size", "uint32", ["pointer"]);
     }
 
     @cache
     static get _objectUnbox() {
-        return this.r("object_unbox", "pointer", ["pointer"]);
+        return this.r("il2cpp_object_unbox", "pointer", ["pointer"]);
     }
 
     @cache
     static get _stringChars() {
-        return this.r("string_chars", "pointer", ["pointer"]);
+        return this.r("il2cpp_string_chars", "pointer", ["pointer"]);
     }
 
     @cache
     static get _stringLength() {
-        return this.r("string_length", "int32", ["pointer"]);
+        return this.r("il2cpp_string_length", "int32", ["pointer"]);
     }
 
     @cache
     static get _stringNew() {
-        return this.r("string_new", "pointer", ["pointer"]);
+        return this.r("il2cpp_string_new", "pointer", ["pointer"]);
     }
 
     @cache
     static get _stringSetLength() {
-        return this.r("string_set_length", "void", ["pointer", "int32"]);
+        return this.r("il2cpp_string_set_length", "void", ["pointer", "int32"]);
     }
 
     @cache
     static get _valueBox() {
-        return this.r("value_box", "pointer", ["pointer", "pointer"]);
+        return this.r("il2cpp_value_box", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _threadAttach() {
-        return this.r("thread_attach", "pointer", ["pointer"]);
+        return this.r("il2cpp_thread_attach", "pointer", ["pointer"]);
     }
 
     @cache
     static get _threadCurrent() {
-        return this.r("thread_current", "pointer", []);
+        return this.r("il2cpp_thread_current", "pointer", []);
     }
 
     @cache
     static get _threadGetAllAttachedThreads() {
-        return this.r("thread_get_all_attached_threads", "pointer", ["pointer"]);
+        return this.r("il2cpp_thread_get_all_attached_threads", "pointer", ["pointer"]);
     }
 
     @cache
     static get _threadIsVm() {
-        return this.r("is_vm_thread", "bool", ["pointer"]);
+        return this.r("il2cpp_is_vm_thread", "bool", ["pointer"]);
     }
 
     @cache
     static get _threadDetach() {
-        return this.r("thread_detach", "void", ["pointer"]);
+        return this.r("il2cpp_thread_detach", "void", ["pointer"]);
     }
 
     @cache
     static get _toString() {
-        return this.r("to_string", "pointer", ["pointer", "pointer"]);
+        return this.r("il2cpp_struct_to_string", "pointer", ["pointer", "pointer"]);
     }
 
     @cache
     static get _typeGetName() {
-        return this.r("type_get_name", "pointer", ["pointer"]);
+        return this.r("il2cpp_type_get_name", "pointer", ["pointer"]);
     }
 
     @cache
     static get _typeGetObject() {
-        return this.r("type_get_object", "pointer", ["pointer"]);
+        return this.r("il2cpp_type_get_object", "pointer", ["pointer"]);
     }
 
     @cache
     static get _typeGetTypeEnum() {
-        return this.r("type_get_type", "int", ["pointer"]);
+        return this.r("il2cpp_type_get_type", "int", ["pointer"]);
     }
 
     @cache
     static get _typeIsByReference() {
-        return this.r("type_is_byref", "bool", ["pointer"]);
+        return this.r("il2cpp_type_is_byref", "bool", ["pointer"]);
     }
 
     @cache
     static get _typeIsPrimitive() {
-        return this.r("type_is_primitive", "bool", ["pointer"]);
+        return this.r("il2cpp_type_is_primitive", "bool", ["pointer"]);
     }
 
     /** @internal */
     @cache
     static get _gLibFree() {
-        return this.r("g_lib_free", "void", ["pointer"]);
+        return this.r("glib_free", "void", ["pointer"]);
     }
 
     /** @internal */
@@ -921,14 +921,14 @@ g_string_append_type_name (GString * string,
 }
 
 void
-il2cpp_g_lib_free (void * pointer)
+glib_free (void * pointer)
 {
     g_free (pointer);
 }
 
 const char *
-il2cpp_to_string (const void * target,
-                  void (*callback) (const void * target, GString * text))
+il2cpp_struct_to_string (const void * target,
+                         void (*callback) (const void * target, GString * text))
 {
     GString * text;
     
@@ -1290,7 +1290,7 @@ il2cpp_memory_snapshot_get_gc_handles (const Il2CppManagedMemorySnapshot * snaps
 }
 
 struct Il2CppRuntimeInformation
-il2cpp_memory_snapshot_get_runtime_information (const Il2CppManagedMemorySnapshot * snapshot)
+il2cpp_memory_snapshot_get_information (const Il2CppManagedMemorySnapshot * snapshot)
 {
     return snapshot->runtime_information;
 }
@@ -1316,14 +1316,13 @@ il2cpp_memory_snapshot_get_runtime_information (const Il2CppManagedMemorySnapsho
         argTypes: ArgTypes,
         requiredUnityVersion?: string
     ) {
-        exportName = "il2cpp_" + exportName;
         const exportPointer = Il2Cpp.module.findExportByName(exportName) || this.cModule[exportName];
 
         if (exportPointer == null) {
             if (requiredUnityVersion == null || Unity.version.isEqualOrAbove(requiredUnityVersion)) {
                 raise(`Couldn't find export "${exportName}".`);
             }
-            
+
             raise(`"${exportName}" requires a Unity version >= ${requiredUnityVersion}, but this application has ${Unity.version}.`);
         }
 
