@@ -146,6 +146,11 @@ class Il2CppApi {
     }
 
     @cache
+    static get _classGetNestedClasses() {
+        return this.r("il2cpp_class_get_nested_types", "pointer", ["pointer", "pointer"]);
+    }
+
+    @cache
     static get _classGetParent() {
         return this.r("il2cpp_class_get_parent", "pointer", ["pointer"]);
     }

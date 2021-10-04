@@ -166,6 +166,12 @@ class Il2CppClass extends NonNullNativeStruct {
         return Il2Cpp.Api._classGetNamespace(this).readUtf8String()!;
     }
 
+    /** Gets the classes nested inside the current class. */
+    @cache
+    get nestedClasses(): IterableRecord<Il2Cpp.Class> {
+        return makeRecordFromNativeIterator(this, Il2Cpp.Api._classGetNestedClasses, Il2Cpp.Class, klass => klass.name, true);
+    }
+
     /** Gets the class from which the current class directly inherits. */
     @cache
     get parent(): Il2Cpp.Class | null {
