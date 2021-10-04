@@ -91,30 +91,34 @@ class Il2CppBase {
 
     /** Attaches the caller thread to Il2Cpp domain and executes the given block.  */
     static perform(block: () => void): void {
-        function executor() {
-            let thread = Il2Cpp.Thread.current;
-            const isForeignThread = thread == null;
-
-            if (isForeignThread) {
-                thread = Il2Cpp.Domain.attach();
-            }
-
-            block();
-
-            if (isForeignThread) {
-                thread?.detach();
-            }
-        }
-
         this.initialize()
-            .then(executor)
-            .catch(error => {
-                if (error.fromIl2CppModule) {
-                    (globalThis as any).console.log(error.stack);
-                } else {
-                    throw error;
+            .then(() => {
+                let thread = Il2Cpp.Thread.current;
+                const isForeignThread = thread == null;
+
+                if (isForeignThread) {
+                    thread = Il2Cpp.Domain.attach();
                 }
-            });
+
+                try {
+                    block();
+                } catch (error: any) {
+                    if (isForeignThread) {
+                        thread?.detach();
+                    }
+
+                    if (error.fromIl2CppModule) {
+                        (globalThis as any).console.log(error.stack);
+                    } else {
+                        throw error;
+                    }
+                }
+            })
+            .catch(error =>
+                Script.nextTick(() => {
+                    throw error;
+                })
+            );
     }
 }
 
