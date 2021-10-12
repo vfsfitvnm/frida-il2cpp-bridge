@@ -1,8 +1,9 @@
 import { cache } from "decorator-cache-getter";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { addLevenshtein, getOrNull, IterableRecord, makeIterable } from "../../utils/utils";
+import { addLevenshtein, cacheInstances, getOrNull, IterableRecord, makeIterable } from "../../utils/utils";
 
 /** Represents a `Il2CppImage`. */
+@cacheInstances
 class Il2CppImage extends NonNullNativeStruct {
     /** Gets the COR library. */
     @cache

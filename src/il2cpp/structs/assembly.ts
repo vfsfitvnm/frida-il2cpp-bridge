@@ -1,7 +1,9 @@
 import { cache } from "decorator-cache-getter";
 import { NonNullNativeStruct } from "../../utils/native-struct";
+import { cacheInstances } from "../../utils/utils";
 
 /** Represents a `Il2CppAssembly`. */
+@cacheInstances
 class Il2CppAssembly extends NonNullNativeStruct {
     /** Gets the image of this assembly. */
     @cache
