@@ -3,7 +3,7 @@ import { shouldBeInstance } from "../decorators";
 import { fromFridaValue, readGString, toFridaValue } from "../utils";
 import { raise, warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { addLevenshtein, makeIterable, overridePropertyValue } from "../../utils/utils";
+import { addLevenshtein, IterableRecord, makeIterable, overridePropertyValue } from "../../utils/utils";
 
 /** Represents a `MethodInfo`. */
 class Il2CppMethod extends NonNullNativeStruct {

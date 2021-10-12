@@ -1,6 +1,6 @@
 import { cache } from "decorator-cache-getter";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { makeRecordFromNativeIterator } from "../../utils/utils";
+import { IterableRecord, makeRecordFromNativeIterator } from "../../utils/utils";
 
 /** Represents a `Il2CppManagedMemorySnapshot`. */
 class Il2CppMemorySnapshot extends NonNullNativeStruct {

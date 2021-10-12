@@ -2,7 +2,7 @@ import { cache } from "decorator-cache-getter";
 import { readGString } from "../utils";
 import { raise } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { getOrNull, makeRecordFromNativeIterator } from "../../utils/utils";
+import { getOrNull, IterableRecord, makeRecordFromNativeIterator } from "../../utils/utils";
 
 /** Represents a `Il2CppClass`. */
 class Il2CppClass extends NonNullNativeStruct {

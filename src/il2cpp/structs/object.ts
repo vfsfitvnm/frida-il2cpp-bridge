@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
 import { checkNull } from "../decorators";
 import { NativeStruct } from "../../utils/native-struct";
-import { addLevenshtein, filterMap, getOrNull, makeIterable, overridePropertyValue } from "../../utils/utils";
+import { addLevenshtein, filterMap, getOrNull, IterableRecord, makeIterable, overridePropertyValue } from "../../utils/utils";
 
 /** Represents a `Il2CppObject`. */
 class Il2CppObject extends NativeStruct {

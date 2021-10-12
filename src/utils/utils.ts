@@ -148,3 +148,5 @@ export function makeRecordFromNativeIterator<T extends ObjectWrapper>(
 
     return makeIterable(addLevenshtein(record));
 }
+
+export type IterableRecord<T> = Readonly<Record<string, T>> & Iterable<T>;

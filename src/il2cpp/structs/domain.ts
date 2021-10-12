@@ -1,5 +1,5 @@
 import { cache } from "decorator-cache-getter";
-import { addLevenshtein, getOrNull, makeIterable } from "../../utils/utils";
+import { addLevenshtein, getOrNull, IterableRecord, makeIterable } from "../../utils/utils";
 
 /** Represents a `Il2CppDomain`. */
 class Il2CppDomain {
