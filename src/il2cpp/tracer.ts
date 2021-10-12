@@ -258,7 +258,7 @@ class Il2CppTracer {
             target.implementation = function (...parameters: Il2Cpp.Parameter.Type[]): Il2Cpp.Method.ReturnType {
                 onEnter?.apply(this, parameters);
 
-                const returnValue = (this instanceof Il2Cpp.Object ? target.withHolder(this) : target).invoke(...parameters);
+                const returnValue = target.invokeRaw(this, ...parameters);
 
                 onLeave?.call(this, returnValue);
 
