@@ -34,7 +34,10 @@ class Il2CppImage extends NonNullNativeStruct {
 
             const types = object.methods.GetTypes.invoke<Il2Cpp.Array<Il2Cpp.Object>>(false);
 
-            for (const type of types) {
+            // On Unity 5.3.8f1, getting System.Reflection.Emit.OpCodes type name
+            // without iterating all the classes first somehow blows things up at
+            // app startup, hence the `Array.from`.
+            for (const type of Array.from(types)) {
                 const klass = new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(type));
                 record[klass.type.name] = klass;
             }
