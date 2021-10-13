@@ -77,6 +77,12 @@ class Il2CppClass extends NonNullNativeStruct {
         return !!Il2Cpp.Api._classHasReferences(this);
     }
 
+    /** Determines whether ther current class has a valid static constructor. */
+    @cache
+    get hasStaticConstructor(): boolean {
+        return ".cctor" in this.methods && !this.methods[".cctor"].virtualAddress.isNull();
+    }
+
     /** Gets the image in which the current class is defined. */
     @cache
     get image(): Il2Cpp.Image {
@@ -245,7 +251,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Calls the static constructor of the current class. */
     initialize(): void {
-        Il2Cpp.Api._classInit(this);
+        Il2Cpp.try(() => Il2Cpp.Api._classInit(this));
     }
 
     /** Determines whether an instance of `other` class can be assigned to a variable of the current type. */
