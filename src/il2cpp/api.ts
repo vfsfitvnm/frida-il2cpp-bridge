@@ -1269,11 +1269,16 @@ il2cpp_method_to_string (void * method,
 
     for (uint32_t i = 0; i < parameter_count; i++)
     {
+        const char * param_name;
+
         if (i > 0) g_string_append_len (text, ", ", 2);
         
         g_string_append_type_name (text, il2cpp_method_get_parameter_type (method, i));
         g_string_append_c (text, ' ');
-        g_string_append (text, il2cpp_method_get_parameter_name (method, i));
+
+        param_name = il2cpp_method_get_parameter_name (method, i);
+
+        g_string_append (text, param_name == NULL ? "" : param_name);
     }
 
     g_string_append_len (text, ");", 2);
