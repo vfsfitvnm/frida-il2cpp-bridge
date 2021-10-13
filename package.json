@@ -37,7 +37,7 @@
     "kleur": "^4.1.4"
   },
   "devDependencies": {
-    "@types/frida-gum": "^17.1.0",
-    "prettier": "^2.3.2"
+    "@types/frida-gum": "^17.1.1",
+    "prettier": "^2.4.1"
   }
 }
