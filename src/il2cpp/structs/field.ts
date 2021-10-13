@@ -2,6 +2,7 @@ import { cache } from "decorator-cache-getter";
 import { read, readGString, write } from "../utils";
 import { warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
+import { shouldBeInstance } from "../decorators";
 
 /** Represents a `FieldInfo`. */
 class Il2CppField extends NonNullNativeStruct {
@@ -75,24 +76,30 @@ class Il2CppField extends NonNullNativeStruct {
     }
 
     /** @internal */
+    @shouldBeInstance(true)
     withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Field {
-        const newField = new Il2Cpp.Field(this.handle);
-
         let valueHandle = instance.handle.add(this.offset);
         if (instance instanceof Il2Cpp.ValueType) {
             valueHandle = valueHandle.sub(Il2Cpp.Runtime.objectHeaderSize);
         }
 
-        Reflect.defineProperty(newField, "value", {
-            get(): Il2Cpp.Field.Type {
-                return read(valueHandle, newField.type);
+        return new Proxy(this, {
+            get(target: Il2Cpp.Field, property: keyof Il2Cpp.Field): any {
+                if (property == "value") {
+                    return read(valueHandle, target.type);
+                }
+                return Reflect.get(target, property);
             },
-            set(value: Il2Cpp.Field.Type): void {
-                write(valueHandle, value, newField.type);
+
+            set(target: Il2Cpp.Field, property: keyof Il2Cpp.Field, value: any): boolean {
+                if (property == "value") {
+                    write(valueHandle, value, target.type);
+                    return true;
+                }
+
+                return Reflect.set(target, property, value);
             }
         });
-
-        return newField;
     }
 
     override toString(): string {

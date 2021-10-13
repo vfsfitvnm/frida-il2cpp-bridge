@@ -270,13 +270,15 @@ class Il2CppMethod extends NonNullNativeStruct {
     /** @internal */
     @shouldBeInstance(true)
     withHolder(instance: Il2Cpp.Object): Il2Cpp.Method {
-        return overridePropertyValue(
-            new Il2Cpp.Method(this.handle),
-            "invoke",
-            <T extends Il2Cpp.Method.ReturnType>(...parameters: Il2Cpp.Parameter.Type[]): T => {
-                return this.invokeRaw(instance.handle, ...parameters) as T;
+        return new Proxy(this, {
+            get(target: Il2Cpp.Method, property: keyof Il2Cpp.Method): any {
+                if (property == "invoke") {
+                    return target.invokeRaw.bind(target, instance.handle);
+                }
+
+                return Reflect.get(target, property);
             }
-        );
+        });
     }
 
     override toString(): string {
