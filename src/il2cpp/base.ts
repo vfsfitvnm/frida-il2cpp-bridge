@@ -1,5 +1,5 @@
 import { cache } from "decorator-cache-getter";
-import { platformNotSupported, warn } from "../utils/console";
+import { platformNotSupported, raise, warn } from "../utils/console";
 import { forModule } from "../utils/native-wait";
 
 /** */
@@ -119,6 +119,36 @@ class Il2CppBase {
                     throw error;
                 })
             );
+    }
+
+    /** Tries to execute the given block and prints the underlying C# (C++) exception. */
+    static try<T>(block: () => T): T {
+        try {
+            return block();
+        } catch (error: any) {
+            if (error.message != "abort was called") {
+                throw error;
+            }
+
+            const exception = Il2Cpp.Api._cxaGetGlobals().readPointer();
+            const dummyException = Il2Cpp.Api._cxaAllocateException(Process.pointerSize);
+
+            try {
+                Il2Cpp.Api._cxaThrow(dummyException, NULL, NULL);
+            } catch (e) {
+                const dummyExceptionHeader = Il2Cpp.Api._cxaGetGlobals().readPointer();
+
+                for (let i = 0; i < 256; i++) {
+                    if (dummyExceptionHeader.add(i).equals(dummyException)) {
+                        Il2Cpp.Api._cxaFreeException(dummyException);
+
+                        raise(new Il2Cpp.Object(exception.add(i).readPointer()).toString()!);
+                    }
+                }
+            }
+
+            throw error;
+        }
     }
 }
 
