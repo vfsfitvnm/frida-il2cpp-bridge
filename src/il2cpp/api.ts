@@ -892,7 +892,7 @@ struct _Il2CppMetadataType
 #define METHOD_IMPL_ATTRIBUTE_SYNCHRONIZED 0x0020
 
 
-extern const char * il2cpp_value_to_string (void *, void *);
+extern char * il2cpp_value_to_string (void *, void *, int *);
 
 const char * (*il2cpp_image_get_name) (void *) = (void *) ${this._imageGetName};
 void * (*il2cpp_class_from_type) (void *) = (void *) ${this._classFromType};
@@ -1173,7 +1173,10 @@ il2cpp_field_to_string (void * field,
     g_string_append (text, il2cpp_field_get_name (field));
 
     if (il2cpp_field_is_literal (field))
-    {       
+    {
+        char * buf;
+        int size;
+
         has_offset = 0;
 
         value = g_malloc (sizeof (void *));
@@ -1184,15 +1187,14 @@ il2cpp_field_to_string (void * field,
         g_string_append_len (text, " = ", 3);
 
         if (il2cpp_class_is_enum (class))
-        {
-            g_string_append (text, il2cpp_value_to_string (value, il2cpp_class_get_base_type (class)));
-        } 
-        else
-        {
-            g_string_append (text, il2cpp_value_to_string (value, type));
-        }
+          type = il2cpp_class_get_base_type (class);
+
+        buf = il2cpp_value_to_string (value, type, &size);
+
+        g_string_append_len (text, buf, size);
 
         g_free (value);
+        il2cpp_free (buf);
     }
 
     g_string_append_c (text, ';');
@@ -1334,11 +1336,13 @@ il2cpp_memory_snapshot_get_information (const Il2CppManagedMemorySnapshot * snap
 
         return new CModule(source, {
             il2cpp_value_to_string: new NativeCallback(
-                (value: NativePointer, type: NativePointer) => {
-                    return Memory.allocUtf8String(read(value, new Il2Cpp.Type(type)) + "");
+                (value: NativePointer, type: NativePointer, size: NativePointer): NativePointer => {
+                    const string = read(value, new Il2Cpp.Type(type)) + "";
+                    size.writeInt(string.length);
+                    return Il2Cpp.alloc(string.length + 1).writeUtf8String(string);
                 },
                 "pointer",
-                ["pointer", "pointer"]
+                ["pointer", "pointer", "pointer"]
             )
         });
     }
