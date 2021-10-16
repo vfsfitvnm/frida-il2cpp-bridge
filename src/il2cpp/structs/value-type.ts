@@ -29,7 +29,7 @@ class Il2CppValueType extends NativeStruct {
     }
 
     @checkNull
-    override toString(): string | null {
+    override toString(): string {
         return this.box().toString();
     }
 }

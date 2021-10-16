@@ -107,13 +107,13 @@ class Il2CppObject extends NativeStruct {
     }
 
     @checkNull
-    override toString(): string | null {
+    override toString(): string {
         let object: Il2Cpp.Object = this;
         while (!("ToString" in object.methods)) {
             object = object.base;
         }
 
-        return object.methods.ToString.invoke<Il2Cpp.String>().content;
+        return object.methods.ToString.invoke<Il2Cpp.String>().content || "null";
     }
 }
 

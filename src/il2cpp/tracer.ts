@@ -213,10 +213,10 @@ class Il2CppTracer {
                 onEnter(...parameters: Il2Cpp.Parameter.Type[]): void {
                     const thisText = target.isStatic
                         ? ""
-                        : `${kleur.yellow("this")} = ${kleur.cyan(this + "")}${parameters.length > 0 ? ", " : ""}`;
+                        : `${kleur.yellow("this")} = ${kleur.cyan(this.toString())}${parameters.length > 0 ? ", " : ""}`;
                     const parametersText = parametersInfo
                         .map(({ type, name }, index) => {
-                            return `${kleur.blue(type.name)} ${kleur.yellow(name)} = ${kleur.cyan(parameters[index] + "")}`;
+                            return `${kleur.blue(type.name)} ${kleur.yellow(name)} = ${kleur.cyan(parameters[index].toString())}`;
                         })
                         .join(", ");
 
@@ -225,14 +225,18 @@ class Il2CppTracer {
                             ")"
                         )}`
                     );
+
                     counter += 1;
                 },
                 onLeave(returnValue: Il2Cpp.Method.ReturnType): void {
                     counter -= 1;
+
+                    const returnValueText = returnValue == undefined ? "" : ` = ${kleur.cyan(returnValue.toString())}`;
+
                     inform(
-                        `${at} ${"│ ".repeat(counter)}└─${kleur.green(sign)} ${kleur.magenta(target.returnType.name)} = ${kleur.cyan(
-                            returnValue + ""
-                        )}${counter == 0 ? "\n" : ""}`
+                        `${at} ${"│ ".repeat(counter)}└─${kleur.green(sign)} ${kleur.magenta(target.returnType.name)}${returnValueText}${
+                            counter == 0 ? "\n" : ""
+                        }`
                     );
                 }
             };

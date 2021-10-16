@@ -1337,7 +1337,7 @@ il2cpp_memory_snapshot_get_information (const Il2CppManagedMemorySnapshot * snap
         return new CModule(source, {
             il2cpp_value_to_string: new NativeCallback(
                 (value: NativePointer, type: NativePointer, size: NativePointer): NativePointer => {
-                    const string = read(value, new Il2Cpp.Type(type)) + "";
+                    const string = read(value, new Il2Cpp.Type(type)).toString();
                     size.writeInt(string.length);
                     return Il2Cpp.alloc(string.length + 1).writeUtf8String(string);
                 },
