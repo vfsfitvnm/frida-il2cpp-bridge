@@ -251,6 +251,11 @@ class Il2CppApi {
     }
 
     @cache
+    static get _fieldGetModifier() {
+        return this.r("il2cpp_field_get_modifier", "pointer", ["pointer"]);
+    }
+
+    @cache
     static get _fieldGetClass() {
         return this.r("il2cpp_field_get_parent", "pointer", ["pointer"]);
     }
@@ -463,6 +468,11 @@ class Il2CppApi {
     @cache
     static get _memorySnapshotGetRuntimeInformation() {
         return this.r("il2cpp_memory_snapshot_get_information", ["uint32", "uint32", "uint32", "uint32", "uint32", "uint32"], ["pointer"]);
+    }
+
+    @cache
+    static get _methodGetModifier() {
+        return this.r("il2cpp_method_get_modifier", "pointer", ["pointer"]);
     }
 
     @cache
@@ -885,8 +895,28 @@ struct _Il2CppMetadataType
 
 
 #define THREAD_STATIC_FIELD_OFFSET -1;
+
+#define FIELD_ATTRIBUTE_FIELD_ACCESS_MASK 0x0007
+#define FIELD_ATTRIBUTE_COMPILER_CONTROLLED 0x0000
+#define FIELD_ATTRIBUTE_PRIVATE 0x0001
+#define FIELD_ATTRIBUTE_FAM_AND_ASSEM 0x0002
+#define FIELD_ATTRIBUTE_ASSEMBLY 0x0003
+#define FIELD_ATTRIBUTE_FAMILY 0x0004
+#define FIELD_ATTRIBUTE_FAM_OR_ASSEM 0x0005
+#define FIELD_ATTRIBUTE_PUBLIC 0x0006
+
 #define FIELD_ATTRIBUTE_STATIC 0x0010
 #define FIELD_ATTRIBUTE_LITERAL 0x0040
+
+#define METHOD_ATTRIBUTE_MEMBER_ACCESS_MASK 0x0007
+#define METHOD_ATTRIBUTE_COMPILER_CONTROLLED 0x0000
+#define METHOD_ATTRIBUTE_PRIVATE 0x0001
+#define METHOD_ATTRIBUTE_FAM_AND_ASSEM 0x0002
+#define METHOD_ATTRIBUTE_ASSEMBLY 0x0003
+#define METHOD_ATTRIBUTE_FAMILY 0x0004
+#define METHOD_ATTRIBUTE_FAM_OR_ASSEM 0x0005
+#define METHOD_ATTRIBUTE_PUBLIC 0x0006
+
 #define METHOD_ATTRIBUTE_STATIC 0x0010
 #define METHOD_IMPL_ATTRIBUTE_INTERNAL_CALL 0x1000
 #define METHOD_IMPL_ATTRIBUTE_SYNCHRONIZED 0x0020
@@ -1126,6 +1156,31 @@ il2cpp_class_to_string (void * class,
     g_string_append_len (text, "\n}\n\n", 4);
 }
 
+const char *
+il2cpp_field_get_modifier (void * field)
+{   
+    int flags;
+
+    flags = il2cpp_field_get_flags (field);
+
+    switch (flags & FIELD_ATTRIBUTE_FIELD_ACCESS_MASK) {
+        case FIELD_ATTRIBUTE_PRIVATE:
+            return "private";
+        case FIELD_ATTRIBUTE_FAM_AND_ASSEM:
+            return "private protected";
+        case FIELD_ATTRIBUTE_ASSEMBLY:
+            return "internal";
+        case FIELD_ATTRIBUTE_FAMILY:
+            return "protected";
+        case FIELD_ATTRIBUTE_FAM_OR_ASSEM:
+            return "protected internal";
+        case FIELD_ATTRIBUTE_PUBLIC:
+            return "public";
+    }
+
+    return "";
+}
+
 uint8_t
 il2cpp_field_is_literal (void * field)
 {
@@ -1203,6 +1258,31 @@ il2cpp_field_to_string (void * field,
     {
         g_string_append_printf (text, " // 0x%x", il2cpp_field_get_offset (field));
     }
+}
+
+const char *
+il2cpp_method_get_modifier (void * method)
+{
+    uint32_t flags;
+
+    flags = il2cpp_method_get_flags (method, NULL);
+
+    switch (flags & METHOD_ATTRIBUTE_MEMBER_ACCESS_MASK) {
+        case METHOD_ATTRIBUTE_PRIVATE:
+            return "private";
+        case METHOD_ATTRIBUTE_FAM_AND_ASSEM:
+            return "private protected";
+        case METHOD_ATTRIBUTE_ASSEMBLY:
+            return "internal";
+        case METHOD_ATTRIBUTE_FAMILY:
+            return "protected";
+        case METHOD_ATTRIBUTE_FAM_OR_ASSEM:
+            return "protected internal";
+        case METHOD_ATTRIBUTE_PUBLIC:
+            return "public";
+    }
+
+    return "";
 }
 
 void *

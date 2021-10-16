@@ -91,6 +91,11 @@ class Il2CppMethod extends NonNullNativeStruct {
         return !!Il2Cpp.Api._methodIsSynchronized(this);
     }
 
+    /** Gets the access modifier of this method. */
+    get modifier(): string {
+        return Il2Cpp.Api._methodGetModifier(this).readUtf8String()!;
+    }
+
     /** Gets the name of this method. */
     @cache
     get name(): string {

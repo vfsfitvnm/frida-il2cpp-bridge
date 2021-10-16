@@ -36,6 +36,11 @@ class Il2CppField extends NonNullNativeStruct {
         return !!Il2Cpp.Api._fieldIsThreadStatic(this);
     }
 
+    /** Gets the access modifier of this field. */
+    get modifier(): string {
+        return Il2Cpp.Api._fieldGetModifier(this).readUtf8String()!;
+    }
+
     /** Gets the name of this field. */
     @cache
     get name(): string {
