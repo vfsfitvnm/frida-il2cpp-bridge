@@ -57,10 +57,6 @@ class Il2CppBase {
 
     /** @internal Waits for Unity and Il2Cpp native libraries to be loaded and initialized. */
     private static async initialize(): Promise<void> {
-        if (Script.runtime != "V8") {
-            warn("Frida's JavaScript runtime is not V8 (--runtime=v8). Proceed with caution.");
-        }
-
         if (Process.platform == "darwin") {
             let il2cppModuleName = Process.findModuleByAddress(Module.findExportByName(null, "il2cpp_init") || NULL)?.name;
             let unityModuleName = il2cppModuleName;
