@@ -97,7 +97,7 @@ class Il2CppApi {
 
     @cache
     static get _classGetFlags() {
-        return this.r("il2cpp_class_get_fields", "int", ["pointer"]);
+        return this.r("il2cpp_class_get_flags", "int", ["pointer"]);
     }
 
     @cache
