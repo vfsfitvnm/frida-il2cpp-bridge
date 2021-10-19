@@ -7,6 +7,12 @@ import { cacheInstances, getOrNull, IterableRecord, makeRecordFromNativeIterator
 /** Represents a `Il2CppClass`. */
 @cacheInstances
 class Il2CppClass extends NonNullNativeStruct {
+    /** Gets the actual size of the instance of the current class. */
+    @cache
+    get actualInstanceSize(): number {
+        return Il2Cpp.Api._classGetActualInstanceSize(this);
+    }
+
     /** Gets the array class which encompass the current class. */
     @cache
     get arrayClass(): Il2Cpp.Class {

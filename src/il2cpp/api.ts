@@ -51,6 +51,11 @@ class Il2CppApi {
     }
 
     @cache
+    static get _classGetActualInstanceSize() {
+        return this.r("il2cpp_class_get_actual_instance_size", "int32", ["pointer"]);
+    }
+
+    @cache
     static get _classGetArrayClass() {
         return this.r("il2cpp_array_class_get", "pointer", ["pointer", "uint32"]);
     }
@@ -1045,6 +1050,12 @@ il2cpp_type_is_primitive (void * type)
         type_enum == IL2CPP_TYPE_I || 
         type_enum == IL2CPP_TYPE_U
     );
+}
+
+int32_t
+il2cpp_class_get_actual_instance_size (int32_t * class)
+{
+    return *(class + ${offsetOfInt32(SystemString, SystemString.instanceSize - 2)});
 }
 
 uint16_t
