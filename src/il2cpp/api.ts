@@ -712,12 +712,6 @@ class Il2CppApi {
 
     /** @internal */
     @cache
-    static get _buildMetadata() {
-        return this.r("il2cpp_build_metadata", "void", ["pointer", "pointer"]);
-    }
-
-    /** @internal */
-    @cache
     static get _gLibFree() {
         return this.r("glib_free", "void", ["pointer"]);
     }
@@ -793,7 +787,6 @@ OFFSET_OF (offset_of_pointer, void *)
 #include <stdint.h>
 #include <string.h>
 #include "glib.h"
-#include "json-glib/json-glib.h"
 
 
 typedef struct _Il2CppObject Il2CppObject;
@@ -1429,166 +1422,6 @@ struct Il2CppRuntimeInformation
 il2cpp_memory_snapshot_get_information (const Il2CppManagedMemorySnapshot * snapshot)
 {
     return snapshot->runtime_information;
-}
-
-void
-_il2cpp_class_add_type_metadata (void * class,
-                                 JsonBuilder * builder,
-                                 GHashTable * table)
-{
-    void * parent;
-    void * parent_name;
-    char * name;
-    int field_count;
-    void * iter;
-
-    if (il2cpp_class_is_generic (class) && !il2cpp_class_is_inflated (class))
-      return;
-
-    if (g_hash_table_contains (table, class))
-        return;
-    
-    g_hash_table_add (table, class);
-
-    parent = il2cpp_class_get_parent (class);
-    name = il2cpp_type_get_name (il2cpp_class_get_type (class));
-
-    if (parent != NULL)  
-    {
-        _il2cpp_class_add_type_metadata (parent, builder, table);
-        parent_name = il2cpp_type_get_name (il2cpp_class_get_type (parent));
-    }
-
-    field_count = il2cpp_class_get_field_count (class);
-
-    iter = NULL;
-    for (uint16_t i = 0; i < field_count; i++)
-    {   
-        void * field;
-        void * field_type;
-        
-        field = il2cpp_class_get_fields (class, &iter);
-
-        if (il2cpp_field_is_static (field))
-          continue;
-
-        field_type = il2cpp_field_get_type (field);
-
-        _il2cpp_class_add_type_metadata (il2cpp_class_from_type (field_type), builder, table);
-    }
-    
-    json_builder_set_member_name (builder, name);
-    
-    json_builder_begin_object (builder);
-
-    json_builder_set_member_name (builder, "size");
-    json_builder_add_int_value (builder, il2cpp_class_instance_size (class));
-
-    json_builder_set_member_name (builder, "valuetype");
-    json_builder_add_boolean_value (builder, il2cpp_class_is_valuetype (class));
-
-    json_builder_set_member_name (builder, "parent");
-    if (parent != NULL)
-    {
-        json_builder_add_string_value (builder, parent_name);
-        il2cpp_free (parent_name);
-    }
-    else 
-    {
-        json_builder_add_null_value (builder); 
-    }
-
-    json_builder_set_member_name (builder, "fields");
-    json_builder_begin_array (builder);
-
-    iter = NULL;
-    for (uint16_t i = 0; i < field_count; i++)
-    {   
-        void * field;
-        void * field_type;
-        void * field_type_name;
-        
-        field = il2cpp_class_get_fields (class, &iter);
-
-        if (il2cpp_field_is_static (field))
-          continue;
-
-        field_type = il2cpp_field_get_type (field);
-        
-        field_type_name = il2cpp_type_get_name (field_type);
-
-        json_builder_begin_object (builder);
-
-        json_builder_set_member_name (builder, "name");
-        json_builder_add_string_value (builder, il2cpp_field_get_name (field));
-
-        json_builder_set_member_name (builder, "type");
-        json_builder_add_string_value (builder, field_type_name);
-
-        json_builder_set_member_name (builder, "offset");
-        json_builder_add_int_value (builder, il2cpp_field_get_offset (field)); 
-
-        json_builder_end_object (builder);
-
-        il2cpp_free (field_type_name);
-    }
-
-    json_builder_end_array (builder);
-
-    json_builder_end_object (builder);
-
-    il2cpp_free (name);
-}
-
-void
-il2cpp_build_metadata (void * (*next_class) (),
-                       void (*on_done) (char *))
-{
-    JsonBuilder * builder;
-    GHashTable * table;
-    void * class;
-    JsonNode * root;
-    char * content;
-    
-    builder = json_builder_new_immutable ();
-    table = g_hash_table_new_full (g_direct_hash, g_direct_equal, NULL, NULL);
-
-    json_builder_begin_object (builder);
-    json_builder_set_member_name (builder, "types");
-    json_builder_begin_object (builder);
-
-    class = next_class ();
-    while (class != NULL)
-    {
-        _il2cpp_class_add_type_metadata (class, builder, table);
-        class = next_class ();
-    }
-
-    json_builder_end_object (builder);
-
-    json_builder_set_member_name (builder, "methods");
-    json_builder_begin_array (builder);
-
-    class = next_class ();
-    while (class != NULL)
-    {
-        // TODO: add methods
-        class = next_class ();
-    }
-
-    json_builder_end_array (builder);
-
-    json_builder_end_object (builder);
-
-    root = json_builder_get_root (builder);
-
-    content = json_to_string (root, 1);
-
-    on_done (content);
-
-    g_free (content);
-    json_node_unref (root);
-    g_free (builder);
 }
         `;
 

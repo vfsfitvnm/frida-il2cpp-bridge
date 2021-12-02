@@ -36,12 +36,12 @@ class Il2CppDumper {
     /** @internal */
     #generator?: () => Generator<string>;
 
-    directoryPath(directoryPath: string): Pick<Il2Cpp.Dumper, "fileName" | "classes" | "methods" | "metadata"> {
+    directoryPath(directoryPath: string): Pick<Il2Cpp.Dumper, "fileName" | "classes" | "methods"> {
         this.#directoryPath = directoryPath;
         return this;
     }
 
-    fileName(fileName: string): Pick<Il2Cpp.Dumper, "classes" | "methods" | "metadata"> {
+    fileName(fileName: string): Pick<Il2Cpp.Dumper, "classes" | "methods"> {
         this.#fileName = fileName;
         return this;
     }
@@ -58,44 +58,6 @@ class Il2CppDumper {
         };
 
         this.#extension = "cs";
-        return this;
-    }
-
-    metadata(): Pick<Il2Cpp.Dumper, "build"> {
-        function * getIterator(): Generator<Il2Cpp.Class> {
-            for (const assembly of Il2Cpp.Domain.assemblies) {
-                inform(`Dumping \x1b[1m${assembly.name}\x1b[0m...`);
-    
-                for (const klass of assembly.image.classes) {
-                    yield klass;
-                }
-            }
-        }
-
-        let content: string;
-        let iterator = getIterator();
-
-        const nextClass = new NativeCallback(() => {
-            const next = iterator.next();
-            
-            if (next.done) {
-                iterator = getIterator();
-                return NULL;
-            }
-    
-            return next.value;
-        }, "pointer", []);
-
-        const onDone = new NativeCallback((contentPointer: NativePointer) => {
-            content = contentPointer.readCString()!;
-        }, "void", ["pointer"]);
-
-        this.#generator = function* (): Generator<string> {
-            Il2Cpp.Api._buildMetadata(nextClass, onDone);
-            yield content;
-        };
-
-        this.#extension = "json";
         return this;
     }
 
