@@ -5,10 +5,21 @@ import { NativeStruct } from "../../utils/native-struct";
 
 /** Represents a `Il2CppArraySize`. */
 class Il2CppArray<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends NativeStruct implements Iterable<T> {
-    /** Creates a new array. */
-    static from<T extends Il2Cpp.Field.Type>(klass: Il2Cpp.Class, elements: T[]): Il2Cpp.Array<T> {
-        const array = new Il2Cpp.Array<T>(Il2Cpp.Api._arrayNew(klass, elements.length));
-        array.elements.values = elements;
+    /** Creates a new empty array of the given length. */
+    static from<T extends Il2Cpp.Field.Type>(klass: Il2Cpp.Class, length: number): Il2Cpp.Array<T>;
+
+    /** Creates a new array with the given elements. */
+    static from<T extends Il2Cpp.Field.Type>(klass: Il2Cpp.Class, elements: T[]): Il2Cpp.Array<T>;
+
+     /** @internal */
+    static from<T extends Il2Cpp.Field.Type>(klass: Il2Cpp.Class, lengthOrElements: number | T[]): Il2Cpp.Array<T> {
+        const length = typeof lengthOrElements == "number" ? lengthOrElements : lengthOrElements.length;
+        const array = new Il2Cpp.Array<T>(Il2Cpp.Api._arrayNew(klass, length));
+
+        if (Array.isArray(lengthOrElements)) {
+            array.elements.values = lengthOrElements;
+        }
+
         return array;
     }
 
