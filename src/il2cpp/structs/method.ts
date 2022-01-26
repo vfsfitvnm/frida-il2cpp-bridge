@@ -251,6 +251,10 @@ class Il2CppMethod extends NonNullNativeStruct {
             get(target: Il2Cpp.Method, property: keyof Il2Cpp.Method): any {
                 if (property == "invoke") {
                     return target.invokeRaw.bind(target, instance.handle);
+                } else if (property == "inflate") {
+                    return function (...classes: Il2Cpp.Class[]) {
+                        return target.inflate(...classes).withHolder(instance);
+                    };
                 }
 
                 return Reflect.get(target, property);
