@@ -53,10 +53,6 @@ export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Ty
 
 /** @internal */
 export function write(pointer: NativePointer, value: any, type: Il2Cpp.Type): NativePointer {
-    if (type.isByReference) {
-        return pointer.writePointer(value);
-    }
-
     switch (type.typeEnum) {
         case Il2Cpp.Type.Enum.Boolean:
             return pointer.writeU8(+value);
