@@ -1,7 +1,6 @@
 import { cache } from "decorator-cache-getter";
 import { raise, warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { overridePropertyValue } from "../../utils/utils";
 import { levenshtein, shouldBeInstance } from "../decorators";
 import { fromFridaValue, readGString, toFridaValue } from "../utils";
 
@@ -194,12 +193,9 @@ class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Paramete
 
     /** @internal */
     inflateRaw(typeArray: Il2Cpp.Array<Il2Cpp.Object>): Il2Cpp.Method {
-        const MakeGenericMethod = this.object.class.method<Il2Cpp.Object, [Il2Cpp.Array<Il2Cpp.Object>]>("MakeGenericMethod", 1)!;
-
-        let object = this.object;
-        while (!object.class.equals(MakeGenericMethod.class)) object = object.base;
-
-        const inflatedMethodObject = MakeGenericMethod.invokeRaw(object, typeArray);
+        const inflatedMethodObject = this.object
+            .method<Il2Cpp.Object, [Il2Cpp.Array<Il2Cpp.Object>]>("MakeGenericMethod", 1)
+            .invoke(typeArray);
 
         return new Il2Cpp.Method(Il2Cpp.Api._methodGetFromReflection(inflatedMethodObject));
     }

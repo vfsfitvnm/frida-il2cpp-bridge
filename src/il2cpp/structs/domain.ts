@@ -21,7 +21,7 @@ class Il2CppDomain {
 
         if (count == 0) {
             for (const assemblyObject of this.object.method<Il2Cpp.Array<Il2Cpp.Object>, []>("GetAssemblies", 0).invoke()) {
-                const assemblyName = assemblyObject.base.base.method<Il2Cpp.String, []>("GetSimpleName").invoke().content;
+                const assemblyName = assemblyObject.method<Il2Cpp.String, []>("GetSimpleName").invoke().content;
 
                 if (assemblyName != null) {
                     array.push(this.assembly(assemblyName));

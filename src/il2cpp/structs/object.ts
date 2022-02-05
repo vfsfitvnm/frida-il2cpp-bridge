@@ -1,16 +1,10 @@
 import { cache } from "decorator-cache-getter";
 import { NativeStruct } from "../../utils/native-struct";
-import { getOrNull, overridePropertyValue } from "../../utils/utils";
+import { getOrNull } from "../../utils/utils";
 import { checkNull } from "../decorators";
 
 /** Represents a `Il2CppObject`. */
 class Il2CppObject extends NativeStruct {
-    /** Gets this object casted to its base type. */
-    @cache
-    get base(): Il2Cpp.Object {
-        return overridePropertyValue(new Il2Cpp.Object(this), "class", this.class.parent!);
-    }
-
     /** Gets the class of this object. */
     @cache
     get class(): Il2Cpp.Class {
@@ -44,7 +38,10 @@ class Il2CppObject extends NativeStruct {
     }
 
     /** Gets the field with the given name. */
-    method<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]>(name: string, parameterCount: number = -1): Il2Cpp.Method<R, A> {
+    method<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]>(
+        name: string,
+        parameterCount: number = -1
+    ): Il2Cpp.Method<R, A> {
         return this.class.method<R, A>(name, parameterCount)!.withHolder(this);
     }
 

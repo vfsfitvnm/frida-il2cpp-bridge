@@ -23,12 +23,6 @@ export function mapToArray<V, U>(source: V[], map: (value: V) => U): U[] {
 }
 
 /** @internal */
-export function overridePropertyValue<T extends object, K extends keyof T>(target: T, property: K, value: T[K]): T {
-    Reflect.defineProperty(target, property, { value: value });
-    return target;
-}
-
-/** @internal */
 export function formatNativePointer(nativePointer: NativePointer): string {
     return `0x${nativePointer.toString(16).padStart(8, "0")}`;
 }

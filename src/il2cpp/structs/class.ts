@@ -243,13 +243,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** @internal */
     inflateRaw(typeArray: Il2Cpp.Array<Il2Cpp.Object>): Il2Cpp.Class {
-        const MakeGenericType = this.type.object.class.method<Il2Cpp.Object, [Il2Cpp.Array<Il2Cpp.Object>]>("MakeGenericType", 1)!;
-
-        // TODO: check if this can be removed
-        let object = this.type.object;
-        while (!object.class.equals(MakeGenericType.class)) object = object.base;
-
-        const inflatedType = MakeGenericType.invokeRaw(object, typeArray);
+        const inflatedType = this.type.object.method<Il2Cpp.Object, [Il2Cpp.Array<Il2Cpp.Object>]>("MakeGenericType", 1).invoke(typeArray);
 
         return new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(inflatedType));
     }
