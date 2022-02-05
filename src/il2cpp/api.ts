@@ -775,13 +775,13 @@ OFFSET_OF (offset_of_pointer, void *)
         SystemDateTime.initialize();
         SystemReflectionModule.initialize();
 
-        const DaysToMonth365 = (SystemDateTime.tryField("daysmonth") || SystemDateTime.field("DaysToMonth365"))
-            .value as Il2Cpp.Array<number>;
+        const DaysToMonth365 = (
+            SystemDateTime.tryField<Il2Cpp.Array<number>>("daysmonth") || SystemDateTime.field<Il2Cpp.Array<number>>("DaysToMonth365")
+        ).value;
 
         const filter_by_type_name = SystemReflectionModule.method("filter_by_type_name", 2);
-        const FilterTypeName = SystemReflectionModule.field("FilterTypeName").value as Il2Cpp.Object;
-        const method_ptr = FilterTypeName.class.field("method_ptr")!;
-        const FilterTypeNamePointer = FilterTypeName.handle.add(method_ptr.offset).readPointer();
+        const FilterTypeName = SystemReflectionModule.field<Il2Cpp.Object>("FilterTypeName").value;
+        const FilterTypeNamePointer = FilterTypeName.handle.add(FilterTypeName.class.field("method_ptr").offset).readPointer();
 
         const source = `\
 #include <stdint.h>

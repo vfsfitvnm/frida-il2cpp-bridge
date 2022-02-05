@@ -224,8 +224,8 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the field identified by the given name. */
     @levenshtein("fields")
-    field(name: string): Il2Cpp.Field {
-        return this.tryField(name)!;
+    field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> {
+        return this.tryField<T>(name)!;
     }
 
     /** Builds a generic instance of the current generic class. */
@@ -299,7 +299,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the field with the given name. */
     @memoize
-    tryField(name: string): Il2Cpp.Field | null {
+    tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> | null {
         const handle = Il2Cpp.Api._classGetFieldFromName(this, Memory.allocUtf8String(name));
         return handle.isNull() ? null : new Il2Cpp.Field(handle);
     }

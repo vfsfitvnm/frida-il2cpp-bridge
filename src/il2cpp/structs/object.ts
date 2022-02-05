@@ -39,8 +39,8 @@ class Il2CppObject extends NativeStruct {
     }
 
     /** Gets the field with the given name. */
-    field(name: string): Il2Cpp.Field {
-        return this.class.field(name)!.withHolder(this);
+    field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> {
+        return this.class.field<T>(name)!.withHolder(this);
     }
 
     /** Gets the field with the given name. */

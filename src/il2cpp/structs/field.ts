@@ -5,7 +5,7 @@ import { NonNullNativeStruct } from "../../utils/native-struct";
 import { shouldBeInstance } from "../decorators";
 
 /** Represents a `FieldInfo`. */
-class Il2CppField extends NonNullNativeStruct {
+class Il2CppField<T extends Il2Cpp.Field.Type> extends NonNullNativeStruct {
     /** Gets the class in which this field is defined. */
     @cache
     get class(): Il2Cpp.Class {
@@ -60,15 +60,15 @@ class Il2CppField extends NonNullNativeStruct {
     }
 
     /** Gets the value of this field. */
-    get value(): Il2Cpp.Field.Type {
+    get value(): T {
         const handle = Memory.alloc(Process.pointerSize);
         Il2Cpp.Api._fieldGetStaticValue(this.handle, handle);
 
-        return read(handle, this.type);
+        return read(handle, this.type) as T;
     }
 
     /** Sets the value of this field. Thread static or literal values cannot be altered yet. */
-    set value(value: Il2Cpp.Field.Type) {
+    set value(value: T) {
         if (this.isThreadStatic || this.isLiteral) {
             warn(`${this.class.type.name}.${this.name} is a thread static or literal field, its value won't be modified.`);
             return;
@@ -82,21 +82,21 @@ class Il2CppField extends NonNullNativeStruct {
 
     /** @internal */
     @shouldBeInstance(true)
-    withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Field {
+    withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Field<T> {
         let valueHandle = instance.handle.add(this.offset);
         if (instance instanceof Il2Cpp.ValueType) {
             valueHandle = valueHandle.sub(Il2Cpp.Runtime.objectHeaderSize);
         }
 
         return new Proxy(this, {
-            get(target: Il2Cpp.Field, property: keyof Il2Cpp.Field): any {
+            get(target: Il2Cpp.Field<T>, property: keyof Il2Cpp.Field): any {
                 if (property == "value") {
                     return read(valueHandle, target.type);
                 }
                 return Reflect.get(target, property);
             },
 
-            set(target: Il2Cpp.Field, property: keyof Il2Cpp.Field, value: any): boolean {
+            set(target: Il2Cpp.Field<T>, property: keyof Il2Cpp.Field, value: any): boolean {
                 if (property == "value") {
                     write(valueHandle, value, target.type);
                     return true;
@@ -116,7 +116,7 @@ Reflect.set(Il2Cpp, "Field", Il2CppField);
 
 declare global {
     namespace Il2Cpp {
-        class Field extends Il2CppField {}
+        class Field<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Il2CppField<T> {}
 
         namespace Field {
             type Type =
