@@ -34,7 +34,7 @@ class Il2CppObject extends NativeStruct {
 
     /** Gets the field with the given name. */
     field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> {
-        return this.class.field<T>(name)!.withHolder(this);
+        return this.class.field<T>(name).withHolder(this);
     }
 
     /** Gets the field with the given name. */
@@ -42,7 +42,7 @@ class Il2CppObject extends NativeStruct {
         name: string,
         parameterCount: number = -1
     ): Il2Cpp.Method<R, A> {
-        return this.class.method<R, A>(name, parameterCount)!.withHolder(this);
+        return this.class.method<R, A>(name, parameterCount).withHolder(this);
     }
 
     /** Notifies a thread in the waiting queue of a change in the locked object's state. */
