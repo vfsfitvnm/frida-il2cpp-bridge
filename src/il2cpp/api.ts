@@ -1197,13 +1197,13 @@ il2cpp_field_get_modifier (void * field)
 uint8_t
 il2cpp_field_is_literal (void * field)
 {
-    return il2cpp_field_get_flags (field) & FIELD_ATTRIBUTE_LITERAL;
+    return (il2cpp_field_get_flags (field) & FIELD_ATTRIBUTE_LITERAL) != 0;
 }
 
 uint8_t
 il2cpp_field_is_static (void * field)
 {
-    return il2cpp_field_get_flags (field) & FIELD_ATTRIBUTE_STATIC;
+    return (il2cpp_field_get_flags (field) & FIELD_ATTRIBUTE_STATIC) != 0;
 }
 
 uint8_t
@@ -1313,33 +1313,21 @@ il2cpp_method_get_pointer (void ** method)
 uint8_t
 il2cpp_method_is_external (void * method)
 {
-    uint8_t is_external;
-    uint32_t * implementation_flags;
+    uint32_t implementation_flags;
 
-    implementation_flags = g_malloc (sizeof (void *));
+    il2cpp_method_get_flags (method, &implementation_flags);
 
-    il2cpp_method_get_flags (method, implementation_flags);
-
-    is_external = (* implementation_flags) & METHOD_IMPL_ATTRIBUTE_INTERNAL_CALL;
-
-    g_free (implementation_flags);
-    return is_external;
+    return (implementation_flags & METHOD_IMPL_ATTRIBUTE_INTERNAL_CALL) != 0;
 }
 
 uint8_t
 il2cpp_method_is_synchronized (void * method)
 {
-    uint8_t is_synchronized;
-    uint32_t * implementation_flags;
+    uint32_t implementation_flags;
 
-    implementation_flags = g_malloc (sizeof (void *));
+    il2cpp_method_get_flags (method, &implementation_flags);
 
-    il2cpp_method_get_flags (method, implementation_flags);
-
-    is_synchronized = (* implementation_flags) & METHOD_IMPL_ATTRIBUTE_SYNCHRONIZED;
-
-    g_free (implementation_flags);
-    return is_synchronized;
+    return (implementation_flags & METHOD_IMPL_ATTRIBUTE_SYNCHRONIZED) != 0;
 }
 
 void
