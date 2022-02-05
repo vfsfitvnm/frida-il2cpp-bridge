@@ -99,14 +99,14 @@ class Il2CppBase {
                 try {
                     block();
                 } catch (error: any) {
-                    if (isForeignThread) {
-                        thread?.detach();
-                    }
-
                     if (error.fromIl2CppModule) {
                         (globalThis as any).console.log(error.stack);
                     } else {
                         throw error;
+                    }
+                } finally {
+                    if (isForeignThread) {
+                        thread?.detach();
                     }
                 }
             })
