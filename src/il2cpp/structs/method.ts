@@ -229,6 +229,21 @@ class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Paramete
         return fromFridaValue(returnValue, this.returnType) as R;
     }
 
+    /** Gets the overloaded method with the given parameter types. */
+    overload<R extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]>(
+        ...parameterTypes: string[]
+    ): Il2Cpp.Method<R, A> {
+        const result = this.tryOverload<R, A>(...parameterTypes);
+
+        if (result != undefined) return result;
+
+        raise(
+            `Couldn't find the overload ${this.name}(${parameterTypes.join(", ")}); candidates are:\n${this.class.methods
+                .filter(e => e.name == this.name)
+                .join("\n")}`
+        );
+    }
+
     /** Gets the parameter with the given name. */
     @levenshtein("parameters")
     parameter(name: string): Il2Cpp.Parameter {
@@ -257,6 +272,18 @@ class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Paramete
                 return Reflect.get(target, property);
             }
         });
+    }
+
+    /** Gets the overloaded method with the given parameter types. */
+    tryOverload<R extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]>(
+        ...parameterTypes: string[]
+    ): Il2Cpp.Method<R, A> | undefined {
+        return this.class.methods.find(
+            e =>
+                e.name == this.name &&
+                e.parameterCount == parameterTypes.length &&
+                e.parameters.map(e => e.type.name).toString() == parameterTypes.toString()
+        ) as Il2Cpp.Method<R, A> | undefined;
     }
 
     /** Gets the parameter with the given name. */
