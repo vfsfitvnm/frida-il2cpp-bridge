@@ -7,7 +7,7 @@ class Il2CppDumper {
     static get defaultDirectoryPath(): string {
         const UnityEngine = Il2Cpp.Domain.tryAssembly("UnityEngine.CoreModule") || Il2Cpp.Domain.assembly("UnityEngine");
         const Application = UnityEngine.image.class("UnityEngine.Application");
-        return Application.method<Il2Cpp.String, []>("get_persistentDataPath").invoke().content!;
+        return Application.method<Il2Cpp.String>("get_persistentDataPath").invoke().content!;
     }
 
     /** Gets the default file name. */
@@ -16,8 +16,8 @@ class Il2CppDumper {
         const Application = UnityEngine.image.class("UnityEngine.Application");
 
         try {
-            const identifier = (Application.tryMethod<Il2Cpp.String, []>("get_identifier") || Application.method<Il2Cpp.String, []>("get_bundleIdentifier")).invoke();
-            const version = Application.method<Il2Cpp.String, []>("get_version").invoke();
+            const identifier = (Application.tryMethod<Il2Cpp.String>("get_identifier") || Application.method<Il2Cpp.String>("get_bundleIdentifier")).invoke();
+            const version = Application.method<Il2Cpp.String>("get_version").invoke();
             return `${identifier.content}_${version.content}`;
         } catch (e) {
             return `${new Date().getTime()}`;

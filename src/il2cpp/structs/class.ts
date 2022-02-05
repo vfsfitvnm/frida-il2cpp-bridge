@@ -75,7 +75,7 @@ class Il2CppClass extends NonNullNativeStruct {
             return 0;
         }
 
-        return this.type.object.method<Il2Cpp.Array, []>("GetGenericArguments").invoke().length;
+        return this.type.object.method<Il2Cpp.Array>("GetGenericArguments").invoke().length;
     }
 
     /** Determines whether the GC has tracking references to the current class instances. */
@@ -243,7 +243,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** @internal */
     inflateRaw(typeArray: Il2Cpp.Array<Il2Cpp.Object>): Il2Cpp.Class {
-        const inflatedType = this.type.object.method<Il2Cpp.Object, [Il2Cpp.Array<Il2Cpp.Object>]>("MakeGenericType", 1).invoke(typeArray);
+        const inflatedType = this.type.object.method<Il2Cpp.Object>("MakeGenericType", 1).invoke(typeArray);
 
         return new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(inflatedType));
     }
@@ -265,11 +265,8 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the method identified by the given name and parameter count. */
     @levenshtein("methods")
-    method<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]>(
-        name: string,
-        parameterCount: number = -1
-    ): Il2Cpp.Method<R, A> {
-        return this.tryMethod<R, A>(name, parameterCount)!;
+    method<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> {
+        return this.tryMethod<T>(name, parameterCount)!;
     }
 
     /** Gets the nested class with the given name. */
@@ -299,17 +296,14 @@ class Il2CppClass extends NonNullNativeStruct {
     @memoize
     tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> | null {
         const handle = Il2Cpp.Api._classGetFieldFromName(this, Memory.allocUtf8String(name));
-        return handle.isNull() ? null : new Il2Cpp.Field(handle);
+        return handle.isNull() ? null : new Il2Cpp.Field<T>(handle);
     }
 
     /** Gets the method with the given name and parameter count. */
     @memoize
-    tryMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]>(
-        name: string,
-        parameterCount: number = -1
-    ): Il2Cpp.Method<R, A> | null {
+    tryMethod<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> | null {
         const handle = Il2Cpp.Api._classGetMethodFromName(this, Memory.allocUtf8String(name), parameterCount);
-        return handle.isNull() ? null : new Il2Cpp.Method(handle);
+        return handle.isNull() ? null : new Il2Cpp.Method<T>(handle);
     }
 
     /** Gets the nested class with the given name. */

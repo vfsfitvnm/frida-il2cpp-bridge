@@ -5,7 +5,7 @@ import { levenshtein, shouldBeInstance } from "../decorators";
 import { fromFridaValue, readGString, toFridaValue } from "../utils";
 
 /** Represents a `MethodInfo`. */
-class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | []> extends NonNullNativeStruct {
+class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStruct {
     /** Gets the class in which this method is defined. */
     @cache
     get class(): Il2Cpp.Class {
@@ -54,7 +54,7 @@ class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Paramete
             return 0;
         }
 
-        return this.object.method<Il2Cpp.Array, []>("GetGenericArguments").invoke().length;
+        return this.object.method<Il2Cpp.Array>("GetGenericArguments").invoke().length;
     }
 
     /** Determines whether this method is external. */
@@ -145,7 +145,7 @@ class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Paramete
     }
 
     /** Replaces the body of this method. */
-    set implementation(block: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: A) => R) {
+    set implementation(block: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => T) {
         if (this.virtualAddress.isNull()) {
             raise(`Cannot implementation for ${this.class.type.name}.${this.name}: pointer is null.`);
         } else if (this.isExternal) {
@@ -158,7 +158,7 @@ class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Paramete
 
             const result = block.call(
                 this.isStatic ? this.class : new Il2Cpp.Object(args[0]),
-                ...(this.parameters.map((e, i) => fromFridaValue(args[i + startIndex], e.type)) as A)
+                ...(this.parameters.map((e, i) => fromFridaValue(args[i + startIndex], e.type)))
             );
 
             if (typeof result != "undefined") {
@@ -178,7 +178,7 @@ class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Paramete
     }
 
     /** Creates a generic instance of the current generic method. */
-    inflate(...classes: Il2Cpp.Class[]): Il2Cpp.Method {
+    inflate<R extends Il2Cpp.Method.ReturnType = T>(...classes: Il2Cpp.Class[]): Il2Cpp.Method<R> {
         if (!this.isGeneric) {
             raise(`${this.name} it's not generic, so it cannot be inflated.`);
         }
@@ -191,13 +191,13 @@ class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Paramete
         const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.class("System.Type"), types);
 
         // TODO: typeArray leaks
-        return this.inflateRaw(typeArray);
+        return this.inflateRaw<R>(typeArray);
     }
 
     /** @internal */
-    inflateRaw(typeArray: Il2Cpp.Array<Il2Cpp.Object>): Il2Cpp.Method {
+    inflateRaw<R extends Il2Cpp.Method.ReturnType = T>(typeArray: Il2Cpp.Array<Il2Cpp.Object>): Il2Cpp.Method<R> {
         const inflatedMethodObject = this.object
-            .method<Il2Cpp.Object, [Il2Cpp.Array<Il2Cpp.Object>]>("MakeGenericMethod", 1)
+            .method<Il2Cpp.Object>("MakeGenericMethod", 1)
             .invoke(typeArray);
 
         return new Il2Cpp.Method(Il2Cpp.Api._methodGetFromReflection(inflatedMethodObject));
@@ -205,12 +205,12 @@ class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Paramete
 
     /** Invokes this method. */
     @shouldBeInstance(false)
-    invoke(...parameters: A): R {
+    invoke(...parameters: Il2Cpp.Parameter.Type[]): T {
         return this.invokeRaw(NULL, ...parameters);
     }
 
     /** @internal */
-    invokeRaw(instance: NativePointerValue, ...parameters: A): R {
+    invokeRaw(instance: NativePointerValue, ...parameters: Il2Cpp.Parameter.Type[]): T {
         if (this.parameterCount != parameters.length) {
             raise(`${this.name} requires ${this.parameterCount} parameters, but ${parameters.length} were supplied.`);
         }
@@ -226,14 +226,12 @@ class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Paramete
         }
 
         const returnValue = Il2Cpp.try(() => this.nativeFunction(...allocatedParameters));
-        return fromFridaValue(returnValue, this.returnType) as R;
+        return fromFridaValue(returnValue, this.returnType) as T;
     }
 
     /** Gets the overloaded method with the given parameter types. */
-    overload<R extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]>(
-        ...parameterTypes: string[]
-    ): Il2Cpp.Method<R, A> {
-        const result = this.tryOverload<R, A>(...parameterTypes);
+    overload( ...parameterTypes: string[] ): Il2Cpp.Method<T> {
+        const result = this.tryOverload<T>(...parameterTypes);
 
         if (result != undefined) return result;
 
@@ -258,9 +256,9 @@ class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Paramete
 
     /** @internal */
     @shouldBeInstance(true)
-    withHolder(instance: Il2Cpp.Object): Il2Cpp.Method<R, A> {
+    withHolder(instance: Il2Cpp.Object): Il2Cpp.Method<T> {
         return new Proxy(this, {
-            get(target: Il2Cpp.Method<R, A>, property: keyof Il2Cpp.Method): any {
+            get(target: Il2Cpp.Method<T>, property: keyof Il2Cpp.Method<T>): any {
                 if (property == "invoke") {
                     return target.invokeRaw.bind(target, instance.handle);
                 } else if (property == "inflate") {
@@ -275,15 +273,13 @@ class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Paramete
     }
 
     /** Gets the overloaded method with the given parameter types. */
-    tryOverload<R extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]>(
-        ...parameterTypes: string[]
-    ): Il2Cpp.Method<R, A> | undefined {
+    tryOverload<R extends Il2Cpp.Method.ReturnType>(...parameterTypes: string[]): Il2Cpp.Method<R> | undefined {
         return this.class.methods.find(
             e =>
                 e.name == this.name &&
                 e.parameterCount == parameterTypes.length &&
                 e.parameters.map(e => e.type.name).toString() == parameterTypes.toString()
-        ) as Il2Cpp.Method<R, A> | undefined;
+        ) as Il2Cpp.Method<R> | undefined;
     }
 
     /** Gets the parameter with the given name. */
@@ -300,10 +296,7 @@ Reflect.set(Il2Cpp, "Method", Il2CppMethod);
 
 declare global {
     namespace Il2Cpp {
-        class Method<
-            R extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType,
-            A extends Il2Cpp.Parameter.Type[] | [] = any[]
-        > extends Il2CppMethod<R, A> {}
+        class Method<T extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType> extends Il2CppMethod<T> {}
         namespace Method {
             type ReturnType = void | Il2Cpp.Field.Type;
 

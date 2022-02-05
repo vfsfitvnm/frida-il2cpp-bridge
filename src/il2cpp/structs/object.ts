@@ -38,11 +38,8 @@ class Il2CppObject extends NativeStruct {
     }
 
     /** Gets the field with the given name. */
-    method<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]>(
-        name: string,
-        parameterCount: number = -1
-    ): Il2Cpp.Method<R, A> {
-        return this.class.method<R, A>(name, parameterCount).withHolder(this);
+    method<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> {
+        return this.class.method<T>(name, parameterCount).withHolder(this);
     }
 
     /** Notifies a thread in the waiting queue of a change in the locked object's state. */
@@ -71,11 +68,8 @@ class Il2CppObject extends NativeStruct {
     }
 
     /** Gets the field with the given name. */
-    tryMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]>(
-        name: string,
-        parameterCount: number = -1
-    ): Il2Cpp.Method<R, A> | undefined {
-        return this.class.tryMethod<R, A>(name, parameterCount)?.withHolder(this);
+    tryMethod<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> | undefined {
+        return this.class.tryMethod<T>(name, parameterCount)?.withHolder(this);
     }
 
     /** Releases the lock on an object and attempts to block the current thread until it reacquires the lock. */
@@ -100,7 +94,7 @@ class Il2CppObject extends NativeStruct {
 
     @checkNull
     override toString(): string {
-        return this.method<Il2Cpp.String, []>("ToString").invoke().content || "null";
+        return this.method<Il2Cpp.String>("ToString").invoke().content || "null";
     }
 }
 
