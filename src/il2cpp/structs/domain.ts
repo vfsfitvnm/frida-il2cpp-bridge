@@ -1,5 +1,6 @@
 import { cache } from "decorator-cache-getter";
-import { addLevenshtein, getOrNull, IterableRecord, makeIterable } from "../../utils/utils";
+import { memoize } from "../../utils/utils";
+import { levenshtein } from "../decorators";
 
 /** Represents a `Il2CppDomain`. */
 class Il2CppDomain {
@@ -7,34 +8,28 @@ class Il2CppDomain {
 
     /** Gets the assemblies that have been loaded into the execution context of the application domain. */
     @cache
-    static get assemblies(): IterableRecord<Il2Cpp.Assembly> {
-        const record: Record<string, Il2Cpp.Assembly> = {};
-
+    static get assemblies(): Il2Cpp.Assembly[] {
         const sizePointer = Memory.alloc(Process.pointerSize);
         const startPointer = Il2Cpp.Api._domainGetAssemblies(this, sizePointer);
 
         const count = sizePointer.readInt();
+        const array: Il2Cpp.Assembly[] = new Array(count);
 
         for (let i = 0; i < count; i++) {
-            const assembly = new Il2Cpp.Assembly(startPointer.add(i * Process.pointerSize).readPointer());
-            record[assembly.name] = assembly;
+            array[i] = new Il2Cpp.Assembly(startPointer.add(i * Process.pointerSize).readPointer());
         }
 
         if (count == 0) {
-            for (const assemblyObject of this.object.methods.GetAssemblies_.invoke<Il2Cpp.Array<Il2Cpp.Object>>()) {
-                const assemblyName = assemblyObject.base.base.methods.GetSimpleName.invoke<Il2Cpp.String>().content;
+            for (const assemblyObject of this.object.method("GetAssemblies", 0).invoke<Il2Cpp.Array<Il2Cpp.Object>>()) {
+                const assemblyName = assemblyObject.base.base.method("GetSimpleName").invoke<Il2Cpp.String>().content;
 
                 if (assemblyName != null) {
-                    const assembly = this.open(assemblyName);
-
-                    if (assembly != null) {
-                        record[assembly.name] = assembly;
-                    }
+                    array.push(this.assembly(assemblyName));
                 }
             }
         }
 
-        return makeIterable(addLevenshtein(record));
+        return array;
     }
 
     /** Gets the application domain handle. */
@@ -46,7 +41,13 @@ class Il2CppDomain {
     /** Gets the encompassing object of the application domain. */
     @cache
     static get object(): Il2Cpp.Object {
-        return Il2Cpp.Image.corlib.getClass("System", "AppDomain")!.methods.get_CurrentDomain.invoke<Il2Cpp.Object>();
+        return Il2Cpp.Image.corlib.class("System.AppDomain").method("get_CurrentDomain").invoke<Il2Cpp.Object>();
+    }
+
+    /** Opens and loads the assembly with the given name. */
+    @levenshtein("assemblies")
+    static assembly(name: string): Il2Cpp.Assembly {
+        return this.tryAssembly(name)!;
     }
 
     /** Attached a new thread to the application domain. */
@@ -55,8 +56,10 @@ class Il2CppDomain {
     }
 
     /** Opens and loads the assembly with the given name. */
-    static open(assemblyName: string): Il2Cpp.Assembly | null {
-        return getOrNull(Il2Cpp.Api._domainAssemblyOpen(this, Memory.allocUtf8String(assemblyName)), Il2Cpp.Assembly);
+    @memoize
+    static tryAssembly(name: string): Il2Cpp.Assembly | null {
+        const handle = Il2Cpp.Api._domainAssemblyOpen(this, Memory.allocUtf8String(name));
+        return handle.isNull() ? null : new Il2Cpp.Assembly(handle);
     }
 }
 

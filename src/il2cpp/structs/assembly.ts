@@ -20,9 +20,7 @@ class Il2CppAssembly extends NonNullNativeStruct {
     /** Gets the encompassing object of the current assembly. */
     @cache
     get object(): Il2Cpp.Object {
-        return Il2Cpp.Image.corlib
-            .getClass("System.Reflection", "Assembly")!
-            .methods.Load.invoke<Il2Cpp.Object>(Il2Cpp.String.from(this.name));
+        return Il2Cpp.Image.corlib.class("System.Reflection.Assembly").method("Load").invoke<Il2Cpp.Object>(Il2Cpp.String.from(this.name));
     }
 }
 

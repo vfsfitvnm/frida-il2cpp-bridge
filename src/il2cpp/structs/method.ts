@@ -1,9 +1,9 @@
 import { cache } from "decorator-cache-getter";
-import { shouldBeInstance } from "../decorators";
-import { fromFridaValue, readGString, toFridaValue } from "../utils";
 import { raise, warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { addLevenshtein, IterableRecord, makeIterable, overridePropertyValue } from "../../utils/utils";
+import { overridePropertyValue } from "../../utils/utils";
+import { levenshtein, shouldBeInstance } from "../decorators";
+import { fromFridaValue, readGString, toFridaValue } from "../utils";
 
 /** Represents a `MethodInfo`. */
 class Il2CppMethod extends NonNullNativeStruct {
@@ -55,10 +55,7 @@ class Il2CppMethod extends NonNullNativeStruct {
             return 0;
         }
 
-        let object = this.object;
-        while (!("GetGenericArguments" in object.methods)) object = object.base;
-
-        return object.methods.GetGenericArguments.invoke<Il2Cpp.Array>().length;
+        return this.object.method("GetGenericArguments").invoke<Il2Cpp.Array>().length;
     }
 
     /** Determines whether this method is external. */
@@ -122,15 +119,12 @@ class Il2CppMethod extends NonNullNativeStruct {
 
     /** Gets the parameters of this method. */
     @cache
-    get parameters(): IterableRecord<Il2Cpp.Parameter> {
-        const record: Record<string, Il2Cpp.Parameter> = {};
-        for (let i = 0; i < this.parameterCount; i++) {
+    get parameters(): Il2Cpp.Parameter[] {
+        return Array.from(Array(this.parameterCount), (_, i) => {
             const parameterName = Il2Cpp.Api._methodGetParameterName(this, i).readUtf8String()!;
             const parameterType = Il2Cpp.Api._methodGetParameterType(this, i);
-            record[parameterName] = new Il2Cpp.Parameter(parameterName, i, new Il2Cpp.Type(parameterType));
-        }
-
-        return makeIterable(addLevenshtein(record));
+            return new Il2Cpp.Parameter(parameterName, i, new Il2Cpp.Type(parameterType));
+        });
     }
 
     /** Gets the relative virtual address (RVA) of this method. */
@@ -194,7 +188,7 @@ class Il2CppMethod extends NonNullNativeStruct {
         }
 
         const types = classes.map(klass => klass.type.object);
-        const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.classes["System.Type"], types);
+        const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.class("System.Type"), types);
 
         // TODO: typeArray leaks
         return this.inflateRaw(typeArray);
@@ -202,7 +196,7 @@ class Il2CppMethod extends NonNullNativeStruct {
 
     /** @internal */
     inflateRaw(typeArray: Il2Cpp.Array<Il2Cpp.Object>): Il2Cpp.Method {
-        const MakeGenericMethod = this.object.class.getMethod("MakeGenericMethod", 1)!;
+        const MakeGenericMethod = this.object.class.method("MakeGenericMethod", 1)!;
 
         let object = this.object;
         while (!object.class.equals(MakeGenericMethod.class)) object = object.base;
@@ -238,6 +232,12 @@ class Il2CppMethod extends NonNullNativeStruct {
         return fromFridaValue(returnValue, this.returnType) as Il2Cpp.Method.ReturnType;
     }
 
+    /** Gets the parameter with the given name. */
+    @levenshtein("parameters")
+    parameter(name: string): Il2Cpp.Parameter {
+        return this.tryParameter(name)!;
+    }
+
     /** Restore the original method implementation. */
     restoreImplementation(): void {
         Interceptor.revert(this.virtualAddress);
@@ -260,6 +260,11 @@ class Il2CppMethod extends NonNullNativeStruct {
                 return Reflect.get(target, property);
             }
         });
+    }
+
+    /** Gets the parameter with the given name. */
+    tryParameter(name: string): Il2Cpp.Parameter | undefined {
+        return this.parameters.find(e => e.name == name);
     }
 
     override toString(): string {

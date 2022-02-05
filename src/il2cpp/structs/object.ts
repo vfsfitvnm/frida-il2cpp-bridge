@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
-import { checkNull } from "../decorators";
 import { NativeStruct } from "../../utils/native-struct";
-import { addLevenshtein, filterMap, getOrNull, IterableRecord, makeIterable, overridePropertyValue } from "../../utils/utils";
+import { getOrNull, overridePropertyValue } from "../../utils/utils";
+import { checkNull } from "../decorators";
 
 /** Represents a `Il2CppObject`. */
 class Il2CppObject extends NativeStruct {
@@ -15,34 +15,6 @@ class Il2CppObject extends NativeStruct {
     @cache
     get class(): Il2Cpp.Class {
         return new Il2Cpp.Class(Il2Cpp.Api._objectGetClass(this));
-    }
-
-    /** Gets the fields of this object. */
-    @cache
-    get fields(): IterableRecord<Il2Cpp.Field> {
-        return makeIterable(
-            addLevenshtein(
-                filterMap(
-                    this.class.fields,
-                    (field: Il2Cpp.Field) => !field.isStatic,
-                    (field: Il2Cpp.Field) => field.withHolder(this)
-                )
-            )
-        );
-    }
-
-    /** Gets the methods of this object. */
-    @cache
-    get methods(): IterableRecord<Il2Cpp.Method> {
-        return makeIterable(
-            addLevenshtein(
-                filterMap(
-                    this.class.methods,
-                    (method: Il2Cpp.Method) => !method.isStatic,
-                    (method: Il2Cpp.Method) => method.withHolder(this)
-                )
-            )
-        );
     }
 
     /** Gets the size of the current object. */
@@ -64,6 +36,16 @@ class Il2CppObject extends NativeStruct {
     /** */
     getVirtualMethod(method: Il2Cpp.Method): Il2Cpp.Method | null {
         return getOrNull(Il2Cpp.Api._objectGetVirtualMethod(this, method), Il2Cpp.Method);
+    }
+
+    /** Gets the field with the given name. */
+    field(name: string): Il2Cpp.Field {
+        return this.class.field(name)!.withHolder(this);
+    }
+
+    /** Gets the field with the given name. */
+    method(name: string, parameterCount: number = -1): Il2Cpp.Method {
+        return this.class.method(name, parameterCount)!.withHolder(this);
     }
 
     /** Notifies a thread in the waiting queue of a change in the locked object's state. */
@@ -108,12 +90,7 @@ class Il2CppObject extends NativeStruct {
 
     @checkNull
     override toString(): string {
-        let object: Il2Cpp.Object = this;
-        while (!("ToString" in object.methods)) {
-            object = object.base;
-        }
-
-        return object.methods.ToString.invoke<Il2Cpp.String>().content || "null";
+        return this.method("ToString").invoke<Il2Cpp.String>().content || "null";
     }
 }
 

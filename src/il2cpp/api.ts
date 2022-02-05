@@ -767,20 +767,20 @@ OFFSET_OF (offset_of_pointer, void *)
         const offsetOfInt32 = new NativeFunction(offsetsFinderCModule.offset_of_int32, "int16", ["pointer", "int32"]);
         const offsetOfPointer = new NativeFunction(offsetsFinderCModule.offset_of_pointer, "int16", ["pointer", "pointer"]);
 
-        const SystemString = Il2Cpp.Image.corlib.getClass("System", "String")!;
-        const SystemValueType = Il2Cpp.Image.corlib.getClass("System", "ValueType")!;
-        const SystemDateTime = Il2Cpp.Image.corlib.getClass("System", "DateTime")!;
-        const SystemReflectionModule = Il2Cpp.Image.corlib.getClass("System.Reflection", "Module")!;
+        const SystemString = Il2Cpp.Image.corlib.class("System.String");
+        const SystemValueType = Il2Cpp.Image.corlib.class("System.ValueType");
+        const SystemDateTime = Il2Cpp.Image.corlib.class("System.DateTime");
+        const SystemReflectionModule = Il2Cpp.Image.corlib.class("System.Reflection.Module");
 
         SystemDateTime.initialize();
         SystemReflectionModule.initialize();
 
-        const DaysToMonth365 = (SystemDateTime.getField("daysmonth") || SystemDateTime.getField("DaysToMonth365"))!
+        const DaysToMonth365 = (SystemDateTime.tryField("daysmonth") || SystemDateTime.field("DaysToMonth365"))
             .value as Il2Cpp.Array<number>;
 
-        const filter_by_type_name = SystemReflectionModule.getMethod("filter_by_type_name", 2)!;
-        const FilterTypeName = SystemReflectionModule.getField("FilterTypeName")!.value as Il2Cpp.Object;
-        const method_ptr = FilterTypeName.class.getField("method_ptr")!;
+        const filter_by_type_name = SystemReflectionModule.method("filter_by_type_name", 2);
+        const FilterTypeName = SystemReflectionModule.field("FilterTypeName").value as Il2Cpp.Object;
+        const method_ptr = FilterTypeName.class.field("method_ptr")!;
         const FilterTypeNamePointer = FilterTypeName.handle.add(method_ptr.offset).readPointer();
 
         const source = `\

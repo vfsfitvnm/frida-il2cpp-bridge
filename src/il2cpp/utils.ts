@@ -142,7 +142,11 @@ export function toFridaValue(value: Il2Cpp.Parameter.Type): NativeFunctionArgume
 }
 
 function valueTypeToArray(value: Il2Cpp.ValueType): NativeFunctionArgumentValue[] {
-    return mapToArray(value.fields, (field: Il2Cpp.Field) => {
+    const fields = value.type.class.fields
+        .filter(f => !f.isStatic)
+        .map(f => f.withHolder(value));  
+
+    return mapToArray(fields, (field: Il2Cpp.Field) => {
         const fieldValue = field.value;
         return fieldValue instanceof Il2Cpp.ValueType
             ? valueTypeToArray(fieldValue)

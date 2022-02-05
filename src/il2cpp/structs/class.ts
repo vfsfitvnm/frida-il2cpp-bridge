@@ -1,8 +1,9 @@
 import { cache } from "decorator-cache-getter";
-import { readGString } from "../utils";
 import { raise } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { cacheInstances, getOrNull, IterableRecord, makeRecordFromNativeIterator } from "../../utils/utils";
+import { cacheInstances, getOrNull, makeArrayFromNativeIterator, memoize } from "../../utils/utils";
+import { levenshtein } from "../decorators";
+import { readGString } from "../utils";
 
 /** Represents a `Il2CppClass`. */
 @cacheInstances
@@ -57,8 +58,8 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the fields of the current class. */
     @cache
-    get fields(): IterableRecord<Il2Cpp.Field> {
-        return makeRecordFromNativeIterator(this, Il2Cpp.Api._classGetFields, Il2Cpp.Field, field => field.name);
+    get fields(): Il2Cpp.Field[] {
+        return makeArrayFromNativeIterator(this, Il2Cpp.Api._classGetFields, Il2Cpp.Field);
     }
 
     /** Gets the flags of the current class. */
@@ -74,7 +75,7 @@ class Il2CppClass extends NonNullNativeStruct {
             return 0;
         }
 
-        return this.type.object.methods.GetGenericArguments.invoke<Il2Cpp.Array>().length;
+        return this.type.object.method("GetGenericArguments").invoke<Il2Cpp.Array>().length;
     }
 
     /** Determines whether the GC has tracking references to the current class instances. */
@@ -86,7 +87,8 @@ class Il2CppClass extends NonNullNativeStruct {
     /** Determines whether ther current class has a valid static constructor. */
     @cache
     get hasStaticConstructor(): boolean {
-        return ".cctor" in this.methods && !this.methods[".cctor"].virtualAddress.isNull();
+        const staticConstructor = this.tryMethod(".cctor");
+        return staticConstructor != null && !staticConstructor.virtualAddress.isNull();
     }
 
     /** Gets the image in which the current class is defined. */
@@ -151,8 +153,8 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the interfaces implemented or inherited by the current class. */
     @cache
-    get interfaces(): IterableRecord<Il2Cpp.Class> {
-        return makeRecordFromNativeIterator(this, Il2Cpp.Api._classGetInterfaces, Il2Cpp.Class, klass => klass.type.name);
+    get interfaces(): Il2Cpp.Class[] {
+        return makeArrayFromNativeIterator(this, Il2Cpp.Api._classGetInterfaces, Il2Cpp.Class);
     }
 
     /** Gets the amount of the implemented methods by the current class. */
@@ -163,8 +165,8 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the methods implemented by the current class. */
     @cache
-    get methods(): IterableRecord<Il2Cpp.Method> {
-        return makeRecordFromNativeIterator(this, Il2Cpp.Api._classGetMethods, Il2Cpp.Method, method => method.name, true);
+    get methods(): Il2Cpp.Method[] {
+        return makeArrayFromNativeIterator(this, Il2Cpp.Api._classGetMethods, Il2Cpp.Method);
     }
 
     /** Gets the name of the current class. */
@@ -181,8 +183,8 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the classes nested inside the current class. */
     @cache
-    get nestedClasses(): IterableRecord<Il2Cpp.Class> {
-        return makeRecordFromNativeIterator(this, Il2Cpp.Api._classGetNestedClasses, Il2Cpp.Class, klass => klass.name, true);
+    get nestedClasses(): Il2Cpp.Class[] {
+        return makeArrayFromNativeIterator(this, Il2Cpp.Api._classGetNestedClasses, Il2Cpp.Class);
     }
 
     /** Gets the class from which the current class directly inherits. */
@@ -221,13 +223,9 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     /** Gets the field identified by the given name. */
-    getField(name: string): Il2Cpp.Field | null {
-        return getOrNull(Il2Cpp.Api._classGetFieldFromName(this, Memory.allocUtf8String(name)), Il2Cpp.Field);
-    }
-
-    /** Gets the method identified by the given name and parameter count. */
-    getMethod(name: string, parameterCount: number = -1): Il2Cpp.Method | null {
-        return getOrNull(Il2Cpp.Api._classGetMethodFromName(this, Memory.allocUtf8String(name), parameterCount), Il2Cpp.Method);
+    @levenshtein("fields")
+    field(name: string): Il2Cpp.Field {
+        return this.tryField(name)!;
     }
 
     /** Builds a generic instance of the current generic class. */
@@ -237,7 +235,7 @@ class Il2CppClass extends NonNullNativeStruct {
         }
 
         const types = classes.map(klass => klass.type.object);
-        const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.classes["System.Type"], types);
+        const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.class("System.Type"), types);
 
         // TODO: typeArray leaks
         return this.inflateRaw(typeArray);
@@ -245,7 +243,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** @internal */
     inflateRaw(typeArray: Il2Cpp.Array<Il2Cpp.Object>): Il2Cpp.Class {
-        const MakeGenericType = this.type.object.class.getMethod("MakeGenericType", 1)!;
+        const MakeGenericType = this.type.object.class.method("MakeGenericType", 1)!;
 
         let object = this.type.object;
         while (!object.class.equals(MakeGenericType.class)) object = object.base;
@@ -270,6 +268,18 @@ class Il2CppClass extends NonNullNativeStruct {
         return !!Il2Cpp.Api._classIsSubclassOf(this, other, +checkInterfaces);
     }
 
+    /** Gets the method identified by the given name and parameter count. */
+    @levenshtein("methods")
+    method(name: string, parameterCount: number = -1): Il2Cpp.Method {
+        return this.tryMethod(name, parameterCount)!;
+    }
+
+    /** Gets the nested class with the given name. */
+    @levenshtein("nestedClasses")
+    nested(name: string): Il2Cpp.Class {
+        return this.tryNested(name)!;
+    }
+
     /** Allocates a new object of the current class and calls its default constructor. */
     new(): Il2Cpp.Object {
         const object = this.alloc();
@@ -285,6 +295,26 @@ class Il2CppClass extends NonNullNativeStruct {
         }
 
         return object;
+    }
+
+    /** Gets the field with the given name. */
+    @memoize
+    tryField(name: string): Il2Cpp.Field | null {
+        const handle = Il2Cpp.Api._classGetFieldFromName(this, Memory.allocUtf8String(name));
+        return handle.isNull() ? null : new Il2Cpp.Field(handle);
+    }
+
+    /** Gets the method with the given name and parameter count. */
+    @memoize
+    tryMethod(name: string, parameterCount: number = -1): Il2Cpp.Method | null {
+        const handle = Il2Cpp.Api._classGetMethodFromName(this, Memory.allocUtf8String(name), parameterCount);
+        return handle.isNull() ? null : new Il2Cpp.Method(handle);
+    }
+
+    /** Gets the nested class with the given name. */
+    @memoize
+    tryNested(name: string): Il2Cpp.Class | undefined {
+        return this.nestedClasses.find(e => e.name == name);
     }
 
     override toString(): string {

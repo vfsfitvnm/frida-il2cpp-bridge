@@ -1,6 +1,7 @@
 import { cache } from "decorator-cache-getter";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { addLevenshtein, cacheInstances, getOrNull, IterableRecord, makeIterable } from "../../utils/utils";
+import { cacheInstances, memoize } from "../../utils/utils";
+import { levenshtein } from "../decorators";
 
 /** Represents a `Il2CppImage`. */
 @cacheInstances
@@ -25,32 +26,16 @@ class Il2CppImage extends NonNullNativeStruct {
 
     /** Gets the classes defined in this image. */
     @cache
-    get classes(): IterableRecord<Il2Cpp.Class> {
-        const record: Record<string, Il2Cpp.Class> = {};
-
+    get classes(): Il2Cpp.Class[] {
         if (Unity.isBelow2018_3_0) {
-            let object = this.assembly.object;
-            while (!("GetTypes" in object.methods)) object = object.base;
-
-            const types = object.methods.GetTypes.invoke<Il2Cpp.Array<Il2Cpp.Object>>(false);
-
+            const types = this.assembly.object.method("GetTypes").invoke<Il2Cpp.Array<Il2Cpp.Object>>(false);
             // On Unity 5.3.8f1, getting System.Reflection.Emit.OpCodes type name
             // without iterating all the classes first somehow blows things up at
             // app startup, hence the `Array.from`.
-            for (const type of Array.from(types)) {
-                const klass = new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(type));
-                record[klass.type.name] = klass;
-            }
+            return Array.from(types).map(e => new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(e)));
         } else {
-            const end = this.classCount;
-
-            for (let i = 0; i < end; i++) {
-                const klass = new Il2Cpp.Class(Il2Cpp.Api._imageGetClass(this, i));
-                record[klass.type.name] = klass;
-            }
+            return Array.from(Array(this.classCount), (_, i) => new Il2Cpp.Class(Il2Cpp.Api._imageGetClass(this, i)));
         }
-
-        return makeIterable(addLevenshtein(record));
     }
 
     /** Gets the name of this image. */
@@ -59,9 +44,21 @@ class Il2CppImage extends NonNullNativeStruct {
         return Il2Cpp.Api._imageGetName(this).readUtf8String()!;
     }
 
-    /** Gets the class with the specified namespace and name defined in this image. */
-    getClass(namespace: string, name: string): Il2Cpp.Class | null {
-        return getOrNull(Il2Cpp.Api._classFromName(this, Memory.allocUtf8String(namespace), Memory.allocUtf8String(name)), Il2Cpp.Class);
+    /** Gets the class with the specified name defined in this image. */
+    @levenshtein("classes", e => e.type.name)
+    class(name: string): Il2Cpp.Class {
+        return this.tryClass(name)!;
+    }
+
+    /** Gets the class with the specified name defined in this image. */
+    @memoize
+    tryClass(name: string): Il2Cpp.Class | null {
+        const dotIndex = name.lastIndexOf(".");
+        const classNamespace = Memory.allocUtf8String(dotIndex == -1 ? "" : name.slice(0, dotIndex));
+        const className = Memory.allocUtf8String(name.slice(dotIndex + 1));
+
+        const handle = Il2Cpp.Api._classFromName(this, classNamespace, className);
+        return handle.isNull() ? null : new Il2Cpp.Class(handle);
     }
 }
 

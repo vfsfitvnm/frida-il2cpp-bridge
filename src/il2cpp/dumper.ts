@@ -1,23 +1,23 @@
 import { inform, ok } from "../utils/console";
-import { formatNativePointer, getUntilFound } from "../utils/utils";
+import { formatNativePointer } from "../utils/utils";
 
 /** Dumping utilities. */
 class Il2CppDumper {
     /** Gets the default directory path where the dump will be saved to. */
     static get defaultDirectoryPath(): string {
-        const UnityEngine = getUntilFound(Il2Cpp.Domain.assemblies, "UnityEngine.CoreModule", "UnityEngine")!.image;
-        const Application = UnityEngine.classes["UnityEngine.Application"];
-        return Application.methods.get_persistentDataPath.invoke<Il2Cpp.String>().content!;
+        const UnityEngine = Il2Cpp.Domain.tryAssembly("UnityEngine.CoreModule") || Il2Cpp.Domain.assembly("UnityEngine");
+        const Application = UnityEngine.image.class("UnityEngine.Application");
+        return Application.method("get_persistentDataPath").invoke<Il2Cpp.String>().content!;
     }
 
     /** Gets the default file name. */
     static get defaultFileName(): string {
-        const UnityEngine = getUntilFound(Il2Cpp.Domain.assemblies, "UnityEngine.CoreModule", "UnityEngine")!.image;
-        const Application = UnityEngine.classes["UnityEngine.Application"];
+        const UnityEngine = Il2Cpp.Domain.tryAssembly("UnityEngine.CoreModule") || Il2Cpp.Domain.assembly("UnityEngine");
+        const Application = UnityEngine.image.class("UnityEngine.Application");
 
         try {
-            const identifier = getUntilFound(Application.methods, "get_identifier", "get_bundleIdentifier")!.invoke<Il2Cpp.String>();
-            const version = Application.methods.get_version.invoke<Il2Cpp.String>();
+            const identifier = (Application.tryMethod("get_identifier") || Application.method("get_bundleIdentifier")).invoke<Il2Cpp.String>();
+            const version = Application.method("get_version").invoke<Il2Cpp.String>();
             return `${identifier.content}_${version.content}`;
         } catch (e) {
             return `${new Date().getTime()}`;
@@ -63,8 +63,8 @@ class Il2CppDumper {
 
     methods(): Pick<Il2Cpp.Dumper, "build"> {
         this.#generator = function* (): Generator<string> {
-            const SystemType = Il2Cpp.Image.corlib.classes["System.Type"];
-            const SystemObject = Il2Cpp.Image.corlib.classes["System.Object"].type.object;
+            const SystemType = Il2Cpp.Image.corlib.class("System.Type");
+            const SystemObject = Il2Cpp.Image.corlib.class("System.Object").type.object;
 
             const getTypeArray = (genericParameterCount: number): Il2Cpp.Array<Il2Cpp.Object> =>
                 Il2Cpp.Array.from(SystemType, Array(genericParameterCount).fill(SystemObject));

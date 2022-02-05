@@ -1,88 +1,8 @@
-import { closest } from "fastest-levenshtein";
-
 /** @internal */
-export function preventKeyClash<T extends PropertyKey, V>(object: Record<T, V>): Record<T, V> {
-    return new Proxy(object, {
-        set<T extends PropertyKey, V>(target: Record<T, V>, key: PropertyKey, value: V): boolean {
-            if (typeof key == "string") {
-                while (key in target) {
-                    key += "_";
-                }
-            }
-
-            Reflect.set(target, key, value);
-            return true;
-        }
-    });
-}
-
-/** @internal */
-export function addLevenshtein<T extends PropertyKey, V>(object: Record<T, V>): Record<T, V> {
-    return new Proxy(object, {
-        get<T extends PropertyKey, V>(target: Record<T, V>, key: PropertyKey): T {
-            if (typeof key != "string" || key in target) {
-                return Reflect.get(target, key);
-            }
-
-            const closestMatch = closest(key, Object.keys(target));
-            if (closestMatch) {
-                throw new Error(`Couldn't find property "${key}", did you mean "${closestMatch}"?`);
-            } else {
-                throw new Error(`Couldn't find property "${key}".`);
-            }
-        }
-    });
-}
-
-/** @internal */
-export function getUntilFound<V>(record: Record<string, V>, ...keys: string[]): V | undefined {
-    for (const key of keys) {
-        if (key in record) {
-            return record[key];
-        }
-    }
-}
-
-/** @internal */
-export function makeIterable<V>(source: Record<string, V>): Record<string, V> & Iterable<V> {
-    Reflect.set(source, Symbol.iterator, function* () {
-        for (const value of Object.values(source)) {
-            yield value;
-        }
-    });
-
-    return source as any;
-}
-
-/** @internal */
-export function map<V, U>(source: Record<string, V>, map: (value: V) => U): Record<string, U> {
-    const record: Record<string, U> = {};
-
-    for (const [key, value] of Object.entries(source)) {
-        record[key] = map(value);
-    }
-
-    return record;
-}
-
-/** @internal */
-export function filterMap<V, U>(source: Record<string, V>, filter: (value: V) => boolean, map: (value: V) => U): Record<string, U> {
-    const record: Record<string, U> = {};
-
-    for (const [key, value] of Object.entries(source)) {
-        if (filter(value)) {
-            record[key] = map(value);
-        }
-    }
-
-    return record;
-}
-
-/** @internal */
-export function filterMapArray<V, U>(source: Record<string, V>, filter: (value: V) => boolean, map: (value: V) => U): U[] {
+export function filterMapArray<V, U>(source: V[], filter: (value: V) => boolean, map: (value: V) => U): U[] {
     const dest: U[] = [];
 
-    for (const value of Object.values(source)) {
+    for (const value of source) {
         if (filter(value)) {
             dest.push(map(value));
         }
@@ -92,10 +12,10 @@ export function filterMapArray<V, U>(source: Record<string, V>, filter: (value: 
 }
 
 /** @internal */
-export function mapToArray<V, U>(source: Record<string, V>, map: (value: V) => U): U[] {
+export function mapToArray<V, U>(source: V[], map: (value: V) => U): U[] {
     const dest: U[] = [];
 
-    for (const value of Object.values(source)) {
+    for (const value of source) {
         dest.push(map(value));
     }
 
@@ -105,16 +25,6 @@ export function mapToArray<V, U>(source: Record<string, V>, map: (value: V) => U
 /** @internal */
 export function overridePropertyValue<T extends object, K extends keyof T>(target: T, property: K, value: T[K]): T {
     Reflect.defineProperty(target, property, { value: value });
-    return target;
-}
-
-/** @internal */
-export function redefineProperty<T extends object, K extends keyof T>(
-    target: T,
-    property: K,
-    descriptor: { get?: () => T[K]; set?: (value: T[K]) => void }
-): T {
-    Reflect.defineProperty(target, property, descriptor);
     return target;
 }
 
@@ -129,27 +39,22 @@ export function getOrNull<T extends ObjectWrapper>(handle: NativePointer, Class:
 }
 
 /** @internal */
-export function makeRecordFromNativeIterator<T extends ObjectWrapper>(
+export function makeArrayFromNativeIterator<T extends ObjectWrapper>(
     holder: NativePointerValue,
     nativeFunction: NativeFunction<NativePointer, [NativePointerValue, NativePointer]>,
-    Class: new (handle: NativePointer) => T,
-    keyGetter: (value: T) => string,
-    keyClashPrevention: boolean = false
-): IterableRecord<T> {
+    Class: new (handle: NativePointer) => T
+): T[] {
     const iterator = Memory.alloc(Process.pointerSize);
-    const record: Record<string, T> = keyClashPrevention ? preventKeyClash({}) : {};
+    const array: T[] = [];
 
     let handle: NativePointer;
 
     while (!(handle = nativeFunction(holder, iterator)).isNull()) {
-        const value = new Class(handle);
-        record[keyGetter(value)] = value;
+        array.push(new Class(handle));
     }
 
-    return makeIterable(addLevenshtein(record));
+    return array;
 }
-
-export type IterableRecord<T> = Readonly<Record<string, T>> & Iterable<T>;
 
 /** @internal */
 export function cacheInstances<T extends ObjectWrapper, U extends new (handle: NativePointer) => T>(Class: U) {
@@ -165,4 +70,22 @@ export function cacheInstances<T extends ObjectWrapper, U extends new (handle: N
             return instanceCache.get(handle)!;
         }
     });
+}
+
+/** @internal */
+export function memoize(_: any, __: string, descriptor: TypedPropertyDescriptor<(key: string) => any>) {
+    if (descriptor.value != null) {
+        const map = new Map<string, any>();
+        const original = descriptor.value;
+
+        descriptor.value = function (key: string): any {
+            if (!map.has(key)) {
+                const result = original.call(this, key);
+                if (result) {
+                    map.set(key, result);
+                }
+            }
+            return map.get(key)!;
+        };
+    }
 }
