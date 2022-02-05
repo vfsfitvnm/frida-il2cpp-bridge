@@ -65,6 +65,19 @@ class Il2CppObject extends NativeStruct {
         return !!Il2Cpp.Api._monitorTryEnter(this, timeout);
     }
 
+    /** Gets the field with the given name. */
+    tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> | undefined {
+        return this.class.tryField<T>(name)?.withHolder(this);
+    }
+
+    /** Gets the field with the given name. */
+    tryMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]>(
+        name: string,
+        parameterCount: number = -1
+    ): Il2Cpp.Method<R, A> | undefined {
+        return this.class.tryMethod<R, A>(name, parameterCount)?.withHolder(this);
+    }
+
     /** Releases the lock on an object and attempts to block the current thread until it reacquires the lock. */
     tryWait(timeout: number): boolean {
         return !!Il2Cpp.Api._monitorTryWait(this, timeout);
