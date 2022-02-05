@@ -148,6 +148,9 @@ class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Paramete
     set implementation(block: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: A) => R) {
         if (this.virtualAddress.isNull()) {
             raise(`Cannot implementation for ${this.class.type.name}.${this.name}: pointer is null.`);
+        } else if (this.isExternal) {
+            warn(`Skipping implementation for ${this.class.type.name}.${this.name}: method is external.`);
+            return;
         }
 
         const replaceCallback: NativeCallbackImplementation<any, any> = (...args: any[]): any => {
