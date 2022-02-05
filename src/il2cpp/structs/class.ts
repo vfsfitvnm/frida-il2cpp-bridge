@@ -75,7 +75,7 @@ class Il2CppClass extends NonNullNativeStruct {
             return 0;
         }
 
-        return this.type.object.method("GetGenericArguments").invoke<Il2Cpp.Array>().length;
+        return this.type.object.method<Il2Cpp.Array, []>("GetGenericArguments").invoke().length;
     }
 
     /** Determines whether the GC has tracking references to the current class instances. */
@@ -243,14 +243,15 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** @internal */
     inflateRaw(typeArray: Il2Cpp.Array<Il2Cpp.Object>): Il2Cpp.Class {
-        const MakeGenericType = this.type.object.class.method("MakeGenericType", 1)!;
+        const MakeGenericType = this.type.object.class.method<Il2Cpp.Object, [Il2Cpp.Array<Il2Cpp.Object>]>("MakeGenericType", 1)!;
 
+        // TODO: check if this can be removed
         let object = this.type.object;
         while (!object.class.equals(MakeGenericType.class)) object = object.base;
 
         const inflatedType = MakeGenericType.invokeRaw(object, typeArray);
 
-        return new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(inflatedType as Il2Cpp.Object));
+        return new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(inflatedType));
     }
 
     /** Calls the static constructor of the current class. */
@@ -270,8 +271,11 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the method identified by the given name and parameter count. */
     @levenshtein("methods")
-    method(name: string, parameterCount: number = -1): Il2Cpp.Method {
-        return this.tryMethod(name, parameterCount)!;
+    method<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]>(
+        name: string,
+        parameterCount: number = -1
+    ): Il2Cpp.Method<R, A> {
+        return this.tryMethod<R, A>(name, parameterCount)!;
     }
 
     /** Gets the nested class with the given name. */
@@ -306,7 +310,10 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the method with the given name and parameter count. */
     @memoize
-    tryMethod(name: string, parameterCount: number = -1): Il2Cpp.Method | null {
+    tryMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]>(
+        name: string,
+        parameterCount: number = -1
+    ): Il2Cpp.Method<R, A> | null {
         const handle = Il2Cpp.Api._classGetMethodFromName(this, Memory.allocUtf8String(name), parameterCount);
         return handle.isNull() ? null : new Il2Cpp.Method(handle);
     }

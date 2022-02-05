@@ -20,8 +20,8 @@ class Il2CppDomain {
         }
 
         if (count == 0) {
-            for (const assemblyObject of this.object.method("GetAssemblies", 0).invoke<Il2Cpp.Array<Il2Cpp.Object>>()) {
-                const assemblyName = assemblyObject.base.base.method("GetSimpleName").invoke<Il2Cpp.String>().content;
+            for (const assemblyObject of this.object.method<Il2Cpp.Array<Il2Cpp.Object>, []>("GetAssemblies", 0).invoke()) {
+                const assemblyName = assemblyObject.base.base.method<Il2Cpp.String, []>("GetSimpleName").invoke().content;
 
                 if (assemblyName != null) {
                     array.push(this.assembly(assemblyName));
@@ -41,7 +41,7 @@ class Il2CppDomain {
     /** Gets the encompassing object of the application domain. */
     @cache
     static get object(): Il2Cpp.Object {
-        return Il2Cpp.Image.corlib.class("System.AppDomain").method("get_CurrentDomain").invoke<Il2Cpp.Object>();
+        return Il2Cpp.Image.corlib.class("System.AppDomain").method<Il2Cpp.Object, []>("get_CurrentDomain").invoke();
     }
 
     /** Opens and loads the assembly with the given name. */

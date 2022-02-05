@@ -6,7 +6,7 @@ import { levenshtein, shouldBeInstance } from "../decorators";
 import { fromFridaValue, readGString, toFridaValue } from "../utils";
 
 /** Represents a `MethodInfo`. */
-class Il2CppMethod extends NonNullNativeStruct {
+class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | []> extends NonNullNativeStruct {
     /** Gets the class in which this method is defined. */
     @cache
     get class(): Il2Cpp.Class {
@@ -55,7 +55,7 @@ class Il2CppMethod extends NonNullNativeStruct {
             return 0;
         }
 
-        return this.object.method("GetGenericArguments").invoke<Il2Cpp.Array>().length;
+        return this.object.method<Il2Cpp.Array, []>("GetGenericArguments").invoke().length;
     }
 
     /** Determines whether this method is external. */
@@ -146,7 +146,7 @@ class Il2CppMethod extends NonNullNativeStruct {
     }
 
     /** Replaces the body of this method. */
-    set implementation(block: Il2Cpp.Method.Implementation) {
+    set implementation(block: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: A) => R) {
         if (this.virtualAddress.isNull()) {
             raise(`Cannot implementation for ${this.class.type.name}.${this.name}: pointer is null.`);
         }
@@ -156,9 +156,9 @@ class Il2CppMethod extends NonNullNativeStruct {
 
             const result = block.call(
                 this.isStatic ? this.class : overridePropertyValue(new Il2Cpp.Object(args[0]), "class", this.class),
-                ...Object.values(this.parameters).map((parameter: Il2Cpp.Parameter, index: number) =>
+                ...this.parameters.map((parameter: Il2Cpp.Parameter, index: number) =>
                     fromFridaValue(args[index + startIndex], parameter.type)
-                )
+                ) as A
             );
 
             if (typeof result != "undefined") {
@@ -196,24 +196,24 @@ class Il2CppMethod extends NonNullNativeStruct {
 
     /** @internal */
     inflateRaw(typeArray: Il2Cpp.Array<Il2Cpp.Object>): Il2Cpp.Method {
-        const MakeGenericMethod = this.object.class.method("MakeGenericMethod", 1)!;
+        const MakeGenericMethod = this.object.class.method<Il2Cpp.Object, [Il2Cpp.Array<Il2Cpp.Object>]>("MakeGenericMethod", 1)!;
 
         let object = this.object;
         while (!object.class.equals(MakeGenericMethod.class)) object = object.base;
 
         const inflatedMethodObject = MakeGenericMethod.invokeRaw(object, typeArray);
 
-        return new Il2Cpp.Method(Il2Cpp.Api._methodGetFromReflection(inflatedMethodObject as Il2Cpp.Object));
+        return new Il2Cpp.Method(Il2Cpp.Api._methodGetFromReflection(inflatedMethodObject));
     }
 
     /** Invokes this method. */
     @shouldBeInstance(false)
-    invoke<T extends Il2Cpp.Method.ReturnType>(...parameters: Il2Cpp.Parameter.Type[]): T {
-        return this.invokeRaw(NULL, ...parameters) as T;
+    invoke(...parameters: A): R {
+        return this.invokeRaw(NULL, ...parameters);
     }
 
     /** @internal */
-    invokeRaw(instance: NativePointerValue, ...parameters: Il2Cpp.Parameter.Type[]): Il2Cpp.Method.ReturnType {
+    invokeRaw(instance: NativePointerValue, ...parameters: A): R {
         if (this.parameterCount != parameters.length) {
             raise(`${this.name} requires ${this.parameterCount} parameters, but ${parameters.length} were supplied.`);
         }
@@ -229,7 +229,7 @@ class Il2CppMethod extends NonNullNativeStruct {
         }
 
         const returnValue = Il2Cpp.try(() => this.nativeFunction(...allocatedParameters));
-        return fromFridaValue(returnValue, this.returnType) as Il2Cpp.Method.ReturnType;
+        return fromFridaValue(returnValue, this.returnType) as R;
     }
 
     /** Gets the parameter with the given name. */
@@ -246,9 +246,9 @@ class Il2CppMethod extends NonNullNativeStruct {
 
     /** @internal */
     @shouldBeInstance(true)
-    withHolder(instance: Il2Cpp.Object): Il2Cpp.Method {
+    withHolder(instance: Il2Cpp.Object): Il2Cpp.Method<R, A> {
         return new Proxy(this, {
-            get(target: Il2Cpp.Method, property: keyof Il2Cpp.Method): any {
+            get(target: Il2Cpp.Method<R, A>, property: keyof Il2Cpp.Method): any {
                 if (property == "invoke") {
                     return target.invokeRaw.bind(target, instance.handle);
                 } else if (property == "inflate") {
@@ -276,9 +276,8 @@ Reflect.set(Il2Cpp, "Method", Il2CppMethod);
 
 declare global {
     namespace Il2Cpp {
-        class Method extends Il2CppMethod {}
+        class Method<R extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]> extends Il2CppMethod<R, A> {}
         namespace Method {
-            type Implementation = (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => Il2Cpp.Method.ReturnType;
             type ReturnType = void | Il2Cpp.Field.Type;
 
             const enum Attributes {

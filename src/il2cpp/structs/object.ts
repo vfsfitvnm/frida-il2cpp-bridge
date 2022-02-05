@@ -44,8 +44,8 @@ class Il2CppObject extends NativeStruct {
     }
 
     /** Gets the field with the given name. */
-    method(name: string, parameterCount: number = -1): Il2Cpp.Method {
-        return this.class.method(name, parameterCount)!.withHolder(this);
+    method<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]>(name: string, parameterCount: number = -1): Il2Cpp.Method<R, A> {
+        return this.class.method<R, A>(name, parameterCount)!.withHolder(this);
     }
 
     /** Notifies a thread in the waiting queue of a change in the locked object's state. */
@@ -90,7 +90,7 @@ class Il2CppObject extends NativeStruct {
 
     @checkNull
     override toString(): string {
-        return this.method("ToString").invoke<Il2Cpp.String>().content || "null";
+        return this.method<Il2Cpp.String, []>("ToString").invoke().content || "null";
     }
 }
 
