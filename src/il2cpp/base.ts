@@ -1,5 +1,5 @@
 import { cache } from "decorator-cache-getter";
-import { platformNotSupported, raise, warn } from "../utils/console";
+import { platformNotSupported, raise } from "../utils/console";
 import { forModule } from "../utils/native-wait";
 
 /** */
