@@ -155,10 +155,8 @@ class Il2CppMethod<R extends Il2Cpp.Method.ReturnType, A extends Il2Cpp.Paramete
             const startIndex = +!this.isStatic | +Unity.isBelow2018_3_0;
 
             const result = block.call(
-                this.isStatic ? this.class : overridePropertyValue(new Il2Cpp.Object(args[0]), "class", this.class),
-                ...this.parameters.map((parameter: Il2Cpp.Parameter, index: number) =>
-                    fromFridaValue(args[index + startIndex], parameter.type)
-                ) as A
+                this.isStatic ? this.class : new Il2Cpp.Object(args[0]),
+                ...(this.parameters.map((e, i) => fromFridaValue(args[i + startIndex], e.type)) as A)
             );
 
             if (typeof result != "undefined") {
@@ -276,7 +274,10 @@ Reflect.set(Il2Cpp, "Method", Il2CppMethod);
 
 declare global {
     namespace Il2Cpp {
-        class Method<R extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType, A extends Il2Cpp.Parameter.Type[] | [] = any[]> extends Il2CppMethod<R, A> {}
+        class Method<
+            R extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType,
+            A extends Il2Cpp.Parameter.Type[] | [] = any[]
+        > extends Il2CppMethod<R, A> {}
         namespace Method {
             type ReturnType = void | Il2Cpp.Field.Type;
 
