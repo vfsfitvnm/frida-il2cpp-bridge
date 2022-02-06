@@ -33,21 +33,17 @@ export function getOrNull<T extends ObjectWrapper>(handle: NativePointer, Class:
 }
 
 /** @internal */
-export function makeArrayFromNativeIterator<T extends ObjectWrapper>(
+export function *nativeIterator<T extends ObjectWrapper>(
     holder: NativePointerValue,
     nativeFunction: NativeFunction<NativePointer, [NativePointerValue, NativePointer]>,
     Class: new (handle: NativePointer) => T
-): T[] {
+): Generator<T> {
     const iterator = Memory.alloc(Process.pointerSize);
-    const array: T[] = [];
-
     let handle: NativePointer;
 
     while (!(handle = nativeFunction(holder, iterator)).isNull()) {
-        array.push(new Class(handle));
+        yield new Class(handle);
     }
-
-    return array;
 }
 
 /** @internal */

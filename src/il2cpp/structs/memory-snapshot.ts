@@ -1,6 +1,6 @@
 import { cache } from "decorator-cache-getter";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { makeArrayFromNativeIterator } from "../../utils/utils";
+import { nativeIterator } from "../../utils/utils";
 
 /** Represents a `Il2CppManagedMemorySnapshot`. */
 class Il2CppMemorySnapshot extends NonNullNativeStruct {
@@ -17,7 +17,7 @@ class Il2CppMemorySnapshot extends NonNullNativeStruct {
     /** Gets any initialized class. */
     @cache
     get classes(): Il2Cpp.Class[] {
-        return makeArrayFromNativeIterator(this, Il2Cpp.Api._memorySnapshotGetClasses, Il2Cpp.Class);
+        return Array.from(nativeIterator(this, Il2Cpp.Api._memorySnapshotGetClasses, Il2Cpp.Class));
     }
 
     /** Gets the objects tracked by this memory snapshot. */
