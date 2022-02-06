@@ -27,11 +27,11 @@ export function checkNull(target: NativeStruct, propertyKey: "toString", descrip
 
 /** @internal */
 export function levenshtein(candidatesKey: string, nameGetter: (e: any) => string = e => e.name) {
-    return function (_: any, propertyKey: string, descriptor: TypedPropertyDescriptor<(key: string) => any>) {
+    return function (_: any, propertyKey: string, descriptor: TypedPropertyDescriptor<(key: string, ...args: any[]) => any>) {
         const original = descriptor.value!;
 
-        descriptor.value = function (this: any, key: string): any {
-            const result = original.call(this, key);
+        descriptor.value = function (this: any, key: string, ...args: any[]): any {
+            const result = original.call(this, key, ...args);
 
             if (result != null) return result;
 
