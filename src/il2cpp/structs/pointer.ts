@@ -44,13 +44,18 @@ class Il2CppPointer<T extends Il2Cpp.Field.Type> extends NativeStruct implements
                 value.push(read(this.getElementHandle(i), this.type) as T);
             }
         }
- 
+
         return value;
     }
 
     /** Sets the given element at the given index */
     set(index: number, value: T): void {
         write(this.getElementHandle(index), value, this.type);
+    }
+
+    /** */
+    toString(): string {
+        return `[${this.values}]`;
     }
 
     /** Writes the given elements starting at the given index. */
@@ -60,10 +65,6 @@ class Il2CppPointer<T extends Il2Cpp.Field.Type> extends NativeStruct implements
             this.set(i, value);
             i++;
         }
-    }
-
-    override toString(): string {
-        return `[${this.values}]`;
     }
 
     /** Iterable. */

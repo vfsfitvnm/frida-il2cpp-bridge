@@ -1,39 +1,8 @@
-/** @internal */
-export function filterMapArray<V, U>(source: V[], filter: (value: V) => boolean, map: (value: V) => U): U[] {
-    const dest: U[] = [];
-
-    for (const value of source) {
-        if (filter(value)) {
-            dest.push(map(value));
-        }
-    }
-
-    return dest;
-}
+import { closest } from "fastest-levenshtein";
+import { raise } from "./console";
 
 /** @internal */
-export function mapToArray<V, U>(source: V[], map: (value: V) => U): U[] {
-    const dest: U[] = [];
-
-    for (const value of source) {
-        dest.push(map(value));
-    }
-
-    return dest;
-}
-
-/** @internal */
-export function formatNativePointer(nativePointer: NativePointer): string {
-    return `0x${nativePointer.toString(16).padStart(8, "0")}`;
-}
-
-/** @internal */
-export function getOrNull<T extends ObjectWrapper>(handle: NativePointer, Class: new (handle: NativePointer) => T): T | null {
-    return handle.isNull() ? null : new Class(handle);
-}
-
-/** @internal */
-export function *nativeIterator<T extends ObjectWrapper>(
+export function* nativeIterator<T extends ObjectWrapper>(
     holder: NativePointerValue,
     nativeFunction: NativeFunction<NativePointer, [NativePointerValue, NativePointer]>,
     Class: new (handle: NativePointer) => T
@@ -79,4 +48,21 @@ export function memoize(_: any, __: string, descriptor: PropertyDescriptor) {
             return map.get(key);
         };
     }
+}
+
+/** @internal */
+export function levenshtein(candidatesKey: string, nameGetter: (e: any) => string = e => e.name) {
+    return function (_: any, propertyKey: string, descriptor: TypedPropertyDescriptor<(key: string, ...args: any[]) => any>) {
+        const original = descriptor.value!;
+
+        descriptor.value = function (this: any, key: string, ...args: any[]): any {
+            const result = original.call(this, key, ...args);
+
+            if (result != null) return result;
+
+            const closestMatch = closest(key, this[candidatesKey].map(nameGetter));
+
+            raise(`couldn't find ${propertyKey} ${key} in ${this.name}${closestMatch ? `, did you mean ${closestMatch}?` : ``}`);
+        };
+    };
 }

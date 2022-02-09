@@ -1,8 +1,9 @@
 import { cache } from "decorator-cache-getter";
 import { raise, warn } from "../../utils/console";
+import { GLib } from "../../utils/glib";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { levenshtein, shouldBeInstance } from "../decorators";
-import { fromFridaValue, readGString, toFridaValue } from "../utils";
+import { levenshtein } from "../../utils/utils";
+import { fromFridaValue, toFridaValue } from "../utils";
 
 /** Represents a `MethodInfo`. */
 class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStruct {
@@ -40,6 +41,7 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
             types.unshift("pointer");
         }
 
+        // TODO: check if this is needed
         if (this.isInflated) {
             types.push("pointer");
         }
@@ -146,19 +148,12 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
 
     /** Replaces the body of this method. */
     set implementation(block: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => T) {
-        if (this.virtualAddress.isNull()) {
-            raise(`Cannot implementation for ${this.class.type.name}.${this.name}: pointer is null.`);
-        } else if (this.isExternal) {
-            warn(`Skipping implementation for ${this.class.type.name}.${this.name}: method is external.`);
-            return;
-        }
-
         const replaceCallback: NativeCallbackImplementation<any, any> = (...args: any[]): any => {
             const startIndex = +!this.isStatic | +Unity.isBelow2018_3_0;
 
             const result = block.call(
                 this.isStatic ? this.class : new Il2Cpp.Object(args[0]),
-                ...(this.parameters.map((e, i) => fromFridaValue(args[i + startIndex], e.type)))
+                ...this.parameters.map((e, i) => fromFridaValue(args[i + startIndex], e.type))
             );
 
             if (typeof result != "undefined") {
@@ -166,80 +161,101 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
             }
         };
 
-        this.restoreImplementation();
         try {
-            Interceptor.replace(
-                this.virtualAddress,
-                new NativeCallback(replaceCallback, this.returnType.fridaAlias, this.fridaSignature as NativeCallbackArgumentType[])
-            );
+            Interceptor.replace(this.virtualAddress, new NativeCallback(replaceCallback, this.returnType.fridaAlias, this.fridaSignature));
         } catch (e: any) {
-            warn(`Skipping implementation for ${this.class.type.name}.${this.name}: ${e.message}.`);
+            switch (e.message) {
+                case "access violation accessing 0x0":
+                    raise(`cannot implement method ${this.name}: it has a NULL virtual address`);
+                case `unable to intercept function at ${this.virtualAddress}; please file a bug`:
+                    warn(`cannot implement method ${this.name}: it may be a thunk`);
+                    break;
+                default:
+                    throw e;
+            }
         }
     }
 
     /** Creates a generic instance of the current generic method. */
     inflate<R extends Il2Cpp.Method.ReturnType = T>(...classes: Il2Cpp.Class[]): Il2Cpp.Method<R> {
         if (!this.isGeneric) {
-            raise(`${this.name} it's not generic, so it cannot be inflated.`);
+            raise(`cannot inflate method ${this.name}: it has no generic parameters`);
         }
 
         if (this.genericParameterCount != classes.length) {
-            raise(`${this.name} has ${this.genericParameterCount} generic parameter(s), but ${classes.length} classes were supplied.`);
+            raise(`cannot inflate method ${this.name}: it needs ${this.genericParameterCount} generic parameter(s), not ${classes.length}`);
         }
 
         const types = classes.map(klass => klass.type.object);
         const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.class("System.Type"), types);
 
-        // TODO: typeArray leaks
-        return this.inflateRaw<R>(typeArray);
-    }
-
-    /** @internal */
-    inflateRaw<R extends Il2Cpp.Method.ReturnType = T>(typeArray: Il2Cpp.Array<Il2Cpp.Object>): Il2Cpp.Method<R> {
-        const inflatedMethodObject = this.object
-            .method<Il2Cpp.Object>("MakeGenericMethod", 1)
-            .invoke(typeArray);
-
+        const inflatedMethodObject = this.object.method<Il2Cpp.Object>("MakeGenericMethod", 1).invoke(typeArray);
         return new Il2Cpp.Method(Il2Cpp.Api._methodGetFromReflection(inflatedMethodObject));
     }
 
     /** Invokes this method. */
-    @shouldBeInstance(false)
     invoke(...parameters: Il2Cpp.Parameter.Type[]): T {
+        if (!this.isStatic) {
+            raise(`cannot invoke a non-static method ${this.name}: must be invoked throught a Il2Cpp.Object, not a Il2Cpp.Class`);
+        }
         return this.invokeRaw(NULL, ...parameters);
     }
 
     /** @internal */
     invokeRaw(instance: NativePointerValue, ...parameters: Il2Cpp.Parameter.Type[]): T {
-        if (this.parameterCount != parameters.length) {
-            raise(`${this.name} requires ${this.parameterCount} parameters, but ${parameters.length} were supplied.`);
-        }
-
         const allocatedParameters = parameters.map(toFridaValue);
 
         if (!this.isStatic || Unity.isBelow2018_3_0) {
             allocatedParameters.unshift(instance);
         }
 
+        // TODO: check if this is really needed
         if (this.isInflated) {
             allocatedParameters.push(this.handle);
         }
 
-        const returnValue = Il2Cpp.try(() => this.nativeFunction(...allocatedParameters));
-        return fromFridaValue(returnValue, this.returnType) as T;
+        try {
+            const returnValue = this.nativeFunction(...allocatedParameters);
+            return fromFridaValue(returnValue, this.returnType) as T;
+        } catch (e: any) {
+            switch (e.message) {
+                // TODO: remove
+                case "abort was called":
+                    const exception = Il2Cpp.Api._cxaGetGlobals().readPointer();
+                    const dummyException = Il2Cpp.Api._cxaAllocateException(Process.pointerSize);
+
+                    try {
+                        Il2Cpp.Api._cxaThrow(dummyException, NULL, NULL);
+                    } catch (e) {
+                        const dummyExceptionHeader = Il2Cpp.Api._cxaGetGlobals().readPointer();
+
+                        for (let i = 0; i < 256; i++) {
+                            if (dummyExceptionHeader.add(i).equals(dummyException)) {
+                                Il2Cpp.Api._cxaFreeException(dummyException);
+
+                                raise(new Il2Cpp.Object(exception.add(i).readPointer()));
+                            }
+                        }
+                    }
+                case "bad argument count":
+                    raise(`cannot invoke method ${this.name}: it needs ${this.parameterCount} parameter(s), not ${parameters.length}`);
+                case "expected a pointer":
+                case "expected number":
+                case "expected array with fields":
+                    raise(`cannot invoke method ${this.name}: parameter types mismatch`);
+            }
+
+            throw e;
+        }
     }
 
     /** Gets the overloaded method with the given parameter types. */
-    overload( ...parameterTypes: string[] ): Il2Cpp.Method<T> {
+    overload(...parameterTypes: string[]): Il2Cpp.Method<T> {
         const result = this.tryOverload<T>(...parameterTypes);
 
         if (result != undefined) return result;
 
-        raise(
-            `Couldn't find the overload ${this.name}(${parameterTypes.join(", ")}); candidates are:\n${this.class.methods
-                .filter(e => e.name == this.name)
-                .join("\n")}`
-        );
+        raise(`cannot find overloaded method ${this.name}(${parameterTypes})`);
     }
 
     /** Gets the parameter with the given name. */
@@ -254,29 +270,12 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
         Interceptor.flush();
     }
 
-    /** @internal */
-    @shouldBeInstance(true)
-    withHolder(instance: Il2Cpp.Object): Il2Cpp.Method<T> {
-        return new Proxy(this, {
-            get(target: Il2Cpp.Method<T>, property: keyof Il2Cpp.Method<T>): any {
-                if (property == "invoke") {
-                    return target.invokeRaw.bind(target, instance.handle);
-                } else if (property == "inflate") {
-                    return function (...classes: Il2Cpp.Class[]) {
-                        return target.inflate(...classes).withHolder(instance);
-                    };
-                }
-
-                return Reflect.get(target, property);
-            }
-        });
-    }
-
     /** Gets the overloaded method with the given parameter types. */
     tryOverload<R extends Il2Cpp.Method.ReturnType>(...parameterTypes: string[]): Il2Cpp.Method<R> | undefined {
         return this.class.methods.find(
             e =>
                 e.name == this.name &&
+                e.isStatic == this.isStatic &&
                 e.parameterCount == parameterTypes.length &&
                 e.parameters.map(e => e.type.name).toString() == parameterTypes.toString()
         ) as Il2Cpp.Method<R> | undefined;
@@ -287,8 +286,34 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
         return this.parameters.find(e => e.name == name);
     }
 
-    override toString(): string {
-        return readGString(Il2Cpp.Api._toString(this, Il2Cpp.Api._methodToString))!;
+    /** */
+    toString(): string {
+        const buffer = Il2Cpp.Api._toString(this, Il2Cpp.Api._methodToString);
+        try {
+            return buffer.readUtf8String()!;
+        } finally {
+            GLib.free(buffer);
+        }
+    }
+
+    /** @internal */
+    withHolder(instance: Il2Cpp.Object): Il2Cpp.Method<T> {
+        return new Proxy(this, {
+            get(target: Il2Cpp.Method<T>, property: keyof Il2Cpp.Method<T>): any {
+                switch (property) {
+                    case "invoke":
+                        return target.invokeRaw.bind(target, instance.handle);
+                    case "inflate":
+                    case "overload":
+                    case "tryOverload":
+                        return function (...args: any[]) {
+                            return target[property](...args)?.withHolder(instance);
+                        };
+                }
+
+                return Reflect.get(target, property);
+            }
+        });
     }
 }
 

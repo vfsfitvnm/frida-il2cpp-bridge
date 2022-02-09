@@ -710,31 +710,21 @@ class Il2CppApi {
         return this.r("il2cpp_type_is_primitive", "bool", ["pointer"]);
     }
 
-    /** @internal */
-    @cache
-    static get _gLibFree() {
-        return this.r("glib_free", "void", ["pointer"]);
-    }
-
-    /** @internal */
     @cache
     static get _cxaAllocateException() {
         return this.r("__cxa_allocate_exception", "pointer", ["size_t"]);
     }
 
-    /** @internal */
     @cache
     static get _cxaFreeException() {
         return this.r("__cxa_free_exception", "void", ["pointer"]);
     }
 
-    /** @internal */
     @cache
     static get _cxaGetGlobals() {
         return this.r("__cxa_get_globals", "pointer", []);
     }
 
-    /** @internal */
     @cache
     static get _cxaThrow() {
         return this.r("__cxa_throw", "void", ["pointer", "pointer", "pointer"]);
@@ -744,7 +734,7 @@ class Il2CppApi {
     @cache
     private static get cModule(): Record<string, NativePointer | null> {
         if (Unity.mayBeUnsupported) {
-            warn(`Unity version "${Unity.version}" may be unsupported, continue with caution.`);
+            warn(`current Unity version ${Unity.version} is not supported, expect breakage`);
         }
 
         const offsetsFinderCModule = new CModule(`\
@@ -973,7 +963,7 @@ void il2cpp_field_to_string (void *, GString *);
 void il2cpp_method_to_string (void *, GString *);
 
 
-void
+static void
 g_string_append_type_name (GString * string,
                            void * type)
 {   
@@ -984,12 +974,6 @@ g_string_append_type_name (GString * string,
     g_string_append (string, type_name);
 
     il2cpp_free (type_name);
-}
-
-void
-glib_free (void * pointer)
-{
-    g_free (pointer);
 }
 
 const char *
@@ -1439,10 +1423,10 @@ il2cpp_memory_snapshot_get_information (const Il2CppManagedMemorySnapshot * snap
 
         if (exportPointer == null) {
             if (requiredUnityVersion == null || Unity.version.isEqualOrAbove(requiredUnityVersion)) {
-                raise(`Couldn't find export "${exportName}".`);
+                raise(`cannot resolve export ${exportName}`);
             }
 
-            raise(`"${exportName}" requires a Unity version >= ${requiredUnityVersion}, but this application has ${Unity.version}.`);
+            raise(`${exportName} was added in version ${requiredUnityVersion}, but this application uses ${Unity.version}`);
         }
 
         return new NativeFunction(exportPointer, retType, argTypes);

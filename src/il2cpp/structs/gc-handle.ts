@@ -1,5 +1,3 @@
-import { getOrNull } from "../../utils/utils";
-
 /** Represents a GCHandle. */
 class Il2CppGCHandle {
     /** @internal */
@@ -7,7 +5,7 @@ class Il2CppGCHandle {
 
     /** Gets the object associated to this handle. */
     get target(): Il2Cpp.Object | null {
-        return getOrNull(Il2Cpp.Api._gcHandleGetTarget(this.handle), Il2Cpp.Object);
+        return Il2Cpp.Api._gcHandleGetTarget(this.handle).nullOr(Il2Cpp.Object);
     }
 
     /** Frees this handle. */
@@ -25,3 +23,5 @@ declare global {
         }
     }
 }
+
+export {};

@@ -1,6 +1,6 @@
 import { raise, warn } from "../utils/console";
+import { GLib } from "../utils/glib";
 import { NativeStruct } from "../utils/native-struct";
-import { mapToArray } from "../utils/utils";
 
 /** @internal */
 export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Type {
@@ -142,27 +142,25 @@ export function toFridaValue(value: Il2Cpp.Parameter.Type): NativeFunctionArgume
 }
 
 function valueTypeToArray(value: Il2Cpp.ValueType): NativeFunctionArgumentValue[] {
-    const fields = value.type.class.fields
-        .filter(f => !f.isStatic)
-        .map(f => f.withHolder(value));  
-
-    return mapToArray(fields, (field: Il2Cpp.Field) => {
-        const fieldValue = field.value;
-        return fieldValue instanceof Il2Cpp.ValueType
-            ? valueTypeToArray(fieldValue)
-            : fieldValue instanceof NativeStruct
-            ? fieldValue.handle
-            : typeof fieldValue == "boolean"
-            ? +fieldValue
-            : fieldValue;
-    });
+    return value.type.class.fields
+        .filter(field => !field.isStatic)
+        .map(field => field.withHolder(value).value)
+        .map(value =>
+            value instanceof Il2Cpp.ValueType
+                ? valueTypeToArray(value)
+                : value instanceof NativeStruct
+                ? value.handle
+                : typeof value == "boolean"
+                ? +value
+                : value
+        );
 }
 
 function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueType {
     function iter(type: Il2Cpp.Type, startOffset: number = 0): [Il2Cpp.Type.Enum, number][] {
         const arr: [Il2Cpp.Type.Enum, number][] = [];
 
-        for (const field of Object.values(type.class.fields)) {
+        for (const field of type.class.fields) {
             if (!field.isStatic) {
                 const offset = startOffset + field.offset - Il2Cpp.Runtime.objectHeaderSize;
                 if (
@@ -245,13 +243,4 @@ function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueT
     }
 
     return new Il2Cpp.ValueType(valueType, type);
-}
-
-/** @internal */
-export function readGString(handle: NativePointer): string | null {
-    try {
-        return handle.readUtf8String();
-    } finally {
-        Il2Cpp.Api._gLibFree(handle);
-    }
 }

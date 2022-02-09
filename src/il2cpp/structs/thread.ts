@@ -1,6 +1,5 @@
 import { cache } from "decorator-cache-getter";
 import { NativeStruct } from "../../utils/native-struct";
-import { getOrNull } from "../../utils/utils";
 
 /** Represents a `Il2CppThread`. */
 class Il2CppThread extends NativeStruct {
@@ -21,8 +20,8 @@ class Il2CppThread extends NativeStruct {
     }
 
     /** Gets the current attached thread, if any. */
-    static get current(): Il2CppThread | null {
-        return getOrNull(Il2Cpp.Api._threadCurrent(), Il2CppThread);
+    static get current(): Il2Cpp.Thread | null {
+        return Il2Cpp.Api._threadCurrent().nullOr(Il2Cpp.Thread);
     }
 
     /** Determines whether the current thread is the garbage collector finalizer one. */

@@ -15,6 +15,7 @@ class Il2CppParameter {
         this.type = type;
     }
 
+    /** */
     toString(): string {
         return `${this.type} ${this.name}`;
     }

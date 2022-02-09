@@ -1,8 +1,8 @@
 import { cache } from "decorator-cache-getter";
-import { read, readGString, write } from "../utils";
-import { warn } from "../../utils/console";
+import { raise } from "../../utils/console";
+import { GLib } from "../../utils/glib";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { shouldBeInstance } from "../decorators";
+import { read, write } from "../utils";
 
 /** Represents a `FieldInfo`. */
 class Il2CppField<T extends Il2Cpp.Field.Type> extends NonNullNativeStruct {
@@ -70,8 +70,7 @@ class Il2CppField<T extends Il2Cpp.Field.Type> extends NonNullNativeStruct {
     /** Sets the value of this field. Thread static or literal values cannot be altered yet. */
     set value(value: T) {
         if (this.isThreadStatic || this.isLiteral) {
-            warn(`${this.class.type.name}.${this.name} is a thread static or literal field, its value won't be modified.`);
-            return;
+            raise(`cannot modify the value of field ${this.name}: is thread static or literal`);
         }
 
         const handle = Memory.alloc(Process.pointerSize);
@@ -80,8 +79,17 @@ class Il2CppField<T extends Il2Cpp.Field.Type> extends NonNullNativeStruct {
         Il2Cpp.Api._fieldSetStaticValue(this.handle, handle);
     }
 
+    /** */
+    toString(): string {
+        const buffer = Il2Cpp.Api._toString(this, Il2Cpp.Api._fieldToString);
+        try {
+            return buffer.readUtf8String()!;
+        } finally {
+            GLib.free(buffer);
+        }
+    }
+
     /** @internal */
-    @shouldBeInstance(true)
     withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Field<T> {
         let valueHandle = instance.handle.add(this.offset);
         if (instance instanceof Il2Cpp.ValueType) {
@@ -105,10 +113,6 @@ class Il2CppField<T extends Il2Cpp.Field.Type> extends NonNullNativeStruct {
                 return Reflect.set(target, property, value);
             }
         });
-    }
-
-    override toString(): string {
-        return readGString(Il2Cpp.Api._toString(this, Il2Cpp.Api._fieldToString))!;
     }
 }
 

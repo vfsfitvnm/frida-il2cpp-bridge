@@ -1,7 +1,5 @@
 import { cache } from "decorator-cache-getter";
 import { NativeStruct } from "../../utils/native-struct";
-import { getOrNull } from "../../utils/utils";
-import { checkNull } from "../decorators";
 
 /** Represents a `Il2CppObject`. */
 class Il2CppObject extends NativeStruct {
@@ -27,17 +25,12 @@ class Il2CppObject extends NativeStruct {
         return Il2Cpp.Api._monitorExit(this);
     }
 
-    /** */
-    getVirtualMethod(method: Il2Cpp.Method): Il2Cpp.Method | null {
-        return getOrNull(Il2Cpp.Api._objectGetVirtualMethod(this, method), Il2Cpp.Method);
-    }
-
     /** Gets the field with the given name. */
     field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> {
         return this.class.field<T>(name).withHolder(this);
     }
 
-    /** Gets the field with the given name. */
+    /** Gets the method with the given name. */
     method<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> {
         return this.class.method<T>(name, parameterCount).withHolder(this);
     }
@@ -55,6 +48,11 @@ class Il2CppObject extends NativeStruct {
     /** Creates a reference to this object. */
     ref(pin: boolean): Il2Cpp.GC.Handle {
         return new Il2Cpp.GC.Handle(Il2Cpp.Api._gcHandleNew(this, +pin));
+    }
+
+    /** Gets the correct virtual method from the given virtual method. */
+    virtualMethod<T extends Il2Cpp.Method.ReturnType>(method: Il2Cpp.Method): Il2Cpp.Method<T> {
+        return new Il2Cpp.Method<T>(Il2Cpp.Api._objectGetVirtualMethod(this, method)).withHolder(this);
     }
 
     /** Attempts to acquire an exclusive lock on the current object. */
@@ -77,6 +75,11 @@ class Il2CppObject extends NativeStruct {
         return !!Il2Cpp.Api._monitorTryWait(this, timeout);
     }
 
+    /** */
+    toString(): string {
+        return this.isNull() ? "null" : this.method<Il2Cpp.String>("ToString").invoke().content || "null";
+    }
+
     /** Unboxes the value type out of this object. */
     unbox(): NativePointer {
         return Il2Cpp.Api._objectUnbox(this);
@@ -90,11 +93,6 @@ class Il2CppObject extends NativeStruct {
     /** Creates a weak reference to this object. */
     weakRef(trackResurrection: boolean): Il2Cpp.GC.Handle {
         return new Il2Cpp.GC.Handle(Il2Cpp.Api._gcHandleNewWeakRef(this, +trackResurrection));
-    }
-
-    @checkNull
-    override toString(): string {
-        return this.method<Il2Cpp.String>("ToString").invoke().content || "null";
     }
 }
 

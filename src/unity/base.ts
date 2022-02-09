@@ -55,7 +55,7 @@ class UnityBase {
             }
         }
 
-        raise("Couldn't obtain the Unity version. Please open an issue.");
+        raise("couldn't obtain the Unity version, please open an issue: https://github.com/vfsfitvnm/frida-il2cpp-bridge/issues/new");
     }
 }
 

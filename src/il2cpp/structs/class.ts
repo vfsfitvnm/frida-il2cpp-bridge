@@ -1,9 +1,8 @@
 import { cache } from "decorator-cache-getter";
 import { raise } from "../../utils/console";
+import { GLib } from "../../utils/glib";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { cacheInstances, getOrNull, memoize, nativeIterator } from "../../utils/utils";
-import { levenshtein } from "../decorators";
-import { readGString } from "../utils";
+import { cacheInstances, levenshtein, memoize, nativeIterator } from "../../utils/utils";
 
 /** Represents a `Il2CppClass`. */
 @cacheInstances
@@ -35,19 +34,19 @@ class Il2CppClass extends NonNullNativeStruct {
     /** Gets the class that declares the current nested class. */
     @cache
     get declaringClass(): Il2Cpp.Class | null {
-        return getOrNull(Il2Cpp.Api._classGetDeclaringType(this), Il2Cpp.Class);
+        return Il2Cpp.Api._classGetDeclaringType(this).nullOr(Il2Cpp.Class);
     }
 
     /** Gets the encompassed type of this array, reference, pointer or enum type. */
     @cache
     get baseType(): Il2Cpp.Type | null {
-        return getOrNull(Il2Cpp.Api._classGetBaseType(this), Il2Cpp.Type);
+        return Il2Cpp.Api._classGetBaseType(this).nullOr(Il2Cpp.Type);
     }
 
     /** Gets the class of the object encompassed or referred to by the current array, pointer or reference class. */
     @cache
     get elementClass(): Il2Cpp.Class | null {
-        return getOrNull(Il2Cpp.Api._classGetElementClass(this), Il2Cpp.Class);
+        return Il2Cpp.Api._classGetElementClass(this).nullOr(Il2Cpp.Class);
     }
 
     /** Gets the amount of the fields of the current class. */
@@ -190,7 +189,7 @@ class Il2CppClass extends NonNullNativeStruct {
     /** Gets the class from which the current class directly inherits. */
     @cache
     get parent(): Il2Cpp.Class | null {
-        return getOrNull(Il2Cpp.Api._classGetParent(this), Il2Cpp.Class);
+        return Il2Cpp.Api._classGetParent(this).nullOr(Il2Cpp.Class);
     }
 
     /** Gets the rank (number of dimensions) of the current array class. */
@@ -231,26 +230,25 @@ class Il2CppClass extends NonNullNativeStruct {
     /** Builds a generic instance of the current generic class. */
     inflate(...classes: Il2Cpp.Class[]): Il2Cpp.Class {
         if (!this.isGeneric) {
-            raise(`Cannot inflate ${this.type.name} because it's not generic.`);
+            raise(`cannot inflate class ${this.type.name}: it has no generic parameters`);
+        }
+
+        if (this.genericParameterCount != classes.length) {
+            raise(
+                `cannot inflate class ${this.type.name}: it needs ${this.genericParameterCount} generic parameter(s), not ${classes.length}`
+            );
         }
 
         const types = classes.map(klass => klass.type.object);
         const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.class("System.Type"), types);
 
-        // TODO: typeArray leaks
-        return this.inflateRaw(typeArray);
-    }
-
-    /** @internal */
-    inflateRaw(typeArray: Il2Cpp.Array<Il2Cpp.Object>): Il2Cpp.Class {
         const inflatedType = this.type.object.method<Il2Cpp.Object>("MakeGenericType", 1).invoke(typeArray);
-
         return new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(inflatedType));
     }
 
     /** Calls the static constructor of the current class. */
     initialize(): void {
-        Il2Cpp.try(() => Il2Cpp.Api._classInit(this));
+        Il2Cpp.Api._classInit(this);
     }
 
     /** Determines whether an instance of `other` class can be assigned to a variable of the current type. */
@@ -286,7 +284,7 @@ class Il2CppClass extends NonNullNativeStruct {
         const exception = exceptionArray.readPointer();
 
         if (!exception.isNull()) {
-            raise(new Il2Cpp.Object(exception).toString()!);
+            raise(new Il2Cpp.Object(exception).toString());
         }
 
         return object;
@@ -312,8 +310,14 @@ class Il2CppClass extends NonNullNativeStruct {
         return this.nestedClasses.find(e => e.name == name);
     }
 
-    override toString(): string {
-        return readGString(Il2Cpp.Api._toString(this, Il2Cpp.Api._classToString))!;
+    /** */
+    toString(): string {
+        const buffer = Il2Cpp.Api._toString(this, Il2Cpp.Api._classToString);
+        try {
+            return buffer.readUtf8String()!;
+        } finally {
+            GLib.free(buffer);
+        }
     }
 
     /** Executes a callback for every defined class. */

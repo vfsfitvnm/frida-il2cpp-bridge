@@ -1,5 +1,4 @@
 import { inform, ok } from "../utils/console";
-import { formatNativePointer } from "../utils/utils";
 
 /** Dumping utilities. */
 class Il2CppDumper {
@@ -16,7 +15,9 @@ class Il2CppDumper {
         const Application = UnityEngine.image.class("UnityEngine.Application");
 
         try {
-            const identifier = (Application.tryMethod<Il2Cpp.String>("get_identifier") || Application.method<Il2Cpp.String>("get_bundleIdentifier")).invoke();
+            const identifier = (
+                Application.tryMethod<Il2Cpp.String>("get_identifier") || Application.method<Il2Cpp.String>("get_bundleIdentifier")
+            ).invoke();
             const version = Application.method<Il2Cpp.String>("get_version").invoke();
             return `${identifier.content}_${version.content}`;
         } catch (e) {
@@ -49,7 +50,7 @@ class Il2CppDumper {
     classes(): Pick<Il2Cpp.Dumper, "build"> {
         this.#generator = function* (): Generator<string> {
             for (const assembly of Il2Cpp.Domain.assemblies) {
-                inform(`Dumping \x1b[1m${assembly.name}\x1b[0m...`);
+                inform(`dumping ${assembly.name}...`);
 
                 for (const klass of assembly.image.classes) {
                     yield klass.toString();
@@ -63,27 +64,13 @@ class Il2CppDumper {
 
     methods(): Pick<Il2Cpp.Dumper, "build"> {
         this.#generator = function* (): Generator<string> {
-            const SystemType = Il2Cpp.Image.corlib.class("System.Type");
-            const SystemObject = Il2Cpp.Image.corlib.class("System.Object").type.object;
-
-            const getTypeArray = (genericParameterCount: number): Il2Cpp.Array<Il2Cpp.Object> =>
-                Il2Cpp.Array.from(SystemType, Array(genericParameterCount).fill(SystemObject));
-
             for (const assembly of Il2Cpp.Domain.assemblies) {
-                inform(`Dumping methods from \x1b[1m${assembly.name}\x1b[0m...`);
+                inform(`dumping methods from ${assembly.name}...`);
 
                 for (let klass of assembly.image.classes) {
-                    if (klass.isGeneric) {
-                        klass = klass.inflateRaw(getTypeArray(klass.genericParameterCount));
-                    }
-
                     for (let method of klass.methods) {
-                        if (method.isGeneric && !klass.isGeneric) {
-                            method = method.inflateRaw(getTypeArray(method.genericParameterCount));
-                        }
-
                         if (!method.virtualAddress.isNull()) {
-                            yield `${formatNativePointer(method.relativeVirtualAddress)} ${klass.type.name}.${method.name}\n`;
+                            yield `${method.relativeVirtualAddress.format()} ${klass.type.name}.${method.name}\n`;
                         }
                     }
                 }
@@ -95,10 +82,10 @@ class Il2CppDumper {
     }
 
     build(): void {
-        const directoryPath = (this.#directoryPath) ?? Il2Cpp.Dumper.defaultDirectoryPath;
-        const fileName = (this.#fileName) ?? Il2Cpp.Dumper.defaultFileName;
+        const directoryPath = this.#directoryPath ?? Il2Cpp.Dumper.defaultDirectoryPath;
+        const fileName = this.#fileName ?? Il2Cpp.Dumper.defaultFileName;
 
-        const destinationPath = `${directoryPath}/${fileName}.${(this.#extension) ?? "dump"}`;
+        const destinationPath = `${directoryPath}/${fileName}.${this.#extension ?? "dump"}`;
         const file = new File(destinationPath, "w");
 
         for (const chunk of this.#generator!()) {
@@ -107,7 +94,7 @@ class Il2CppDumper {
 
         file.flush();
         file.close();
-        ok(`Dump saved to ${destinationPath}`);
+        ok(`dump saved to ${destinationPath}`);
     }
 }
 

@@ -1,4 +1,3 @@
-import { checkNull } from "../decorators";
 import { read, write } from "../utils";
 import { NativeStruct } from "../../utils/native-struct";
 
@@ -18,9 +17,9 @@ class Il2CppReference<T extends Il2Cpp.Field.Type> extends NativeStruct {
         write(this.handle, value, this.type);
     }
 
-    @checkNull
-    override toString(): string {
-        return `->${this.value}`;
+    /** */
+    toString(): string {
+        return this.isNull() ? "null" : `->${this.value}`;
     }
 }
 

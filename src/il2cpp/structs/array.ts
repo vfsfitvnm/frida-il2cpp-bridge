@@ -1,5 +1,4 @@
 import { cache } from "decorator-cache-getter";
-import { checkNull } from "../decorators";
 import { raise } from "../../utils/console";
 import { NativeStruct } from "../../utils/native-struct";
 
@@ -11,7 +10,7 @@ class Il2CppArray<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Nativ
     /** Creates a new array with the given elements. */
     static from<T extends Il2Cpp.Field.Type>(klass: Il2Cpp.Class, elements: T[]): Il2Cpp.Array<T>;
 
-     /** @internal */
+    /** @internal */
     static from<T extends Il2Cpp.Field.Type>(klass: Il2Cpp.Class, lengthOrElements: number | T[]): Il2Cpp.Array<T> {
         const length = typeof lengthOrElements == "number" ? lengthOrElements : lengthOrElements.length;
         const array = new Il2Cpp.Array<T>(Il2Cpp.Api._arrayNew(klass, length));
@@ -56,7 +55,7 @@ class Il2CppArray<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Nativ
     /** @internal */
     checkIndexOutOfBounds(index: number): void {
         if (index < 0 || index >= this.length) {
-            raise(`${this.constructor.name} element index '${index}' out of bounds (length: ${this.length}).`);
+            raise(`cannot get element at index ${index}: array length is ${this.length}`);
         }
     }
 
@@ -72,9 +71,9 @@ class Il2CppArray<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Nativ
         this.elements.set(index, value);
     }
 
-    @checkNull
-    override toString(): string {
-        return `[${this.elements.read(0, this.length)}]`;
+    /** */
+    toString(): string {
+        return this.isNull() ? "null" : `[${this.elements.read(0, this.length)}]`;
     }
 
     /** Iterable. */

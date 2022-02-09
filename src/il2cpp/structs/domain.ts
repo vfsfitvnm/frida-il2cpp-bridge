@@ -1,6 +1,5 @@
 import { cache } from "decorator-cache-getter";
-import { memoize } from "../../utils/utils";
-import { levenshtein } from "../decorators";
+import { levenshtein, memoize } from "../../utils/utils";
 
 /** Represents a `Il2CppDomain`. */
 class Il2CppDomain {

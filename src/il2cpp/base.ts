@@ -50,11 +50,6 @@ class Il2CppBase {
         return Il2Cpp.Api._free(pointer);
     }
 
-    /** Creates a new `Il2Cpp.Tracer` instance. */
-    static trace(): Pick<Il2Cpp.Tracer, "domain" | "assemblies" | "classes" | "methods"> {
-        return new Il2Cpp.Tracer();
-    }
-
     /** @internal Waits for Unity and Il2Cpp native libraries to be loaded and initialized. */
     private static async initialize(): Promise<void> {
         if (Process.platform == "darwin") {
@@ -98,53 +93,22 @@ class Il2CppBase {
 
                 try {
                     block();
-                } catch (error: any) {
-                    if (error.fromIl2CppModule) {
-                        (globalThis as any).console.log(error.stack);
-                    } else {
-                        throw error;
-                    }
                 } finally {
                     if (isForeignThread) {
                         thread?.detach();
                     }
                 }
             })
-            .catch(error =>
+            .catch(e =>
                 Script.nextTick(() => {
-                    throw error;
+                    throw e;
                 })
             );
     }
 
-    /** Tries to execute the given block and prints the underlying C# (C++) exception. */
-    static try<T>(block: () => T): T {
-        try {
-            return block();
-        } catch (error: any) {
-            if (error.message != "abort was called") {
-                throw error;
-            }
-
-            const exception = Il2Cpp.Api._cxaGetGlobals().readPointer();
-            const dummyException = Il2Cpp.Api._cxaAllocateException(Process.pointerSize);
-
-            try {
-                Il2Cpp.Api._cxaThrow(dummyException, NULL, NULL);
-            } catch (e) {
-                const dummyExceptionHeader = Il2Cpp.Api._cxaGetGlobals().readPointer();
-
-                for (let i = 0; i < 256; i++) {
-                    if (dummyExceptionHeader.add(i).equals(dummyException)) {
-                        Il2Cpp.Api._cxaFreeException(dummyException);
-
-                        raise(new Il2Cpp.Object(exception.add(i).readPointer()).toString()!);
-                    }
-                }
-            }
-
-            throw error;
-        }
+    /** Creates a new `Il2Cpp.Tracer` instance. */
+    static trace(): Pick<Il2Cpp.Tracer, "domain" | "assemblies" | "classes" | "methods"> {
+        return new Il2Cpp.Tracer();
     }
 }
 

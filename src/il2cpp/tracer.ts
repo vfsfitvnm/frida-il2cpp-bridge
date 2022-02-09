@@ -1,6 +1,5 @@
 import kleur from "kleur";
 import { inform } from "../utils/console";
-import { formatNativePointer } from "../utils/utils";
 
 /** Tracing utilities. */
 class Il2CppTracer {
@@ -164,7 +163,7 @@ class Il2CppTracer {
     /** Reports method invocations. */
     simple(): Pick<Il2Cpp.Tracer, "build"> {
         this.#generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
-            const at = kleur.white(formatNativePointer(target.relativeVirtualAddress));
+            const at = kleur.white(target.relativeVirtualAddress.format());
             const sign = `${target.class.type.name}.${kleur.bold(target.name)}`;
 
             return {
@@ -182,7 +181,7 @@ class Il2CppTracer {
         let counter = 0;
 
         this.#generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
-            const at = kleur.white(formatNativePointer(target.relativeVirtualAddress));
+            const at = kleur.white(target.relativeVirtualAddress.format());
             const sign = `${target.class.type.name}.${kleur.bold(target.name)}`;
 
             return {
@@ -205,7 +204,7 @@ class Il2CppTracer {
         let counter = 0;
 
         this.#generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
-            const at = kleur.white(formatNativePointer(target.relativeVirtualAddress));
+            const at = kleur.white(target.relativeVirtualAddress.format());
             const sign = `${target.class.type.name}.${kleur.bold(target.name)}`;
             const parametersInfo = Object.values(target.parameters);
 
@@ -253,7 +252,7 @@ class Il2CppTracer {
 
     build(): void {
         for (const target of this.targets) {
-            if (target.virtualAddress.isNull()) {
+            if (target.virtualAddress.isNull() || target.isExternal) {
                 continue;
             }
 
@@ -296,3 +295,5 @@ declare global {
         }
     }
 }
+
+kleur.enabled = true;

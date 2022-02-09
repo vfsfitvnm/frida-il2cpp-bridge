@@ -1,4 +1,3 @@
-import { checkNull } from "../decorators";
 import { NativeStruct } from "../../utils/native-struct";
 
 /** Represents a `Il2CppString`. */
@@ -24,14 +23,14 @@ class Il2CppString extends NativeStruct {
         return new Il2Cpp.Object(this);
     }
 
+    /** */
+    toString(): string {
+        return this.isNull() ? "null" : `"${this.content}"`;
+    }
+
     /** Creates a new string with the specified content. */
     static from(content: string | null): Il2Cpp.String {
         return new Il2Cpp.String(Il2Cpp.Api._stringNew(Memory.allocUtf8String(content || "")));
-    }
-
-    @checkNull
-    override toString(): string {
-        return `"${this.content}"`;
     }
 }
 

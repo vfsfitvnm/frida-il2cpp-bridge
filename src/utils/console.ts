@@ -1,28 +1,21 @@
-import kleur from "kleur";
-
-kleur.enabled = true;
-
 /** @internal */
-export function raise(message: string): never {
-    const error = new Error(message);
-    error.stack = error.stack?.replace("Error:", kleur.red("[il2cpp]"));
-    (error as any).fromIl2CppModule = true;
-    throw error;
+export function raise(message: any): never {
+    throw `\x1B[0m\x1B[38;5;9mil2cpp\x1B[0m: ${message}`;
 }
 
 /** @internal */
-export function ok(message: string): void {
-    (globalThis as any).console.log(`${kleur.green("[il2cpp]")} ${message}`);
+export function warn(message: any): void {
+    (globalThis as any).console.log(`\x1B[38;5;11mil2cpp\x1B[0m: ${message}`);
 }
 
 /** @internal */
-export function warn(message: string): void {
-    (globalThis as any).console.log(`${kleur.yellow("[il2cpp]")} ${message}`);
+export function ok(message: any): void {
+    (globalThis as any).console.log(`\x1B[38;5;10mil2cpp\x1B[0m: ${message}`);
 }
 
 /** @internal */
-export function inform(message: string): void {
-    (globalThis as any).console.log(`${kleur.blue("[il2cpp]")} ${message}`);
+export function inform(message: any): void {
+    (globalThis as any).console.log(`\x1B[38;5;12mil2cpp\x1B[0m: ${message}`);
 }
 
 /** @internal */

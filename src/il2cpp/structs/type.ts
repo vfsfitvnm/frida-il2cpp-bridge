@@ -1,7 +1,5 @@
 import { cache } from "decorator-cache-getter";
-import { warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { filterMapArray } from "../../utils/utils";
 
 /** Represents a `Il2CppType`. */
 class Il2CppType extends NonNullNativeStruct {
@@ -59,7 +57,6 @@ class Il2CppType extends NonNullNativeStruct {
             case Il2Cpp.Type.Enum.GenericInstance:
                 return this.class.isValueType ? getValueTypeFields(this) : "pointer";
             default:
-                warn(`fridaAlias: defaulting ${this.name}, "${this.typeEnum}" to pointer`);
                 return "pointer";
         }
     }
@@ -102,11 +99,7 @@ class Il2CppType extends NonNullNativeStruct {
 }
 
 function getValueTypeFields(type: Il2Cpp.Type): NativeCallbackArgumentType {
-    return filterMapArray(
-        type.class.fields,
-        (field: Il2Cpp.Field) => !field.isStatic,
-        (field: Il2Cpp.Field) => field.type.fridaAlias
-    );
+    return type.class.fields.filter(f => !f.isStatic).map(f => f.type.fridaAlias);
 }
 
 Reflect.set(Il2Cpp, "Type", Il2CppType);

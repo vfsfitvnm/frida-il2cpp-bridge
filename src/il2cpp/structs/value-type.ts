@@ -1,5 +1,4 @@
 import { NativeStruct } from "../../utils/native-struct";
-import { checkNull } from "../decorators";
 
 /** Value type class utility. */
 class Il2CppValueType extends NativeStruct {
@@ -17,9 +16,9 @@ class Il2CppValueType extends NativeStruct {
         return this.type.class.field<T>(name).withHolder(this);
     }
 
-    @checkNull
-    override toString(): string {
-        return this.box().toString();
+    /** */
+    toString(): string {
+        return this.isNull() ? "null" : this.box().toString();
     }
 }
 
