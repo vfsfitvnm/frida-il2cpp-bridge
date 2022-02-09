@@ -219,24 +219,6 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
             return fromFridaValue(returnValue, this.returnType) as T;
         } catch (e: any) {
             switch (e.message) {
-                // TODO: remove
-                case "abort was called":
-                    const exception = Il2Cpp.Api._cxaGetGlobals().readPointer();
-                    const dummyException = Il2Cpp.Api._cxaAllocateException(Process.pointerSize);
-
-                    try {
-                        Il2Cpp.Api._cxaThrow(dummyException, NULL, NULL);
-                    } catch (e) {
-                        const dummyExceptionHeader = Il2Cpp.Api._cxaGetGlobals().readPointer();
-
-                        for (let i = 0; i < 256; i++) {
-                            if (dummyExceptionHeader.add(i).equals(dummyException)) {
-                                Il2Cpp.Api._cxaFreeException(dummyException);
-
-                                raise(new Il2Cpp.Object(exception.add(i).readPointer()));
-                            }
-                        }
-                    }
                 case "bad argument count":
                     raise(`cannot invoke method ${this.name}: it needs ${this.parameterCount} parameter(s), not ${parameters.length}`);
                 case "expected a pointer":

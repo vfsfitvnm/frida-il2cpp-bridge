@@ -710,26 +710,6 @@ class Il2CppApi {
         return this.r("il2cpp_type_is_primitive", "bool", ["pointer"]);
     }
 
-    @cache
-    static get _cxaAllocateException() {
-        return this.r("__cxa_allocate_exception", "pointer", ["size_t"]);
-    }
-
-    @cache
-    static get _cxaFreeException() {
-        return this.r("__cxa_free_exception", "void", ["pointer"]);
-    }
-
-    @cache
-    static get _cxaGetGlobals() {
-        return this.r("__cxa_get_globals", "pointer", []);
-    }
-
-    @cache
-    static get _cxaThrow() {
-        return this.r("__cxa_throw", "void", ["pointer", "pointer", "pointer"]);
-    }
-
     /** @internal */
     @cache
     private static get cModule(): Record<string, NativePointer | null> {
