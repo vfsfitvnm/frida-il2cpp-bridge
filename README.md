@@ -24,6 +24,56 @@ It should work for any Unity version in the range **5.3.0** - **2021.1.x**.
 **Android**, **Linux**, **Windows**, **iOS**, **macOS** are supported.
 However, only Android and Linux are tested: expect breakage if you are using another platform.
 
+## Changelog
+
+### 0.7.0
+- `Il2Cpp.Domain::assemblies`, `Il2Cpp.Image::classes`, `Il2Cpp.Class::methods` and so on now return a plain simple array.
+- `Il2Cpp.Domain::assembly`, `Il2Cpp.Image::class`, `Il2Cpp.Class::method` and so on were added to obtain an item with the given name. They are all equivalent to the old accessor way:
+  ```ts
+  // old
+  const mscorlib = Il2Cpp.Domain.assemblies.mscorlib.image;
+  const SystemString = mscorlib.classes["System.String"];
+  
+  // new, this is way
+  const mscorlib = Il2Cpp.Domain.assembly("mscorlib").image;
+  const SystemString = mscorlib.class("System.String");
+  ```
+  The new look is more consistent and easier to manage and has a positive noticeable impact on performance (e.g. there's no need to find all classes first). Lastly, but not least importantly, there's no need to cast an object to its base when trying to invoke a base method or accessing a base class!
+  
+  However, there are a couple of important changes:
+  - Nested classes must be accessed within their declaring class via `Il2Cpp.Class::nested`:
+    ```ts
+    // old
+    const TransitionTime = mscorlib.classes["System.TimeZoneInfo.TransitionTime"];
+
+    // new
+    const TransitionTime = mscorlib.class("System.TimeZoneInfo").nested("TransitionTime");
+    ```
+  - Generic type parameters must follow IL convention, so `<T1, ... TN>` becomes `` `N `` when calling `Il2Cpp.Image::class` or `Il2Cpp.Image::tryClass`:
+    ```ts
+    // old
+    const List = mscorlib.classes["System.Collections.Generic.List<T>"];
+
+    // new
+    const List = mscorlib.class("System.Collections.Generic.List`1");
+    ```
+
+- `Il2Cpp.Method::overload` was added to help picking the correct method with the given parameter type names.
+- `Il2Cpp.Object::base` was removed because it's not necessary anymore.
+- `Il2Cpp.Method::implement` does not artificially cast instances to the method declaring class anymore.
+- `Il2Cpp.Method::invoke` doesn't try to catch C# exceptions anymore: the solutions I adopted (= catch `abort was called` error) is unreliable and inconsistent.
+- `Il2Cpp.Field` and `Il2Cpp.Method` now have type parameters:
+  ```ts
+  const SystemBoolean = Il2Cpp.Image.corlib.class("System.Boolean");
+
+  const TrueLiteral = SystemBoolean.field<Il2Cpp.String>("TrueLiteral");
+  TrueLiteral.value = 23; // type error!
+
+  const Parse = SystemBoolean.method<boolean>("Parse");
+  const result = Parse.invoke(Il2Cpp.String.from("true"));
+  ```
+  In `Il2Cpp.Method` the type parameter was moved out from `invoke`. Type parameters for method arguments aren't present because they add too much verbosity for little benefit.
+
 ## Acknowledgements
 Thanks to [meme](https://github.com/meme) and [knobse](https://github.com/knobse) for helping and getting me into this, 
 and to [djkaty](https://github.com/djkaty) and [nneonneo](https://github.com/nneonneo) for providing the Il2Cpp
