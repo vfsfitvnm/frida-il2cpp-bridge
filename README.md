@@ -18,13 +18,19 @@ A Frida module to dump, trace or hijack any Il2Cpp application at runtime, witho
 ## Compatibility
 
 #### Unity version
-It should work for any Unity version in the range **5.3.0** - **2021.1.x**.
+It should work for any Unity version in the range **5.3.0** - **2022.1.x**.
 
 #### Platforms
 **Android**, **Linux**, **Windows**, **iOS**, **macOS** are supported.
 However, only Android and Linux are tested: expect breakage if you are using another platform.
 
 ## Changelog
+
+### 0.7.1
+- Support Unity version up to 2022.1.x. Note: `Il2Cpp.GC::choose` makes the application crash in applications whose Unity version is above 2021.1.
+- `Il2Cpp.Class::toString`, `Il2Cpp.Field::toString` and `Il2Cpp.Method::toString` are now implemented in JavaScript. I know this is a considerable performance loss, but the C code looks much simpler now as less logic is involved, also dumping is actually performed once per application, so it's not a total drama.
+- `Il2Cpp.Class::interfaceCount`, `Il2Cpp.Class::fieldCount` and `Il2Cpp.Class::methodCount` were removed because unnecessary.
+- Faster Unity version detection: the memory isn't scanned anymore, the proper function is invoked instead.
 
 ### 0.7.0
 - `Il2Cpp.Domain::assemblies`, `Il2Cpp.Image::classes`, `Il2Cpp.Class::methods` and so on now return a plain simple array.
@@ -34,7 +40,7 @@ However, only Android and Linux are tested: expect breakage if you are using ano
   const mscorlib = Il2Cpp.Domain.assemblies.mscorlib.image;
   const SystemString = mscorlib.classes["System.String"];
   
-  // new, this is way
+  // new
   const mscorlib = Il2Cpp.Domain.assembly("mscorlib").image;
   const SystemString = mscorlib.class("System.String");
   ```
