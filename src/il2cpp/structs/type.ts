@@ -96,6 +96,11 @@ class Il2CppType extends NonNullNativeStruct {
     get typeEnum(): Il2Cpp.Type.Enum {
         return Il2Cpp.Api._typeGetTypeEnum(this);
     }
+
+    /** */
+    toString(): string {
+        return this.name;
+    }
 }
 
 function getValueTypeFields(type: Il2Cpp.Type): NativeCallbackArgumentType {
