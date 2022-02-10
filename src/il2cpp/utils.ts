@@ -1,5 +1,4 @@
 import { raise, warn } from "../utils/console";
-import { GLib } from "../utils/glib";
 import { NativeStruct } from "../utils/native-struct";
 
 /** @internal */

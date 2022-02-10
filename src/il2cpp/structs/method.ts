@@ -1,6 +1,5 @@
 import { cache } from "decorator-cache-getter";
 import { raise, warn } from "../../utils/console";
-import { GLib } from "../../utils/glib";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { levenshtein } from "../../utils/utils";
 import { fromFridaValue, toFridaValue } from "../utils";
@@ -270,12 +269,12 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
 
     /** */
     toString(): string {
-        const buffer = Il2Cpp.Api._toString(this, Il2Cpp.Api._methodToString);
-        try {
-            return buffer.readUtf8String()!;
-        } finally {
-            GLib.free(buffer);
-        }
+        return `\
+${this.isStatic ? `static ` : ``}\
+${this.returnType.name} \
+${this.name}\
+(${this.parameters.join(`, `)});\
+${this.virtualAddress.isNull() ? `` : ` // ${this.virtualAddress.sub(Il2Cpp.module.base).format()}`}`;
     }
 
     /** @internal */

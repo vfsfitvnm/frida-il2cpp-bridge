@@ -89,7 +89,7 @@ class Il2CppDumper {
         const file = new File(destinationPath, "w");
 
         for (const chunk of this.#generator!()) {
-            file.write(chunk);
+            file.write(chunk + "\n\n");
         }
 
         file.flush();

@@ -1,6 +1,5 @@
 import { cache } from "decorator-cache-getter";
 import { raise } from "../../utils/console";
-import { GLib } from "../../utils/glib";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { read, write } from "../utils";
 
@@ -81,12 +80,13 @@ class Il2CppField<T extends Il2Cpp.Field.Type> extends NonNullNativeStruct {
 
     /** */
     toString(): string {
-        const buffer = Il2Cpp.Api._toString(this, Il2Cpp.Api._fieldToString);
-        try {
-            return buffer.readUtf8String()!;
-        } finally {
-            GLib.free(buffer);
-        }
+        return `\
+${this.isThreadStatic ? `[ThreadStatic] ` : ``}\
+${this.isStatic ? `static ` : ``}\
+${this.type.name} \
+${this.name}\
+${this.isLiteral ? ` = ${this.class.isEnum ? read((this.value as Il2Cpp.ValueType).handle, this.class.baseType!) : this.value}` : ``};\
+${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)}`}`;
     }
 
     /** @internal */

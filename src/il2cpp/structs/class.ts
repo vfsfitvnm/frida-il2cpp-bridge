@@ -1,6 +1,5 @@
 import { cache } from "decorator-cache-getter";
 import { raise } from "../../utils/console";
-import { GLib } from "../../utils/glib";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { cacheInstances, levenshtein, memoize, nativeIterator } from "../../utils/utils";
 
@@ -47,12 +46,6 @@ class Il2CppClass extends NonNullNativeStruct {
     @cache
     get elementClass(): Il2Cpp.Class | null {
         return Il2Cpp.Api._classGetElementClass(this).nullOr(Il2Cpp.Class);
-    }
-
-    /** Gets the amount of the fields of the current class. */
-    @cache
-    get fieldCount(): UInt64 {
-        return Il2Cpp.Api._classGetFieldCount(this);
     }
 
     /** Gets the fields of the current class. */
@@ -144,22 +137,10 @@ class Il2CppClass extends NonNullNativeStruct {
         return !!Il2Cpp.Api._classIsValueType(this);
     }
 
-    /** Gets the amount of the implemented or inherited interfaces by the current class. */
-    @cache
-    get interfaceCount(): number {
-        return Il2Cpp.Api._classGetInterfaceCount(this);
-    }
-
     /** Gets the interfaces implemented or inherited by the current class. */
     @cache
     get interfaces(): Il2Cpp.Class[] {
         return Array.from(nativeIterator(this, Il2Cpp.Api._classGetInterfaces, Il2Cpp.Class));
-    }
-
-    /** Gets the amount of the implemented methods by the current class. */
-    @cache
-    get methodCount(): number {
-        return Il2Cpp.Api._classGetMethodCount(this);
     }
 
     /** Gets the methods implemented by the current class. */
@@ -312,12 +293,17 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** */
     toString(): string {
-        const buffer = Il2Cpp.Api._toString(this, Il2Cpp.Api._classToString);
-        try {
-            return buffer.readUtf8String()!;
-        } finally {
-            GLib.free(buffer);
-        }
+        const inherited = [this.parent].concat(this.interfaces);
+
+        return `\
+// ${this.assemblyName}
+${this.isEnum ? `enum` : this.isValueType ? `struct` : this.isInterface ? `interface` : `class`} \
+${this.type.name}\
+${inherited ? ` : ${inherited.map(e => e?.type.name).join(`, `)}` : ``}
+{
+    ${this.fields.join(`\n    `)}
+    ${this.methods.join(`\n    `)}
+}`;
     }
 
     /** Executes a callback for every defined class. */
