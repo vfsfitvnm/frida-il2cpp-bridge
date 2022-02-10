@@ -1,6 +1,6 @@
 import { cache } from "decorator-cache-getter";
-import { read } from "./utils";
 import { raise, warn } from "../utils/console";
+import { read } from "./utils";
 
 class Il2CppApi {
     protected constructor() {}
@@ -436,6 +436,11 @@ class Il2CppApi {
     }
 
     @cache
+    static get _livenessAllocateStruct() {
+        return this.r("il2cpp_unity_liveness_allocate_struct", "pointer", ["pointer", "int", "pointer", "pointer", "pointer"], "2021.2.0");
+    }
+
+    @cache
     static get _livenessCalculationBegin() {
         return this.r("il2cpp_unity_liveness_calculation_begin", "pointer", ["pointer", "int", "pointer", "pointer", "pointer", "pointer"]);
     }
@@ -448,6 +453,16 @@ class Il2CppApi {
     @cache
     static get _livenessCalculationFromStatics() {
         return this.r("il2cpp_unity_liveness_calculation_from_statics", "void", ["pointer"]);
+    }
+
+    @cache
+    static get _livenessFinalize() {
+        return this.r("il2cpp_unity_liveness_finalize", "void", ["pointer"], "2021.2.0");
+    }
+
+    @cache
+    static get _livenessFreeStruct() {
+        return this.r("il2cpp_unity_liveness_free_struct", "void", ["pointer"], "2021.2.0");
     }
 
     @cache
@@ -631,6 +646,11 @@ class Il2CppApi {
     }
 
     @cache
+    static get _resolveInternalCall() {
+        return this.r("il2cpp_resolve_icall", "pointer", ["pointer"]);
+    }
+
+    @cache
     static get _stringChars() {
         return this.r("il2cpp_string_chars", "pointer", ["pointer"]);
     }
@@ -746,12 +766,14 @@ OFFSET_OF (offset_of_pointer, void *)
         SystemReflectionModule.initialize();
 
         const DaysToMonth365 = (
-            SystemDateTime.tryField<Il2Cpp.Array<number>>("daysmonth") || SystemDateTime.field<Il2Cpp.Array<number>>("DaysToMonth365")
+            SystemDateTime.tryField<Il2Cpp.Array<number>>("daysmonth") ||
+            SystemDateTime.tryField<Il2Cpp.Array<number>>("DaysToMonth365") ||
+            SystemDateTime.field<Il2Cpp.Array<number>>("s_daysToMonth365")
         ).value;
 
-        const filter_by_type_name = SystemReflectionModule.method("filter_by_type_name", 2);
         const FilterTypeName = SystemReflectionModule.field<Il2Cpp.Object>("FilterTypeName").value;
-        const FilterTypeNamePointer = FilterTypeName.handle.add(FilterTypeName.class.field("method_ptr").offset).readPointer();
+        const FilterTypeNameMethodPointer = FilterTypeName.field<NativePointer>("method_ptr").value;
+        const FilterTypeNameMethod = FilterTypeName.field<NativePointer>("method").value;
 
         const source = `\
 #include <stdint.h>
@@ -1016,9 +1038,20 @@ il2cpp_class_get_actual_instance_size (int32_t * class)
 }
 
 uint16_t
-il2cpp_class_get_interface_count (uint16_t * class)
+il2cpp_class_get_interface_count (void * class)
 {
-    return *(class + ${offsetOfUInt16(SystemString, 7)});
+    uint16_t count;
+    void * iter;
+
+    count = 0;
+    iter = NULL;
+
+    while (il2cpp_class_get_interfaces (class, &iter) != NULL)
+    {
+        count++;
+    }
+
+    return count;
 }
 
 uint16_t
@@ -1271,7 +1304,7 @@ il2cpp_method_get_from_reflection (const Il2CppReflectionMethod * method)
 void *
 il2cpp_method_get_pointer (void ** method)
 {
-    return * (method + ${offsetOfPointer(filter_by_type_name, FilterTypeNamePointer)});
+    return * (method + ${offsetOfPointer(FilterTypeNameMethod, FilterTypeNameMethodPointer)});
 }
 
 uint8_t

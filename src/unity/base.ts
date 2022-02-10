@@ -36,7 +36,7 @@ class UnityBase {
     /** Determines whether the Unity version is fully supported by this module. */
     @cache
     static get mayBeUnsupported(): boolean {
-        return this.version.isBelow("5.3.0") || this.version.isEqualOrAbove("2021.2.0");
+        return this.version.isBelow("5.3.0") || this.version.isEqualOrAbove("2022.2.0");
     }
 
     /** Gets the Unity version of the current application. */
@@ -44,18 +44,9 @@ class UnityBase {
     static get version(): Version {
         Version.pattern = /(20\d{2}|\d)\.(\d)\.(\d{1,2})([abcfp]|rc){0,2}\d?/;
 
-        const module = Process.getModuleByName(this.moduleName);
-        const ranges = [...module.enumerateRanges("r--"), Process.getRangeByAddress(module.base)];
-
-        for (const range of ranges) {
-            const scan = Memory.scanSync(range.base, range.size, "45787065637465642076657273696f6e3a")[0];
-
-            if (scan != undefined) {
-                return new Version(scan.address.readUtf8String()!);
-            }
-        }
-
-        raise("couldn't obtain the Unity version, please open an issue: https://github.com/vfsfitvnm/frida-il2cpp-bridge/issues/new");
+        const get_unityVersion = Il2Cpp.Api._resolveInternalCall(Memory.allocUtf8String("UnityEngine.Application::get_unityVersion"));
+        const get_unityVersionNative = new NativeFunction(get_unityVersion, "pointer", []);
+        return new Version(new Il2Cpp.String(get_unityVersionNative()).content!);
     }
 }
 

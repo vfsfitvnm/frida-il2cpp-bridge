@@ -1,3 +1,5 @@
+import { warn } from "../../utils/console";
+
 /** Garbage collector utility functions. */
 class Il2CppGC {
     protected constructor() {}
@@ -48,11 +50,30 @@ class Il2CppGC {
         };
 
         const chooseCallback = new NativeCallback(callback, "void", ["pointer", "int", "pointer"]);
-        const onWorld = new NativeCallback(() => {}, "void", []);
 
-        const state = Il2Cpp.Api._livenessCalculationBegin(klass.handle, 0, chooseCallback, NULL, onWorld, onWorld);
-        Il2Cpp.Api._livenessCalculationFromStatics(state);
-        Il2Cpp.Api._livenessCalculationEnd(state);
+        if (Unity.version.isEqualOrAbove("2021.2.0")) {
+            const realloc = (handle: NativePointer, size: UInt64) => {
+                if (!handle.isNull() && size.compare(0) == 0) {
+                    Il2Cpp.free(handle);
+                    return NULL;
+                } else {
+                    return Il2Cpp.alloc(size);
+                }
+            };
+
+            const reallocCallback = new NativeCallback(realloc, "pointer", ["pointer", "size_t", "pointer"]);
+
+            const state = Il2Cpp.Api._livenessAllocateStruct(klass.handle, 0, chooseCallback, NULL, reallocCallback);
+            Il2Cpp.Api._livenessCalculationFromStatics(state);
+            Il2Cpp.Api._livenessFinalize(state);
+            Il2Cpp.Api._livenessFreeStruct(state);
+        } else {
+            const onWorld = new NativeCallback(() => {}, "void", []);
+            const state = Il2Cpp.Api._livenessCalculationBegin(klass.handle, 0, chooseCallback, NULL, onWorld, onWorld);
+
+            Il2Cpp.Api._livenessCalculationFromStatics(state);
+            Il2Cpp.Api._livenessCalculationEnd(state);
+        }
 
         return matches;
     }
