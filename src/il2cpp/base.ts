@@ -1,6 +1,6 @@
 import Versioning from "versioning";
 import { cache } from "decorator-cache-getter";
-import { inform, ok, platformNotSupported } from "../utils/console";
+import { inform, ok, raise } from "../utils/console";
 import { forModule } from "../utils/native-wait";
 
 /** */
@@ -27,7 +27,7 @@ class Il2CppBase {
                 }
         }
 
-        platformNotSupported();
+        raise(`${Process.platform} is not supported yet`);
     }
 
     /** */

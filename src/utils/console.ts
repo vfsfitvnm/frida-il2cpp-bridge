@@ -17,8 +17,3 @@ export function ok(message: any): void {
 export function inform(message: any): void {
     (globalThis as any).console.log(`\x1B[38;5;12mil2cpp\x1B[0m: ${message}`);
 }
-
-/** @internal */
-export function platformNotSupported(): never {
-    raise(`Platform "${Process.platform}" is not supported yet.`);
-}
