@@ -2,26 +2,6 @@ import { inform, ok } from "../utils/console";
 
 /** Dumping utilities. */
 class Il2CppDumper {
-    /** Gets the default directory path where the dump will be saved to. */
-    static get defaultDirectoryPath(): string {
-        const get_persistentDataPath = Il2Cpp.internalCall("UnityEngine.Application::get_persistentDataPath", "pointer", [])!;
-        return new Il2Cpp.String(get_persistentDataPath()).content!;
-    }
-
-    /** Gets the default file name. */
-    static get defaultFileName(): string {
-        const get_identifier =
-            Il2Cpp.internalCall("UnityEngine.Application::get_identifier", "pointer", []) ||
-            Il2Cpp.internalCall("UnityEngine.Application::get_bundleIdentifier", "pointer", []);
-
-        const get_version = Il2Cpp.internalCall("UnityEngine.Application::get_version", "pointer", []);
-
-        const identifier = get_identifier ? new Il2Cpp.String(get_identifier()).content : "unknownidentifier";
-        const version = get_version ? new Il2Cpp.String(get_version()).content : "unknownversion";
-
-        return `${identifier}_${version}`;
-    }
-
     /** @internal */
     #directoryPath?: string;
 
@@ -79,8 +59,8 @@ class Il2CppDumper {
     }
 
     build(): void {
-        const directoryPath = this.#directoryPath ?? Il2Cpp.Dumper.defaultDirectoryPath;
-        const fileName = this.#fileName ?? Il2Cpp.Dumper.defaultFileName;
+        const directoryPath = this.#directoryPath ?? Il2Cpp.applicationDataPath;
+        const fileName = this.#fileName ?? `${Il2Cpp.applicationVersion ?? "unknown"}_${Il2Cpp.applicationVersion ?? "unknown"}`;
 
         const destinationPath = `${directoryPath}/${fileName}.${this.#extension ?? "dump"}`;
         const file = new File(destinationPath, "w");

@@ -29,6 +29,30 @@ class Il2CppBase {
         platformNotSupported();
     }
 
+    /** */
+    @cache
+    static get applicationDataPath(): string {
+        const get_persistentDataPath = this.internalCall("UnityEngine.Application::get_persistentDataPath", "pointer", [])!;
+        return new Il2Cpp.String(get_persistentDataPath()).content!;
+    }
+
+    /** */
+    @cache
+    static get applicationIdentifier(): string | null {
+        const get_identifier =
+            Il2Cpp.internalCall("UnityEngine.Application::get_identifier", "pointer", []) ??
+            Il2Cpp.internalCall("UnityEngine.Application::get_bundleIdentifier", "pointer", []);
+
+        return get_identifier ? new Il2Cpp.String(get_identifier()).content : null;
+    }
+
+    /** Gets the version of the application */
+    @cache
+    static get applicationVersion(): string | null {
+        const get_version = Il2Cpp.internalCall("UnityEngine.Application::get_version", "pointer", []);
+        return get_version ? new Il2Cpp.String(get_version()).content : null;
+    }
+
     /** Gets the Il2Cpp module as a Frida module. */
     @cache
     static get module(): Module {
