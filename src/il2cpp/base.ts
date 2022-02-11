@@ -65,7 +65,7 @@ class Il2CppBase {
     }
 
     /** Creates a new `Il2Cpp.Dumper` instance. */
-    static dump(): Pick<Il2Cpp.Dumper, "directoryPath" | "fileName" | "classes" | "methods"> {
+    static dump(): Pick<Il2Cpp.Dumper, "directoryPath" | "fileName" | "classes"> {
         return new Il2Cpp.Dumper();
     }
 

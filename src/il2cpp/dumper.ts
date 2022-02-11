@@ -14,12 +14,12 @@ class Il2CppDumper {
     /** @internal */
     #generator?: () => Generator<string>;
 
-    directoryPath(directoryPath: string): Pick<Il2Cpp.Dumper, "fileName" | "classes" | "methods"> {
+    directoryPath(directoryPath: string): Pick<Il2Cpp.Dumper, "fileName" | "classes"> {
         this.#directoryPath = directoryPath;
         return this;
     }
 
-    fileName(fileName: string): Pick<Il2Cpp.Dumper, "classes" | "methods"> {
+    fileName(fileName: string): Pick<Il2Cpp.Dumper, "classes"> {
         this.#fileName = fileName;
         return this;
     }
@@ -36,25 +36,6 @@ class Il2CppDumper {
         };
 
         this.#extension = "cs";
-        return this;
-    }
-
-    methods(): Pick<Il2Cpp.Dumper, "build"> {
-        this.#generator = function* (): Generator<string> {
-            for (const assembly of Il2Cpp.Domain.assemblies) {
-                inform(`dumping methods from ${assembly.name}...`);
-
-                for (let klass of assembly.image.classes) {
-                    for (let method of klass.methods) {
-                        if (!method.virtualAddress.isNull()) {
-                            yield `0x${method.relativeVirtualAddress.toString(16).padStart(8, "0")} ${klass.type.name}.${method.name}\n`;
-                        }
-                    }
-                }
-            }
-        };
-
-        this.#extension = "ms";
         return this;
     }
 
