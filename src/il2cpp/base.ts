@@ -1,5 +1,5 @@
 import { cache } from "decorator-cache-getter";
-import { platformNotSupported } from "../utils/console";
+import { inform, ok, platformNotSupported } from "../utils/console";
 import { forModule } from "../utils/native-wait";
 
 /** */
@@ -64,9 +64,24 @@ class Il2CppBase {
         return Il2Cpp.Api._alloc(size);
     }
 
-    /** Creates a new `Il2Cpp.Dumper` instance. */
-    static dump(): Pick<Il2Cpp.Dumper, "directoryPath" | "fileName" | "classes"> {
-        return new Il2Cpp.Dumper();
+    /** Dumps the application. */
+    static dump(fileName?: string, path?: string): void {
+        fileName = fileName ?? `${Il2Cpp.applicationVersion ?? "unknown"}_${Il2Cpp.applicationVersion ?? "unknown"}.cs`;
+
+        const destination = `${path ?? Il2Cpp.applicationDataPath}/${fileName}`;
+        const file = new File(destination, "w");
+
+        for (const assembly of Il2Cpp.Domain.assemblies) {
+            inform(`dumping ${assembly.name}...`);
+
+            for (const klass of assembly.image.classes) {
+                file.write(`${klass}\n\n`);
+            }
+        }
+
+        file.flush();
+        file.close();
+        ok(`dump saved to ${destination}`);
     }
 
     /** Frees memory. */
