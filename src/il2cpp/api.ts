@@ -1,6 +1,5 @@
 import { cache } from "decorator-cache-getter";
 import { raise, warn } from "../utils/console";
-import { read } from "./utils";
 
 class Il2CppApi {
     protected constructor() {}
@@ -713,17 +712,14 @@ class Il2CppApi {
         return -1;\
     }
 
-OFFSET_OF (offset_of_uint16, uint16_t)
 OFFSET_OF (offset_of_int32, int32_t)
 OFFSET_OF (offset_of_pointer, void *)
             `);
 
-        const offsetOfUInt16 = new NativeFunction(offsetsFinderCModule.offset_of_uint16, "int16", ["pointer", "uint16"]);
         const offsetOfInt32 = new NativeFunction(offsetsFinderCModule.offset_of_int32, "int16", ["pointer", "int32"]);
         const offsetOfPointer = new NativeFunction(offsetsFinderCModule.offset_of_pointer, "int16", ["pointer", "pointer"]);
 
         const SystemString = Il2Cpp.Image.corlib.class("System.String");
-        const SystemValueType = Il2Cpp.Image.corlib.class("System.ValueType");
         const SystemDateTime = Il2Cpp.Image.corlib.class("System.DateTime");
         const SystemReflectionModule = Il2Cpp.Image.corlib.class("System.Reflection.Module");
 

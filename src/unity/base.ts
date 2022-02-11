@@ -1,32 +1,8 @@
 import { cache } from "decorator-cache-getter";
-import { platformNotSupported, raise } from "../utils/console";
 import { Version } from "../utils/version";
 
 /** */
 class UnityBase {
-    /** Gets the Unity module name. */
-    static get moduleName(): string {
-        switch (Process.platform) {
-            case "linux":
-                try {
-                    const _ = Java.androidVersion;
-                    return "libunity.so";
-                } catch (e) {
-                    return "UnityPlayer.so";
-                }
-            case "windows":
-                return "UnityPlayer.dll";
-            case "darwin":
-                try {
-                    return "UnityFramework";
-                } catch (e) {
-                    return "UnityPlayer.dylib";
-                }
-        }
-
-        platformNotSupported();
-    }
-
     /** @internal */
     @cache
     static get isBelow2018_3_0(): boolean {

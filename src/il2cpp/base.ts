@@ -1,5 +1,5 @@
 import { cache } from "decorator-cache-getter";
-import { platformNotSupported, raise } from "../utils/console";
+import { platformNotSupported } from "../utils/console";
 import { forModule } from "../utils/native-wait";
 
 /** */
@@ -54,17 +54,13 @@ class Il2CppBase {
     private static async initialize(): Promise<void> {
         if (Process.platform == "darwin") {
             let il2cppModuleName = Process.findModuleByAddress(Module.findExportByName(null, "il2cpp_init") || NULL)?.name;
-            let unityModuleName = il2cppModuleName;
 
             if (il2cppModuleName == undefined) {
-                unityModuleName = await forModule("UnityFramework", "UnityPlayer.dylib");
                 il2cppModuleName = await forModule("UnityFramework", "GameAssembly.dylib");
             }
 
-            Reflect.defineProperty(Unity, "moduleName", { value: unityModuleName });
             Reflect.defineProperty(Il2Cpp, "moduleName", { value: il2cppModuleName });
         } else {
-            await forModule(Unity.moduleName);
             await forModule(this.moduleName);
         }
 
