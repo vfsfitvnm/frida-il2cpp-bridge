@@ -1,4 +1,5 @@
 import { cache } from "decorator-cache-getter";
+import Versioning from "versioning";
 import { raise, warn } from "../utils/console";
 
 class Il2CppApi {
@@ -31,7 +32,7 @@ class Il2CppApi {
 
     @cache
     static get _classForEach() {
-        return this.r("il2cpp_class_for_each", "void", ["pointer", "pointer"], "2019.3.0");
+        return this.r("il2cpp_class_for_each", "void", ["pointer", "pointer"]);
     }
 
     @cache
@@ -151,7 +152,7 @@ class Il2CppApi {
 
     @cache
     static get _classGetStaticFieldData() {
-        return this.r("il2cpp_class_get_static_field_data", "pointer", ["pointer"], "2019.3.0");
+        return this.r("il2cpp_class_get_static_field_data", "pointer", ["pointer"]);
     }
 
     @cache
@@ -186,7 +187,7 @@ class Il2CppApi {
 
     @cache
     static get _classIsBlittable() {
-        return this.r("il2cpp_class_is_blittable", "bool", ["pointer"], "2017.1.0");
+        return this.r("il2cpp_class_is_blittable", "bool", ["pointer"]);
     }
 
     @cache
@@ -301,17 +302,17 @@ class Il2CppApi {
 
     @cache
     static get _gcCollectALittle() {
-        return this.r("il2cpp_gc_collect_a_little", "void", [], "5.3.5");
+        return this.r("il2cpp_gc_collect_a_little", "void", []);
     }
 
     @cache
     static get _gcDisable() {
-        return this.r("il2cpp_gc_disable", "void", [], "5.3.5");
+        return this.r("il2cpp_gc_disable", "void", []);
     }
 
     @cache
     static get _gcEnable() {
-        return this.r("il2cpp_gc_enable", "void", [], "5.3.5");
+        return this.r("il2cpp_gc_enable", "void", []);
     }
 
     @cache
@@ -321,7 +322,7 @@ class Il2CppApi {
 
     @cache
     static get _gcGetMaxTimeSlice() {
-        return this.r("il2cpp_gc_get_max_time_slice_ns", "int64", [], "2019.1.0");
+        return this.r("il2cpp_gc_get_max_time_slice_ns", "int64", []);
     }
 
     @cache
@@ -351,32 +352,32 @@ class Il2CppApi {
 
     @cache
     static get _gcIsDisabled() {
-        return this.r("il2cpp_gc_is_disabled", "bool", [], "2018.3.0");
+        return this.r("il2cpp_gc_is_disabled", "bool", []);
     }
 
     @cache
     static get _gcIsIncremental() {
-        return this.r("il2cpp_gc_is_incremental", "bool", [], "2019.1.0");
+        return this.r("il2cpp_gc_is_incremental", "bool", []);
     }
 
     @cache
     static get _gcSetMaxTimeSlice() {
-        return this.r("il2cpp_gc_set_max_time_slice_ns", "void", ["int64"], "2019.1.0");
+        return this.r("il2cpp_gc_set_max_time_slice_ns", "void", ["int64"]);
     }
 
     @cache
     static get _gcStartIncrementalCollection() {
-        return this.r("il2cpp_gc_start_incremental_collection", "void", [], "2020.2.0");
+        return this.r("il2cpp_gc_start_incremental_collection", "void", []);
     }
 
     @cache
     static get _gcStartWorld() {
-        return this.r("il2cpp_start_gc_world", "void", [], "2019.3.0");
+        return this.r("il2cpp_start_gc_world", "void", []);
     }
 
     @cache
     static get _gcStopWorld() {
-        return this.r("il2cpp_stop_gc_world", "void", [], "2019.3.0");
+        return this.r("il2cpp_stop_gc_world", "void", []);
     }
 
     @cache
@@ -396,7 +397,7 @@ class Il2CppApi {
 
     @cache
     static get _imageGetClassCount() {
-        return this.r("il2cpp_image_get_class_count", "uint32", ["pointer"], "2018.3.0");
+        return this.r("il2cpp_image_get_class_count", "uint32", ["pointer"]);
     }
 
     @cache
@@ -411,7 +412,7 @@ class Il2CppApi {
 
     @cache
     static get _livenessAllocateStruct() {
-        return this.r("il2cpp_unity_liveness_allocate_struct", "pointer", ["pointer", "int", "pointer", "pointer", "pointer"], "2021.2.0");
+        return this.r("il2cpp_unity_liveness_allocate_struct", "pointer", ["pointer", "int", "pointer", "pointer", "pointer"]);
     }
 
     @cache
@@ -431,12 +432,12 @@ class Il2CppApi {
 
     @cache
     static get _livenessFinalize() {
-        return this.r("il2cpp_unity_liveness_finalize", "void", ["pointer"], "2021.2.0");
+        return this.r("il2cpp_unity_liveness_finalize", "void", ["pointer"]);
     }
 
     @cache
     static get _livenessFreeStruct() {
-        return this.r("il2cpp_unity_liveness_free_struct", "void", ["pointer"], "2021.2.0");
+        return this.r("il2cpp_unity_liveness_free_struct", "void", ["pointer"]);
     }
 
     @cache
@@ -697,8 +698,8 @@ class Il2CppApi {
     /** @internal */
     @cache
     private static get cModule(): Record<string, NativePointer | null> {
-        if (Unity.mayBeUnsupported) {
-            warn(`current Unity version ${Unity.version} is not supported, expect breakage`);
+        if (Versioning.lt(Il2Cpp.unityVersion, "5.3.0") || Versioning.gte(Il2Cpp.unityVersion, "2022.2.0")) {
+            warn(`current Unity version ${Il2Cpp.unityVersion} is not supported, expect breakage`);
         }
 
         const offsetsFinderCModule = new CModule(`\
@@ -1106,17 +1107,12 @@ il2cpp_memory_snapshot_get_information (const Il2CppManagedMemorySnapshot * snap
     private static r<RetType extends NativeFunctionReturnType, ArgTypes extends NativeFunctionArgumentType[] | []>(
         exportName: string,
         retType: RetType,
-        argTypes: ArgTypes,
-        requiredUnityVersion?: string
+        argTypes: ArgTypes
     ) {
         const exportPointer = Il2Cpp.module.findExportByName(exportName) || this.cModule[exportName];
 
         if (exportPointer == null) {
-            if (requiredUnityVersion == null || Unity.version.isEqualOrAbove(requiredUnityVersion)) {
-                raise(`cannot resolve export ${exportName}`);
-            }
-
-            raise(`${exportName} was added in version ${requiredUnityVersion}, but this application uses ${Unity.version}`);
+            raise(`cannot resolve export ${exportName}`);
         }
 
         return new NativeFunction(exportPointer, retType, argTypes);

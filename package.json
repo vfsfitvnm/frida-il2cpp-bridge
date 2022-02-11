@@ -34,7 +34,8 @@
   "dependencies": {
     "decorator-cache-getter": "^1.0.0",
     "fastest-levenshtein": "^1.0.12",
-    "kleur": "^4.1.4"
+    "kleur": "^4.1.4",
+    "versioning": "^1.1.2"
   },
   "devDependencies": {
     "@types/frida-gum": "^17.2.0",

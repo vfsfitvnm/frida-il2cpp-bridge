@@ -1,3 +1,4 @@
+import Versioning from "versioning";
 import { cache } from "decorator-cache-getter";
 import { inform, ok, platformNotSupported } from "../utils/console";
 import { forModule } from "../utils/native-wait";
@@ -40,8 +41,8 @@ class Il2CppBase {
     @cache
     static get applicationIdentifier(): string | null {
         const get_identifier =
-            Il2Cpp.internalCall("UnityEngine.Application::get_identifier", "pointer", []) ??
-            Il2Cpp.internalCall("UnityEngine.Application::get_bundleIdentifier", "pointer", []);
+            this.internalCall("UnityEngine.Application::get_identifier", "pointer", []) ??
+            this.internalCall("UnityEngine.Application::get_bundleIdentifier", "pointer", []);
 
         return get_identifier ? new Il2Cpp.String(get_identifier()).content : null;
     }
@@ -49,7 +50,7 @@ class Il2CppBase {
     /** Gets the version of the application */
     @cache
     static get applicationVersion(): string | null {
-        const get_version = Il2Cpp.internalCall("UnityEngine.Application::get_version", "pointer", []);
+        const get_version = this.internalCall("UnityEngine.Application::get_version", "pointer", []);
         return get_version ? new Il2Cpp.String(get_version()).content : null;
     }
 
@@ -57,6 +58,19 @@ class Il2CppBase {
     @cache
     static get module(): Module {
         return Process.getModuleByName(this.moduleName);
+    }
+
+    /** Gets the Unity version of the current application. */
+    @cache
+    static get unityVersion(): string {
+        const get_unityVersion = this.internalCall("UnityEngine.Application::get_unityVersion", "pointer", [])!;
+        return new Il2Cpp.String(get_unityVersion()).content!;
+    }
+
+    /** @internal */
+    @cache
+    static get unityVersionIsBelow201830(): boolean {
+        return Versioning.lt(this.unityVersion, "2018.3.0");
     }
 
     /** Allocates the given amount of bytes. */

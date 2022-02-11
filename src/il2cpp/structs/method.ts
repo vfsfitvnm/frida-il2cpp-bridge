@@ -36,7 +36,7 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
             types.push(parameter.type.fridaAlias);
         }
 
-        if (!this.isStatic || Unity.isBelow2018_3_0) {
+        if (!this.isStatic || Il2Cpp.unityVersionIsBelow201830) {
             types.unshift("pointer");
         }
 
@@ -148,7 +148,7 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
     /** Replaces the body of this method. */
     set implementation(block: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => T) {
         const replaceCallback: NativeCallbackImplementation<any, any> = (...args: any[]): any => {
-            const startIndex = +!this.isStatic | +Unity.isBelow2018_3_0;
+            const startIndex = +!this.isStatic | +Il2Cpp.unityVersionIsBelow201830;
 
             const result = block.call(
                 this.isStatic ? this.class : new Il2Cpp.Object(args[0]),
@@ -204,7 +204,7 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
     invokeRaw(instance: NativePointerValue, ...parameters: Il2Cpp.Parameter.Type[]): T {
         const allocatedParameters = parameters.map(toFridaValue);
 
-        if (!this.isStatic || Unity.isBelow2018_3_0) {
+        if (!this.isStatic || Il2Cpp.unityVersionIsBelow201830) {
             allocatedParameters.unshift(instance);
         }
 

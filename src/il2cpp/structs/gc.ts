@@ -1,4 +1,4 @@
-import { warn } from "../../utils/console";
+import Versioning from "versioning";
 
 /** Garbage collector utility functions. */
 class Il2CppGC {
@@ -51,7 +51,7 @@ class Il2CppGC {
 
         const chooseCallback = new NativeCallback(callback, "void", ["pointer", "int", "pointer"]);
 
-        if (Unity.version.isEqualOrAbove("2021.2.0")) {
+        if (Versioning.gte(Il2Cpp.unityVersion, "2021.2.0")) {
             const realloc = (handle: NativePointer, size: UInt64) => {
                 if (!handle.isNull() && size.compare(0) == 0) {
                     Il2Cpp.free(handle);
