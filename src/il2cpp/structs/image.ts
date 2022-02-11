@@ -1,6 +1,6 @@
 import { cache } from "decorator-cache-getter";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { cacheInstances, levenshtein, memoize } from "../../utils/utils";
+import { cacheInstances, levenshtein } from "../../utils/utils";
 
 /** Represents a `Il2CppImage`. */
 @cacheInstances
@@ -50,7 +50,6 @@ class Il2CppImage extends NonNullNativeStruct {
     }
 
     /** Gets the class with the specified name defined in this image. */
-    @memoize
     tryClass(name: string): Il2Cpp.Class | null {
         const dotIndex = name.lastIndexOf(".");
         const classNamespace = Memory.allocUtf8String(dotIndex == -1 ? "" : name.slice(0, dotIndex));

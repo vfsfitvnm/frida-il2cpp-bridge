@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
 import { raise } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
-import { cacheInstances, levenshtein, memoize, nativeIterator } from "../../utils/utils";
+import { cacheInstances, levenshtein, nativeIterator } from "../../utils/utils";
 
 /** Represents a `Il2CppClass`. */
 @cacheInstances
@@ -272,21 +272,18 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     /** Gets the field with the given name. */
-    @memoize
     tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> | null {
         const handle = Il2Cpp.Api._classGetFieldFromName(this, Memory.allocUtf8String(name));
         return handle.isNull() ? null : new Il2Cpp.Field<T>(handle);
     }
 
     /** Gets the method with the given name and parameter count. */
-    @memoize
     tryMethod<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> | null {
         const handle = Il2Cpp.Api._classGetMethodFromName(this, Memory.allocUtf8String(name), parameterCount);
         return handle.isNull() ? null : new Il2Cpp.Method<T>(handle);
     }
 
     /** Gets the nested class with the given name. */
-    @memoize
     tryNested(name: string): Il2Cpp.Class | undefined {
         return this.nestedClasses.find(e => e.name == name);
     }

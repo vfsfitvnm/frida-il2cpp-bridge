@@ -1,5 +1,5 @@
 import { cache } from "decorator-cache-getter";
-import { levenshtein, memoize } from "../../utils/utils";
+import { levenshtein } from "../../utils/utils";
 
 /** Represents a `Il2CppDomain`. */
 class Il2CppDomain {
@@ -55,7 +55,6 @@ class Il2CppDomain {
     }
 
     /** Opens and loads the assembly with the given name. */
-    @memoize
     static tryAssembly(name: string): Il2Cpp.Assembly | null {
         const handle = Il2Cpp.Api._domainAssemblyOpen(this, Memory.allocUtf8String(name));
         return handle.isNull() ? null : new Il2Cpp.Assembly(handle);

@@ -32,25 +32,6 @@ export function cacheInstances<T extends ObjectWrapper, U extends new (handle: N
 }
 
 /** @internal */
-export function memoize(_: any, __: string, descriptor: PropertyDescriptor) {
-    if (descriptor.value != null) {
-        const map = new Map<string, any>();
-        const original = descriptor.value;
-
-        descriptor.value = function (...args: any[]): any {
-            const key = args.toString();
-            if (!map.has(key)) {
-                const result = original.apply(this, args);
-                if (result) {
-                    map.set(key, result);
-                }
-            }
-            return map.get(key);
-        };
-    }
-}
-
-/** @internal */
 export function levenshtein(candidatesKey: string, nameGetter: (e: any) => string = e => e.name) {
     return function (_: any, propertyKey: string, descriptor: TypedPropertyDescriptor<(key: string, ...args: any[]) => any>) {
         const original = descriptor.value!;
