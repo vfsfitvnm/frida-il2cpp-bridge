@@ -33,19 +33,22 @@ class Il2CppClass extends NonNullNativeStruct {
     /** Gets the class that declares the current nested class. */
     @cache
     get declaringClass(): Il2Cpp.Class | null {
-        return Il2Cpp.Api._classGetDeclaringType(this).nullOr(Il2Cpp.Class);
+        const handle = Il2Cpp.Api._classGetDeclaringType(this);
+        return handle.isNull() ? null : new Il2Cpp.Class(handle);
     }
 
     /** Gets the encompassed type of this array, reference, pointer or enum type. */
     @cache
     get baseType(): Il2Cpp.Type | null {
-        return Il2Cpp.Api._classGetBaseType(this).nullOr(Il2Cpp.Type);
+        const handle = Il2Cpp.Api._classGetBaseType(this);
+        return handle.isNull() ? null : new Il2Cpp.Type(handle);
     }
 
     /** Gets the class of the object encompassed or referred to by the current array, pointer or reference class. */
     @cache
     get elementClass(): Il2Cpp.Class | null {
-        return Il2Cpp.Api._classGetElementClass(this).nullOr(Il2Cpp.Class);
+        const handle = Il2Cpp.Api._classGetElementClass(this);
+        return handle.isNull() ? null : new Il2Cpp.Class(handle);
     }
 
     /** Gets the fields of the current class. */
@@ -170,7 +173,8 @@ class Il2CppClass extends NonNullNativeStruct {
     /** Gets the class from which the current class directly inherits. */
     @cache
     get parent(): Il2Cpp.Class | null {
-        return Il2Cpp.Api._classGetParent(this).nullOr(Il2Cpp.Class);
+        const handle = Il2Cpp.Api._classGetParent(this);
+        return handle.isNull() ? null : new Il2Cpp.Class(handle);
     }
 
     /** Gets the rank (number of dimensions) of the current array class. */

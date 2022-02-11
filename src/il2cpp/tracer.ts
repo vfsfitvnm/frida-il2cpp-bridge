@@ -163,7 +163,7 @@ class Il2CppTracer {
     /** Reports method invocations. */
     simple(): Pick<Il2Cpp.Tracer, "build"> {
         this.#generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
-            const at = kleur.white(target.relativeVirtualAddress.format());
+            const at = kleur.white(target.relativeVirtualAddress.toString());
             const sign = `${target.class.type.name}.${kleur.bold(target.name)}`;
 
             return {
@@ -181,7 +181,7 @@ class Il2CppTracer {
         let counter = 0;
 
         this.#generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
-            const at = kleur.white(target.relativeVirtualAddress.format());
+            const at = kleur.white(target.relativeVirtualAddress.toString());
             const sign = `${target.class.type.name}.${kleur.bold(target.name)}`;
 
             return {
@@ -204,7 +204,7 @@ class Il2CppTracer {
         let counter = 0;
 
         this.#generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
-            const at = kleur.white(target.relativeVirtualAddress.format());
+            const at = kleur.white(target.relativeVirtualAddress.toString());
             const sign = `${target.class.type.name}.${kleur.bold(target.name)}`;
             const parametersInfo = Object.values(target.parameters);
 

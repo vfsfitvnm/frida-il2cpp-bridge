@@ -5,7 +5,8 @@ class Il2CppGCHandle {
 
     /** Gets the object associated to this handle. */
     get target(): Il2Cpp.Object | null {
-        return Il2Cpp.Api._gcHandleGetTarget(this.handle).nullOr(Il2Cpp.Object);
+        const handle = Il2Cpp.Api._gcHandleGetTarget(this.handle);
+        return handle.isNull() ? null : new Il2Cpp.Object(handle);
     }
 
     /** Frees this handle. */

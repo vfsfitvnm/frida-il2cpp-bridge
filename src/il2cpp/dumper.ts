@@ -67,7 +67,7 @@ class Il2CppDumper {
                 for (let klass of assembly.image.classes) {
                     for (let method of klass.methods) {
                         if (!method.virtualAddress.isNull()) {
-                            yield `${method.relativeVirtualAddress.format()} ${klass.type.name}.${method.name}\n`;
+                            yield `0x${method.relativeVirtualAddress.toString(16).padStart(8, "0")} ${klass.type.name}.${method.name}\n`;
                         }
                     }
                 }

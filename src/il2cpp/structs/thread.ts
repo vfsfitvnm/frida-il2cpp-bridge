@@ -21,7 +21,8 @@ class Il2CppThread extends NativeStruct {
 
     /** Gets the current attached thread, if any. */
     static get current(): Il2Cpp.Thread | null {
-        return Il2Cpp.Api._threadCurrent().nullOr(Il2Cpp.Thread);
+        const handle = Il2Cpp.Api._threadCurrent();
+        return handle.isNull() ? null : new Il2Cpp.Thread(handle);
     }
 
     /** Determines whether the current thread is the garbage collector finalizer one. */
