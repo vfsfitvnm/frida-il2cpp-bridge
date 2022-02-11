@@ -77,7 +77,7 @@ class Il2CppObject extends NativeStruct {
 
     /** */
     toString(): string {
-        return this.isNull() ? "null" : this.method<Il2Cpp.String>("ToString").invoke().content || "null";
+        return this.isNull() ? "null" : this.method<Il2Cpp.String>("ToString").invoke().content ?? "null";
     }
 
     /** Unboxes the value type out of this object. */

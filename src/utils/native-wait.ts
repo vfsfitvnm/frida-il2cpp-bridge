@@ -58,7 +58,7 @@ export function forModule(...moduleNames: string[]): Promise<string> {
         const interceptors = Target.targets.map(target =>
             Interceptor.attach(target.address, {
                 onEnter(args: InvocationArguments) {
-                    this.modulePath = target.readString(args[0]) || "";
+                    this.modulePath = target.readString(args[0]) ?? "";
                 },
                 onLeave(returnValue: InvocationReturnValue) {
                     if (returnValue.isNull()) return;

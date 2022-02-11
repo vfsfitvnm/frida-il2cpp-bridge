@@ -728,8 +728,8 @@ OFFSET_OF (offset_of_pointer, void *)
         SystemReflectionModule.initialize();
 
         const DaysToMonth365 = (
-            SystemDateTime.tryField<Il2Cpp.Array<number>>("daysmonth") ||
-            SystemDateTime.tryField<Il2Cpp.Array<number>>("DaysToMonth365") ||
+            SystemDateTime.tryField<Il2Cpp.Array<number>>("daysmonth") ??
+            SystemDateTime.tryField<Il2Cpp.Array<number>>("DaysToMonth365") ??
             SystemDateTime.field<Il2Cpp.Array<number>>("s_daysToMonth365")
         ).value;
 
@@ -1104,12 +1104,12 @@ il2cpp_memory_snapshot_get_information (const Il2CppManagedMemorySnapshot * snap
     }
 
     /** @internal */
-    private static r<RetType extends NativeFunctionReturnType, ArgTypes extends NativeFunctionArgumentType[] | []>(
+    private static r<R extends NativeFunctionReturnType, A extends NativeFunctionArgumentType[] | []>(
         exportName: string,
-        retType: RetType,
-        argTypes: ArgTypes
+        retType: R,
+        argTypes: A
     ) {
-        const exportPointer = Il2Cpp.module.findExportByName(exportName) || this.cModule[exportName];
+        const exportPointer = Il2Cpp.module.findExportByName(exportName) ?? this.cModule[exportName];
 
         if (exportPointer == null) {
             raise(`cannot resolve export ${exportName}`);

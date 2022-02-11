@@ -106,7 +106,7 @@ class Il2CppBase {
     /** @internal Waits for Unity and Il2Cpp native libraries to be loaded and initialized. */
     private static async initialize(): Promise<void> {
         if (Process.platform == "darwin") {
-            let il2cppModuleName = Process.findModuleByAddress(Module.findExportByName(null, "il2cpp_init") || NULL)?.name;
+            let il2cppModuleName = Process.findModuleByAddress(Module.findExportByName(null, "il2cpp_init") ?? NULL)?.name;
 
             if (il2cppModuleName == undefined) {
                 il2cppModuleName = await forModule("UnityFramework", "GameAssembly.dylib");

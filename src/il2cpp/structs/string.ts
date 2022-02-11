@@ -9,8 +9,8 @@ class Il2CppString extends NativeStruct {
 
     /** Sets the content of this string. */
     set content(value: string | null) {
-        Il2Cpp.Api._stringChars(this).writeUtf16String(value || "");
-        Il2Cpp.Api._stringSetLength(this, value?.length || 0);
+        Il2Cpp.Api._stringChars(this).writeUtf16String(value ?? "");
+        Il2Cpp.Api._stringSetLength(this, value?.length ?? 0);
     }
 
     /** Gets the length of this string. */
