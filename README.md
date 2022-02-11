@@ -26,6 +26,17 @@ However, only Android and Linux are tested: expect breakage if you are using ano
 
 ## Changelog
 
+### Planned
+**If you don't agree with any of these, open a discussion on the 'Discussions' tab!**
+
+- Drop `Il2Cpp.Tracer::detailed` mode. I know this may be controversial, but I'd like to not rely on `Interceptor.replace` anymore when tracing is involved: it is slower (because of the abstraction layer I apply) and it cannot trace thunk functions.
+
+### 0.7.2
+- `Il2Cpp::internalCall`, `Il2Cpp::applicationDataPath`, `Il2Cpp::applicationIdentifier`, `Il2Cpp::applicationVersion`, `Il2Cpp::unityVersion` were added.
+- `unity` TS module was removed as it was quite useless now that I don't need to interact with Unity native module anymore.
+- `Il2Cpp.Dumper` was removed as it was just boilerplate code - `Il2Cpp::dump` gets the exact same job done. `Il2Cpp.Dumper::methods` is gone - I'll provide a snippet to extract methods from the classic dump.
+- `Il2Cpp.Api` will not give any hint about the required version when an export isn't found.
+
 ### 0.7.1
 - Support Unity version up to 2022.1.x. Note: `Il2Cpp.GC::choose` makes the application crash in applications whose Unity version is above 2021.1.
 - `Il2Cpp.Class::toString`, `Il2Cpp.Field::toString` and `Il2Cpp.Method::toString` are now implemented in JavaScript. I know this is a considerable performance loss, but the C code looks much simpler now as less logic is involved, also dumping is actually performed once per application, so it's not a total drama.
