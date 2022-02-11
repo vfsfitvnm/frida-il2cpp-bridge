@@ -80,7 +80,7 @@ class Il2CppBase {
 
     /** Dumps the application. */
     static dump(fileName?: string, path?: string): void {
-        fileName = fileName ?? `${Il2Cpp.applicationVersion ?? "unknown"}_${Il2Cpp.applicationVersion ?? "unknown"}.cs`;
+        fileName = fileName ?? `${Il2Cpp.applicationIdentifier ?? "unknown"}_${Il2Cpp.applicationVersion ?? "unknown"}.cs`;
 
         const destination = `${path ?? Il2Cpp.applicationDataPath}/${fileName}`;
         const file = new File(destination, "w");
