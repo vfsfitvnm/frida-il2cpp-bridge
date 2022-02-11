@@ -1,5 +1,5 @@
-import Versioning from "versioning";
 import { cache } from "decorator-cache-getter";
+import Versioning from "versioning";
 import { inform, ok, raise } from "../utils/console";
 import { forModule } from "../utils/native-wait";
 
@@ -140,29 +140,26 @@ class Il2CppBase {
     }
 
     /** Attaches the caller thread to Il2Cpp domain and executes the given block.  */
-    static perform(block: () => void): void {
-        this.initialize()
-            .then(() => {
-                let thread = Il2Cpp.Thread.current;
-                const isForeignThread = thread == null;
+    static async perform<T>(block: () => T): Promise<T> {
+        await this.initialize();
 
-                if (isForeignThread) {
-                    thread = Il2Cpp.Domain.attach();
-                }
+        let thread = Il2Cpp.Thread.current;
+        const isForeignThread = thread == null;
 
-                try {
-                    block();
-                } finally {
-                    if (isForeignThread) {
-                        thread?.detach();
-                    }
-                }
-            })
-            .catch(e =>
-                Script.nextTick(() => {
-                    throw e;
-                })
-            );
+        if (thread == null) {
+            thread = Il2Cpp.Domain.attach();
+        }
+
+        try {
+            return block();
+        } catch (e: any) {
+            (globalThis as any).console.log(e);
+            throw e;
+        } finally {
+            if (isForeignThread) {
+                thread.detach();
+            }
+        }
     }
 
     /** Creates a new `Il2Cpp.Tracer` instance. */
