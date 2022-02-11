@@ -76,6 +76,16 @@ class Il2CppBase {
         }
     }
 
+    /** */
+    static internalCall<R extends NativeFunctionReturnType, A extends NativeFunctionArgumentType[] | []>(
+        name: string,
+        retType: R,
+        argTypes: A
+    ) {
+        const handle = Il2Cpp.Api._resolveInternalCall(Memory.allocUtf8String(name));
+        return handle.isNull() ? null : new NativeFunction<R, A>(handle, retType, argTypes);
+    }
+
     /** Attaches the caller thread to Il2Cpp domain and executes the given block.  */
     static perform(block: () => void): void {
         this.initialize()

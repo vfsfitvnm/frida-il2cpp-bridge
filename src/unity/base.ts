@@ -20,9 +20,8 @@ class UnityBase {
     static get version(): Version {
         Version.pattern = /(20\d{2}|\d)\.(\d)\.(\d{1,2})([abcfp]|rc){0,2}\d?/;
 
-        const get_unityVersion = Il2Cpp.Api._resolveInternalCall(Memory.allocUtf8String("UnityEngine.Application::get_unityVersion"));
-        const get_unityVersionNative = new NativeFunction(get_unityVersion, "pointer", []);
-        return new Version(new Il2Cpp.String(get_unityVersionNative()).content!);
+        const get_unityVersion = Il2Cpp.internalCall("UnityEngine.Application::get_unityVersion", "pointer", [])!;
+        return new Version(new Il2Cpp.String(get_unityVersion()).content!);
     }
 }
 

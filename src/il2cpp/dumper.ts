@@ -4,25 +4,22 @@ import { inform, ok } from "../utils/console";
 class Il2CppDumper {
     /** Gets the default directory path where the dump will be saved to. */
     static get defaultDirectoryPath(): string {
-        const UnityEngine = Il2Cpp.Domain.tryAssembly("UnityEngine.CoreModule") || Il2Cpp.Domain.assembly("UnityEngine");
-        const Application = UnityEngine.image.class("UnityEngine.Application");
-        return Application.method<Il2Cpp.String>("get_persistentDataPath").invoke().content!;
+        const get_persistentDataPath = Il2Cpp.internalCall("UnityEngine.Application::get_persistentDataPath", "pointer", [])!;
+        return new Il2Cpp.String(get_persistentDataPath()).content!;
     }
 
     /** Gets the default file name. */
     static get defaultFileName(): string {
-        const UnityEngine = Il2Cpp.Domain.tryAssembly("UnityEngine.CoreModule") || Il2Cpp.Domain.assembly("UnityEngine");
-        const Application = UnityEngine.image.class("UnityEngine.Application");
+        const get_identifier =
+            Il2Cpp.internalCall("UnityEngine.Application::get_identifier", "pointer", []) ||
+            Il2Cpp.internalCall("UnityEngine.Application::get_bundleIdentifier", "pointer", []);
 
-        try {
-            const identifier = (
-                Application.tryMethod<Il2Cpp.String>("get_identifier") || Application.method<Il2Cpp.String>("get_bundleIdentifier")
-            ).invoke();
-            const version = Application.method<Il2Cpp.String>("get_version").invoke();
-            return `${identifier.content}_${version.content}`;
-        } catch (e) {
-            return `${new Date().getTime()}`;
-        }
+        const get_version = Il2Cpp.internalCall("UnityEngine.Application::get_version", "pointer", []);
+
+        const identifier = get_identifier ? new Il2Cpp.String(get_identifier()).content : "unknownidentifier";
+        const version = get_version ? new Il2Cpp.String(get_version()).content : "unknownversion";
+
+        return `${identifier}_${version}`;
     }
 
     /** @internal */
