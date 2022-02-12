@@ -274,7 +274,7 @@ ${this.isStatic ? `static ` : ``}\
 ${this.returnType.name} \
 ${this.name}\
 (${this.parameters.join(`, `)});\
-${this.virtualAddress.isNull() ? `` : ` // 0x${this.virtualAddress.sub(Il2Cpp.module.base).toString(16).padStart(8, `0`)}`}`;
+${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toString(16).padStart(8, `0`)}`}`;
     }
 
     /** @internal */
