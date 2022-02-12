@@ -1,4 +1,5 @@
 import { cache } from "decorator-cache-getter";
+import { raise } from "../../utils/console";
 import { NativeStruct } from "../../utils/native-struct";
 
 /** Represents a `Il2CppThread`. */
@@ -23,6 +24,33 @@ class Il2CppThread extends NativeStruct {
     static get current(): Il2Cpp.Thread | null {
         const handle = Il2Cpp.Api._threadCurrent();
         return handle.isNull() ? null : new Il2Cpp.Thread(handle);
+    }
+
+    /** @internal */
+    @cache
+    private static get idOffset(): number {
+        const internalThread = this.current?.object.tryField<Il2Cpp.Object>("internal_thread")?.value;
+        const object = internalThread ? internalThread : this.current!.object;
+
+        const handle = ptr(object.field<UInt64>("thread_id").value.toString());
+        const currentThreadId = Process.getCurrentThreadId();
+
+        for (let i = 0; i < 1024; i++) {
+            const candidate = handle.add(i).readS32();
+            if (candidate == currentThreadId) {
+                return i;
+            }
+        }
+
+        raise(`couldn't determine the offset for a native thread id value`);
+    }
+
+    /** Gets the native id of the current thread. */
+    get id(): number {
+        const internalThread = this.object.tryField<Il2Cpp.Object>("internal_thread")?.value;
+        const object = internalThread ? internalThread : this.object;
+
+        return ptr(object.field<UInt64>("thread_id").value.toString()).add(Il2Cpp.Thread.idOffset).readS32();
     }
 
     /** Determines whether the current thread is the garbage collector finalizer one. */
