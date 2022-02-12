@@ -31,6 +31,22 @@ However, only Android and Linux are tested: expect breakage if you are using ano
 
 - Drop `Il2Cpp.Tracer::detailed` mode. I know this may be controversial, but I'd like to not rely on `Interceptor.replace` anymore when tracing is involved: it is slower (because of the abstraction layer I apply) and it cannot trace thunk functions.
 
+### 0.7.3
+- `Il2Cpp.Thread::id` was added.
+- `Il2Cpp::perform` can now return a value:
+  ```ts
+  async function foo() {
+      const result = await Il2Cpp.perform<string>(() => {
+          const SystemBoolean = Il2Cpp.Image.corlib.class("System.Boolean");
+          return SystemBoolean.field("TrueLiteral").value.toString();
+      });
+
+      console.log(`Result from Il2Cpp: ${result}`);
+
+      // ...
+  }
+  ```
+
 ### 0.7.2
 - `Il2Cpp::internalCall`, `Il2Cpp::applicationDataPath`, `Il2Cpp::applicationIdentifier`, `Il2Cpp::applicationVersion`, `Il2Cpp::unityVersion` were added.
 - `unity` TS module was removed as it was quite useless now that I don't need to interact with Unity native module anymore.
