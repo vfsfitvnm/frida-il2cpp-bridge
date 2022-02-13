@@ -180,9 +180,7 @@ ${returnValue == undefined ? `` : ` = ${fromFridaValue(returnValue, this.returnT
                         ...this.parameters.map((e, i) => fromFridaValue(args[i + startIndex], e.type))
                     );
 
-                    if (typeof result != "undefined") {
-                        return toFridaValue(result);
-                    }
+                    return toFridaValue(result as any);
                 };
         }
 
