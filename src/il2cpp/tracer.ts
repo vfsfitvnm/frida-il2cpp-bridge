@@ -1,8 +1,8 @@
-import kleur from "kleur";
-import { inform } from "../utils/console";
+import { inform, warn } from "../utils/console";
 
 /** Tracing utilities. */
 class Il2CppTracer {
+    /** @internal */
     readonly targets: Il2Cpp.Method[] = [];
 
     /** @internal */
@@ -25,9 +25,6 @@ class Il2CppTracer {
 
     /** @internal */
     #parameterFilter?: (parameter: Il2Cpp.Parameter) => boolean;
-
-    /** @internal */
-    #generator?: (method: Il2Cpp.Method) => Il2Cpp.Tracer.Callbacks;
 
     domain(): FilterAssemblies {
         return this;
@@ -63,12 +60,12 @@ class Il2CppTracer {
         return this;
     }
 
-    filterParameters(filter: (parameter: Il2Cpp.Parameter) => boolean): Pick<Il2Cpp.Tracer, "commit"> {
+    filterParameters(filter: (parameter: Il2Cpp.Parameter) => boolean): Pick<Il2Cpp.Tracer, "and"> {
         this.#parameterFilter = filter;
         return this;
     }
 
-    commit(): ReturnType<typeof Il2Cpp["trace"]> & Pick<Il2Cpp.Tracer, "targets" | "simple" | "full" | "detailed" | "special"> {
+    and(): ReturnType<typeof Il2Cpp["trace"]> & Pick<Il2Cpp.Tracer, "attach"> {
         const filterMethod = (method: Il2Cpp.Method): void => {
             if (this.#parameterFilter == undefined) {
                 this.targets.push(method);
@@ -155,118 +152,36 @@ class Il2CppTracer {
         this.#classFilter = undefined;
         this.#methodFilter = undefined;
         this.#parameterFilter = undefined;
-        this.#generator = undefined;
 
         return this;
     }
 
-    /** Reports method invocations. */
-    simple(): Pick<Il2Cpp.Tracer, "build"> {
-        this.#generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
-            const at = kleur.white(target.relativeVirtualAddress.toString());
-            const sign = `${target.class.type.name}.${kleur.bold(target.name)}`;
+    attach(showErrors: boolean = false): void {
+        let i = 0;
 
-            return {
-                onEnter() {
-                    inform(`${at} ${sign}`);
-                }
-            };
-        };
-
-        return this;
-    }
-
-    /** Reports method invocations and returns. */
-    full(): Pick<Il2Cpp.Tracer, "build"> {
-        let counter = 0;
-
-        this.#generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
-            const at = kleur.white(target.relativeVirtualAddress.toString());
-            const sign = `${target.class.type.name}.${kleur.bold(target.name)}`;
-
-            return {
-                onEnter() {
-                    inform(`${at} ${"│ ".repeat(counter)}┌─${kleur.red(sign)}`);
-                    counter += 1;
-                },
-                onLeave() {
-                    counter -= 1;
-                    inform(`${at} ${"│ ".repeat(counter)}└─${kleur.green(sign)}${counter == 0 ? "\n" : ""}`);
-                }
-            };
-        };
-
-        return this;
-    }
-
-    /** Reports method invocations, input arguments, returns and return values. */
-    detailed(): Pick<Il2Cpp.Tracer, "build"> {
-        let counter = 0;
-
-        this.#generator = (target: Il2Cpp.Method): Il2Cpp.Tracer.Callbacks => {
-            const at = kleur.white(target.relativeVirtualAddress.toString());
-            const sign = `${target.class.type.name}.${kleur.bold(target.name)}`;
-            const parametersInfo = Object.values(target.parameters);
-
-            return {
-                onEnter(...parameters: Il2Cpp.Parameter.Type[]): void {
-                    const thisText = target.isStatic
-                        ? ""
-                        : `${kleur.yellow("this")} = ${kleur.cyan(this.toString())}${parameters.length > 0 ? ", " : ""}`;
-                    const parametersText = parametersInfo
-                        .map(({ type, name }, index) => {
-                            return `${kleur.blue(type.name)} ${kleur.yellow(name)} = ${kleur.cyan(parameters[index].toString())}`;
-                        })
-                        .join(", ");
-
-                    inform(
-                        `${at} ${"│ ".repeat(counter)}┌─${kleur.red(sign)}${kleur.yellow("(")}${thisText}${parametersText}${kleur.yellow(
-                            ")"
-                        )}`
-                    );
-
-                    counter += 1;
-                },
-                onLeave(returnValue: Il2Cpp.Method.ReturnType): void {
-                    counter -= 1;
-
-                    const returnValueText = returnValue == undefined ? "" : ` = ${kleur.cyan(returnValue.toString())}`;
-
-                    inform(
-                        `${at} ${"│ ".repeat(counter)}└─${kleur.green(sign)} ${kleur.magenta(target.returnType.name)}${returnValueText}${
-                            counter == 0 ? "\n" : ""
-                        }`
-                    );
-                }
-            };
-        };
-
-        return this;
-    }
-
-    /** Custom behaviour. */
-    special(generator: (target: Il2Cpp.Method) => Il2Cpp.Tracer.Callbacks): Pick<Il2Cpp.Tracer, "build"> {
-        this.#generator = generator;
-        return this;
-    }
-
-    build(): void {
         for (const target of this.targets) {
-            if (target.virtualAddress.isNull() || target.isExternal) {
+            if (target.virtualAddress.isNull()) {
                 continue;
             }
 
-            const { onEnter, onLeave } = this.#generator!(target);
+            const offset = `0x${target.relativeVirtualAddress.toString(16).padStart(8, `0`)}`;
+            const fullName = `${target.class.type.name}.\x1b[1m${target.name}\x1b[0m`;
 
-            target.implementation = function (...parameters: Il2Cpp.Parameter.Type[]): Il2Cpp.Method.ReturnType {
-                onEnter?.apply(this, parameters);
-
-                const returnValue = target.invokeRaw(this, ...parameters);
-
-                onLeave?.call(this, returnValue);
-
-                return returnValue;
-            };
+            try {
+                Interceptor.attach(target.virtualAddress, {
+                    onEnter: () => inform(`${offset} ${`│ `.repeat(i++)}┌─\x1b[35m${fullName}\x1b[0m`),
+                    onLeave: () => inform(`${offset} ${`│ `.repeat(--i)}└─\x1b[33m${fullName}\x1b[0m${i == 0 ? `\n` : ``}`)
+                });
+            } catch (e: any) {
+                if (showErrors) {
+                    switch (e.message) {
+                        case `unable to intercept function at ${target.virtualAddress}; please file a bug`:
+                            warn(`frida couldn't intercept method ${target.name} at ${offset}`);
+                            continue;
+                    }
+                    throw e;
+                }
+            }
         }
     }
 }
@@ -279,21 +194,12 @@ type FilterClasses = FilterMethods & Pick<Il2Cpp.Tracer, "filterClasses">;
 
 type FilterMethods = FilterParameters & Pick<Il2Cpp.Tracer, "filterMethods">;
 
-type FilterParameters = Pick<Il2Cpp.Tracer, "commit"> & Pick<Il2Cpp.Tracer, "filterParameters">;
+type FilterParameters = Pick<Il2Cpp.Tracer, "and"> & Pick<Il2Cpp.Tracer, "filterParameters">;
 
 Il2Cpp.Tracer = Il2CppTracer;
 
 declare global {
     namespace Il2Cpp {
         class Tracer extends Il2CppTracer {}
-
-        namespace Tracer {
-            type Callbacks = {
-                onEnter?: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: Il2Cpp.Parameter.Type[]) => void;
-                onLeave?: (this: Il2Cpp.Class | Il2Cpp.Object, returnValue: Il2Cpp.Method.ReturnType) => void;
-            };
-        }
     }
 }
-
-kleur.enabled = true;
