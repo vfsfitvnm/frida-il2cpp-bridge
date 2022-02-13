@@ -1,5 +1,5 @@
 import { cache } from "decorator-cache-getter";
-import { raise, warn } from "../../utils/console";
+import { inform, raise, warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { levenshtein } from "../../utils/utils";
 import { fromFridaValue, toFridaValue } from "../utils";
@@ -146,21 +146,42 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
     }
 
     /** Replaces the body of this method. */
-    set implementation(block: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => T) {
-        const replaceCallback: NativeCallbackImplementation<any, any> = (...args: any[]): any => {
-            const startIndex = +!this.isStatic | +Il2Cpp.unityVersionIsBelow201830;
+    set implementation(blockOrMode: "trace" | ((this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => T)) {
+        let replaceCallback: NativeCallbackImplementation<any, any>;
 
-            const result = block.call(
-                this.isStatic ? this.class : new Il2Cpp.Object(args[0]),
-                ...this.parameters.map((e, i) => fromFridaValue(args[i + startIndex], e.type))
-            );
+        const startIndex = +!this.isStatic | +Il2Cpp.unityVersionIsBelow201830;
 
-            if (typeof result != "undefined") {
-                return toFridaValue(result);
-            }
-        };
+        if (blockOrMode == "trace") {
+            const offset = `0x${this.relativeVirtualAddress.toString(16).padStart(8, `0`)}`;
+            const fullName = `${this.class.type.name}.\x1b[1m${this.name}\x1b[0m`;
+
+            replaceCallback = (...args: any[]): any => {
+                const returnValue = this.nativeFunction(...args);
+
+                inform(`\
+${offset} \
+${fullName}\
+${this.isStatic ? `` : `[this = ${fromFridaValue(args[0], this.class.type)}]`}\
+(${this.parameters.map((e, i) => `${e.type.name} ${e.name} = ${fromFridaValue(args[i + startIndex], e.type)}`).join(`, `)})\
+${returnValue == undefined ? `` : ` = ${fromFridaValue(returnValue, this.returnType)}`};`);
+
+                return returnValue;
+            };
+        } else {
+            replaceCallback = (...args: any[]): any => {
+                const result = blockOrMode.call(
+                    this.isStatic ? this.class : new Il2Cpp.Object(args[0]),
+                    ...this.parameters.map((e, i) => fromFridaValue(args[i + startIndex], e.type))
+                );
+
+                if (typeof result != "undefined") {
+                    return toFridaValue(result);
+                }
+            };
+        }
 
         this.restoreImplementation();
+
         try {
             Interceptor.replace(this.virtualAddress, new NativeCallback(replaceCallback, this.returnType.fridaAlias, this.fridaSignature));
         } catch (e: any) {
@@ -169,6 +190,9 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
                     raise(`cannot implement method ${this.name}: it has a NULL virtual address`);
                 case `unable to intercept function at ${this.virtualAddress}; please file a bug`:
                     warn(`cannot implement method ${this.name}: it may be a thunk`);
+                    break;
+                case "already replaced this function":
+                    warn(`cannot implement method ${this.name}: already replaced by a thunk`);
                     break;
                 default:
                     throw e;
