@@ -160,6 +160,7 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
             }
         };
 
+        this.restoreImplementation();
         try {
             Interceptor.replace(this.virtualAddress, new NativeCallback(replaceCallback, this.returnType.fridaAlias, this.fridaSignature));
         } catch (e: any) {
