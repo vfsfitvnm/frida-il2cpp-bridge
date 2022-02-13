@@ -16,7 +16,7 @@ class Il2CppArray<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Nativ
         const array = new Il2Cpp.Array<T>(Il2Cpp.Api._arrayNew(klass, length));
 
         if (Array.isArray(lengthOrElements)) {
-            array.elements.values = lengthOrElements;
+            array.elements.write(lengthOrElements);
         }
 
         return array;
@@ -52,28 +52,27 @@ class Il2CppArray<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Nativ
         return new Il2Cpp.Object(this);
     }
 
-    /** @internal */
-    checkIndexOutOfBounds(index: number): void {
+    /** Gets the element at the specified index of the current array. */
+    get(index: number): T {
         if (index < 0 || index >= this.length) {
             raise(`cannot get element at index ${index}: array length is ${this.length}`);
         }
-    }
 
-    /** Gets the element at the specified index of the current array. */
-    get(index: number): T {
-        this.checkIndexOutOfBounds(index);
         return this.elements.get(index);
     }
 
     /** Sets the element at the specified index of the current array. */
     set(index: number, value: T) {
-        this.checkIndexOutOfBounds(index);
+        if (index < 0 || index >= this.length) {
+            raise(`cannot get element at index ${index}: array length is ${this.length}`);
+        }
+
         this.elements.set(index, value);
     }
 
     /** */
     toString(): string {
-        return this.isNull() ? "null" : `[${this.elements.read(0, this.length)}]`;
+        return this.isNull() ? "null" : `[${this.elements.read(this.length, 0)}]`;
     }
 
     /** Iterable. */

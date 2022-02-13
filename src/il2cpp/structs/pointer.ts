@@ -2,75 +2,41 @@ import { read, write } from "../utils";
 import { NativeStruct } from "../../utils/native-struct";
 
 /** */
-class Il2CppPointer<T extends Il2Cpp.Field.Type> extends NativeStruct implements Iterable<T> {
+class Il2CppPointer<T extends Il2Cpp.Field.Type> extends NativeStruct {
     constructor(handle: NativePointer, readonly type: Il2Cpp.Type) {
         super(handle);
     }
 
-    /** Gets all the values pointed by the current pointer, until NULL occurs. */
-    get values(): T[] {
-        return this.read();
-    }
-
-    /** Sets the values pointed by the current pointer. */
-    set values(values: T[]) {
-        this.write(values);
-    }
-
     /** Gets the element at the given index. */
     get(index: number): T {
-        return read(this.getElementHandle(index), this.type) as T;
+        return read(this.handle.add(index * this.type.class.arrayElementSize), this.type) as T;
     }
 
-    /** Gets the element handle at the given index. */
-    getElementHandle(index: number): NativePointer {
-        return this.handle.add(index * this.type.class.arrayElementSize);
-    }
+    /** Reads the given amount of elements starting at the given offset. */
+    read(length: number, offset: number = 0): T[] {
+        const values = new Array<T>(length);
 
-    /** Reads the given amount of elements starting at the given index. */
-    read(offset: number = 0, length: number = Number.MAX_SAFE_INTEGER): T[] {
-        const value: T[] = [];
-
-        if (length == Number.MAX_SAFE_INTEGER) {
-            for (let i = offset; i < length; i++) {
-                const elementHandle = this.getElementHandle(i);
-
-                if (elementHandle.readPointer().isNull()) break;
-
-                value.push(read(elementHandle, this.type) as T);
-            }
-        } else {
-            for (let i = offset; i < length; i++) {
-                value.push(read(this.getElementHandle(i), this.type) as T);
-            }
+        for (let i = 0; i < length; i++) {
+            values[i] = this.get(i + offset);
         }
 
-        return value;
+        return values;
     }
 
     /** Sets the given element at the given index */
     set(index: number, value: T): void {
-        write(this.getElementHandle(index), value, this.type);
+        write(this.handle.add(index * this.type.class.arrayElementSize), value, this.type);
     }
 
     /** */
     toString(): string {
-        return `[${this.values}]`;
+        return this.handle.toString();
     }
 
     /** Writes the given elements starting at the given index. */
     write(values: T[], offset: number = 0): void {
-        let i = offset;
-        for (const value of values) {
-            this.set(i, value);
-            i++;
-        }
-    }
-
-    /** Iterable. */
-    *[Symbol.iterator](): IterableIterator<T> {
-        for (const value of this.values) {
-            yield value;
+        for (let i = 0; i < values.length; i++) {
+            this.set(i + offset, values[i]);
         }
     }
 }
