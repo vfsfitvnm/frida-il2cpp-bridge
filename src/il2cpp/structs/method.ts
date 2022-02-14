@@ -1,5 +1,5 @@
 import { cache } from "decorator-cache-getter";
-import { inform, raise, warn } from "../../utils/console";
+import { raise, warn } from "../../utils/console";
 import { NonNullNativeStruct } from "../../utils/native-struct";
 import { levenshtein } from "../../utils/utils";
 import { fromFridaValue, toFridaValue } from "../utils";
@@ -146,48 +146,16 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
     }
 
     /** Replaces the body of this method. */
-    set implementation(blockOrMode: "trace" | ((this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => T) | null) {
-        let replaceCallback: NativeCallbackImplementation<any, any>;
-
+    set implementation(block: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => T) {
         const startIndex = +!this.isStatic | +Il2Cpp.unityVersionIsBelow201830;
 
-        switch (blockOrMode) {
-            case null:
-                Interceptor.revert(this.virtualAddress);
-                Interceptor.flush();
-                return;
-            case "trace":
-                const offset = `0x${this.relativeVirtualAddress.toString(16).padStart(8, `0`)}`;
-                const fullName = `${this.class.type.name}.\x1b[1m${this.name}\x1b[0m`;
-
-                replaceCallback = (...args: any[]): any => {
-                    const returnValue = this.nativeFunction(...args);
-
-                    inform(`\
-${offset} \
-${fullName}\
-${this.isStatic ? `` : `[this = ${fromFridaValue(args[0], this.class.type)}]`}\
-(${this.parameters.map((e, i) => `${e.type.name} ${e.name} = ${fromFridaValue(args[i + startIndex], e.type)}`).join(`, `)})\
-${returnValue == undefined ? `` : ` = ${fromFridaValue(returnValue, this.returnType)}`};`);
-
-                    return returnValue;
-                };
-                break;
-            default:
-                replaceCallback = (...args: any[]): any => {
-                    const result = blockOrMode.call(
-                        this.isStatic ? this.class : new Il2Cpp.Object(args[0]),
-                        ...this.parameters.map((e, i) => fromFridaValue(args[i + startIndex], e.type))
-                    );
-
-                    return toFridaValue(result as any);
-                };
-        }
-
-        this.implementation = null;
+        const callback = (...args: any[]): any => {
+            const parameters = this.parameters.map((e, i) => fromFridaValue(args[i + startIndex], e.type));
+            return toFridaValue(block.call(this.isStatic ? this.class : new Il2Cpp.Object(args[0]), ...parameters) as any);
+        };
 
         try {
-            Interceptor.replace(this.virtualAddress, new NativeCallback(replaceCallback, this.returnType.fridaAlias, this.fridaSignature));
+            Interceptor.replace(this.virtualAddress, new NativeCallback(callback, this.returnType.fridaAlias, this.fridaSignature));
         } catch (e: any) {
             switch (e.message) {
                 case "access violation accessing 0x0":
@@ -272,6 +240,12 @@ ${returnValue == undefined ? `` : ` = ${fromFridaValue(returnValue, this.returnT
     @levenshtein("parameters")
     parameter(name: string): Il2Cpp.Parameter {
         return this.tryParameter(name)!;
+    }
+
+    /** Restore the original method implementation. */
+    revert(): void {
+        Interceptor.revert(this.virtualAddress);
+        Interceptor.flush();
     }
 
     /** Gets the overloaded method with the given parameter types. */

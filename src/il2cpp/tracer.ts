@@ -1,4 +1,5 @@
-import { inform, warn } from "../utils/console";
+import { inform } from "../utils/console";
+import { fromFridaValue } from "./utils";
 
 /** Tracing utilities. */
 class Il2CppTracer {
@@ -156,31 +157,49 @@ class Il2CppTracer {
         return this;
     }
 
-    attach(showErrors: boolean = false): void {
-        let i = 0;
+    attach(mode: "full" | "detailed" = "full"): void {
+        let count = 0;
 
         for (const target of this.targets) {
             if (target.virtualAddress.isNull()) {
                 continue;
             }
 
-            const offset = `0x${target.relativeVirtualAddress.toString(16).padStart(8, `0`)}`;
+            const offset = `\x1b[2m0x${target.relativeVirtualAddress.toString(16).padStart(8, `0`)}\x1b[0m`;
             const fullName = `${target.class.type.name}.\x1b[1m${target.name}\x1b[0m`;
 
-            try {
-                Interceptor.attach(target.virtualAddress, {
-                    onEnter: () => inform(`${offset} ${`│ `.repeat(i++)}┌─\x1b[35m${fullName}\x1b[0m`),
-                    onLeave: () => inform(`${offset} ${`│ `.repeat(--i)}└─\x1b[33m${fullName}\x1b[0m${i == 0 ? `\n` : ``}`)
-                });
-            } catch (e: any) {
-                if (showErrors) {
-                    switch (e.message) {
-                        case `unable to intercept function at ${target.virtualAddress}; please file a bug`:
-                            warn(`frida couldn't intercept method ${target.name} at ${offset}`);
-                            continue;
-                    }
-                    throw e;
-                }
+            if (mode == "detailed") {
+                const startIndex = +!target.isStatic | +Il2Cpp.unityVersionIsBelow201830;
+
+                const callback = (...args: any[]): any => {
+                    const thisParameter = target.isStatic ? undefined : new Il2Cpp.Parameter("this", -1, target.class.type);
+                    const parameters = thisParameter ? [thisParameter].concat(target.parameters) : target.parameters;
+
+                    inform(`\
+${offset} ${`│ `.repeat(count++)}┌─\x1b[35m${fullName}\x1b[0m(\
+${parameters.map(e => `\x1b[32m${e.name}\x1b[0m = \x1b[31m${fromFridaValue(args[e.position + startIndex], e.type)}\x1b[0m`).join(`, `)});`);
+
+                    const returnValue = target.nativeFunction(...args);
+
+                    inform(`\
+${offset} ${`│ `.repeat(--count)}└─\x1b[33m${fullName}\x1b[0m\
+${returnValue == undefined ? `` : ` = \x1b[36m${fromFridaValue(returnValue, target.returnType)}`}\x1b[0m;`);
+
+                    return returnValue;
+                };
+
+                try {
+                    target.revert();
+                    const nativeCallback = new NativeCallback(callback, target.returnType.fridaAlias, target.fridaSignature);
+                    Interceptor.replace(target.virtualAddress, nativeCallback);
+                } catch (e: any) {}
+            } else {
+                try {
+                    Interceptor.attach(target.virtualAddress, {
+                        onEnter: () => inform(`${offset} ${`│ `.repeat(count++)}┌─\x1b[35m${fullName}\x1b[0m`),
+                        onLeave: () => inform(`${offset} ${`│ `.repeat(--count)}└─\x1b[33m${fullName}\x1b[0m${count == 0 ? `\n` : ``}`)
+                    });
+                } catch (e: any) {}
             }
         }
     }
