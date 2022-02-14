@@ -5,7 +5,8 @@
 
 A Frida module to dump, trace or hijack any Il2Cpp application at runtime, without needing the `global-metadata.dat` file.
 
-![Screenshot_20210911_121628](https://user-images.githubusercontent.com/46219656/132944635-6fb7d70b-ff4d-457f-9cd5-d9b98f40af9c.png)
+![code](https://user-images.githubusercontent.com/46219656/153902126-062ee74c-df0b-49d0-8c0f-3a306bf1a52d.png)
+
 
 ## Features
 
@@ -26,10 +27,17 @@ However, only Android and Linux are tested: expect breakage if you are using ano
 
 ## Changelog
 
-### Planned
-**If you don't agree with any of these, open a discussion on the 'Discussions' tab!**
-
-- Drop `Il2Cpp.Tracer::detailed` mode. I know this may be controversial, but I'd like to not rely on `Interceptor.replace` anymore when tracing is involved: it is slower (because of the abstraction layer I apply) and it cannot trace thunk functions.
+### 0.7.4
+- `Il2Cpp.Method::restoreImplementation` was renamed to `Il2Cpp.Method::revert`.
+- `Il2Cpp.Tracer` api change:
+  ```ts
+  Il2Cpp.perform(() => {
+    Il2Cpp.trace()
+        .classes(Il2Cpp.Image.corlib.class("System.String"))
+        .and()
+        .attach("detailed");
+  });
+  ```
 
 ### 0.7.3
 - `Il2Cpp.Thread::id` was added.
