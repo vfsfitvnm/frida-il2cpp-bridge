@@ -27,6 +27,9 @@ However, only Android and Linux are tested: expect breakage if you are using ano
 
 ## Changelog
 
+### 0.7.5
+- Fix #66 and #95.
+
 ### 0.7.4
 - `Il2Cpp.Method::restoreImplementation` was renamed to `Il2Cpp.Method::revert`.
 - `Il2Cpp.Tracer` api change:
