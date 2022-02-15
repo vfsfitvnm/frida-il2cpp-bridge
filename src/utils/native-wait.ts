@@ -1,4 +1,5 @@
 import { cache } from "decorator-cache-getter";
+import Versioning from "versioning";
 
 type StringEncoding = "utf8" | "utf16" | "ansi";
 
@@ -15,8 +16,11 @@ class Target {
             switch (Process.platform) {
                 case "linux":
                     try {
-                        const _ = Java.androidVersion;
-                        return ["libdl.so", ["dlopen", "utf8"], ["android_dlopen_ext", "utf8"]];
+                        if (Versioning.gte(Java.androidVersion, "12")) {
+                            return [null, ["__loader_dlopen", "utf8"]];
+                        } else {
+                            return ["libdl.so", ["dlopen", "utf8"], ["android_dlopen_ext", "utf8"]];
+                        }
                     } catch (e) {
                         return [null, ["dlopen", "utf8"]];
                     }
