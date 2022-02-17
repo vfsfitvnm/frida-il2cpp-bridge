@@ -54,6 +54,28 @@ class Il2CppBase {
         return get_version ? new Il2Cpp.String(get_version()).content : null;
     }
 
+    /** Gets the attached threads. */
+    static get attachedThreads(): Il2Cpp.Thread[] {
+        const array: Il2Cpp.Thread[] = [];
+
+        const sizePointer = Memory.alloc(Process.pointerSize);
+        const startPointer = Il2Cpp.Api._threadGetAllAttachedThreads(sizePointer);
+
+        const size = sizePointer.readInt();
+
+        for (let i = 0; i < size; i++) {
+            array.push(new Il2Cpp.Thread(startPointer.add(i * Process.pointerSize).readPointer()));
+        }
+
+        return array;
+    }
+
+    /** Gets the current attached thread, if any. */
+    static get currentThread(): Il2Cpp.Thread | null {
+        const handle = Il2Cpp.Api._threadCurrent();
+        return handle.isNull() ? null : new Il2Cpp.Thread(handle);
+    }
+
     /** Gets the Il2Cpp module as a Frida module. */
     @cache
     static get module(): Module {
@@ -159,7 +181,7 @@ class Il2CppBase {
     static async perform<T>(block: () => T | Promise<T>): Promise<T> {
         await this.initialize();
 
-        let thread = Il2Cpp.Thread.current;
+        let thread = this.currentThread;
         const isForeignThread = thread == null;
 
         if (thread == null) {
