@@ -27,6 +27,11 @@ However, only Android and Linux are tested: expect breakage if you are using ano
 
 ## Changelog
 
+### 0.7.6
+- Move `I2Cpp.Thread::current` to `Il2Cpp::currentThread`.
+- Move `I2Cpp.Thread::all` to `Il2Cpp::attachedThreads`.
+- Add `Il2Cpp::sheduleOnInitializerThread` to run a callback inside the main Il2Cpp thread instead of Frida's one.
+
 ### 0.7.5
 - Fix #66 and #95.
 
