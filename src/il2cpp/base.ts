@@ -63,7 +63,12 @@ class Il2CppBase {
     /** Gets the Unity version of the current application. */
     @cache
     static get unityVersion(): string {
-        const get_unityVersion = this.internalCall("UnityEngine.Application::get_unityVersion", "pointer", [])!;
+        const get_unityVersion = this.internalCall("UnityEngine.Application::get_unityVersion", "pointer", []);
+
+        if (get_unityVersion == null) {
+            raise("couldn't determine the Unity version, please specify it manually");
+        }
+
         return new Il2Cpp.String(get_unityVersion()).content!;
     }
 
