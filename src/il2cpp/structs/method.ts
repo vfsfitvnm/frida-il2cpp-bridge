@@ -40,7 +40,6 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
             types.unshift("pointer");
         }
 
-        // TODO: check if this is needed
         if (this.isInflated) {
             types.push("pointer");
         }
@@ -205,7 +204,6 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
             allocatedParameters.unshift(instance);
         }
 
-        // TODO: check if this is really needed
         if (this.isInflated) {
             allocatedParameters.push(this.handle);
         }
