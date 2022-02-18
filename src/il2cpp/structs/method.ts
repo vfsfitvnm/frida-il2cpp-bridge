@@ -248,9 +248,12 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
 
     /** Gets the overloaded method with the given parameter types. */
     tryOverload<U extends Il2Cpp.Method.ReturnType = T>(...parameterTypes: string[]): Il2Cpp.Method<U> | undefined {
-        return this.class.methods.find(e => e.name == this.name && e.parameters.every((e, i) => e.type.name == parameterTypes[i])) as
-            | Il2Cpp.Method<U>
-            | undefined;
+        return this.class.methods.find(
+            e =>
+                e.name == this.name &&
+                e.parameterCount == parameterTypes.length &&
+                e.parameters.every((e, i) => e.type.name == parameterTypes[i])
+        ) as Il2Cpp.Method<U> | undefined;
     }
 
     /** Gets the parameter with the given name. */
