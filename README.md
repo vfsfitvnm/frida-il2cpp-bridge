@@ -27,6 +27,9 @@ However, only Android and Linux are tested: expect breakage if you are using ano
 
 ## Changelog
 
+### 0.7.7
+- Fix #107
+
 ### 0.7.6
 - Move `I2Cpp.Thread::current` to `Il2Cpp::currentThread`.
 - Move `I2Cpp.Thread::all` to `Il2Cpp::attachedThreads`.
