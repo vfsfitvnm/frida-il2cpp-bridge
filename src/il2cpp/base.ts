@@ -167,7 +167,7 @@ class Il2CppBase {
     }
 
     /** Schedules a callback on the Il2Cpp initializer thread. */
-    static async sheduleOnInitializerThread<T>(block: () => T | Promise<T>): Promise<T> {
+    static async scheduleOnInitializerThread<T>(block: () => T | Promise<T>): Promise<T> {
         return new Promise<T>(resolve => {
             const listener = Interceptor.attach(Il2Cpp.Api._threadCurrent, () => {
                 listener.detach();
