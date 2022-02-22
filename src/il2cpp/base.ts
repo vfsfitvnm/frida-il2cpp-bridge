@@ -157,6 +157,19 @@ class Il2CppBase {
     }
 
     /** */
+    static installExceptionListener(targetThread: "current" | "all" = "current"): InvocationListener {
+        const threadId = Process.getCurrentThreadId();
+
+        return Interceptor.attach(Il2Cpp.module.getExportByName("__cxa_throw"), function (args) {
+            if (targetThread == "current" && this.threadId != threadId) {
+                return;
+            }
+
+            inform(new Il2Cpp.Object(args[0].readPointer()));
+        });
+    }
+
+    /** */
     static internalCall<R extends NativeFunctionReturnType, A extends NativeFunctionArgumentType[] | []>(
         name: string,
         retType: R,
