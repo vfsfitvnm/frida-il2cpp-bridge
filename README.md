@@ -27,8 +27,12 @@ However, only Android and Linux are tested: expect breakage if you are using ano
 
 ## Changelog
 
+### 0.7.8
+- Add `Il2Cpp::installExceptionListener`.
+- Fix #132.
+
 ### 0.7.7
-- Fix #107
+- Fix #107.
 
 ### 0.7.6
 - Move `I2Cpp.Thread::current` to `Il2Cpp::currentThread`.
