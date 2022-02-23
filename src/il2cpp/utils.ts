@@ -141,18 +141,21 @@ export function toFridaValue(value: Il2Cpp.Parameter.Type): NativeFunctionArgume
 }
 
 function valueTypeToArray(value: Il2Cpp.ValueType): NativeFunctionArgumentValue[] {
-    return value.type.class.fields
-        .filter(field => !field.isStatic)
-        .map(field => field.withHolder(value).value)
-        .map(value =>
-            value instanceof Il2Cpp.ValueType
-                ? valueTypeToArray(value)
-                : value instanceof NativeStruct
-                ? value.handle
-                : typeof value == "boolean"
-                ? +value
-                : value
-        );
+    const instanceFields = value.type.class.fields.filter(f => !f.isStatic);
+
+    return instanceFields.length == 0
+        ? [value.handle.readU8()]
+        : instanceFields
+              .map(field => field.withHolder(value).value)
+              .map(value =>
+                  value instanceof Il2Cpp.ValueType
+                      ? valueTypeToArray(value)
+                      : value instanceof NativeStruct
+                      ? value.handle
+                      : typeof value == "boolean"
+                      ? +value
+                      : value
+              );
 }
 
 function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueType {
@@ -171,6 +174,10 @@ function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueT
                     arr.push([field.type.typeEnum, offset]);
                 }
             }
+        }
+
+        if (arr.length == 0) {
+            arr.push([Il2Cpp.Type.Enum.U1, 0]);
         }
 
         return arr;
