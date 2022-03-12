@@ -54,7 +54,7 @@ export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Ty
 export function write(pointer: NativePointer, value: any, type: Il2Cpp.Type): NativePointer {
     switch (type.typeEnum) {
         case Il2Cpp.Type.Enum.Boolean:
-            return pointer.writeU8(+value);
+            return pointer.writeS8(+value);
         case Il2Cpp.Type.Enum.I1:
             return pointer.writeS8(value);
         case Il2Cpp.Type.Enum.U1:
@@ -195,7 +195,7 @@ function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueT
 
         switch (typeEnum) {
             case Il2Cpp.Type.Enum.Boolean:
-                pointer.writeU8(value);
+                pointer.writeS8(value);
                 break;
             case Il2Cpp.Type.Enum.I1:
                 pointer.writeS8(value);
