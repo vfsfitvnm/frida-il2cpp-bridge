@@ -31,17 +31,17 @@ class Il2CppTracer {
         return this;
     }
 
-    assemblies(...assemblies: NonEmptyArray<Il2Cpp.Assembly>): FilterClasses {
+    assemblies(...assemblies: Il2Cpp.Assembly[]): FilterClasses {
         this.#assemblies = assemblies;
         return this;
     }
 
-    classes(...classes: NonEmptyArray<Il2Cpp.Class>): FilterMethods {
+    classes(...classes: Il2Cpp.Class[]): FilterMethods {
         this.#classes = classes;
         return this;
     }
 
-    methods(...methods: NonEmptyArray<Il2Cpp.Method>): FilterParameters {
+    methods(...methods: Il2Cpp.Method[]): FilterParameters {
         this.#methods = methods;
         return this;
     }
@@ -204,8 +204,6 @@ ${returnValue == undefined ? `` : ` = \x1b[36m${fromFridaValue(returnValue, targ
         }
     }
 }
-
-type NonEmptyArray<T> = [T, ...T[]];
 
 type FilterAssemblies = FilterClasses & Pick<Il2Cpp.Tracer, "filterAssemblies">;
 
