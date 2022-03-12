@@ -27,6 +27,9 @@ However, only Android and Linux are tested: expect breakage if you are using ano
 
 ## Changelog
 
+### 0.7.9
+- Minor things.
+
 ### 0.7.8
 - Add `Il2Cpp::installExceptionListener`.
 - Fix #132.
