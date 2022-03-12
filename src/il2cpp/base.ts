@@ -202,7 +202,8 @@ class Il2CppBase {
         }
 
         try {
-            return block();
+            const result = block();
+            return result instanceof Promise ? await result : result;
         } catch (e: any) {
             (globalThis as any).console.log(e);
             throw e;
