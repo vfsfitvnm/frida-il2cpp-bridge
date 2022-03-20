@@ -27,6 +27,31 @@ However, only Android and Linux are tested: expect breakage if you are using ano
 
 ## Changelog
 
+### 0.7.10
+- Add `Il2Cpp.Reference::to` to easily create a `Il2Cpp.Reference`:
+  ```ts
+  Il2Cpp.perform(() => {
+    const TryParse = Il2Cpp.Image.corlib.class("System.Boolean").method("TryParse");
+
+    const value = Il2Cpp.Reference.to(false);
+
+    console.log(value); // ->false
+    TryParse.invoke(Il2Cpp.String.from("TrUe"), value);
+    console.log(value); // ->true
+  });
+  ```
+  A `Il2Cpp.Type` is required when creating a reference to a `number` or `NativePointer` in order to disambiguate their representation:
+  ```ts
+  const value = Il2Cpp.Reference.to(1355, Il2Cpp.Image.corlib.class("System.UInt16").type);
+  ```
+- Make `Il2Cpp.Object::unbox` directly return a `Il2Cpp.ValueType`:
+  ```ts
+  // old
+  const valueType = new Il2Cpp.ValueType(object.unbox(), object.class.type);
+  // new
+  const valueType = object.unbox();
+  ```
+
 ### 0.7.9
 - Minor things.
 
