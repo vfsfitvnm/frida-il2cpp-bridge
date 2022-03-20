@@ -81,8 +81,8 @@ class Il2CppObject extends NativeStruct {
     }
 
     /** Unboxes the value type out of this object. */
-    unbox(): NativePointer {
-        return Il2Cpp.Api._objectUnbox(this);
+    unbox(): Il2Cpp.ValueType {
+        return new Il2Cpp.ValueType(Il2Cpp.Api._objectUnbox(this), this.class.type);
     }
 
     /** Releases the lock on an object and blocks the current thread until it reacquires the lock. */
