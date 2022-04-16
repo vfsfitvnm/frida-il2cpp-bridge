@@ -85,7 +85,7 @@ ${this.isThreadStatic ? `[ThreadStatic] ` : ``}\
 ${this.isStatic ? `static ` : ``}\
 ${this.type.name} \
 ${this.name}\
-${this.isLiteral ? ` = ${this.class.isEnum ? read((this.value as Il2Cpp.ValueType).handle, this.class.baseType!) : this.value}` : ``};\
+${this.isLiteral ? ` = ${this.type.class.isEnum ? read((this.value as Il2Cpp.ValueType).handle, this.type.class.baseType!) : this.value}` : ``};\
 ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)}`}`;
     }
 
