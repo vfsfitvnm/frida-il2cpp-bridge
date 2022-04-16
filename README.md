@@ -27,6 +27,9 @@ However, only Android and Linux are tested: expect breakage if you are using ano
 
 ## Changelog
 
+### 0.7.11
+- Fix #171.
+
 ### 0.7.10
 - Add `Il2Cpp.Reference::to` to easily create a `Il2Cpp.Reference`:
   ```ts
