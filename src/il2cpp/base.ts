@@ -181,11 +181,19 @@ class Il2CppBase {
 
     /** Schedules a callback on the Il2Cpp initializer thread. */
     static async scheduleOnInitializerThread<T>(block: () => T | Promise<T>): Promise<T> {
+        return Il2Cpp.attachedThreads[0].schedule(block);
+    }
+
+    /** Schedules a callback on the Il2Cpp initializer thread, alternative version. */
+    static async scheduleOnInitializerThread2<T>(block: () => T | Promise<T>): Promise<T> {
+        const targetThreadId = this.attachedThreads[0].id;
         return new Promise<T>(resolve => {
-            const listener = Interceptor.attach(Il2Cpp.Api._threadCurrent, () => {
-                listener.detach();
-                const result = block();
-                setImmediate(() => resolve(result));
+            const listener = Interceptor.attach(Il2Cpp.Api._threadCurrent, function () {
+                if (this.threadId == targetThreadId) {
+                    listener.detach();
+                    const result = block();
+                    setImmediate(() => resolve(result));
+                }
             });
         });
     }
