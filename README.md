@@ -27,6 +27,9 @@ However, only Android and Linux are tested: expect breakage if you are using ano
 
 ## Changelog
 
+### 0.7.12
+- Add `Il2Cpp::sheduleOnInitializerThread2`. The old `sheduleOnInitializerThread` is now ``Il2Cpp::sheduleOnInitializerThread2`, and the new `Il2Cpp::sheduleOnInitializerThread` is a brand new implementation.
+
 ### 0.7.11
 - Fix #171.
 
