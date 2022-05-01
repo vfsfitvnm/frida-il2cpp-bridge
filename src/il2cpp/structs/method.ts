@@ -212,6 +212,10 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
             const returnValue = this.nativeFunction(...allocatedParameters);
             return fromFridaValue(returnValue, this.returnType) as T;
         } catch (e: any) {
+            if (e == null) {
+                raise("an unexpected native function exception occurred, this is due to parameter types mismatch");
+            }
+
             switch (e.message) {
                 case "bad argument count":
                     raise(`cannot invoke method ${this.name}: it needs ${this.parameterCount} parameter(s), not ${parameters.length}`);
