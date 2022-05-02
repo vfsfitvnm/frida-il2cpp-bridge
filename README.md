@@ -27,8 +27,40 @@ However, only Android and Linux are tested: expect breakage if you are using ano
 
 ## Changelog
 
-### 0.7.12
-- Add `Il2Cpp::sheduleOnInitializerThread2`. The old `sheduleOnInitializerThread` is now `Il2Cpp::sheduleOnInitializerThread2`, and the new `Il2Cpp::sheduleOnInitializerThread` is a brand new implementation.
+### 0.7.13
+- Add `Il2Cpp.Thread::schedule` to schedule a delayed callback:
+  ```ts
+  Il2Cpp.perform(() => {
+    const Class: Il2Cpp.Class = ...;
+
+    Class.method("MethodName").implementation = function () {
+      // we probably are on the "main" thread now
+      
+      // non blocking
+      Il2Cpp.currentThread?.schedule(() => {
+        // we are on the same thread!
+      }, 1000);
+
+      return this..method("MethodName").invoke();
+    };
+  });
+  ```
+  Of course, it can be used to schedule a callback on a specific thread (see version `0.7.6` release notes). Sometimes, you could face an access violation/abort error when trying to invoke a Il2Cpp function within the wrong thread.
+  ```ts
+  Il2Cpp.perform(() => {
+    const Method: Il2Cpp.Method = ...;
+
+    // access violation :(
+    Method.invoke();
+
+    Il2Cpp.attachedThreads[0].schedule(() => {
+      // works :)
+      Method.invoke();
+    });
+  });
+  ```
+  **Note**: `Il2Cpp.Thread::schedule` similar to `Il2Cpp::scheduleOnInitializerThread`. However, they use different approaches. Eventually, one of them will be removed. \
+  **Note**: `Il2Cpp.Thread::schedule` may not work with old Unity versions.
 
 ### 0.7.11
 - Fix #171.
