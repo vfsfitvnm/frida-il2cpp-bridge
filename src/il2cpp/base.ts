@@ -56,6 +56,10 @@ class Il2CppBase {
 
     /** Gets the attached threads. */
     static get attachedThreads(): Il2Cpp.Thread[] {
+        if (Il2Cpp.currentThread == null) {
+            raise("only Il2Cpp threads can invoke Il2Cpp.attachedThreads");
+        }
+
         const array: Il2Cpp.Thread[] = [];
 
         const sizePointer = Memory.alloc(Process.pointerSize);
@@ -180,16 +184,11 @@ class Il2CppBase {
     }
 
     /** Schedules a callback on the Il2Cpp initializer thread. */
-    static async scheduleOnInitializerThread<T>(block: () => T | Promise<T>): Promise<T> {
-        return Il2Cpp.attachedThreads[0].schedule(block);
-    }
-
-    /** Schedules a callback on the Il2Cpp initializer thread, alternative version. */
-    static async scheduleOnInitializerThread2<T>(block: () => T | Promise<T>): Promise<T> {
-        const targetThreadId = this.attachedThreads[0].id;
+    static scheduleOnInitializerThread<T>(block: () => T | Promise<T>): Promise<T> {
         return new Promise<T>(resolve => {
-            const listener = Interceptor.attach(Il2Cpp.Api._threadCurrent, function () {
-                if (this.threadId == targetThreadId) {
+            const listener = Interceptor.attach(Il2Cpp.Api._threadCurrent, () => {
+                const currentThreadId = Il2Cpp.currentThread?.id;
+                if (currentThreadId != undefined && currentThreadId == Il2Cpp.attachedThreads[0].id) {
                     listener.detach();
                     const result = block();
                     setImmediate(() => resolve(result));

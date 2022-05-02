@@ -7,10 +7,7 @@ class Il2CppThread extends NativeStruct {
     /** @internal */
     @cache
     private static get idOffset(): number {
-        const internalThread = Il2Cpp.currentThread?.object.tryField<Il2Cpp.Object>("internal_thread")?.value;
-        const object = internalThread ? internalThread : Il2Cpp.currentThread!.object;
-
-        const handle = ptr(object.field<UInt64>("thread_id").value.toString());
+        const handle = ptr(Il2Cpp.currentThread!.internal.field<UInt64>("thread_id").value.toString());
         const currentThreadId = Process.getCurrentThreadId();
 
         for (let i = 0; i < 1024; i++) {
@@ -28,7 +25,7 @@ class Il2CppThread extends NativeStruct {
         return ptr(this.internal.field<UInt64>("thread_id").value.toString()).add(Il2Cpp.Thread.idOffset).readS32();
     }
 
-    /** Gets the encompassing internal object (System.Threding.InternalThreead) of the current thread. */
+    /** @internal Gets the encompassing internal object (System.Threding.InternalThreead) of the current thread. */
     @cache
     private get internal(): Il2Cpp.Object {
         const internalThread = this.object.tryField<Il2Cpp.Object>("internal_thread")?.value;
@@ -46,12 +43,13 @@ class Il2CppThread extends NativeStruct {
         return new Il2Cpp.Object(this);
     }
 
-    /** */
+    /** @internal */
     @cache
     private get staticData(): NativePointer {
         return this.internal.field<NativePointer>("static_data").value;
     }
 
+    /** @internal */
     @cache
     private get synchronizationContext(): Il2Cpp.Object {
         const get_ExecutionContext =
@@ -70,7 +68,7 @@ class Il2CppThread extends NativeStruct {
                             .readPointer()
                             .readPointer()
                     );
-                    if (new Il2Cpp.Object(candidate).class.isSubclassOf(SystemThreadingSynchronizationContext, false)) {
+                    if (candidate.class.isSubclassOf(SystemThreadingSynchronizationContext, false)) {
                         synchronizationContext = candidate;
                         break;
                     }
@@ -91,26 +89,26 @@ class Il2CppThread extends NativeStruct {
     }
 
     /** Schedules a callback on the current thread. */
-    async schedule<T>(block: () => T | Promise<T>): Promise<T> {
-        const thisThreadId = this.id;
+    schedule<T>(block: () => T | Promise<T>, delayMs: number = 0): Promise<T> {
+        const threadId = this.id;
 
         const GetDisplayName = Il2Cpp.Image.corlib.class("Mono.Runtime").method("GetDisplayName");
 
-        const SystemThreadingSendOrPostCallback = Il2Cpp.Image.corlib.class("System.Threading.SendOrPostCallback");
-
-        const SendOrPostCallback = SystemThreadingSendOrPostCallback.alloc();
+        const SendOrPostCallback = Il2Cpp.Image.corlib.class("System.Threading.SendOrPostCallback").alloc();
         SendOrPostCallback.method(".ctor").invoke(NULL, GetDisplayName.handle);
+
+        const Post = this.synchronizationContext.method("Post");
 
         return new Promise<T>(resolve => {
             const listener = Interceptor.attach(GetDisplayName.virtualAddress, function () {
-                if (this.threadId == thisThreadId) {
+                if (this.threadId == threadId) {
                     listener.detach();
                     const result = block();
                     setImmediate(() => resolve(result));
                 }
             });
 
-            this.synchronizationContext.method("Post").invoke(SendOrPostCallback, NULL);
+            setTimeout(() => Post.invoke(SendOrPostCallback, NULL), delayMs);
         });
     }
 }
