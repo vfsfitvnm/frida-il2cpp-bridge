@@ -10,7 +10,7 @@
     "outDir": "dist",
     "stripInternal": true,
     "esModuleInterop": true,
-    "strict": true,
+    "strict": true
   },
   "files": [
     "src/index.ts"
