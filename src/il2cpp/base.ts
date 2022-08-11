@@ -221,6 +221,32 @@ class Il2CppBase {
         }
     }
 
+    /** Check if current thread is the Il2Cpp main thread.  */
+    static currentThreadIsMainThread() {
+        const currentThreadIsMainThread = this.internalCall("UnityEngine.Object::CurrentThreadIsMainThread", "bool", []);
+        if (currentThreadIsMainThread == null) {
+            raise("couldn't invoke UnityEngine.Object::CurrentThreadIsMainThread!");
+        }
+        return currentThreadIsMainThread();
+    }
+
+    /** Attaches the caller thread to Il2Cpp main thread and executes the given block.  */
+    static scheduleOnMainThread<T>(block: () => T | Promise<T>): Promise<T> {
+        const currentThreadIsMainThread = this.internalCall("UnityEngine.Object::CurrentThreadIsMainThread", "bool", []);
+        if (currentThreadIsMainThread == null) {
+            raise("couldn't invoke UnityEngine.Object::CurrentThreadIsMainThread!");
+        }
+        return new Promise(resolve => {
+            const listener = Interceptor.attach(Il2Cpp.Api._threadCurrent, () => {
+                if (currentThreadIsMainThread() ) {
+                    listener.detach();
+                    const result = block();
+                    setImmediate(() => resolve(result));
+                }
+            });
+        });
+    }
+
     /** Creates a new `Il2Cpp.Tracer` instance. */
     static trace(): Pick<Il2Cpp.Tracer, "domain" | "assemblies" | "classes" | "methods"> {
         return new Il2Cpp.Tracer();
