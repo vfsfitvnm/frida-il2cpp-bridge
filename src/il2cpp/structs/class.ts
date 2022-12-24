@@ -298,6 +298,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
         return `\
 // ${this.assemblyName}
+// ${this.namespace}
 ${this.isEnum ? `enum` : this.isValueType ? `struct` : this.isInterface ? `interface` : `class`} \
 ${this.type.name}\
 ${inherited ? ` : ${inherited.map(e => e?.type.name).join(`, `)}` : ``}
