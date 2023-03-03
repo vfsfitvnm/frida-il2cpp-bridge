@@ -37,7 +37,6 @@
     "versioning": "^1.1.2"
   },
   "devDependencies": {
-    "@types/frida-gum": "^18.0.0",
-    "prettier": "^2.6.2"
+    "@types/frida-gum": "^18.0.0"
   }
 }
