@@ -37,6 +37,6 @@
     "versioning": "^1.1.2"
   },
   "devDependencies": {
-    "@types/frida-gum": "^18.0.0"
+    "@types/frida-gum": "^18.3.1"
   }
 }
