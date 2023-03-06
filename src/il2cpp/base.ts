@@ -109,6 +109,11 @@ class Il2CppBase {
         return Il2Cpp.Api._alloc(size);
     }
 
+    /** Creates a new `Il2Cpp.Backtracer` instance. */
+    static backtrace(): Pick<Il2Cpp.Backtracer, "accurate" | "fuzzy"> {
+        return new Il2Cpp.Backtracer();
+    }
+
     /** Dumps the application. */
     static dump(fileName?: string, path?: string): void {
         fileName = fileName ?? `${Il2Cpp.applicationIdentifier ?? "unknown"}_${Il2Cpp.applicationVersion ?? "unknown"}.cs`;
@@ -222,7 +227,7 @@ class Il2CppBase {
     }
 
     /** Creates a new `Il2Cpp.Tracer` instance. */
-    static trace(): Pick<Il2Cpp.Tracer, "domain" | "assemblies" | "classes" | "methods"> {
+    static trace(): Pick<Il2Cpp.Tracer, "detailed" | "domain" | "assemblies" | "classes" | "methods"> {
         return new Il2Cpp.Tracer();
     }
 }

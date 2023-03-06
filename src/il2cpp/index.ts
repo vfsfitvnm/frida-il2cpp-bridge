@@ -3,6 +3,7 @@ import "./api";
 import "./filtering";
 import "./runtime";
 import "./tracing/abstract-tracer";
+import "./tracing/backtracer";
 import "./tracing/tracer";
 import "./structs/array";
 import "./structs/assembly";
