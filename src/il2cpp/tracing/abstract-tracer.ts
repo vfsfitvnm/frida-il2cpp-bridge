@@ -1,8 +1,5 @@
-import { inform } from "../utils/console";
-import { fromFridaValue } from "./utils";
-
 /** Tracing utilities. */
-class Il2CppTracer {
+export abstract class AbstractTracer {
     /** @internal */
     readonly targets: Il2Cpp.Method[] = [];
 
@@ -61,12 +58,12 @@ class Il2CppTracer {
         return this;
     }
 
-    filterParameters(filter: (parameter: Il2Cpp.Parameter) => boolean): Pick<Il2Cpp.Tracer, "and"> {
+    filterParameters(filter: (parameter: Il2Cpp.Parameter) => boolean): Pick<AbstractTracer, "and"> {
         this.#parameterFilter = filter;
         return this;
     }
 
-    and(): ReturnType<typeof Il2Cpp["trace"]> & Pick<Il2Cpp.Tracer, "attach"> {
+    and(): Pick<AbstractTracer, "domain" | "assemblies" | "classes" | "methods" | "attach"> {
         const filterMethod = (method: Il2Cpp.Method): void => {
             if (this.#parameterFilter == undefined) {
                 this.targets.push(method);
@@ -157,66 +154,13 @@ class Il2CppTracer {
         return this;
     }
 
-    attach(mode: "full" | "detailed" = "full"): void {
-        let count = 0;
-
-        for (const target of this.targets) {
-            if (target.virtualAddress.isNull()) {
-                continue;
-            }
-
-            const offset = `\x1b[2m0x${target.relativeVirtualAddress.toString(16).padStart(8, `0`)}\x1b[0m`;
-            const fullName = `${target.class.type.name}.\x1b[1m${target.name}\x1b[0m`;
-
-            if (mode == "detailed") {
-                const startIndex = +!target.isStatic | +Il2Cpp.unityVersionIsBelow201830;
-
-                const callback = (...args: any[]): any => {
-                    const thisParameter = target.isStatic ? undefined : new Il2Cpp.Parameter("this", -1, target.class.type);
-                    const parameters = thisParameter ? [thisParameter].concat(target.parameters) : target.parameters;
-
-                    inform(`\
-${offset} ${`│ `.repeat(count++)}┌─\x1b[35m${fullName}\x1b[0m(\
-${parameters.map(e => `\x1b[32m${e.name}\x1b[0m = \x1b[31m${fromFridaValue(args[e.position + startIndex], e.type)}\x1b[0m`).join(`, `)});`);
-
-                    const returnValue = target.nativeFunction(...args);
-
-                    inform(`\
-${offset} ${`│ `.repeat(--count)}└─\x1b[33m${fullName}\x1b[0m\
-${returnValue == undefined ? `` : ` = \x1b[36m${fromFridaValue(returnValue, target.returnType)}`}\x1b[0m;`);
-
-                    return returnValue;
-                };
-
-                try {
-                    target.revert();
-                    const nativeCallback = new NativeCallback(callback, target.returnType.fridaAlias, target.fridaSignature);
-                    Interceptor.replace(target.virtualAddress, nativeCallback);
-                } catch (e: any) {}
-            } else {
-                try {
-                    Interceptor.attach(target.virtualAddress, {
-                        onEnter: () => inform(`${offset} ${`│ `.repeat(count++)}┌─\x1b[35m${fullName}\x1b[0m`),
-                        onLeave: () => inform(`${offset} ${`│ `.repeat(--count)}└─\x1b[33m${fullName}\x1b[0m${count == 0 ? `\n` : ``}`)
-                    });
-                } catch (e: any) {}
-            }
-        }
-    }
+    abstract attach(): void;
 }
 
-type FilterAssemblies = FilterClasses & Pick<Il2Cpp.Tracer, "filterAssemblies">;
+type FilterAssemblies = FilterClasses & Pick<AbstractTracer, "filterAssemblies">;
 
-type FilterClasses = FilterMethods & Pick<Il2Cpp.Tracer, "filterClasses">;
+type FilterClasses = FilterMethods & Pick<AbstractTracer, "filterClasses">;
 
-type FilterMethods = FilterParameters & Pick<Il2Cpp.Tracer, "filterMethods">;
+type FilterMethods = FilterParameters & Pick<AbstractTracer, "filterMethods">;
 
-type FilterParameters = Pick<Il2Cpp.Tracer, "and"> & Pick<Il2Cpp.Tracer, "filterParameters">;
-
-Il2Cpp.Tracer = Il2CppTracer;
-
-declare global {
-    namespace Il2Cpp {
-        class Tracer extends Il2CppTracer {}
-    }
-}
+type FilterParameters = Pick<AbstractTracer, "and"> & Pick<AbstractTracer, "filterParameters">;
