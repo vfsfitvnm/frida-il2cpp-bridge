@@ -3,7 +3,7 @@ import { AbstractTracer } from "./abstract-tracer";
 
 /** Backtracing utilities. */
 class Il2CppBacktracer extends AbstractTracer {
-    #flags: Flags = 0;
+    #flags: Flags = Flags.Empty;
 
     readonly #methods = Il2Cpp.Domain.assemblies
         .flatMap(a => a.image.classes.flatMap(c => c.methods.filter(m => !m.virtualAddress.isNull())))
@@ -130,6 +130,7 @@ ${debugSymbol.moduleName}`);
 }
 
 const enum Flags {
+    Empty = 0,
     Accurate = 1 << 0,
     Distinct = 1 << 1,
     Clean = 1 << 2
