@@ -1,6 +1,7 @@
 import { cache } from "decorator-cache-getter";
 import { NonNullNativeStruct } from "../../utils/native-struct.js";
-import { cacheInstances, levenshtein } from "../../utils/utils.js";
+import { cacheInstances } from "../../utils/utils.js";
+import { keyNotFound } from "../../utils/key-not-found";
 
 /** Represents a `Il2CppImage`. */
 @cacheInstances
@@ -44,9 +45,8 @@ class Il2CppImage extends NonNullNativeStruct {
     }
 
     /** Gets the class with the specified name defined in this image. */
-    @levenshtein("classes", e => (e.namespace ? `${e.namespace}.${e.name}` : e.name))
     class(name: string): Il2Cpp.Class {
-        return this.tryClass(name)!;
+        return this.tryClass(name) ?? keyNotFound(name, this.name, this.classes.map(_ => _.fullName));
     }
 
     /** Gets the class with the specified name defined in this image. */
@@ -64,6 +64,6 @@ Il2Cpp.Image = Il2CppImage;
 
 declare global {
     namespace Il2Cpp {
-        class Image extends Il2CppImage {}
+        class Image extends Il2CppImage { }
     }
 }

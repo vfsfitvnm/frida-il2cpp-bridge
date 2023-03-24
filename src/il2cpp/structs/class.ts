@@ -1,7 +1,8 @@
 import { cache } from "decorator-cache-getter";
 import { raise } from "../../utils/console.js";
 import { NonNullNativeStruct } from "../../utils/native-struct.js";
-import { cacheInstances, levenshtein, nativeIterator } from "../../utils/utils.js";
+import { cacheInstances, nativeIterator } from "../../utils/utils.js";
+import { keyNotFound } from "../../utils/key-not-found";
 
 /** Represents a `Il2CppClass`. */
 @cacheInstances
@@ -212,9 +213,8 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     /** Gets the field identified by the given name. */
-    @levenshtein("fields")
     field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> {
-        return this.tryField<T>(name)!;
+        return this.tryField<T>(name) ?? keyNotFound(name, this.name, this.fields.map(_ => _.name));
     }
 
     /** Builds a generic instance of the current generic class. */
@@ -252,15 +252,13 @@ class Il2CppClass extends NonNullNativeStruct {
     }
 
     /** Gets the method identified by the given name and parameter count. */
-    @levenshtein("methods")
     method<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> {
-        return this.tryMethod<T>(name, parameterCount)!;
+        return this.tryMethod<T>(name, parameterCount) ?? keyNotFound(name, this.name, this.methods.map(_ => _.name));
     }
 
     /** Gets the nested class with the given name. */
-    @levenshtein("nestedClasses")
     nested(name: string): Il2Cpp.Class {
-        return this.tryNested(name)!;
+        return this.tryNested(name) ?? keyNotFound(name, this.name, this.nestedClasses.map(_ => _.name));
     }
 
     /** Allocates a new object of the current class and calls its default constructor. */

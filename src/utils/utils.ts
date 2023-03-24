@@ -1,6 +1,3 @@
-import { closest } from "fastest-levenshtein/esm/mod.js";
-import { raise } from "./console.js";
-
 /** @internal */
 export function* nativeIterator<T extends ObjectWrapper>(
     holder: NativePointerValue,
@@ -29,21 +26,4 @@ export function cacheInstances<T extends ObjectWrapper, U extends new (handle: N
             return instanceCache.get(handle)!;
         }
     });
-}
-
-/** @internal */
-export function levenshtein(candidatesKey: string, nameGetter: (e: any) => string = e => e.name) {
-    return function (_: any, propertyKey: string, descriptor: TypedPropertyDescriptor<(key: string, ...args: any[]) => any>) {
-        const original = descriptor.value!;
-
-        descriptor.value = function (this: any, key: string, ...args: any[]): any {
-            const result = original.call(this, key, ...args);
-
-            if (result != null) return result;
-
-            const closestMatch = closest(key, this[candidatesKey].map(nameGetter));
-
-            raise(`couldn't find ${propertyKey} ${key} in ${this.name}${closestMatch ? `, did you mean ${closestMatch}?` : ``}`);
-        };
-    };
 }
