@@ -63,6 +63,11 @@ class Il2CppClass extends NonNullNativeStruct {
         return Il2Cpp.Api._classGetFlags(this);
     }
 
+    /** Gets the full name (namespace + name) of the current class. */
+    get fullName(): string {
+        return this.namespace ? `${this.namespace}.${this.name}` : this.name;
+    }
+
     /** Gets the amount of generic parameters of this generic class. */
     @cache
     get genericParameterCount(): number {
