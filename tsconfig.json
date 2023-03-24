@@ -10,7 +10,10 @@
     "outDir": "dist",
     "stripInternal": true,
     "esModuleInterop": true,
-    "strict": true
+    "strict": true,
+    "plugins": [
+      { "transform": "ts-transformer-inline-file/transformer" }
+    ]
   },
   "files": [
     "src/index.ts"

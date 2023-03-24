@@ -22,7 +22,7 @@
     "/dist/*"
   ],
   "scripts": {
-    "prepare": "tsc"
+    "prepare": "ttsc"
   },
   "prettier": {
     "arrowParens": "avoid",
@@ -37,6 +37,8 @@
     "versioning": "^1.1.2"
   },
   "devDependencies": {
-    "@types/frida-gum": "^18.3.1"
+    "@types/frida-gum": "^18.3.1",
+    "ts-transformer-inline-file": "^0.2.0",
+    "ttypescript": "^1.5.15"
   }
 }

@@ -1,0 +1,10 @@
+DisableFormat: false
+AlwaysBreakAfterDefinitionReturnType: All
+BreakBeforeBraces: Allman
+ColumnLimit: 80
+IndentWidth: 2
+MaxEmptyLinesToKeep: 1
+SpaceAfterCStyleCast: true
+SpaceAroundPointerQualifiers: Both
+SpaceBeforeParens: Always
+PointerAlignment: Middle
