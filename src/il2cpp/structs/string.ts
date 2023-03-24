@@ -1,4 +1,4 @@
-import { NativeStruct } from "../../utils/native-struct";
+import { NativeStruct } from "../../utils/native-struct.js";
 
 /** Represents a `Il2CppString`. */
 class Il2CppString extends NativeStruct {

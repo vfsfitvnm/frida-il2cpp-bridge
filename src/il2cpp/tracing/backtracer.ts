@@ -1,5 +1,5 @@
-import { inform } from "../../utils/console";
-import { AbstractTracer } from "./abstract-tracer";
+import { inform } from "../../utils/console.js";
+import { AbstractTracer } from "./abstract-tracer.js";
 
 /** Backtracing utilities. */
 class Il2CppBacktracer extends AbstractTracer {

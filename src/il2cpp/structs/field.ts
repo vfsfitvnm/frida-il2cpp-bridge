@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
-import { raise } from "../../utils/console";
-import { NonNullNativeStruct } from "../../utils/native-struct";
-import { read, write } from "../utils";
+import { raise } from "../../utils/console.js";
+import { NonNullNativeStruct } from "../../utils/native-struct.js";
+import { read, write } from "../utils.js";
 
 /** Represents a `FieldInfo`. */
 class Il2CppField<T extends Il2Cpp.Field.Type> extends NonNullNativeStruct {
@@ -85,7 +85,11 @@ ${this.isThreadStatic ? `[ThreadStatic] ` : ``}\
 ${this.isStatic ? `static ` : ``}\
 ${this.type.name} \
 ${this.name}\
-${this.isLiteral ? ` = ${this.type.class.isEnum ? read((this.value as Il2Cpp.ValueType).handle, this.type.class.baseType!) : this.value}` : ``};\
+${
+    this.isLiteral
+        ? ` = ${this.type.class.isEnum ? read((this.value as Il2Cpp.ValueType).handle, this.type.class.baseType!) : this.value}`
+        : ``
+};\
 ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)}`}`;
     }
 

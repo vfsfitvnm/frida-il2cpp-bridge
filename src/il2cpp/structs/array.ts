@@ -1,6 +1,6 @@
 import { cache } from "decorator-cache-getter";
-import { raise } from "../../utils/console";
-import { NativeStruct } from "../../utils/native-struct";
+import { raise } from "../../utils/console.js";
+import { NativeStruct } from "../../utils/native-struct.js";
 
 /** Represents a `Il2CppArraySize`. */
 class Il2CppArray<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends NativeStruct implements Iterable<T> {

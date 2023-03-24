@@ -1,6 +1,6 @@
 import { cache } from "decorator-cache-getter";
-import { NonNullNativeStruct } from "../../utils/native-struct";
-import { cacheInstances } from "../../utils/utils";
+import { NonNullNativeStruct } from "../../utils/native-struct.js";
+import { cacheInstances } from "../../utils/utils.js";
 
 /** Represents a `Il2CppAssembly`. */
 @cacheInstances

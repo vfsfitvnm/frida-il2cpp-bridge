@@ -1,8 +1,8 @@
 import { cache } from "decorator-cache-getter";
-import { raise, warn } from "../../utils/console";
-import { NonNullNativeStruct } from "../../utils/native-struct";
-import { levenshtein } from "../../utils/utils";
-import { fromFridaValue, toFridaValue } from "../utils";
+import { raise, warn } from "../../utils/console.js";
+import { NonNullNativeStruct } from "../../utils/native-struct.js";
+import { levenshtein } from "../../utils/utils.js";
+import { fromFridaValue, toFridaValue } from "../utils.js";
 
 /** Represents a `MethodInfo`. */
 class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStruct {

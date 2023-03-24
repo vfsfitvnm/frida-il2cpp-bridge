@@ -1,5 +1,5 @@
-import { raise, warn } from "../utils/console";
-import { NativeStruct } from "../utils/native-struct";
+import { raise, warn } from "../utils/console.js";
+import { NativeStruct } from "../utils/native-struct.js";
 
 /** @internal */
 export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Type {

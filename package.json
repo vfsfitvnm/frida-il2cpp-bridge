@@ -15,8 +15,9 @@
   },
   "license": "MIT",
   "author": "vfsfitvnm",
-  "main": "./dist/index.js",
+  "exports": "./dist/index.js",
   "module": "./dist/index.js",
+  "type": "module",
   "types": "./dist/index.d.ts",
   "files": [
     "/dist/*"

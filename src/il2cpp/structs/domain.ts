@@ -1,5 +1,5 @@
 import { cache } from "decorator-cache-getter";
-import { levenshtein } from "../../utils/utils";
+import { levenshtein } from "../../utils/utils.js";
 
 /** Represents a `Il2CppDomain`. */
 class Il2CppDomain {

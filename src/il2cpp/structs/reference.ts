@@ -1,6 +1,6 @@
-import { read, write } from "../utils";
-import { NativeStruct } from "../../utils/native-struct";
-import { raise } from "../../utils/console";
+import { read, write } from "../utils.js";
+import { NativeStruct } from "../../utils/native-struct.js";
+import { raise } from "../../utils/console.js";
 
 /** Represent a parameter passed by reference. */
 class Il2CppReference<T extends Il2Cpp.Field.Type> extends NativeStruct {
@@ -57,7 +57,7 @@ class Il2CppReference<T extends Il2Cpp.Field.Type> extends NativeStruct {
                         return new Il2Cpp.Reference<T>(handle.writeFloat(value), type);
                     case Il2Cpp.Type.Enum.R8:
                         return new Il2Cpp.Reference<T>(handle.writeDouble(value), type);
-                    }
+                }
             case "object":
                 if (value instanceof Il2Cpp.ValueType || value instanceof Il2Cpp.Pointer) {
                     return new Il2Cpp.Reference<T>(handle.writePointer(value), value.type);

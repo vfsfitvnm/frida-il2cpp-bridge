@@ -1,5 +1,5 @@
-import { read, write } from "../utils";
-import { NativeStruct } from "../../utils/native-struct";
+import { read, write } from "../utils.js";
+import { NativeStruct } from "../../utils/native-struct.js";
 
 /** */
 class Il2CppPointer<T extends Il2Cpp.Field.Type> extends NativeStruct {

@@ -1,5 +1,5 @@
-import { closest } from "fastest-levenshtein";
-import { raise } from "./console";
+import { closest } from "fastest-levenshtein/esm/mod.js";
+import { raise } from "./console.js";
 
 /** @internal */
 export function* nativeIterator<T extends ObjectWrapper>(

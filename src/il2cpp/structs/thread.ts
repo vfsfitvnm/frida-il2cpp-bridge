@@ -1,6 +1,6 @@
 import { cache } from "decorator-cache-getter";
-import { raise } from "../../utils/console";
-import { NativeStruct } from "../../utils/native-struct";
+import { raise } from "../../utils/console.js";
+import { NativeStruct } from "../../utils/native-struct.js";
 
 /** Represents a `Il2CppThread`. */
 class Il2CppThread extends NativeStruct {

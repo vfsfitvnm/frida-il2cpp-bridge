@@ -1,4 +1,4 @@
-import { NativeStruct } from "../../utils/native-struct";
+import { NativeStruct } from "../../utils/native-struct.js";
 
 /** Value type class utility. */
 class Il2CppValueType extends NativeStruct {

@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
 import Versioning from "versioning";
-import { inform, ok, raise } from "../utils/console";
-import { forModule } from "../utils/native-wait";
+import { inform, ok, raise } from "../utils/console.js";
+import { forModule } from "../utils/native-wait.js";
 
 /** */
 class Il2CppBase {

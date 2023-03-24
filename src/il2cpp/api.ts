@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
 import { $INLINE_FILE } from "ts-transformer-inline-file";
 import Versioning from "versioning";
-import { raise, warn } from "../utils/console";
+import { raise, warn } from "../utils/console.js";
 
 class Il2CppApi {
     protected constructor() {}

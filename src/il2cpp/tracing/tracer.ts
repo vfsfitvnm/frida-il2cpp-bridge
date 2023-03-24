@@ -1,6 +1,6 @@
-import { inform } from "../../utils/console";
-import { fromFridaValue } from "../utils";
-import { AbstractTracer } from "./abstract-tracer";
+import { inform } from "../../utils/console.js";
+import { fromFridaValue } from "../utils.js";
+import { AbstractTracer } from "./abstract-tracer.js";
 
 /** Tracing utilities. */
 class Il2CppTracer extends AbstractTracer {

@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
-import { raise } from "../../utils/console";
-import { NonNullNativeStruct } from "../../utils/native-struct";
-import { cacheInstances, levenshtein, nativeIterator } from "../../utils/utils";
+import { raise } from "../../utils/console.js";
+import { NonNullNativeStruct } from "../../utils/native-struct.js";
+import { cacheInstances, levenshtein, nativeIterator } from "../../utils/utils.js";
 
 /** Represents a `Il2CppClass`. */
 @cacheInstances

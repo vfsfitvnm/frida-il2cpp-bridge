@@ -1,1 +1,1 @@
-import "./il2cpp";
+import "./il2cpp/index.js";

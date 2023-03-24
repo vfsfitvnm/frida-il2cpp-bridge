@@ -1,5 +1,5 @@
 import { cache } from "decorator-cache-getter";
-import { NativeStruct } from "../../utils/native-struct";
+import { NativeStruct } from "../../utils/native-struct.js";
 
 /** Represents a `Il2CppObject`. */
 class Il2CppObject extends NativeStruct {
