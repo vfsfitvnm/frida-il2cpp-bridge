@@ -1,6 +1,17 @@
 #include <stdint.h>
 #include <string.h>
 
+typedef void Il2CppArray;
+typedef void Il2CppAssembly;
+typedef void Il2CppClass;
+typedef void Il2CppDomain;
+typedef void Il2CppField;
+typedef void Il2CppImage;
+typedef void Il2CppMethod;
+typedef void Il2CppObject;
+typedef void Il2CppString;
+typedef void Il2CppType;
+
 typedef enum _Il2CppTypeEnum Il2CppTypeEnum;
 typedef struct _Il2CppManagedMemorySnapshot Il2CppManagedMemorySnapshot;
 typedef struct _Il2CppMetadataType Il2CppMetadataType;
@@ -140,28 +151,28 @@ struct _Il2CppMetadataType
 #define IL2CPP_METHOD_GET_FROM_REFLECTION_OFFSET 0
 #endif
 
-extern const char * il2cpp_class_get_name (void *);
-extern int il2cpp_field_get_flags (void *);
-extern size_t il2cpp_field_get_offset (void *);
-extern uint32_t il2cpp_method_get_flags (void *, uint32_t *);
-extern char * il2cpp_type_get_name (void *);
-extern Il2CppTypeEnum il2cpp_type_get_type_enum (void *);
+extern const char * il2cpp_class_get_name (Il2CppClass *);
+extern int il2cpp_field_get_flags (Il2CppField *);
+extern size_t il2cpp_field_get_offset (Il2CppField *);
+extern uint32_t il2cpp_method_get_flags (Il2CppMethod *, uint32_t *);
+extern char * il2cpp_type_get_name (Il2CppType *);
+extern Il2CppTypeEnum il2cpp_type_get_type_enum (Il2CppType *);
 extern void il2cpp_free (void *);
 
 void
-il2cpp_string_set_length (int32_t * string, int32_t length)
+il2cpp_string_set_length (Il2CppString * string, int32_t length)
 {
-  *(string + IL2CPP_STRING_SET_LENGTH_OFFSET) = length;
+  *((int32_t *) string + IL2CPP_STRING_SET_LENGTH_OFFSET) = length;
 }
 
 void *
-il2cpp_array_get_elements (int32_t * array)
+il2cpp_array_get_elements (Il2CppArray * array)
 {
-  return array + IL2CPP_ARRAY_GET_ELEMENTS_OFFSET;
+  return (int32_t *) array + IL2CPP_ARRAY_GET_ELEMENTS_OFFSET;
 }
 
 uint8_t
-il2cpp_type_is_byref (void * type)
+il2cpp_type_is_byref (Il2CppType * type)
 {
   char * name;
   char last_char;
@@ -174,7 +185,7 @@ il2cpp_type_is_byref (void * type)
 }
 
 uint8_t
-il2cpp_type_is_primitive (void * type)
+il2cpp_type_is_primitive (Il2CppType * type)
 {
   Il2CppTypeEnum type_enum;
 
@@ -185,13 +196,13 @@ il2cpp_type_is_primitive (void * type)
 }
 
 int32_t
-il2cpp_class_get_actual_instance_size (int32_t * class)
+il2cpp_class_get_actual_instance_size (Il2CppClass * class)
 {
-  return *(class + IL2CPP_CLASS_GET_ACTUAL_INSTANCE_SIZE_OFFSET);
+  return *((int32_t *) class + IL2CPP_CLASS_GET_ACTUAL_INSTANCE_SIZE_OFFSET);
 }
 
 uint8_t
-il2cpp_class_get_rank (void * class)
+il2cpp_class_get_rank (Il2CppClass * class)
 {
   uint8_t rank;
   const char * name;
@@ -217,7 +228,7 @@ il2cpp_class_get_rank (void * class)
 }
 
 const char *
-il2cpp_field_get_modifier (void * field)
+il2cpp_field_get_modifier (Il2CppField * field)
 {
   int flags;
 
@@ -243,25 +254,25 @@ il2cpp_field_get_modifier (void * field)
 }
 
 uint8_t
-il2cpp_field_is_literal (void * field)
+il2cpp_field_is_literal (Il2CppField * field)
 {
   return (il2cpp_field_get_flags (field) & FIELD_ATTRIBUTE_LITERAL) != 0;
 }
 
 uint8_t
-il2cpp_field_is_static (void * field)
+il2cpp_field_is_static (Il2CppField * field)
 {
   return (il2cpp_field_get_flags (field) & FIELD_ATTRIBUTE_STATIC) != 0;
 }
 
 uint8_t
-il2cpp_field_is_thread_static (void * field)
+il2cpp_field_is_thread_static (Il2CppField * field)
 {
   return il2cpp_field_get_offset (field) == THREAD_STATIC_FIELD_OFFSET;
 }
 
 const char *
-il2cpp_method_get_modifier (void * method)
+il2cpp_method_get_modifier (Il2CppMethod * method)
 {
   uint32_t flags;
 
@@ -287,19 +298,19 @@ il2cpp_method_get_modifier (void * method)
 }
 
 void *
-il2cpp_method_get_from_reflection (void * object)
+il2cpp_method_get_from_reflection (Il2CppMethod * object)
 {
   return *((void **) object + IL2CPP_METHOD_GET_FROM_REFLECTION_OFFSET);
 }
 
 void *
-il2cpp_method_get_pointer (void ** method)
+il2cpp_method_get_pointer (Il2CppMethod * method)
 {
-  return *(method + IL2CPP_METHOD_GET_POINTER_OFFSET);
+  return *((void **) method + IL2CPP_METHOD_GET_POINTER_OFFSET);
 }
 
 uint8_t
-il2cpp_method_is_external (void * method)
+il2cpp_method_is_external (Il2CppMethod * method)
 {
   uint32_t implementation_flags;
 
@@ -309,7 +320,7 @@ il2cpp_method_is_external (void * method)
 }
 
 uint8_t
-il2cpp_method_is_synchronized (void * method)
+il2cpp_method_is_synchronized (Il2CppMethod * method)
 {
   uint32_t implementation_flags;
 
