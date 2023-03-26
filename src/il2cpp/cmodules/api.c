@@ -13,8 +13,6 @@ typedef void Il2CppString;
 typedef void Il2CppType;
 
 typedef enum _Il2CppTypeEnum Il2CppTypeEnum;
-typedef struct _Il2CppManagedMemorySnapshot Il2CppManagedMemorySnapshot;
-typedef struct _Il2CppMetadataType Il2CppMetadataType;
 
 enum _Il2CppTypeEnum
 {
@@ -54,54 +52,6 @@ enum _Il2CppTypeEnum
   IL2CPP_TYPE_SENTINEL = 0x41,
   IL2CPP_TYPE_PINNED = 0x45,
   IL2CPP_TYPE_ENUM = 0x55
-};
-
-struct _Il2CppManagedMemorySnapshot
-{
-  struct Il2CppManagedHeap
-  {
-    uint32_t section_count;
-    void * sections;
-  } heap;
-  struct Il2CppStacks
-  {
-    uint32_t stack_count;
-    void * stacks;
-  } stacks;
-  struct Il2CppMetadataSnapshot
-  {
-    uint32_t type_count;
-    Il2CppMetadataType * types;
-  } metadata_snapshot;
-  struct Il2CppGCHandles
-  {
-    uint32_t tracked_object_count;
-    void ** pointers_to_objects;
-  } gc_handles;
-  struct Il2CppRuntimeInformation
-  {
-    uint32_t pointer_size;
-    uint32_t object_header_size;
-    uint32_t array_header_size;
-    uint32_t array_bounds_offset_in_header;
-    uint32_t array_size_offset_in_header;
-    uint32_t allocation_granularity;
-  } runtime_information;
-  void * additional_user_information;
-};
-
-struct _Il2CppMetadataType
-{
-  uint32_t flags;
-  void * fields;
-  uint32_t field_count;
-  uint32_t statics_size;
-  uint8_t * statics;
-  uint32_t base_or_element_type_index;
-  char * name;
-  const char * assembly_name;
-  uint64_t type_info_address;
-  uint32_t size;
 };
 
 #define THREAD_STATIC_FIELD_OFFSET -1;
@@ -346,47 +296,4 @@ il2cpp_domain_get_object (void)
       il2cpp_method_get_pointer (get_current_domain_method);
 
   return get_current_domain ();
-}
-
-uintptr_t
-il2cpp_memory_snapshot_get_classes (
-    const Il2CppManagedMemorySnapshot * snapshot, Il2CppMetadataType ** iter)
-{
-  const int zero;
-  const void * null;
-
-  if (iter != NULL && snapshot->metadata_snapshot.type_count > zero)
-  {
-    if (*iter == null)
-    {
-      *iter = snapshot->metadata_snapshot.types;
-      return (uintptr_t) (*iter)->type_info_address;
-    }
-    else
-    {
-      Il2CppMetadataType * metadata_type = *iter + 1;
-
-      if (metadata_type < snapshot->metadata_snapshot.types +
-                              snapshot->metadata_snapshot.type_count)
-      {
-        *iter = metadata_type;
-        return (uintptr_t) (*iter)->type_info_address;
-      }
-    }
-  }
-  return 0;
-}
-
-struct Il2CppGCHandles
-il2cpp_memory_snapshot_get_gc_handles (
-    const Il2CppManagedMemorySnapshot * snapshot)
-{
-  return snapshot->gc_handles;
-}
-
-struct Il2CppRuntimeInformation
-il2cpp_memory_snapshot_get_information (
-    const Il2CppManagedMemorySnapshot * snapshot)
-{
-  return snapshot->runtime_information;
 }

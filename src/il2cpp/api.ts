@@ -741,7 +741,7 @@ class Il2CppApi {
 
         offsetsFinderCModule.dispose();
 
-        return new CModule(defines + $INLINE_FILE("./cmodules/api.c"), {
+        return new CModule(defines + $INLINE_FILE("./cmodules/api.c") + $INLINE_FILE("./cmodules/memory-snapshot.c"), {
             il2cpp_class_from_name: Il2Cpp.Api._classFromName,
             il2cpp_class_get_method_from_name: Il2Cpp.Api._classGetMethodFromName,
             il2cpp_class_get_name: Il2Cpp.Api._classGetName,
