@@ -1,5 +1,5 @@
 import { cache } from "decorator-cache-getter";
-import { keyNotFound } from "../../utils/key-not-found";
+import { keyNotFound } from "../../utils/key-not-found.js";
 
 /** Represents a `Il2CppDomain`. */
 class Il2CppDomain {

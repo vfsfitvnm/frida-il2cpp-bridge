@@ -1,5 +1,5 @@
 import { cache } from "decorator-cache-getter";
-import { NonNullNativeStruct } from "../../utils/native-struct";
+import { NonNullNativeStruct } from "../../utils/native-struct.js";
 
 /** Represents a `Il2CppType`. */
 class Il2CppType extends NonNullNativeStruct {

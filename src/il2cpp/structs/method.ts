@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
 import { raise, warn } from "../../utils/console.js";
 import { NonNullNativeStruct } from "../../utils/native-struct.js";
-import { keyNotFound } from "../../utils/key-not-found";
+import { keyNotFound } from "../../utils/key-not-found.js";
 import { fromFridaValue, toFridaValue } from "../utils.js";
 
 /** Represents a `MethodInfo`. */

@@ -1,7 +1,7 @@
 import { cache } from "decorator-cache-getter";
 import { NonNullNativeStruct } from "../../utils/native-struct.js";
 import { cacheInstances } from "../../utils/utils.js";
-import { keyNotFound } from "../../utils/key-not-found";
+import { keyNotFound } from "../../utils/key-not-found.js";
 
 /** Represents a `Il2CppImage`. */
 @cacheInstances
