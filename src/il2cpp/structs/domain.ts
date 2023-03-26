@@ -40,7 +40,7 @@ class Il2CppDomain {
     /** Gets the encompassing object of the application domain. */
     @cache
     static get object(): Il2Cpp.Object {
-        return Il2Cpp.Image.corlib.class("System.AppDomain").method<Il2Cpp.Object>("get_CurrentDomain").invoke();
+        return new Il2Cpp.Object(Il2Cpp.Api._domainGetObject());
     }
 
     /** Opens and loads the assembly with the given name. */

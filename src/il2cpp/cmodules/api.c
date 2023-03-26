@@ -151,13 +151,18 @@ struct _Il2CppMetadataType
 #define IL2CPP_METHOD_GET_FROM_REFLECTION_OFFSET 0
 #endif
 
+extern Il2CppClass * il2cpp_class_from_name (const Il2CppImage *, const char *,
+                                             const char *);
+extern Il2CppMethod * il2cpp_class_get_method_from_name (Il2CppClass *,
+                                                         const char *, int32_t);
 extern const char * il2cpp_class_get_name (Il2CppClass *);
 extern int il2cpp_field_get_flags (Il2CppField *);
 extern size_t il2cpp_field_get_offset (Il2CppField *);
+extern void il2cpp_free (void *);
+extern const Il2CppImage * il2cpp_image_get_corlib (void);
 extern uint32_t il2cpp_method_get_flags (Il2CppMethod *, uint32_t *);
 extern char * il2cpp_type_get_name (Il2CppType *);
 extern Il2CppTypeEnum il2cpp_type_get_type_enum (Il2CppType *);
-extern void il2cpp_free (void *);
 
 void
 il2cpp_string_set_length (Il2CppString * string, int32_t length)
@@ -327,6 +332,20 @@ il2cpp_method_is_synchronized (Il2CppMethod * method)
   il2cpp_method_get_flags (method, &implementation_flags);
 
   return (implementation_flags & METHOD_IMPL_ATTRIBUTE_SYNCHRONIZED) != 0;
+}
+
+Il2CppObject *
+il2cpp_domain_get_object (void)
+{
+  const Il2CppImage * cor_image = il2cpp_image_get_corlib ();
+  Il2CppClass * system_appdomain_class =
+      il2cpp_class_from_name (cor_image, "System", "AppDomain");
+  Il2CppMethod * get_current_domain_method = il2cpp_class_get_method_from_name (
+      system_appdomain_class, "get_CurrentDomain", 0);
+  Il2CppObject * (*get_current_domain) (void) =
+      il2cpp_method_get_pointer (get_current_domain_method);
+
+  return get_current_domain ();
 }
 
 uintptr_t

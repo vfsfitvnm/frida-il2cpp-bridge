@@ -237,6 +237,11 @@ class Il2CppApi {
     }
 
     @cache
+    static get _domainGetObject() {
+        return this.r("il2cpp_domain_get_object", "pointer", []);
+    }
+
+    @cache
     static get _fieldGetModifier() {
         return this.r("il2cpp_field_get_modifier", "pointer", ["pointer"]);
     }
@@ -737,13 +742,16 @@ class Il2CppApi {
         offsetsFinderCModule.dispose();
 
         return new CModule(defines + $INLINE_FILE("./cmodules/api.c"), {
-            il2cpp_free: Il2Cpp.Api._free,
+            il2cpp_class_from_name: Il2Cpp.Api._classFromName,
+            il2cpp_class_get_method_from_name: Il2Cpp.Api._classGetMethodFromName,
             il2cpp_class_get_name: Il2Cpp.Api._classGetName,
             il2cpp_field_get_flags: Il2Cpp.Api._fieldGetFlags,
             il2cpp_field_get_offset: Il2Cpp.Api._fieldGetOffset,
+            il2cpp_free: Il2Cpp.Api._free,
+            il2cpp_image_get_corlib: Il2Cpp.Api._getCorlib,
             il2cpp_method_get_flags: Il2Cpp.Api._methodGetFlags,
             il2cpp_type_get_name: Il2Cpp.Api._typeGetName,
-            il2cpp_type_get_type_enum: Il2Cpp.Api._typeGetTypeEnum
+            il2cpp_type_get_type_enum: Il2Cpp.Api._typeGetTypeEnum,
         });
     }
 
