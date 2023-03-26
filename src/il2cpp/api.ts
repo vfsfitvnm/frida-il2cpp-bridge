@@ -726,7 +726,7 @@ class Il2CppApi {
         const FilterTypeNameMethod = FilterTypeName.field<NativePointer>("method").value;
 
         const defines = `
-            #define IL2CPP_CSTRING_SET_LENGTH_OFFSET ${offsetOfInt32(Il2Cpp.String.from("vfsfitvnm"), 9)}
+            #define IL2CPP_STRING_SET_LENGTH_OFFSET ${offsetOfInt32(Il2Cpp.String.from("vfsfitvnm"), 9)}
             #define IL2CPP_ARRAY_GET_ELEMENTS_OFFSET ${offsetOfInt32(DaysToMonth365, 31) - 1}
             #define IL2CPP_CLASS_GET_ACTUAL_INSTANCE_SIZE_OFFSET ${offsetOfInt32(SystemString, SystemString.instanceSize - 2)}
             #define IL2CPP_METHOD_GET_POINTER_OFFSET ${offsetOfPointer(FilterTypeNameMethod, FilterTypeNameMethodPointer)}

@@ -136,12 +136,12 @@ struct _Il2CppMetadataType
 #define METHOD_IMPL_ATTRIBUTE_INTERNAL_CALL 0x1000
 #define METHOD_IMPL_ATTRIBUTE_SYNCHRONIZED 0x0020
 
-#ifndef IL2CPP_CSTRING_SET_LENGTH_OFFSET
-#define IL2CPP_CSTRING_SET_LENGTH_OFFSET 0
+#ifndef IL2CPP_STRING_SET_LENGTH_OFFSET
+#define IL2CPP_STRING_SET_LENGTH_OFFSET 0
 #endif
 
-#ifndef IL2CPP_CARRAY_GET_ELEMENTS_OFFSET
-#define IL2CPP_CARRAY_GET_ELEMENTS_OFFSET 0
+#ifndef IL2CPP_ARRAY_GET_ELEMENTS_OFFSET
+#define IL2CPP_ARRAY_GET_ELEMENTS_OFFSET 0
 #endif
 
 #ifndef IL2CPP_CLASS_GET_ACTUAL_INSTANCE_SIZE_OFFSET
@@ -163,13 +163,13 @@ extern void il2cpp_free (void *);
 void
 il2cpp_string_set_length (int32_t * string, int32_t length)
 {
-  *(string + IL2CPP_CSTRING_SET_LENGTH_OFFSET) = length;
+  *(string + IL2CPP_STRING_SET_LENGTH_OFFSET) = length;
 }
 
 void *
 il2cpp_array_get_elements (int32_t * array)
 {
-  return array + IL2CPP_CARRAY_GET_ELEMENTS_OFFSET;
+  return array + IL2CPP_ARRAY_GET_ELEMENTS_OFFSET;
 }
 
 uint8_t
