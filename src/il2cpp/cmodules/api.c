@@ -1,17 +1,9 @@
 #include <stdint.h>
 #include <string.h>
 
-typedef struct _Il2CppObject Il2CppObject;
 typedef enum _Il2CppTypeEnum Il2CppTypeEnum;
-typedef struct _Il2CppReflectionMethod Il2CppReflectionMethod;
 typedef struct _Il2CppManagedMemorySnapshot Il2CppManagedMemorySnapshot;
 typedef struct _Il2CppMetadataType Il2CppMetadataType;
-
-struct _Il2CppObject
-{
-  void * class;
-  void * monitor;
-};
 
 enum _Il2CppTypeEnum
 {
@@ -53,14 +45,6 @@ enum _Il2CppTypeEnum
   IL2CPP_TYPE_ENUM = 0x55
 };
 
-struct _Il2CppReflectionMethod
-{
-  Il2CppObject object;
-  void * method;
-  void * name;
-  void * reftype;
-};
-
 struct _Il2CppManagedMemorySnapshot
 {
   struct Il2CppManagedHeap
@@ -81,7 +65,7 @@ struct _Il2CppManagedMemorySnapshot
   struct Il2CppGCHandles
   {
     uint32_t tracked_object_count;
-    Il2CppObject ** pointers_to_objects;
+    void ** pointers_to_objects;
   } gc_handles;
   struct Il2CppRuntimeInformation
   {
@@ -150,6 +134,10 @@ struct _Il2CppMetadataType
 
 #ifndef IL2CPP_METHOD_GET_POINTER_OFFSET
 #define IL2CPP_METHOD_GET_POINTER_OFFSET 0
+#endif
+
+#ifndef IL2CPP_METHOD_GET_FROM_REFLECTION_OFFSET
+#define IL2CPP_METHOD_GET_FROM_REFLECTION_OFFSET 0
 #endif
 
 extern const char * il2cpp_class_get_name (void *);
@@ -299,9 +287,9 @@ il2cpp_method_get_modifier (void * method)
 }
 
 void *
-il2cpp_method_get_from_reflection (const Il2CppReflectionMethod * method)
+il2cpp_method_get_from_reflection (void * object)
 {
-  return method->method;
+  return *((void **) object + IL2CPP_METHOD_GET_FROM_REFLECTION_OFFSET);
 }
 
 void *
