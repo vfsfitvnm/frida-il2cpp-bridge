@@ -20,11 +20,7 @@ class Il2CppDomain {
 
         if (count == 0) {
             for (const assemblyObject of this.object.method<Il2Cpp.Array<Il2Cpp.Object>>("GetAssemblies").overload().invoke()) {
-                const assemblyName = assemblyObject.method<Il2Cpp.String>("GetSimpleName").invoke().content;
-
-                if (assemblyName != null) {
-                    array.push(this.assembly(assemblyName));
-                }
+                array.push(new Il2Cpp.Assembly(assemblyObject.field<NativePointer>("_mono_assembly").value));
             }
         }
 
