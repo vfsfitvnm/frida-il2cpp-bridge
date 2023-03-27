@@ -41,7 +41,7 @@ However, only Android and Linux are tested: expect breakage if you are using ano
         // we are on the same thread!
       }, 1000);
 
-      return this..method("MethodName").invoke();
+      return this.method("MethodName").invoke();
     };
   });
   ```
