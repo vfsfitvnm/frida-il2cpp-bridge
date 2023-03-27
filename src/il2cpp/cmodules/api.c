@@ -252,8 +252,8 @@ il2cpp_method_get_modifier (Il2CppMethod * method)
   return "";
 }
 
-void *
-il2cpp_method_get_from_reflection (Il2CppMethod * object)
+Il2CppMethod *
+il2cpp_method_get_from_reflection (Il2CppObject * object)
 {
   return *((void **) object + IL2CPP_METHOD_GET_FROM_REFLECTION_OFFSET);
 }
