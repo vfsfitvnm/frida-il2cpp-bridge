@@ -26,8 +26,14 @@ class Il2CppTracer extends AbstractTracer {
                 case Mode.Default: {
                     try {
                         Interceptor.attach(target.virtualAddress, {
-                            onEnter: () => inform(`${offset} ${`│ `.repeat(count++)}┌─\x1b[35m${fullName}\x1b[0m`),
-                            onLeave: () => inform(`${offset} ${`│ `.repeat(--count)}└─\x1b[33m${fullName}\x1b[0m${count == 0 ? `\n` : ``}`)
+                            onEnter: () => {
+                                if (this.startTargets.length > 0 && !this.startTargets.includes(target.handle.toString()) && count==0) return;
+                                inform(`${offset} ${`│ `.repeat(count++)}┌─\x1b[35m${fullName}\x1b[0m`)
+                            },
+                            onLeave: () => {
+                                if (this.startTargets.length > 0 && count <= 0) return;
+                                inform(`${offset} ${`│ `.repeat(--count)}└─\x1b[33m${fullName}\x1b[0m${count == 0 ? `\n` : ``}`)
+                            }
                         });
                     } catch (e: any) {}
                     break;
@@ -36,18 +42,22 @@ class Il2CppTracer extends AbstractTracer {
                     const startIndex = +!target.isStatic | +Il2Cpp.unityVersionIsBelow201830;
 
                     const callback = (...args: any[]): any => {
-                        const thisParameter = target.isStatic ? undefined : new Il2Cpp.Parameter("this", -1, target.class.type);
-                        const parameters = thisParameter ? [thisParameter].concat(target.parameters) : target.parameters;
+                        if (!(this.startTargets.length > 0 && !this.startTargets.includes(target.handle.toString()) && count==0)) {
+                            const thisParameter = target.isStatic ? undefined : new Il2Cpp.Parameter("this", -1, target.class.type);
+                            const parameters = thisParameter ? [thisParameter].concat(target.parameters) : target.parameters;
 
-                        inform(`\
+                            inform(`\
 ${offset} ${`│ `.repeat(count++)}┌─\x1b[35m${fullName}\x1b[0m(\
 ${parameters.map(e => `\x1b[32m${e.name}\x1b[0m = \x1b[31m${fromFridaValue(args[e.position + startIndex], e.type)}\x1b[0m`).join(`, `)});`);
+                        }
 
                         const returnValue = target.nativeFunction(...args);
 
-                        inform(`\
+                        if (!(this.startTargets.length > 0 && !this.startTargets.includes(target.handle.toString()) && count==0)) {
+                            inform(`\
 ${offset} ${`│ `.repeat(--count)}└─\x1b[33m${fullName}\x1b[0m\
 ${returnValue == undefined ? `` : ` = \x1b[36m${fromFridaValue(returnValue, target.returnType)}`}\x1b[0m;`);
+                        }
 
                         return returnValue;
                     };
