@@ -6,8 +6,8 @@ class Il2CppBacktracer extends AbstractTracer {
     #flags: Flags = Flags.Empty;
 
     readonly #methods = Il2Cpp.Domain.assemblies
-        .flatMap(a => a.image.classes.flatMap(c => c.methods.filter(m => !m.virtualAddress.isNull())))
-        .sort((a, b) => a.virtualAddress.compare(b.virtualAddress));
+        .flatMap(_ => _.image.classes.flatMap(_ => _.methods.filter(_ => !_.virtualAddress.isNull())))
+        .sort((_, __) => _.virtualAddress.compare(__.virtualAddress));
 
     accurate(): Pick<Il2Cpp.Backtracer, "verbose" | "distinct"> {
         this.#flags |= Flags.Accurate;
@@ -55,7 +55,7 @@ class Il2CppBacktracer extends AbstractTracer {
                     backtrace.push(target.virtualAddress);
 
                     if (backtracer.#flags & Flags.Distinct) {
-                        const key = backtrace.map(e => e.toString()).join("");
+                        const key = backtrace.map(_ => _.toString()).join("");
 
                         if (history?.has(key)) {
                             return;

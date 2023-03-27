@@ -3,7 +3,7 @@ import { keyNotFound } from "../../utils/key-not-found.js";
 
 /** Represents a `Il2CppDomain`. */
 class Il2CppDomain {
-    protected constructor() { }
+    protected constructor() {}
 
     /** Gets the assemblies that have been loaded into the execution context of the application domain. */
     @cache
@@ -45,6 +45,7 @@ class Il2CppDomain {
 
     /** Opens and loads the assembly with the given name. */
     static assembly(name: string): Il2Cpp.Assembly {
+        // prettier-ignore
         return this.tryAssembly(name) ?? keyNotFound(name, this.name, this.assemblies.map(_ => _.name));
     }
 

@@ -214,6 +214,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the field identified by the given name. */
     field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> {
+        // prettier-ignore
         return this.tryField<T>(name) ?? keyNotFound(name, this.name, this.fields.map(_ => _.name));
     }
 
@@ -229,7 +230,7 @@ class Il2CppClass extends NonNullNativeStruct {
             );
         }
 
-        const types = classes.map(klass => klass.type.object);
+        const types = classes.map(_ => _.type.object);
         const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.class("System.Type"), types);
 
         const inflatedType = this.type.object.method<Il2Cpp.Object>("MakeGenericType", 1).invoke(typeArray);
@@ -253,11 +254,13 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the method identified by the given name and parameter count. */
     method<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> {
+        // prettier-ignore
         return this.tryMethod<T>(name, parameterCount) ?? keyNotFound(name, this.name, this.methods.map(_ => _.name));
     }
 
     /** Gets the nested class with the given name. */
     nested(name: string): Il2Cpp.Class {
+        // prettier-ignore
         return this.tryNested(name) ?? keyNotFound(name, this.name, this.nestedClasses.map(_ => _.name));
     }
 
@@ -292,7 +295,7 @@ class Il2CppClass extends NonNullNativeStruct {
 
     /** Gets the nested class with the given name. */
     tryNested(name: string): Il2Cpp.Class | undefined {
-        return this.nestedClasses.find(e => e.name == name);
+        return this.nestedClasses.find(_ => _.name == name);
     }
 
     /** */
@@ -303,7 +306,7 @@ class Il2CppClass extends NonNullNativeStruct {
 // ${this.assemblyName}
 ${this.isEnum ? `enum` : this.isValueType ? `struct` : this.isInterface ? `interface` : `class`} \
 ${this.type.name}\
-${inherited ? ` : ${inherited.map(e => e?.type.name).join(`, `)}` : ``}
+${inherited ? ` : ${inherited.map(_ => _?.type.name).join(`, `)}` : ``}
 {
     ${this.fields.join(`\n    `)}
     ${this.methods.join(`\n    `)}

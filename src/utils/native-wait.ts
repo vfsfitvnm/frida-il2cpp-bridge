@@ -33,7 +33,7 @@ class Target {
         }
 
         const [responsible, ...targets] = info()!;
-        return targets.map(([name, encoding]) => new Target(responsible, name, encoding)).filter(target => !target.address.isNull());
+        return targets.map(([name, encoding]) => new Target(responsible, name, encoding)).filter(_ => !_.address.isNull());
     }
 
     readString(pointer: NativePointer): string | null {
@@ -70,7 +70,7 @@ export function forModule(...moduleNames: string[]): Promise<string> {
                     for (const moduleName of moduleNames) {
                         if (!this.modulePath.endsWith(moduleName)) continue;
 
-                        setImmediate(() => interceptors.forEach(i => i.detach()));
+                        setImmediate(() => interceptors.forEach(_ => _.detach()));
                         resolve(moduleName);
                     }
                 }

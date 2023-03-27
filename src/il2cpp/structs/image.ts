@@ -32,7 +32,7 @@ class Il2CppImage extends NonNullNativeStruct {
             // On Unity 5.3.8f1, getting System.Reflection.Emit.OpCodes type name
             // without iterating all the classes first somehow blows things up at
             // app startup, hence the `Array.from`.
-            return Array.from(types).map(e => new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(e)));
+            return Array.from(types).map(_ => new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(_)));
         } else {
             return Array.from(Array(this.classCount), (_, i) => new Il2Cpp.Class(Il2Cpp.Api._imageGetClass(this, i)));
         }
@@ -46,6 +46,7 @@ class Il2CppImage extends NonNullNativeStruct {
 
     /** Gets the class with the specified name defined in this image. */
     class(name: string): Il2Cpp.Class {
+        // prettier-ignore
         return this.tryClass(name) ?? keyNotFound(name, this.name, this.classes.map(_ => _.fullName));
     }
 
@@ -64,6 +65,6 @@ Il2Cpp.Image = Il2CppImage;
 
 declare global {
     namespace Il2Cpp {
-        class Image extends Il2CppImage { }
+        class Image extends Il2CppImage {}
     }
 }

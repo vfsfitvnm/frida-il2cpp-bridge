@@ -181,7 +181,7 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
             raise(`cannot inflate method ${this.name}: it needs ${this.genericParameterCount} generic parameter(s), not ${classes.length}`);
         }
 
-        const types = classes.map(klass => klass.type.object);
+        const types = classes.map(_ => _.type.object);
         const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.class("System.Type"), types);
 
         const inflatedMethodObject = this.object.method<Il2Cpp.Object>("MakeGenericMethod", 1).invoke(typeArray);
@@ -240,6 +240,7 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
 
     /** Gets the parameter with the given name. */
     parameter(name: string): Il2Cpp.Parameter {
+        // prettier-ignore
         return this.tryParameter(name) ?? keyNotFound(name, this.name, this.parameters.map(_ => _.name));
     }
 
@@ -251,17 +252,18 @@ class Il2CppMethod<T extends Il2Cpp.Method.ReturnType> extends NonNullNativeStru
 
     /** Gets the overloaded method with the given parameter types. */
     tryOverload<U extends Il2Cpp.Method.ReturnType = T>(...parameterTypes: string[]): Il2Cpp.Method<U> | undefined {
-        return this.class.methods.find(
-            e =>
-                e.name == this.name &&
-                e.parameterCount == parameterTypes.length &&
-                e.parameters.every((e, i) => e.type.name == parameterTypes[i])
-        ) as Il2Cpp.Method<U> | undefined;
+        return this.class.methods.find(method => {
+            return (
+                method.name == this.name &&
+                method.parameterCount == parameterTypes.length &&
+                method.parameters.every((e, i) => e.type.name == parameterTypes[i])
+            );
+        }) as Il2Cpp.Method<U> | undefined;
     }
 
     /** Gets the parameter with the given name. */
     tryParameter(name: string): Il2Cpp.Parameter | undefined {
-        return this.parameters.find(e => e.name == name);
+        return this.parameters.find(_ => _.name == name);
     }
 
     /** */

@@ -751,7 +751,7 @@ class Il2CppApi {
             il2cpp_image_get_corlib: Il2Cpp.Api._getCorlib,
             il2cpp_method_get_flags: Il2Cpp.Api._methodGetFlags,
             il2cpp_type_get_name: Il2Cpp.Api._typeGetName,
-            il2cpp_type_get_type_enum: Il2Cpp.Api._typeGetTypeEnum,
+            il2cpp_type_get_type_enum: Il2Cpp.Api._typeGetTypeEnum
         });
     }
 

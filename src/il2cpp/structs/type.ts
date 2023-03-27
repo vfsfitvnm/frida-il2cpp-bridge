@@ -104,8 +104,8 @@ class Il2CppType extends NonNullNativeStruct {
 }
 
 function getValueTypeFields(type: Il2Cpp.Type): NativeCallbackArgumentType {
-    const instanceFields = type.class.fields.filter(f => !f.isStatic);
-    return instanceFields.length == 0 ? ["char"] : instanceFields.map(f => f.type.fridaAlias);
+    const instanceFields = type.class.fields.filter(_ => !_.isStatic);
+    return instanceFields.length == 0 ? ["char"] : instanceFields.map(_ => _.type.fridaAlias);
 }
 
 Reflect.set(Il2Cpp, "Type", Il2CppType);
