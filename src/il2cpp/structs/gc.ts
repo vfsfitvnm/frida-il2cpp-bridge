@@ -63,9 +63,14 @@ class Il2CppGC {
 
             const reallocCallback = new NativeCallback(realloc, "pointer", ["pointer", "size_t", "pointer"]);
 
+            Il2Cpp.GC.stopWorld();
+
             const state = Il2Cpp.Api._livenessAllocateStruct(klass.handle, 0, chooseCallback, NULL, reallocCallback);
             Il2Cpp.Api._livenessCalculationFromStatics(state);
             Il2Cpp.Api._livenessFinalize(state);
+
+            Il2Cpp.GC.startWorld();
+
             Il2Cpp.Api._livenessFreeStruct(state);
         } else {
             const onWorld = new NativeCallback(() => {}, "void", []);
