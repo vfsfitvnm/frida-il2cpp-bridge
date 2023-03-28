@@ -65,7 +65,7 @@ class Il2CppGC {
 
             Il2Cpp.GC.stopWorld();
 
-            const state = Il2Cpp.Api._livenessAllocateStruct(klass.handle, 0, chooseCallback, NULL, reallocCallback);
+            const state = Il2Cpp.Api._livenessAllocateStruct(klass, 0, chooseCallback, NULL, reallocCallback);
             Il2Cpp.Api._livenessCalculationFromStatics(state);
             Il2Cpp.Api._livenessFinalize(state);
 
@@ -74,7 +74,7 @@ class Il2CppGC {
             Il2Cpp.Api._livenessFreeStruct(state);
         } else {
             const onWorld = new NativeCallback(() => {}, "void", []);
-            const state = Il2Cpp.Api._livenessCalculationBegin(klass.handle, 0, chooseCallback, NULL, onWorld, onWorld);
+            const state = Il2Cpp.Api._livenessCalculationBegin(klass, 0, chooseCallback, NULL, onWorld, onWorld);
 
             Il2Cpp.Api._livenessCalculationFromStatics(state);
             Il2Cpp.Api._livenessCalculationEnd(state);
