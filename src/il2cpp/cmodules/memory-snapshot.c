@@ -56,8 +56,8 @@ uintptr_t
 il2cpp_memory_snapshot_get_classes (
     const Il2CppManagedMemorySnapshot * snapshot, Il2CppMetadataType ** iter)
 {
-  const int zero;
-  const void * null;
+  const int zero = 0;
+  const void * null = 0;
 
   if (iter != NULL && snapshot->metadata_snapshot.type_count > zero)
   {
