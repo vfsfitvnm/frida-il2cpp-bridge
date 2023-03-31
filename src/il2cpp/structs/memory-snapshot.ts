@@ -17,7 +17,7 @@ class Il2CppMemorySnapshot extends NonNullNativeStruct {
     /** Gets any initialized class. */
     @cache
     get classes(): Il2Cpp.Class[] {
-        return Array.from(nativeIterator(this, Il2Cpp.Api._memorySnapshotGetClasses, Il2Cpp.Class));
+        return nativeIterator(this, Il2Cpp.Api._memorySnapshotGetClasses, Il2Cpp.Class);
     }
 
     /** Gets the objects tracked by this memory snapshot. */

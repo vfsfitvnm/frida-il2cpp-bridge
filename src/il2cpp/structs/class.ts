@@ -56,7 +56,7 @@ class Il2CppClass extends NonNullNativeStruct {
     /** Gets the fields of the current class. */
     @cache
     get fields(): Il2Cpp.Field[] {
-        return Array.from(nativeIterator(this, Il2Cpp.Api._classGetFields, Il2Cpp.Field));
+        return nativeIterator(this, Il2Cpp.Api._classGetFields, Il2Cpp.Field);
     }
 
     /** Gets the flags of the current class. */
@@ -150,13 +150,13 @@ class Il2CppClass extends NonNullNativeStruct {
     /** Gets the interfaces implemented or inherited by the current class. */
     @cache
     get interfaces(): Il2Cpp.Class[] {
-        return Array.from(nativeIterator(this, Il2Cpp.Api._classGetInterfaces, Il2Cpp.Class));
+        return nativeIterator(this, Il2Cpp.Api._classGetInterfaces, Il2Cpp.Class);
     }
 
     /** Gets the methods implemented by the current class. */
     @cache
     get methods(): Il2Cpp.Method[] {
-        return Array.from(nativeIterator(this, Il2Cpp.Api._classGetMethods, Il2Cpp.Method));
+        return nativeIterator(this, Il2Cpp.Api._classGetMethods, Il2Cpp.Method);
     }
 
     /** Gets the name of the current class. */
@@ -174,7 +174,7 @@ class Il2CppClass extends NonNullNativeStruct {
     /** Gets the classes nested inside the current class. */
     @cache
     get nestedClasses(): Il2Cpp.Class[] {
-        return Array.from(nativeIterator(this, Il2Cpp.Api._classGetNestedClasses, Il2Cpp.Class));
+        return nativeIterator(this, Il2Cpp.Api._classGetNestedClasses, Il2Cpp.Class);
     }
 
     /** Gets the class from which the current class directly inherits. */
