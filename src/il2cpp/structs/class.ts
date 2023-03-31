@@ -316,14 +316,7 @@ ${inherited ? ` : ${inherited.map(_ => _?.type.name).join(`, `)}` : ``}
 
     /** Executes a callback for every defined class. */
     static enumerate(block: (klass: Il2Cpp.Class) => void): void {
-        const callback = new NativeCallback(
-            function (klass: NativePointer, _: NativePointer): void {
-                block(new Il2Cpp.Class(klass));
-            },
-            "void",
-            ["pointer", "pointer"]
-        );
-
+        const callback = new NativeCallback(_ => block(new Il2Cpp.Class(_)), "void", ["pointer", "pointer"]);
         return Il2Cpp.Api._classForEach(callback, NULL);
     }
 }

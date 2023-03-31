@@ -43,7 +43,7 @@ class Il2CppGC {
     static choose(klass: Il2Cpp.Class): Il2Cpp.Object[] {
         const matches: Il2Cpp.Object[] = [];
 
-        const callback = (objects: NativePointer, size: number, _: NativePointer) => {
+        const callback = (objects: NativePointer, size: number) => {
             for (let i = 0; i < size; i++) {
                 matches.push(new Il2Cpp.Object(objects.add(i * Process.pointerSize).readPointer()));
             }
