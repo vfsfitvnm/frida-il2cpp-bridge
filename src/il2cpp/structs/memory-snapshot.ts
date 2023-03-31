@@ -1,6 +1,6 @@
 import { cache } from "decorator-cache-getter";
 import { NonNullNativeStruct } from "../../utils/native-struct.js";
-import { nativeIterator } from "../../utils/utils.js";
+import { nativeIterator } from "../../utils/native-iterator.js";
 
 /** Represents a `Il2CppManagedMemorySnapshot`. */
 class Il2CppMemorySnapshot extends NonNullNativeStruct {
