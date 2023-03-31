@@ -28,7 +28,10 @@ class Il2CppMemorySnapshot extends NonNullNativeStruct {
         const [count, start] = Il2Cpp.Api._memorySnapshotGetGCHandles(this);
 
         for (let i = 0; i < count; i++) {
-            array.push(new Il2Cpp.Object(start.add(i * Process.pointerSize).readPointer()));
+            const handle = start.add(i * Process.pointerSize).readPointer();
+            if (!handle.isNull()) {
+                array.push(new Il2Cpp.Object(handle));
+            }
         }
 
         return array;
