@@ -1,5 +1,5 @@
 /** @internal */
-export function cacheInstances<T extends ObjectWrapper, U extends new (handle: NativePointer) => T>(Class: U) {
+export function recycle<T extends ObjectWrapper, U extends new (handle: NativePointer) => T>(Class: U) {
     const instanceCache = new Map<number, T>();
 
     return new Proxy(Class, {

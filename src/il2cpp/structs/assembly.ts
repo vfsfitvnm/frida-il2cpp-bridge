@@ -1,9 +1,9 @@
 import { cache } from "decorator-cache-getter";
 import { NonNullNativeStruct } from "../../utils/native-struct.js";
-import { cacheInstances } from "../../utils/cache-instances.js";
+import { recycle } from "../../utils/recycle.js";
 
 /** Represents a `Il2CppAssembly`. */
-@cacheInstances
+@recycle
 class Il2CppAssembly extends NonNullNativeStruct {
     /** Gets the image of this assembly. */
     @cache

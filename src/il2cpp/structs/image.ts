@@ -1,10 +1,10 @@
 import { cache } from "decorator-cache-getter";
 import { NonNullNativeStruct } from "../../utils/native-struct.js";
-import { cacheInstances } from "../../utils/cache-instances.js";
+import { recycle } from "../../utils/recycle.js";
 import { keyNotFound } from "../../utils/key-not-found.js";
 
 /** Represents a `Il2CppImage`. */
-@cacheInstances
+@recycle
 class Il2CppImage extends NonNullNativeStruct {
     /** Gets the COR library. */
     @cache

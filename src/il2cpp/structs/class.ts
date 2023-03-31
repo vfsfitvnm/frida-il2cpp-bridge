@@ -2,11 +2,11 @@ import { cache } from "decorator-cache-getter";
 import { raise } from "../../utils/console.js";
 import { NonNullNativeStruct } from "../../utils/native-struct.js";
 import { nativeIterator } from "../../utils/native-iterator.js";
-import { cacheInstances } from "../../utils/cache-instances.js";
+import { recycle } from "../../utils/recycle.js";
 import { keyNotFound } from "../../utils/key-not-found.js";
 
 /** Represents a `Il2CppClass`. */
-@cacheInstances
+@recycle
 class Il2CppClass extends NonNullNativeStruct {
     /** Gets the actual size of the instance of the current class. */
     @cache
