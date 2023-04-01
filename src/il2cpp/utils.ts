@@ -88,7 +88,6 @@ export function write(pointer: NativePointer, value: any, type: Il2Cpp.Type): Na
         case Il2Cpp.Type.Enum.Array:
         case Il2Cpp.Type.Enum.GenericInstance:
             if (value instanceof Il2Cpp.ValueType) {
-                console.log("QUA!");
                 Memory.copy(pointer, value, type.class.valueSize);
                 return pointer;
             }
