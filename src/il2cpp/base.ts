@@ -91,11 +91,28 @@ class Il2CppBase {
     static get unityVersion(): string {
         const get_unityVersion = this.internalCall("UnityEngine.Application::get_unityVersion", "pointer", []);
 
-        if (get_unityVersion == null) {
-            raise("couldn't determine the Unity version, please specify it manually");
+        if (get_unityVersion != null) {
+            return new Il2Cpp.String(get_unityVersion()).content!;
         }
 
-        return new Il2Cpp.String(get_unityVersion()).content!;
+        const versionPattern = /(?:20\d{2}|\d)\.\d\.\d{1,2}([abcfp]|rc){0,2}\d?/;
+        const searchPattern = "45 64 69 74 6f 72 ?? 44 61 74 61 ?? 69 6c 32 63 70 70";
+
+        for (const range of this.module.enumerateRanges("r--").concat(Process.getRangeByAddress(this.module.base))) {
+            for (let { address } of Memory.scanSync(range.base, range.size, searchPattern)) {
+                while (address.readU8() != 0) {
+                    address = address.sub(1);
+                }
+
+                const match = address.add(1).readCString()?.match(versionPattern)?.[0];
+
+                if (match != undefined) {
+                    return match;
+                }
+            }
+        }
+
+        raise("couldn't determine the Unity version, please specify it manually");
     }
 
     /** @internal */
