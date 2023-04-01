@@ -92,15 +92,16 @@ class Il2CppThread extends NativeStruct {
     schedule<T>(block: () => T | Promise<T>, delayMs: number = 0): Promise<T> {
         const threadId = this.id;
 
-        const GetDisplayName = Il2Cpp.Image.corlib.class("Mono.Runtime").method("GetDisplayName");
+        const MonoRuntime = Il2Cpp.Image.corlib.class("Mono.Runtime");
+        const Trampoline = MonoRuntime.tryMethod("GetDisplayName") ?? MonoRuntime.method(".cctor");
 
         const SendOrPostCallback = Il2Cpp.Image.corlib.class("System.Threading.SendOrPostCallback").alloc();
-        SendOrPostCallback.method(".ctor").invoke(NULL, GetDisplayName.handle);
+        SendOrPostCallback.method(".ctor").invoke(NULL, Trampoline.handle);
 
         const Post = this.synchronizationContext.method("Post");
 
         return new Promise<T>(resolve => {
-            const listener = Interceptor.attach(GetDisplayName.virtualAddress, function () {
+            const listener = Interceptor.attach(Trampoline.virtualAddress, function () {
                 if (this.threadId == threadId) {
                     listener.detach();
                     const result = block();
