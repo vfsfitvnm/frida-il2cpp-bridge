@@ -11,10 +11,12 @@ class Il2CppThread extends NativeStruct {
         const currentThreadId = Process.getCurrentThreadId();
 
         for (let i = 0; i < 1024; i++) {
-            const candidate = handle.add(i).readS32();
-            if (candidate == currentThreadId) {
-                return i;
-            }
+            try {
+                const candidate = handle.add(i).readS32();
+                if (candidate == currentThreadId) {
+                    return i;
+                }
+            } catch (e: any) {}
         }
 
         raise(`couldn't determine the offset for a native thread id value`);
