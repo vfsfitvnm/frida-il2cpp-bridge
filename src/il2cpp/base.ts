@@ -233,9 +233,9 @@ class Il2CppBase {
         try {
             const result = block();
             return result instanceof Promise ? await result : result;
-        } catch (e: any) {
-            (globalThis as any).console.log(e);
-            throw e;
+        } catch (error: any) {
+            Script.nextTick(_ => { throw _; }, error); // prettier-ignore
+            return Promise.reject<T>(error);
         } finally {
             if (isForeignThread) {
                 thread.detach();
