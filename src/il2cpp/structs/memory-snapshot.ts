@@ -9,6 +9,14 @@ class Il2CppMemorySnapshot extends NonNullNativeStruct {
         return new Il2Cpp.MemorySnapshot();
     }
 
+    /** */
+    static use<T>(block: (memorySnapshot: Omit<Il2Cpp.MemorySnapshot, "free">) => T): T {
+        const memorySnapshot = this.capture();
+        const result = block(memorySnapshot);
+        memorySnapshot.free();
+        return result;
+    }
+
     /** Creates a memory snapshot with the given handle. */
     constructor(handle: NativePointer = Il2Cpp.Api._memorySnapshotCapture()) {
         super(handle);
