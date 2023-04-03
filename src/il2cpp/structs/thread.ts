@@ -27,11 +27,10 @@ class Il2CppThread extends NativeStruct {
         return ptr(this.internal.field<UInt64>("thread_id").value.toString()).add(Il2Cpp.Thread.idOffset).readS32();
     }
 
-    /** @internal Gets the encompassing internal object (System.Threding.InternalThreead) of the current thread. */
+    /** Gets the encompassing internal object (System.Threding.InternalThreead) of the current thread. */
     @cache
-    private get internal(): Il2Cpp.Object {
-        const internalThread = this.object.tryField<Il2Cpp.Object>("internal_thread")?.value;
-        return internalThread ? internalThread : this.object;
+    get internal(): Il2Cpp.Object {
+        return this.object.tryField<Il2Cpp.Object>("internal_thread")?.value ?? this.object;
     }
 
     /** Determines whether the current thread is the garbage collector finalizer one. */
