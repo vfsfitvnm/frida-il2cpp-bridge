@@ -38,6 +38,12 @@ class Il2CppThread extends NativeStruct {
         return !Il2Cpp.Api._threadIsVm(this);
     }
 
+    /** Gets the managed id of the current thread. */
+    @cache
+    get managedId(): number {
+        return this.object.method<number>("get_ManagedThreadId").invoke();
+    }
+
     /** Gets the encompassing object of the current thread. */
     @cache
     get object(): Il2Cpp.Object {
