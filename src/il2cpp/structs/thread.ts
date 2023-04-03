@@ -78,7 +78,7 @@ class Il2CppThread extends NativeStruct {
             }
         }
 
-        if (synchronizationContext == null) {
+        if (synchronizationContext == null || synchronizationContext.isNull()) {
             raise("couldn't retrieve the SynchronizationContext for this thread.");
         }
 
