@@ -1,7 +1,6 @@
 import { cache } from "decorator-cache-getter";
 import { $INLINE_FILE } from "ts-transformer-inline-file";
-import Versioning from "versioning";
-import { raise, warn } from "../utils/console.js";
+import { raise } from "../utils/console.js";
 
 class Il2CppApi {
     protected constructor() {}
@@ -704,10 +703,6 @@ class Il2CppApi {
     /** @internal */
     @cache
     private static get cModule(): Record<string, NativePointer | null> {
-        if (Versioning.lt(Il2Cpp.unityVersion, "5.3.0") || Versioning.gte(Il2Cpp.unityVersion, "2022.2.0")) {
-            warn(`current Unity version ${Il2Cpp.unityVersion} is not supported, expect breakage`);
-        }
-
         const offsetsFinderCModule = new CModule($INLINE_FILE("./cmodules/offset-of.c"));
 
         const offsetOfInt32 = new NativeFunction(offsetsFinderCModule.offset_of_int32, "int16", ["pointer", "int32"]);
