@@ -1,5 +1,4 @@
-/** Tracing utilities. */
-export abstract class AbstractTracer {
+abstract class AbstractTracer {
     /** @internal */
     readonly targets: Il2Cpp.Method[] = [];
 

@@ -1,8 +1,7 @@
-import { cache } from "decorator-cache-getter";
-import Versioning from "versioning";
-
+/** @internal */
 type StringEncoding = "utf8" | "utf16" | "ansi";
 
+/** @internal */
 class Target {
     readonly address: NativePointer;
 
@@ -10,7 +9,6 @@ class Target {
         this.address = Module.findExportByName(responsible, name) ?? NULL;
     }
 
-    @cache
     static get targets(): Target[] {
         function info(): [string | null, ...[string, StringEncoding][]] | undefined {
             switch (Process.platform) {
@@ -49,7 +47,7 @@ class Target {
 }
 
 /** @internal */
-export function forModule(...moduleNames: string[]): Promise<string> {
+function forModule(...moduleNames: string[]): Promise<string> {
     return new Promise<string>(resolve => {
         for (const moduleName of moduleNames) {
             const module = Process.findModuleByName(moduleName);

@@ -1,70 +1,58 @@
-import { cache } from "decorator-cache-getter";
-import { NonNullNativeStruct } from "../../utils/native-struct.js";
-import { recycle } from "../../utils/recycle.js";
-import { keyNotFound } from "../../utils/key-not-found.js";
-
-/** Represents a `Il2CppImage`. */
-@recycle
-class Il2CppImage extends NonNullNativeStruct {
-    /** Gets the COR library. */
-    @cache
-    static get corlib(): Il2Cpp.Image {
-        return new Il2Cpp.Image(Il2Cpp.Api._getCorlib());
-    }
-
-    /** Gets the assembly in which the current image is defined. */
-    @cache
-    get assembly(): Il2Cpp.Assembly {
-        return new Il2Cpp.Assembly(Il2Cpp.Api._imageGetAssembly(this));
-    }
-
-    /** Gets the amount of classes defined in this image. */
-    @cache
-    get classCount(): number {
-        return Il2Cpp.Api._imageGetClassCount(this);
-    }
-
-    /** Gets the classes defined in this image. */
-    @cache
-    get classes(): Il2Cpp.Class[] {
-        if (Il2Cpp.unityVersionIsBelow201830) {
-            const types = this.assembly.object.method<Il2Cpp.Array<Il2Cpp.Object>>("GetTypes").invoke(false);
-            // In Unity 5.3.8f1, getting System.Reflection.Emit.OpCodes type name
-            // without iterating all the classes first somehow blows things up at
-            // app startup, hence the `Array.from`.
-            return Array.from(types).map(_ => new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(_)));
-        } else {
-            return Array.from(Array(this.classCount), (_, i) => new Il2Cpp.Class(Il2Cpp.Api._imageGetClass(this, i)));
+namespace Il2Cpp {
+    @recycle
+    export class Image extends NonNullNativeStruct {
+        /** Gets the COR library. */
+        @lazy
+        static get corlib(): Il2Cpp.Image {
+            return new Il2Cpp.Image(Il2Cpp.Api._getCorlib());
         }
-    }
 
-    /** Gets the name of this image. */
-    @cache
-    get name(): string {
-        return Il2Cpp.Api._imageGetName(this).readUtf8String()!;
-    }
+        /** Gets the assembly in which the current image is defined. */
+        @lazy
+        get assembly(): Il2Cpp.Assembly {
+            return new Il2Cpp.Assembly(Il2Cpp.Api._imageGetAssembly(this));
+        }
 
-    /** Gets the class with the specified name defined in this image. */
-    class(name: string): Il2Cpp.Class {
-        // prettier-ignore
-        return this.tryClass(name) ?? keyNotFound(name, this.name, this.classes.map(_ => _.fullName));
-    }
+        /** Gets the amount of classes defined in this image. */
+        @lazy
+        get classCount(): number {
+            return Il2Cpp.Api._imageGetClassCount(this);
+        }
 
-    /** Gets the class with the specified name defined in this image. */
-    tryClass(name: string): Il2Cpp.Class | null {
-        const dotIndex = name.lastIndexOf(".");
-        const classNamespace = Memory.allocUtf8String(dotIndex == -1 ? "" : name.slice(0, dotIndex));
-        const className = Memory.allocUtf8String(name.slice(dotIndex + 1));
+        /** Gets the classes defined in this image. */
+        @lazy
+        get classes(): Il2Cpp.Class[] {
+            if (Il2Cpp.unityVersionIsBelow201830) {
+                const types = this.assembly.object.method<Il2Cpp.Array<Il2Cpp.Object>>("GetTypes").invoke(false);
+                // In Unity 5.3.8f1, getting System.Reflection.Emit.OpCodes type name
+                // without iterating all the classes first somehow blows things up at
+                // app startup, hence the `Array.from`.
+                return globalThis.Array.from(types).map(_ => new Il2Cpp.Class(Il2Cpp.Api._classFromSystemType(_)));
+            } else {
+                return globalThis.Array.from(globalThis.Array(this.classCount), (_, i) => new Il2Cpp.Class(Il2Cpp.Api._imageGetClass(this, i)));
+            }
+        }
 
-        const handle = Il2Cpp.Api._classFromName(this, classNamespace, className);
-        return handle.isNull() ? null : new Il2Cpp.Class(handle);
-    }
-}
+        /** Gets the name of this image. */
+        @lazy
+        get name(): string {
+            return Il2Cpp.Api._imageGetName(this).readUtf8String()!;
+        }
 
-Il2Cpp.Image = Il2CppImage;
+        /** Gets the class with the specified name defined in this image. */
+        class(name: string): Il2Cpp.Class {
+            // prettier-ignore
+            return this.tryClass(name) ?? keyNotFound(name, this.name, this.classes.map(_ => _.fullName));
+        }
 
-declare global {
-    namespace Il2Cpp {
-        class Image extends Il2CppImage {}
+        /** Gets the class with the specified name defined in this image. */
+        tryClass(name: string): Il2Cpp.Class | null {
+            const dotIndex = name.lastIndexOf(".");
+            const classNamespace = Memory.allocUtf8String(dotIndex == -1 ? "" : name.slice(0, dotIndex));
+            const className = Memory.allocUtf8String(name.slice(dotIndex + 1));
+
+            const handle = Il2Cpp.Api._classFromName(this, classNamespace, className);
+            return handle.isNull() ? null : new Il2Cpp.Class(handle);
+        }
     }
 }

@@ -1,5 +1,5 @@
 /** Scaffold class. */
-export class NativeStruct implements ObjectWrapper {
+class NativeStruct implements ObjectWrapper {
     readonly handle: NativePointer;
 
     constructor(handleOrWrapper: NativePointerValue) {
@@ -20,7 +20,7 @@ export class NativeStruct implements ObjectWrapper {
 }
 
 /** Scaffold class whom pointer cannot be null. */
-export class NonNullNativeStruct extends NativeStruct {
+class NonNullNativeStruct extends NativeStruct {
     constructor(handle: NativePointer) {
         super(handle);
 

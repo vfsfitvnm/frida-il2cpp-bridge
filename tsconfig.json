@@ -1,22 +1,20 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "lib": [
-      "esnext"
-    ],
+    "target": "es2022",
+    "lib": [ "es2020" ],
+    "moduleResolution": "node",
     "experimentalDecorators": true,
-    "module": "esnext",
     "declaration": true,
     "outDir": "dist",
+    "outFile": "dist/index.js",
+    "esModuleInterop": true,
     "stripInternal": true,
-    "esModuleInterop": false,
-    "moduleResolution": "node",
+    "sourceMap": true,
     "strict": true,
     "plugins": [
-      { "transform": "ts-transformer-inline-file/transformer" }
-    ]
+      { "transform": "ts-transformer-inline-file/transformer" },
+      { "transform": "ts-macros" },
+    ],
   },
-  "files": [
-    "src/index.ts"
-  ]
+  "files": [ "src/index.ts" ]
 }

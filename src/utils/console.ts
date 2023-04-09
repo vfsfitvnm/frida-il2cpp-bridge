@@ -1,5 +1,5 @@
 /** @internal */
-export function raise(message: any): never {
+function raise(message: any): never {
     const error = new Error(`\x1B[0m${message}`);
     error.name = `\x1B[0m\x1B[38;5;9mil2cpp\x1B[0m`;
     error.stack = error.stack
@@ -11,16 +11,16 @@ export function raise(message: any): never {
 }
 
 /** @internal */
-export function warn(message: any): void {
-    console.log(`\x1B[38;5;11mil2cpp\x1B[0m: ${message}`);
+function warn(message: any): void {
+    (globalThis as any).console.log(`\x1B[38;5;11mil2cpp\x1B[0m: ${message}`);
 }
 
 /** @internal */
-export function ok(message: any): void {
-    console.log(`\x1B[38;5;10mil2cpp\x1B[0m: ${message}`);
+function ok(message: any): void {
+    (globalThis as any).console.log(`\x1B[38;5;10mil2cpp\x1B[0m: ${message}`);
 }
 
 /** @internal */
-export function inform(message: any): void {
-    console.log(`\x1B[38;5;12mil2cpp\x1B[0m: ${message}`);
+function inform(message: any): void {
+    (globalThis as any).console.log(`\x1B[38;5;12mil2cpp\x1B[0m: ${message}`);
 }

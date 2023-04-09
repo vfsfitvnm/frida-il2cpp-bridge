@@ -16,30 +16,32 @@
   "license": "MIT",
   "author": "vfsfitvnm",
   "exports": "./dist/index.js",
-  "module": "./dist/index.js",
+  "module": "dist/index.js",
+  "main": "dist/index.js",
   "type": "module",
-  "types": "./dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "files": [
-    "/dist/*"
+    "dist"
   ],
   "scripts": {
-    "prepare": "ttsc"
+    "clear": "rm -r dist",
+    "prepare": "tspc"
   },
   "prettier": {
     "arrowParens": "avoid",
     "bracketSpacing": true,
-    "printWidth": 140,
+    "printWidth": 160,
     "tabWidth": 4,
     "trailingComma": "none"
   },
   "dependencies": {
-    "decorator-cache-getter": "^1.0.0",
     "fastest-levenshtein": "^1.0.12",
     "versioning": "^1.1.2"
   },
   "devDependencies": {
     "@types/frida-gum": "^18.3.1",
-    "ts-transformer-inline-file": "^0.2.0",
-    "ttypescript": "^1.5.15"
+    "ts-macros": "^2.2.1",
+    "ts-patch": "^3.0.0-beta2",
+    "ts-transformer-inline-file": "^0.2.0"
   }
 }
