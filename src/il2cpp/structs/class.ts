@@ -49,7 +49,7 @@ namespace Il2Cpp {
         /** Gets the fields of the current class. */
         @lazy
         get fields(): Il2Cpp.Field[] {
-            return nativeIterator(this, Il2Cpp.Api._classGetFields, Il2Cpp.Field);
+            return nativeIterator(_ => Il2Cpp.Api._classGetFields(this, _)).map(_ => new Il2Cpp.Field(_));
         }
 
         /** Gets the flags of the current class. */
@@ -144,13 +144,13 @@ namespace Il2Cpp {
         /** Gets the interfaces implemented or inherited by the current class. */
         @lazy
         get interfaces(): Il2Cpp.Class[] {
-            return nativeIterator(this, Il2Cpp.Api._classGetInterfaces, Il2Cpp.Class);
+            return nativeIterator(_ => Il2Cpp.Api._classGetInterfaces(this, _)).map(_ => new Il2Cpp.Class(_));
         }
 
         /** Gets the methods implemented by the current class. */
         @lazy
         get methods(): Il2Cpp.Method[] {
-            return nativeIterator(this, Il2Cpp.Api._classGetMethods, Il2Cpp.Method);
+            return nativeIterator(_ => Il2Cpp.Api._classGetMethods(this, _)).map(_ => new Il2Cpp.Method(_));
         }
 
         /** Gets the name of the current class. */
@@ -168,7 +168,7 @@ namespace Il2Cpp {
         /** Gets the classes nested inside the current class. */
         @lazy
         get nestedClasses(): Il2Cpp.Class[] {
-            return nativeIterator(this, Il2Cpp.Api._classGetNestedClasses, Il2Cpp.Class);
+            return nativeIterator(_ => Il2Cpp.Api._classGetNestedClasses(this, _)).map(_ => new Il2Cpp.Class(_));
         }
 
         /** Gets the class from which the current class directly inherits. */
