@@ -21,7 +21,7 @@ namespace Il2Cpp {
         /** Gets any initialized class. */
         @lazy
         get classes(): Il2Cpp.Class[] {
-            return nativeIterator(_ => Il2Cpp.Api._memorySnapshotGetClasses(this, _)).map(_ => new Il2Cpp.Class(_));
+            return readNativeIterator(_ => Il2Cpp.Api._memorySnapshotGetClasses(this, _)).map(_ => new Il2Cpp.Class(_));
         }
 
         /** Gets the objects tracked by this memory snapshot. */

@@ -4,9 +4,9 @@
 /// <reference path="./utils/getter.ts">/>
 /// <reference path="./utils/key-not-found.ts">/>
 /// <reference path="./utils/lazy.ts">/>
-/// <reference path="./utils/native-iterator.ts">/>
 /// <reference path="./utils/native-struct.ts">/>
 /// <reference path="./utils/native-wait.ts">/>
+/// <reference path="./utils/read-native-iterator.ts">/>
 /// <reference path="./utils/read-native-list.ts">/>
 /// <reference path="./utils/recycle.ts">/>
 
