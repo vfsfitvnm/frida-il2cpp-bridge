@@ -6,18 +6,7 @@ namespace Il2Cpp {
             raise("only Il2Cpp threads can invoke Il2Cpp.attachedThreads");
         }
 
-        const array: Il2Cpp.Thread[] = [];
-
-        const sizePointer = Memory.alloc(Process.pointerSize);
-        const startPointer = Il2Cpp.Api._threadGetAllAttachedThreads(sizePointer);
-
-        const size = sizePointer.readInt();
-
-        for (let i = 0; i < size; i++) {
-            array.push(new Il2Cpp.Thread(startPointer.add(i * Process.pointerSize).readPointer()));
-        }
-
-        return array;
+        return readNativeList(Il2Cpp.Api._threadGetAllAttachedThreads).map(_ => new Il2Cpp.Thread(_));
     });
 
     /** Gets the current attached thread, if any. */

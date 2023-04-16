@@ -6,23 +6,14 @@ namespace Il2Cpp {
         /** Gets the assemblies that have been loaded into the execution context of the application domain. */
         @lazy
         static get assemblies(): Il2Cpp.Assembly[] {
-            const sizePointer = Memory.alloc(Process.pointerSize);
-            const startPointer = Il2Cpp.Api._domainGetAssemblies(this, sizePointer);
+            let handles = readNativeList(_ => Il2Cpp.Api._domainGetAssemblies(this, _));
 
-            const count = sizePointer.readInt();
-            const array: Il2Cpp.Assembly[] = new globalThis.Array(count);
-
-            for (let i = 0; i < count; i++) {
-                array[i] = new Il2Cpp.Assembly(startPointer.add(i * Process.pointerSize).readPointer());
+            if (handles.length == 0) {
+                const assemblyObjects = this.object.method<Il2Cpp.Array<Il2Cpp.Object>>("GetAssemblies").overload().invoke();
+                handles = globalThis.Array.from(assemblyObjects).map(_ => _.field<NativePointer>("_mono_assembly").value);
             }
 
-            if (count == 0) {
-                for (const assemblyObject of this.object.method<Il2Cpp.Array<Il2Cpp.Object>>("GetAssemblies").overload().invoke()) {
-                    array.push(new Il2Cpp.Assembly(assemblyObject.field<NativePointer>("_mono_assembly").value));
-                }
-            }
-
-            return array;
+            return handles.map(_ => new Il2Cpp.Assembly(_));
         }
 
         /** Gets the application domain handle. */

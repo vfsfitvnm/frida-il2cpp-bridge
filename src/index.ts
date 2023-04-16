@@ -7,6 +7,7 @@
 /// <reference path="./utils/native-iterator.ts">/>
 /// <reference path="./utils/native-struct.ts">/>
 /// <reference path="./utils/native-wait.ts">/>
+/// <reference path="./utils/read-native-list.ts">/>
 /// <reference path="./utils/recycle.ts">/>
 
 /// <reference path="./il2cpp/api.ts">/>
