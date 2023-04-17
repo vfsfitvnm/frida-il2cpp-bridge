@@ -3,61 +3,61 @@ namespace Il2Cpp {
         /** Gets the class in which this field is defined. */
         @lazy
         get class(): Il2Cpp.Class {
-            return new Il2Cpp.Class(Il2Cpp.Api._fieldGetClass(this));
+            return new Il2Cpp.Class(Il2Cpp.Api.fieldGetClass(this));
         }
 
         /** Gets the flags of the current field. */
         @lazy
         get flags(): number {
-            return Il2Cpp.Api._fieldGetFlags(this);
+            return Il2Cpp.Api.fieldGetFlags(this);
         }
 
         /** Determines whether this field value is known at compile time. */
         @lazy
         get isLiteral(): boolean {
-            return !!Il2Cpp.Api._fieldIsLiteral(this);
+            return !!Il2Cpp.Api.fieldIsLiteral(this);
         }
 
         /** Determines whether this field is static. */
         @lazy
         get isStatic(): boolean {
-            return !!Il2Cpp.Api._fieldIsStatic(this);
+            return !!Il2Cpp.Api.fieldIsStatic(this);
         }
 
         /** Determines whether this field is thread static. */
         @lazy
         get isThreadStatic(): boolean {
-            return !!Il2Cpp.Api._fieldIsThreadStatic(this);
+            return !!Il2Cpp.Api.fieldIsThreadStatic(this);
         }
 
         /** Gets the access modifier of this field. */
         @lazy
         get modifier(): string {
-            return Il2Cpp.Api._fieldGetModifier(this).readUtf8String()!;
+            return Il2Cpp.Api.fieldGetModifier(this).readUtf8String()!;
         }
 
         /** Gets the name of this field. */
         @lazy
         get name(): string {
-            return Il2Cpp.Api._fieldGetName(this).readUtf8String()!;
+            return Il2Cpp.Api.fieldGetName(this).readUtf8String()!;
         }
 
         /** Gets the offset of this field, calculated as the difference with its owner virtual address. */
         @lazy
         get offset(): number {
-            return Il2Cpp.Api._fieldGetOffset(this);
+            return Il2Cpp.Api.fieldGetOffset(this);
         }
 
         /** Gets the type of this field. */
         @lazy
         get type(): Il2Cpp.Type {
-            return new Il2Cpp.Type(Il2Cpp.Api._fieldGetType(this));
+            return new Il2Cpp.Type(Il2Cpp.Api.fieldGetType(this));
         }
 
         /** Gets the value of this field. */
         get value(): T {
             const handle = Memory.alloc(Process.pointerSize);
-            Il2Cpp.Api._fieldGetStaticValue(this.handle, handle);
+            Il2Cpp.Api.fieldGetStaticValue(this.handle, handle);
 
             return read(handle, this.type) as T;
         }
@@ -71,7 +71,7 @@ namespace Il2Cpp {
             const handle = Memory.alloc(Process.pointerSize);
             write(handle, value, this.type);
 
-            Il2Cpp.Api._fieldSetStaticValue(this.handle, handle);
+            Il2Cpp.Api.fieldSetStaticValue(this.handle, handle);
         }
 
         /** */

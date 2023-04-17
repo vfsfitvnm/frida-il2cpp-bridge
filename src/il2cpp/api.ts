@@ -3,697 +3,697 @@ namespace Il2Cpp {
         protected constructor() {}
 
         @lazy
-        static get _alloc() {
+        static get alloc() {
             return this.r("il2cpp_alloc", "pointer", ["size_t"]);
         }
 
         @lazy
-        static get _arrayGetElements() {
+        static get arrayGetElements() {
             return this.r("il2cpp_array_get_elements", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _arrayGetLength() {
+        static get arrayGetLength() {
             return this.r("il2cpp_array_length", "uint32", ["pointer"]);
         }
 
         @lazy
-        static get _arrayNew() {
+        static get arrayNew() {
             return this.r("il2cpp_array_new", "pointer", ["pointer", "uint32"]);
         }
 
         @lazy
-        static get _assemblyGetImage() {
+        static get assemblyGetImage() {
             return this.r("il2cpp_assembly_get_image", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _classForEach() {
+        static get classForEach() {
             return this.r("il2cpp_class_for_each", "void", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _classFromName() {
+        static get classFromName() {
             return this.r("il2cpp_class_from_name", "pointer", ["pointer", "pointer", "pointer"]);
         }
 
         @lazy
-        static get _classFromSystemType() {
+        static get classFromSystemType() {
             return this.r("il2cpp_class_from_system_type", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _classFromType() {
+        static get classFromType() {
             return this.r("il2cpp_class_from_type", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _classGetActualInstanceSize() {
+        static get classGetActualInstanceSize() {
             return this.r("il2cpp_class_get_actual_instance_size", "int32", ["pointer"]);
         }
 
         @lazy
-        static get _classGetArrayClass() {
+        static get classGetArrayClass() {
             return this.r("il2cpp_array_class_get", "pointer", ["pointer", "uint32"]);
         }
 
         @lazy
-        static get _classGetArrayElementSize() {
+        static get classGetArrayElementSize() {
             return this.r("il2cpp_class_array_element_size", "int", ["pointer"]);
         }
 
         @lazy
-        static get _classGetAssemblyName() {
+        static get classGetAssemblyName() {
             return this.r("il2cpp_class_get_assemblyname", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _classGetBaseType() {
+        static get classGetBaseType() {
             return this.r("il2cpp_class_enum_basetype", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _classGetDeclaringType() {
+        static get classGetDeclaringType() {
             return this.r("il2cpp_class_get_declaring_type", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _classGetElementClass() {
+        static get classGetElementClass() {
             return this.r("il2cpp_class_get_element_class", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _classGetFieldFromName() {
+        static get classGetFieldFromName() {
             return this.r("il2cpp_class_get_field_from_name", "pointer", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _classGetFields() {
+        static get classGetFields() {
             return this.r("il2cpp_class_get_fields", "pointer", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _classGetFlags() {
+        static get classGetFlags() {
             return this.r("il2cpp_class_get_flags", "int", ["pointer"]);
         }
 
         @lazy
-        static get _classGetImage() {
+        static get classGetImage() {
             return this.r("il2cpp_class_get_image", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _classGetInstanceSize() {
+        static get classGetInstanceSize() {
             return this.r("il2cpp_class_instance_size", "int32", ["pointer"]);
         }
 
         @lazy
-        static get _classGetInterfaces() {
+        static get classGetInterfaces() {
             return this.r("il2cpp_class_get_interfaces", "pointer", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _classGetMethodFromName() {
+        static get classGetMethodFromName() {
             return this.r("il2cpp_class_get_method_from_name", "pointer", ["pointer", "pointer", "int"]);
         }
 
         @lazy
-        static get _classGetMethods() {
+        static get classGetMethods() {
             return this.r("il2cpp_class_get_methods", "pointer", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _classGetName() {
+        static get classGetName() {
             return this.r("il2cpp_class_get_name", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _classGetNamespace() {
+        static get classGetNamespace() {
             return this.r("il2cpp_class_get_namespace", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _classGetNestedClasses() {
+        static get classGetNestedClasses() {
             return this.r("il2cpp_class_get_nested_types", "pointer", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _classGetParent() {
+        static get classGetParent() {
             return this.r("il2cpp_class_get_parent", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _classGetRank() {
+        static get classGetRank() {
             return this.r("il2cpp_class_get_rank", "int", ["pointer"]);
         }
 
         @lazy
-        static get _classGetStaticFieldData() {
+        static get classGetStaticFieldData() {
             return this.r("il2cpp_class_get_static_field_data", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _classGetValueSize() {
+        static get classGetValueSize() {
             return this.r("il2cpp_class_value_size", "int32", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _classGetType() {
+        static get classGetType() {
             return this.r("il2cpp_class_get_type", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _classHasReferences() {
+        static get classHasReferences() {
             return this.r("il2cpp_class_has_references", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _classInit() {
+        static get classInit() {
             return this.r("il2cpp_runtime_class_init", "void", ["pointer"]);
         }
 
         @lazy
-        static get _classIsAbstract() {
+        static get classIsAbstract() {
             return this.r("il2cpp_class_is_abstract", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _classIsAssignableFrom() {
+        static get classIsAssignableFrom() {
             return this.r("il2cpp_class_is_assignable_from", "bool", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _classIsBlittable() {
+        static get classIsBlittable() {
             return this.r("il2cpp_class_is_blittable", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _classIsEnum() {
+        static get classIsEnum() {
             return this.r("il2cpp_class_is_enum", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _classIsGeneric() {
+        static get classIsGeneric() {
             return this.r("il2cpp_class_is_generic", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _classIsInflated() {
+        static get classIsInflated() {
             return this.r("il2cpp_class_is_inflated", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _classIsInterface() {
+        static get classIsInterface() {
             return this.r("il2cpp_class_is_interface", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _classIsSubclassOf() {
+        static get classIsSubclassOf() {
             return this.r("il2cpp_class_is_subclass_of", "bool", ["pointer", "pointer", "bool"]);
         }
 
         @lazy
-        static get _classIsValueType() {
+        static get classIsValueType() {
             return this.r("il2cpp_class_is_valuetype", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _domainAssemblyOpen() {
+        static get domainAssemblyOpen() {
             return this.r("il2cpp_domain_assembly_open", "pointer", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _domainGet() {
+        static get domainGet() {
             return this.r("il2cpp_domain_get", "pointer", []);
         }
 
         @lazy
-        static get _domainGetAssemblies() {
+        static get domainGetAssemblies() {
             return this.r("il2cpp_domain_get_assemblies", "pointer", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _domainGetObject() {
+        static get domainGetObject() {
             return this.r("il2cpp_domain_get_object", "pointer", []);
         }
 
         @lazy
-        static get _fieldGetModifier() {
+        static get fieldGetModifier() {
             return this.r("il2cpp_field_get_modifier", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _fieldGetClass() {
+        static get fieldGetClass() {
             return this.r("il2cpp_field_get_parent", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _fieldGetFlags() {
+        static get fieldGetFlags() {
             return this.r("il2cpp_field_get_flags", "int", ["pointer"]);
         }
 
         @lazy
-        static get _fieldGetName() {
+        static get fieldGetName() {
             return this.r("il2cpp_field_get_name", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _fieldGetOffset() {
+        static get fieldGetOffset() {
             return this.r("il2cpp_field_get_offset", "int32", ["pointer"]);
         }
 
         @lazy
-        static get _fieldGetStaticValue() {
+        static get fieldGetStaticValue() {
             return this.r("il2cpp_field_static_get_value", "void", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _fieldGetType() {
+        static get fieldGetType() {
             return this.r("il2cpp_field_get_type", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _fieldIsLiteral() {
+        static get fieldIsLiteral() {
             return this.r("il2cpp_field_is_literal", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _fieldIsStatic() {
+        static get fieldIsStatic() {
             return this.r("il2cpp_field_is_static", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _fieldIsThreadStatic() {
+        static get fieldIsThreadStatic() {
             return this.r("il2cpp_field_is_thread_static", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _fieldSetStaticValue() {
+        static get fieldSetStaticValue() {
             return this.r("il2cpp_field_static_set_value", "void", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _free() {
+        static get free() {
             return this.r("il2cpp_free", "void", ["pointer"]);
         }
 
         @lazy
-        static get _gcCollect() {
+        static get gcCollect() {
             return this.r("il2cpp_gc_collect", "void", ["int"]);
         }
 
         @lazy
-        static get _gcCollectALittle() {
+        static get gcCollectALittle() {
             return this.r("il2cpp_gc_collect_a_little", "void", []);
         }
 
         @lazy
-        static get _gcDisable() {
+        static get gcDisable() {
             return this.r("il2cpp_gc_disable", "void", []);
         }
 
         @lazy
-        static get _gcEnable() {
+        static get gcEnable() {
             return this.r("il2cpp_gc_enable", "void", []);
         }
 
         @lazy
-        static get _gcGetHeapSize() {
+        static get gcGetHeapSize() {
             return this.r("il2cpp_gc_get_heap_size", "int64", []);
         }
 
         @lazy
-        static get _gcGetMaxTimeSlice() {
+        static get gcGetMaxTimeSlice() {
             return this.r("il2cpp_gc_get_max_time_slice_ns", "int64", []);
         }
 
         @lazy
-        static get _gcGetUsedSize() {
+        static get gcGetUsedSize() {
             return this.r("il2cpp_gc_get_used_size", "int64", []);
         }
 
         @lazy
-        static get _gcHandleGetTarget() {
+        static get gcHandleGetTarget() {
             return this.r("il2cpp_gchandle_get_target", "pointer", ["uint32"]);
         }
 
         @lazy
-        static get _gcHandleFree() {
+        static get gcHandleFree() {
             return this.r("il2cpp_gchandle_free", "void", ["uint32"]);
         }
 
         @lazy
-        static get _gcHandleNew() {
+        static get gcHandleNew() {
             return this.r("il2cpp_gchandle_new", "uint32", ["pointer", "bool"]);
         }
 
         @lazy
-        static get _gcHandleNewWeakRef() {
+        static get gcHandleNewWeakRef() {
             return this.r("il2cpp_gchandle_new_weakref", "uint32", ["pointer", "bool"]);
         }
 
         @lazy
-        static get _gcIsDisabled() {
+        static get gcIsDisabled() {
             return this.r("il2cpp_gc_is_disabled", "bool", []);
         }
 
         @lazy
-        static get _gcIsIncremental() {
+        static get gcIsIncremental() {
             return this.r("il2cpp_gc_is_incremental", "bool", []);
         }
 
         @lazy
-        static get _gcSetMaxTimeSlice() {
+        static get gcSetMaxTimeSlice() {
             return this.r("il2cpp_gc_set_max_time_slice_ns", "void", ["int64"]);
         }
 
         @lazy
-        static get _gcStartIncrementalCollection() {
+        static get gcStartIncrementalCollection() {
             return this.r("il2cpp_gc_start_incremental_collection", "void", []);
         }
 
         @lazy
-        static get _gcStartWorld() {
+        static get gcStartWorld() {
             return this.r("il2cpp_start_gc_world", "void", []);
         }
 
         @lazy
-        static get _gcStopWorld() {
+        static get gcStopWorld() {
             return this.r("il2cpp_stop_gc_world", "void", []);
         }
 
         @lazy
-        static get _getCorlib() {
+        static get getCorlib() {
             return this.r("il2cpp_get_corlib", "pointer", []);
         }
 
         @lazy
-        static get _imageGetAssembly() {
+        static get imageGetAssembly() {
             return this.r("il2cpp_image_get_assembly", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _imageGetClass() {
+        static get imageGetClass() {
             return this.r("il2cpp_image_get_class", "pointer", ["pointer", "uint"]);
         }
 
         @lazy
-        static get _imageGetClassCount() {
+        static get imageGetClassCount() {
             return this.r("il2cpp_image_get_class_count", "uint32", ["pointer"]);
         }
 
         @lazy
-        static get _imageGetName() {
+        static get imageGetName() {
             return this.r("il2cpp_image_get_name", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _init() {
+        static get init() {
             return this.r("il2cpp_init", "void", []);
         }
 
         @lazy
-        static get _livenessAllocateStruct() {
+        static get livenessAllocateStruct() {
             return this.r("il2cpp_unity_liveness_allocate_struct", "pointer", ["pointer", "int", "pointer", "pointer", "pointer"]);
         }
 
         @lazy
-        static get _livenessCalculationBegin() {
+        static get livenessCalculationBegin() {
             return this.r("il2cpp_unity_liveness_calculation_begin", "pointer", ["pointer", "int", "pointer", "pointer", "pointer", "pointer"]);
         }
 
         @lazy
-        static get _livenessCalculationEnd() {
+        static get livenessCalculationEnd() {
             return this.r("il2cpp_unity_liveness_calculation_end", "void", ["pointer"]);
         }
 
         @lazy
-        static get _livenessCalculationFromStatics() {
+        static get livenessCalculationFromStatics() {
             return this.r("il2cpp_unity_liveness_calculation_from_statics", "void", ["pointer"]);
         }
 
         @lazy
-        static get _livenessFinalize() {
+        static get livenessFinalize() {
             return this.r("il2cpp_unity_liveness_finalize", "void", ["pointer"]);
         }
 
         @lazy
-        static get _livenessFreeStruct() {
+        static get livenessFreeStruct() {
             return this.r("il2cpp_unity_liveness_free_struct", "void", ["pointer"]);
         }
 
         @lazy
-        static get _memorySnapshotCapture() {
+        static get memorySnapshotCapture() {
             return this.r("il2cpp_capture_memory_snapshot", "pointer", []);
         }
 
         @lazy
-        static get _memorySnapshotFree() {
+        static get memorySnapshotFree() {
             return this.r("il2cpp_free_captured_memory_snapshot", "void", ["pointer"]);
         }
 
         @lazy
-        static get _memorySnapshotGetClasses() {
+        static get memorySnapshotGetClasses() {
             return this.r("il2cpp_memory_snapshot_get_classes", "pointer", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _memorySnapshotGetGCHandles() {
+        static get memorySnapshotGetGCHandles() {
             return this.r("il2cpp_memory_snapshot_get_gc_handles", ["uint32", "pointer"], ["pointer"]);
         }
 
         @lazy
-        static get _memorySnapshotGetRuntimeInformation() {
+        static get memorySnapshotGetRuntimeInformation() {
             return this.r("il2cpp_memory_snapshot_get_information", ["uint32", "uint32", "uint32", "uint32", "uint32", "uint32"], ["pointer"]);
         }
 
         @lazy
-        static get _methodGetModifier() {
+        static get methodGetModifier() {
             return this.r("il2cpp_method_get_modifier", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _methodGetClass() {
+        static get methodGetClass() {
             return this.r("il2cpp_method_get_class", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _methodGetFlags() {
+        static get methodGetFlags() {
             return this.r("il2cpp_method_get_flags", "uint32", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _methodGetFromReflection() {
+        static get methodGetFromReflection() {
             return this.r("il2cpp_method_get_from_reflection", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _methodGetName() {
+        static get methodGetName() {
             return this.r("il2cpp_method_get_name", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _methodGetObject() {
+        static get methodGetObject() {
             return this.r("il2cpp_method_get_object", "pointer", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _methodGetParameterCount() {
+        static get methodGetParameterCount() {
             return this.r("il2cpp_method_get_param_count", "uint8", ["pointer"]);
         }
 
         @lazy
-        static get _methodGetParameterName() {
+        static get methodGetParameterName() {
             return this.r("il2cpp_method_get_param_name", "pointer", ["pointer", "uint32"]);
         }
 
         @lazy
-        static get _methodGetParameters() {
+        static get methodGetParameters() {
             return this.r("il2cpp_method_get_parameters", "pointer", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _methodGetParameterType() {
+        static get methodGetParameterType() {
             return this.r("il2cpp_method_get_param", "pointer", ["pointer", "uint32"]);
         }
 
         @lazy
-        static get _methodGetPointer() {
+        static get methodGetPointer() {
             return this.r("il2cpp_method_get_pointer", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _methodGetReturnType() {
+        static get methodGetReturnType() {
             return this.r("il2cpp_method_get_return_type", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _methodIsExternal() {
+        static get methodIsExternal() {
             return this.r("il2cpp_method_is_external", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _methodIsGeneric() {
+        static get methodIsGeneric() {
             return this.r("il2cpp_method_is_generic", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _methodIsInflated() {
+        static get methodIsInflated() {
             return this.r("il2cpp_method_is_inflated", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _methodIsInstance() {
+        static get methodIsInstance() {
             return this.r("il2cpp_method_is_instance", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _methodIsSynchronized() {
+        static get methodIsSynchronized() {
             return this.r("il2cpp_method_is_synchronized", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _monitorEnter() {
+        static get monitorEnter() {
             return this.r("il2cpp_monitor_enter", "void", ["pointer"]);
         }
 
         @lazy
-        static get _monitorExit() {
+        static get monitorExit() {
             return this.r("il2cpp_monitor_exit", "void", ["pointer"]);
         }
 
         @lazy
-        static get _monitorPulse() {
+        static get monitorPulse() {
             return this.r("il2cpp_monitor_pulse", "void", ["pointer"]);
         }
 
         @lazy
-        static get _monitorPulseAll() {
+        static get monitorPulseAll() {
             return this.r("il2cpp_monitor_pulse_all", "void", ["pointer"]);
         }
 
         @lazy
-        static get _monitorTryEnter() {
+        static get monitorTryEnter() {
             return this.r("il2cpp_monitor_try_enter", "bool", ["pointer", "uint32"]);
         }
 
         @lazy
-        static get _monitorTryWait() {
+        static get monitorTryWait() {
             return this.r("il2cpp_monitor_try_wait", "bool", ["pointer", "uint32"]);
         }
 
         @lazy
-        static get _monitorWait() {
+        static get monitorWait() {
             return this.r("il2cpp_monitor_wait", "void", ["pointer"]);
         }
 
         @lazy
-        static get _objectGetClass() {
+        static get objectGetClass() {
             return this.r("il2cpp_object_get_class", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _objectGetVirtualMethod() {
+        static get objectGetVirtualMethod() {
             return this.r("il2cpp_object_get_virtual_method", "pointer", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _objectInit() {
+        static get objectInit() {
             return this.r("il2cpp_runtime_object_init_exception", "void", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _objectNew() {
+        static get objectNew() {
             return this.r("il2cpp_object_new", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _objectGetSize() {
+        static get objectGetSize() {
             return this.r("il2cpp_object_get_size", "uint32", ["pointer"]);
         }
 
         @lazy
-        static get _objectUnbox() {
+        static get objectUnbox() {
             return this.r("il2cpp_object_unbox", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _resolveInternalCall() {
+        static get resolveInternalCall() {
             return this.r("il2cpp_resolve_icall", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _stringChars() {
+        static get stringChars() {
             return this.r("il2cpp_string_chars", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _stringLength() {
+        static get stringLength() {
             return this.r("il2cpp_string_length", "int32", ["pointer"]);
         }
 
         @lazy
-        static get _stringNew() {
+        static get stringNew() {
             return this.r("il2cpp_string_new", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _stringSetLength() {
+        static get stringSetLength() {
             return this.r("il2cpp_string_set_length", "void", ["pointer", "int32"]);
         }
 
         @lazy
-        static get _valueBox() {
+        static get valueBox() {
             return this.r("il2cpp_value_box", "pointer", ["pointer", "pointer"]);
         }
 
         @lazy
-        static get _threadAttach() {
+        static get threadAttach() {
             return this.r("il2cpp_thread_attach", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _threadCurrent() {
+        static get threadCurrent() {
             return this.r("il2cpp_thread_current", "pointer", []);
         }
 
         @lazy
-        static get _threadGetAllAttachedThreads() {
+        static get threadGetAllAttachedThreads() {
             return this.r("il2cpp_thread_get_all_attached_threads", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _threadIsVm() {
+        static get threadIsVm() {
             return this.r("il2cpp_is_vm_thread", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _threadDetach() {
+        static get threadDetach() {
             return this.r("il2cpp_thread_detach", "void", ["pointer"]);
         }
 
         @lazy
-        static get _typeGetName() {
+        static get typeGetName() {
             return this.r("il2cpp_type_get_name", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _typeGetObject() {
+        static get typeGetObject() {
             return this.r("il2cpp_type_get_object", "pointer", ["pointer"]);
         }
 
         @lazy
-        static get _typeGetTypeEnum() {
+        static get typeGetTypeEnum() {
             return this.r("il2cpp_type_get_type", "int", ["pointer"]);
         }
 
         @lazy
-        static get _typeIsByReference() {
+        static get typeIsByReference() {
             return this.r("il2cpp_type_is_byref", "bool", ["pointer"]);
         }
 
         @lazy
-        static get _typeIsPrimitive() {
+        static get typeIsPrimitive() {
             return this.r("il2cpp_type_is_primitive", "bool", ["pointer"]);
         }
 
@@ -734,16 +734,16 @@ namespace Il2Cpp {
             offsetsFinderCModule.dispose();
 
             const cModule = new CModule(defines + $INLINE_FILE("cmodules/api.c") + $INLINE_FILE("cmodules/memory-snapshot.c"), {
-                il2cpp_class_from_name: this._classFromName,
-                il2cpp_class_get_method_from_name: this._classGetMethodFromName,
-                il2cpp_class_get_name: this._classGetName,
-                il2cpp_field_get_flags: this._fieldGetFlags,
-                il2cpp_field_get_offset: this._fieldGetOffset,
-                il2cpp_free: this._free,
-                il2cpp_image_get_corlib: this._getCorlib,
-                il2cpp_method_get_flags: this._methodGetFlags,
-                il2cpp_type_get_name: this._typeGetName,
-                il2cpp_type_get_type_enum: this._typeGetTypeEnum
+                il2cpp_class_from_name: this.classFromName,
+                il2cpp_class_get_method_from_name: this.classGetMethodFromName,
+                il2cpp_class_get_name: this.classGetName,
+                il2cpp_field_get_flags: this.fieldGetFlags,
+                il2cpp_field_get_offset: this.fieldGetOffset,
+                il2cpp_free: this.free,
+                il2cpp_image_get_corlib: this.getCorlib,
+                il2cpp_method_get_flags: this.methodGetFlags,
+                il2cpp_type_get_name: this.typeGetName,
+                il2cpp_type_get_type_enum: this.typeGetTypeEnum
             });
 
             return cModule;

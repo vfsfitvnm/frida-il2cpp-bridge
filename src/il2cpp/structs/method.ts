@@ -3,20 +3,20 @@ namespace Il2Cpp {
         /** Gets the class in which this method is defined. */
         @lazy
         get class(): Il2Cpp.Class {
-            return new Il2Cpp.Class(Il2Cpp.Api._methodGetClass(this));
+            return new Il2Cpp.Class(Il2Cpp.Api.methodGetClass(this));
         }
 
         /** Gets the flags of the current method. */
         @lazy
         get flags(): number {
-            return Il2Cpp.Api._methodGetFlags(this, NULL);
+            return Il2Cpp.Api.methodGetFlags(this, NULL);
         }
 
         /** Gets the implementation flags of the current method. */
         @lazy
         get implementationFlags(): number {
             const implementationFlagsPointer = Memory.alloc(Process.pointerSize);
-            Il2Cpp.Api._methodGetFlags(this, implementationFlagsPointer);
+            Il2Cpp.Api.methodGetFlags(this, implementationFlagsPointer);
 
             return implementationFlagsPointer.readU32();
         }
@@ -54,43 +54,43 @@ namespace Il2Cpp {
         /** Determines whether this method is external. */
         @lazy
         get isExternal(): boolean {
-            return !!Il2Cpp.Api._methodIsExternal(this);
+            return !!Il2Cpp.Api.methodIsExternal(this);
         }
 
         /** Determines whether this method is generic. */
         @lazy
         get isGeneric(): boolean {
-            return !!Il2Cpp.Api._methodIsGeneric(this);
+            return !!Il2Cpp.Api.methodIsGeneric(this);
         }
 
         /** Determines whether this method is inflated (generic with a concrete type parameter). */
         @lazy
         get isInflated(): boolean {
-            return !!Il2Cpp.Api._methodIsInflated(this);
+            return !!Il2Cpp.Api.methodIsInflated(this);
         }
 
         /** Determines whether this method is static. */
         @lazy
         get isStatic(): boolean {
-            return !Il2Cpp.Api._methodIsInstance(this);
+            return !Il2Cpp.Api.methodIsInstance(this);
         }
 
         /** Determines whether this method is synchronized. */
         @lazy
         get isSynchronized(): boolean {
-            return !!Il2Cpp.Api._methodIsSynchronized(this);
+            return !!Il2Cpp.Api.methodIsSynchronized(this);
         }
 
         /** Gets the access modifier of this method. */
         @lazy
         get modifier(): string {
-            return Il2Cpp.Api._methodGetModifier(this).readUtf8String()!;
+            return Il2Cpp.Api.methodGetModifier(this).readUtf8String()!;
         }
 
         /** Gets the name of this method. */
         @lazy
         get name(): string {
-            return Il2Cpp.Api._methodGetName(this).readUtf8String()!;
+            return Il2Cpp.Api.methodGetName(this).readUtf8String()!;
         }
 
         /** @internal */
@@ -102,21 +102,21 @@ namespace Il2Cpp {
         /** Gets the encompassing object of the current method. */
         @lazy
         get object(): Il2Cpp.Object {
-            return new Il2Cpp.Object(Il2Cpp.Api._methodGetObject(this, NULL));
+            return new Il2Cpp.Object(Il2Cpp.Api.methodGetObject(this, NULL));
         }
 
         /** Gets the amount of parameters of this method. */
         @lazy
         get parameterCount(): number {
-            return Il2Cpp.Api._methodGetParameterCount(this);
+            return Il2Cpp.Api.methodGetParameterCount(this);
         }
 
         /** Gets the parameters of this method. */
         @lazy
         get parameters(): Il2Cpp.Parameter[] {
             return globalThis.Array.from(globalThis.Array(this.parameterCount), (_, i) => {
-                const parameterName = Il2Cpp.Api._methodGetParameterName(this, i).readUtf8String()!;
-                const parameterType = Il2Cpp.Api._methodGetParameterType(this, i);
+                const parameterName = Il2Cpp.Api.methodGetParameterName(this, i).readUtf8String()!;
+                const parameterType = Il2Cpp.Api.methodGetParameterType(this, i);
                 return new Il2Cpp.Parameter(parameterName, i, new Il2Cpp.Type(parameterType));
             });
         }
@@ -130,13 +130,13 @@ namespace Il2Cpp {
         /** Gets the return type of this method. */
         @lazy
         get returnType(): Il2Cpp.Type {
-            return new Il2Cpp.Type(Il2Cpp.Api._methodGetReturnType(this));
+            return new Il2Cpp.Type(Il2Cpp.Api.methodGetReturnType(this));
         }
 
         /** Gets the virtual address (VA) to this method. */
         @lazy
         get virtualAddress(): NativePointer {
-            return Il2Cpp.Api._methodGetPointer(this);
+            return Il2Cpp.Api.methodGetPointer(this);
         }
 
         /** Replaces the body of this method. */
@@ -180,7 +180,7 @@ namespace Il2Cpp {
             const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.class("System.Type"), types);
 
             const inflatedMethodObject = this.object.method<Il2Cpp.Object>("MakeGenericMethod", 1).invoke(typeArray);
-            return new Il2Cpp.Method(Il2Cpp.Api._methodGetFromReflection(inflatedMethodObject));
+            return new Il2Cpp.Method(Il2Cpp.Api.methodGetFromReflection(inflatedMethodObject));
         }
 
         /** Invokes this method. */

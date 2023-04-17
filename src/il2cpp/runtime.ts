@@ -8,7 +8,7 @@ namespace Il2Cpp {
         /** @internal */
         @lazy
         static get information(): [number, number, number, number, number, number] {
-            return Il2Cpp.MemorySnapshot.use(Il2Cpp.Api._memorySnapshotGetRuntimeInformation);
+            return Il2Cpp.MemorySnapshot.use(Il2Cpp.Api.memorySnapshotGetRuntimeInformation);
         }
 
         /** Gets the pointer size. */
@@ -18,7 +18,7 @@ namespace Il2Cpp {
 
         /** @internal */
         static internalCall<R extends NativeFunctionReturnType, A extends NativeFunctionArgumentType[] | []>(name: string, retType: R, argTypes: A) {
-            const handle = Il2Cpp.Api._resolveInternalCall(Memory.allocUtf8String(name));
+            const handle = Il2Cpp.Api.resolveInternalCall(Memory.allocUtf8String(name));
             return handle.isNull() ? null : new NativeFunction<R, A>(handle, retType, argTypes);
         }
     }

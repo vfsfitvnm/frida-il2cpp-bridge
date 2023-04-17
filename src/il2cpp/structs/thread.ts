@@ -33,7 +33,7 @@ namespace Il2Cpp {
         /** Determines whether the current thread is the garbage collector finalizer one. */
         @lazy
         get isFinalizer(): boolean {
-            return !Il2Cpp.Api._threadIsVm(this);
+            return !Il2Cpp.Api.threadIsVm(this);
         }
 
         /** Gets the managed id of the current thread. */
@@ -89,7 +89,7 @@ namespace Il2Cpp {
 
         /** Detaches the thread from the application domain. */
         detach(): void {
-            return Il2Cpp.Api._threadDetach(this);
+            return Il2Cpp.Api.threadDetach(this);
         }
 
         /** Schedules a callback on the current thread. */
@@ -104,7 +104,7 @@ namespace Il2Cpp {
 
             return new Promise<T>(resolve => {
                 const listener = Interceptor.attach(Trampoline.virtualAddress, () => {
-                    if (Il2Cpp.Api._threadCurrent().equals(this)) {
+                    if (Il2Cpp.Api.threadCurrent().equals(this)) {
                         listener.detach();
                         const result = block();
                         setImmediate(() => resolve(result));

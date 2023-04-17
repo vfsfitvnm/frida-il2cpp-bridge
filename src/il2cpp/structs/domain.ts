@@ -6,7 +6,7 @@ namespace Il2Cpp {
         /** Gets the assemblies that have been loaded into the execution context of the application domain. */
         @lazy
         static get assemblies(): Il2Cpp.Assembly[] {
-            let handles = readNativeList(_ => Il2Cpp.Api._domainGetAssemblies(this, _));
+            let handles = readNativeList(_ => Il2Cpp.Api.domainGetAssemblies(this, _));
 
             if (handles.length == 0) {
                 const assemblyObjects = this.object.method<Il2Cpp.Array<Il2Cpp.Object>>("GetAssemblies").overload().invoke();
@@ -19,13 +19,13 @@ namespace Il2Cpp {
         /** Gets the application domain handle. */
         @lazy
         static get handle(): NativePointer {
-            return Il2Cpp.Api._domainGet();
+            return Il2Cpp.Api.domainGet();
         }
 
         /** Gets the encompassing object of the application domain. */
         @lazy
         static get object(): Il2Cpp.Object {
-            return new Il2Cpp.Object(Il2Cpp.Api._domainGetObject());
+            return new Il2Cpp.Object(Il2Cpp.Api.domainGetObject());
         }
 
         /** Opens and loads the assembly with the given name. */
@@ -36,12 +36,12 @@ namespace Il2Cpp {
 
         /** Attached a new thread to the application domain. */
         static attach(): Il2Cpp.Thread {
-            return new Il2Cpp.Thread(Il2Cpp.Api._threadAttach(this));
+            return new Il2Cpp.Thread(Il2Cpp.Api.threadAttach(this));
         }
 
         /** Opens and loads the assembly with the given name. */
         static tryAssembly(name: string): Il2Cpp.Assembly | null {
-            const handle = Il2Cpp.Api._domainAssemblyOpen(this, Memory.allocUtf8String(name));
+            const handle = Il2Cpp.Api.domainAssemblyOpen(this, Memory.allocUtf8String(name));
             return handle.isNull() ? null : new Il2Cpp.Assembly(handle);
         }
     }

@@ -1,12 +1,12 @@
 namespace Il2Cpp {
     /** Allocates the given amount of bytes. */
     export function alloc(size: number | UInt64 = Process.pointerSize): NativePointer {
-        return Il2Cpp.Api._alloc(size);
+        return Il2Cpp.Api.alloc(size);
     }
 
     /** Frees memory. */
     export function free(pointer: NativePointerValue): void {
-        return Il2Cpp.Api._free(pointer);
+        return Il2Cpp.Api.free(pointer);
     }
 
     /** @internal */

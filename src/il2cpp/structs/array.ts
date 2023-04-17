@@ -9,7 +9,7 @@ namespace Il2Cpp {
         /** @internal */
         static from<T extends Il2Cpp.Field.Type>(klass: Il2Cpp.Class, lengthOrElements: number | T[]): Il2Cpp.Array<T> {
             const length = typeof lengthOrElements == "number" ? lengthOrElements : lengthOrElements.length;
-            const array = new Il2Cpp.Array<T>(Il2Cpp.Api._arrayNew(klass, length));
+            const array = new Il2Cpp.Array<T>(Il2Cpp.Api.arrayNew(klass, length));
 
             if (globalThis.Array.isArray(lengthOrElements)) {
                 array.elements.write(lengthOrElements);
@@ -27,7 +27,7 @@ namespace Il2Cpp {
         /** @internal Gets a pointer to the first element of the current array. */
         @lazy
         get elements(): Il2Cpp.Pointer<T> {
-            return new Il2Cpp.Pointer(Il2Cpp.Api._arrayGetElements(this), this.elementType);
+            return new Il2Cpp.Pointer(Il2Cpp.Api.arrayGetElements(this), this.elementType);
         }
 
         /** Gets the size of the object encompassed by the current array. */
@@ -45,7 +45,7 @@ namespace Il2Cpp {
         /** Gets the total number of elements in all the dimensions of the current array. */
         @lazy
         get length(): number {
-            return Il2Cpp.Api._arrayGetLength(this);
+            return Il2Cpp.Api.arrayGetLength(this);
         }
 
         /** Gets the encompassing object of the current array. */

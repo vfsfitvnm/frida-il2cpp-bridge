@@ -14,14 +14,14 @@ namespace Il2Cpp {
         }
 
         /** Creates a memory snapshot with the given handle. */
-        constructor(handle: NativePointer = Il2Cpp.Api._memorySnapshotCapture()) {
+        constructor(handle: NativePointer = Il2Cpp.Api.memorySnapshotCapture()) {
             super(handle);
         }
 
         /** Gets any initialized class. */
         @lazy
         get classes(): Il2Cpp.Class[] {
-            return readNativeIterator(_ => Il2Cpp.Api._memorySnapshotGetClasses(this, _)).map(_ => new Il2Cpp.Class(_));
+            return readNativeIterator(_ => Il2Cpp.Api.memorySnapshotGetClasses(this, _)).map(_ => new Il2Cpp.Class(_));
         }
 
         /** Gets the objects tracked by this memory snapshot. */
@@ -29,7 +29,7 @@ namespace Il2Cpp {
         get objects(): Il2Cpp.Object[] {
             const array: Il2Cpp.Object[] = [];
 
-            const [count, start] = Il2Cpp.Api._memorySnapshotGetGCHandles(this);
+            const [count, start] = Il2Cpp.Api.memorySnapshotGetGCHandles(this);
 
             for (let i = 0; i < count; i++) {
                 const handle = start.add(i * Process.pointerSize).readPointer();
@@ -43,7 +43,7 @@ namespace Il2Cpp {
 
         /** Frees this memory snapshot. */
         free(): void {
-            Il2Cpp.Api._memorySnapshotFree(this);
+            Il2Cpp.Api.memorySnapshotFree(this);
         }
     }
 }

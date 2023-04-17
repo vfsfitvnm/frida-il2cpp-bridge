@@ -3,7 +3,7 @@ namespace Il2Cpp {
         /** Gets the class of this type. */
         @lazy
         get class(): Il2Cpp.Class {
-            return new Il2Cpp.Class(Il2Cpp.Api._classFromType(this));
+            return new Il2Cpp.Class(Il2Cpp.Api.classFromType(this));
         }
 
         /** */
@@ -61,19 +61,19 @@ namespace Il2Cpp {
         /** Determines whether this type is passed by reference. */
         @lazy
         get isByReference(): boolean {
-            return !!Il2Cpp.Api._typeIsByReference(this);
+            return !!Il2Cpp.Api.typeIsByReference(this);
         }
 
         /** Determines whether this type is primitive. */
         @lazy
         get isPrimitive(): boolean {
-            return !!Il2Cpp.Api._typeIsPrimitive(this);
+            return !!Il2Cpp.Api.typeIsPrimitive(this);
         }
 
         /** Gets the name of this type. */
         @lazy
         get name(): string {
-            const handle = Il2Cpp.Api._typeGetName(this);
+            const handle = Il2Cpp.Api.typeGetName(this);
 
             try {
                 return handle.readUtf8String()!;
@@ -85,13 +85,13 @@ namespace Il2Cpp {
         /** Gets the encompassing object of the current type. */
         @lazy
         get object(): Il2Cpp.Object {
-            return new Il2Cpp.Object(Il2Cpp.Api._typeGetObject(this));
+            return new Il2Cpp.Object(Il2Cpp.Api.typeGetObject(this));
         }
 
         /** Gets the type enum of the current type. */
         @lazy
         get typeEnum(): Il2Cpp.Type.Enum {
-            return Il2Cpp.Api._typeGetTypeEnum(this);
+            return Il2Cpp.Api.typeGetTypeEnum(this);
         }
 
         /** */
