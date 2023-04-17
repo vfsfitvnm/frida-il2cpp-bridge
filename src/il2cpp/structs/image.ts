@@ -41,8 +41,7 @@ namespace Il2Cpp {
 
         /** Gets the class with the specified name defined in this image. */
         class(name: string): Il2Cpp.Class {
-            // prettier-ignore
-            return this.tryClass(name) ?? keyNotFound(name, this.name, this.classes.map(_ => _.fullName));
+            return this.tryClass(name) ?? raise(`couldn't find class ${name} in assembly ${this.name}`);
         }
 
         /** Gets the class with the specified name defined in this image. */

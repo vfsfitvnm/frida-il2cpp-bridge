@@ -235,8 +235,7 @@ namespace Il2Cpp {
 
         /** Gets the parameter with the given name. */
         parameter(name: string): Il2Cpp.Parameter {
-            // prettier-ignore
-            return this.tryParameter(name) ?? keyNotFound(name, this.name, this.parameters.map(_ => _.name));
+            return this.tryParameter(name) ?? raise(`couldn't find parameter ${name} in method ${this.name}`);
         }
 
         /** Restore the original method implementation. */

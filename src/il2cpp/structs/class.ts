@@ -209,8 +209,7 @@ namespace Il2Cpp {
 
         /** Gets the field identified by the given name. */
         field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> {
-            // prettier-ignore
-            return this.tryField<T>(name) ?? keyNotFound(name, this.name, this.fields.map(_ => _.name));
+            return this.tryField<T>(name) ?? raise(`couldn't find field ${name} in class ${this.type.name}`);
         }
 
         /** Builds a generic instance of the current generic class. */
@@ -247,14 +246,12 @@ namespace Il2Cpp {
 
         /** Gets the method identified by the given name and parameter count. */
         method<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> {
-            // prettier-ignore
-            return this.tryMethod<T>(name, parameterCount) ?? keyNotFound(name, this.name, this.methods.map(_ => _.name));
+            return this.tryMethod<T>(name, parameterCount) ?? raise(`couldn't find method ${name} in class ${this.type.name}`);
         }
 
         /** Gets the nested class with the given name. */
         nested(name: string): Il2Cpp.Class {
-            // prettier-ignore
-            return this.tryNested(name) ?? keyNotFound(name, this.name, this.nestedClasses.map(_ => _.name));
+            return this.tryNested(name) ?? raise(`couldn't find nested class ${name} in class ${this.type.name}`);
         }
 
         /** Allocates a new object of the current class and calls its default constructor. */

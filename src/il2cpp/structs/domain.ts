@@ -30,8 +30,7 @@ namespace Il2Cpp {
 
         /** Opens and loads the assembly with the given name. */
         static assembly(name: string): Il2Cpp.Assembly {
-            // prettier-ignore
-            return this.tryAssembly(name) ?? keyNotFound(name, "Domain", this.assemblies.map(_ => _.name));
+            return this.tryAssembly(name) ?? raise(`couldn't find assembly ${name}`);
         }
 
         /** Attached a new thread to the application domain. */
