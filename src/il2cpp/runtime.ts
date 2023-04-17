@@ -1,6 +1,6 @@
 namespace Il2Cpp {
     export class Runtime {
-        /** Gets the allocation granularity. */
+        /** Gets the allocation granularity, it should be `Process.pointerSize * 2`. */
         static get allocationGranularity(): number {
             return this.information[5];
         }
