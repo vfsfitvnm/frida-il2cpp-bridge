@@ -89,7 +89,7 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
         withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Field<T> {
             let valueHandle = instance.handle.add(this.offset);
             if (instance instanceof Il2Cpp.ValueType) {
-                valueHandle = valueHandle.sub(Il2Cpp.Runtime.objectHeaderSize);
+                valueHandle = valueHandle.sub(Il2Cpp.Object.headerSize);
             }
 
             return new Proxy(this, {

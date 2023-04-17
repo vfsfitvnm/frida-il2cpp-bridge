@@ -27,11 +27,6 @@ namespace Il2Cpp {
             return this.information[0];
         }
 
-        /** Gets the size of the Il2CppObject struct. */
-        static get objectHeaderSize(): number {
-            return this.information[1];
-        }
-
         /** @internal */
         static internalCall<R extends NativeFunctionReturnType, A extends NativeFunctionArgumentType[] | []>(name: string, retType: R, argTypes: A) {
             const handle = Il2Cpp.Api._resolveInternalCall(Memory.allocUtf8String(name));

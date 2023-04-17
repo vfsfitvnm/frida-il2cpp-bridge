@@ -1,5 +1,11 @@
 namespace Il2Cpp {
     export class Object extends NativeStruct {
+        /** Gets the Il2CppObject struct size, possibly equal to `Process.pointerSize * 2`. */
+        @lazy
+        static get headerSize(): number {
+            return Il2Cpp.Image.corlib.class("System.Object").instanceSize;
+        }
+
         /** Gets the class of this object. */
         @lazy
         get class(): Il2Cpp.Class {

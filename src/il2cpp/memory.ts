@@ -174,7 +174,7 @@ namespace Il2Cpp {
 
             for (const field of type.class.fields) {
                 if (!field.isStatic) {
-                    const offset = startOffset + field.offset - Il2Cpp.Runtime.objectHeaderSize;
+                    const offset = startOffset + field.offset - Il2Cpp.Object.headerSize;
                     if (
                         field.type.typeEnum == Il2Cpp.Type.Enum.ValueType ||
                         (field.type.typeEnum == Il2Cpp.Type.Enum.GenericInstance && field.type.class.isValueType)
