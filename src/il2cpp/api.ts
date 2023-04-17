@@ -409,7 +409,7 @@ namespace Il2Cpp {
 
         @lazy
         static get init() {
-            return this.r("il2cpp_init", "void", []);
+            return this.r("il2cpp_init", "void", ["pointer"]);
         }
 
         @lazy
