@@ -18,6 +18,12 @@ namespace Il2Cpp {
             return array;
         }
 
+        /** Gets the Il2CppArray struct size, possibly equal to `Process.pointerSize * 4`. */
+        @lazy
+        static get headerSize(): number {
+            return Il2Cpp.Image.corlib.class("System.Array").instanceSize;
+        }
+
         /** @internal Gets a pointer to the first element of the current array. */
         @lazy
         get elements(): Il2Cpp.Pointer<T> {

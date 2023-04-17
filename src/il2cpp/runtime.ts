@@ -5,11 +5,6 @@ namespace Il2Cpp {
             return this.information[5];
         }
 
-        /** Gets the size of the Il2CppArray struct. */
-        static get arrayHeaderSize(): number {
-            return this.information[2];
-        }
-
         /** @internal */
         @lazy
         static get information(): [number, number, number, number, number, number] {
