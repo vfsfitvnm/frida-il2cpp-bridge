@@ -49,7 +49,7 @@ namespace Il2Cpp {
 
             const chooseCallback = new NativeCallback(callback, "void", ["pointer", "int", "pointer"]);
 
-            if (Versioning.gte(Il2Cpp.unityVersion, "2021.2.0")) {
+            if (UnityVersion.gte(Il2Cpp.unityVersion, "2021.2.0")) {
                 const realloc = (handle: NativePointer, size: UInt64) => {
                     if (!handle.isNull() && size.compare(0) == 0) {
                         Il2Cpp.free(handle);

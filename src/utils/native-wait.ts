@@ -14,7 +14,7 @@ class Target {
             switch (Process.platform) {
                 case "linux":
                     try {
-                        if (Versioning.gte(Java.androidVersion, "12")) {
+                        if (UnityVersion.gte(Java.androidVersion, "12")) {
                             return [null, ["__loader_dlopen", "utf8"]];
                         } else {
                             return ["libdl.so", ["dlopen", "utf8"], ["android_dlopen_ext", "utf8"]];

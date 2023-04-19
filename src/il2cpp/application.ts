@@ -36,7 +36,6 @@ namespace Il2Cpp {
             return new Il2Cpp.String(get_unityVersion()).content!;
         }
 
-        const versionPattern = /(?:20\d{2}|\d)\.\d\.\d{1,2}([abcfp]|rc){0,2}\d?/;
         const searchPattern = "45 64 69 74 6f 72 ?? 44 61 74 61 ?? 69 6c 32 63 70 70";
 
         for (const range of module.enumerateRanges("r--").concat(Process.getRangeByAddress(module.base))) {
@@ -44,8 +43,7 @@ namespace Il2Cpp {
                 while (address.readU8() != 0) {
                     address = address.sub(1);
                 }
-
-                const match = address.add(1).readCString()?.match(versionPattern)?.[0];
+                const match = UnityVersion.find(address.add(1).readCString());
 
                 if (match != undefined) {
                     return match;
@@ -60,6 +58,6 @@ namespace Il2Cpp {
     export declare const unityVersionIsBelow201830: boolean;
     // prettier-ignore
     getter(Il2Cpp, "unityVersionIsBelow201830", () => {
-        return Versioning.lt(unityVersion, "2018.3.0");
+        return UnityVersion.lt(unityVersion, "2018.3.0");
     }, lazy);
 }

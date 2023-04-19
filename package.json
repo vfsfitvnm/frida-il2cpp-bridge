@@ -34,9 +34,6 @@
     "tabWidth": 4,
     "trailingComma": "none"
   },
-  "dependencies": {
-    "versioning": "^1.1.2"
-  },
   "devDependencies": {
     "@types/frida-gum": "^18.3.1",
     "ts-macros": "^2.2.1",

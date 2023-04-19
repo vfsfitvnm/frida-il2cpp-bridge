@@ -8,6 +8,7 @@
 /// <reference path="./utils/read-native-iterator.ts">/>
 /// <reference path="./utils/read-native-list.ts">/>
 /// <reference path="./utils/recycle.ts">/>
+/// <reference path="./utils/unity-version.ts">/>
 
 /// <reference path="./il2cpp/api.ts">/>
 /// <reference path="./il2cpp/application.ts">/>
