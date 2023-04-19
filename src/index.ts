@@ -1,5 +1,3 @@
-/// <reference path="./imports.ts">/>
-
 /// <reference path="./utils/console.ts">/>
 /// <reference path="./utils/getter.ts">/>
 /// <reference path="./utils/lazy.ts">/>

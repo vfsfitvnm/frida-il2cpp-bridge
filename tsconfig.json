@@ -10,11 +10,7 @@
     "esModuleInterop": true,
     "stripInternal": true,
     "sourceMap": true,
-    "strict": true,
-    "plugins": [
-      { "transform": "ts-transformer-inline-file/transformer" },
-      { "transform": "ts-macros" },
-    ],
+    "strict": true
   },
   "files": [ "src/index.ts" ]
 }
