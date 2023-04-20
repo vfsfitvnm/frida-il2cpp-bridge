@@ -94,24 +94,18 @@ namespace Il2Cpp {
 
         /** Schedules a callback on the current thread. */
         schedule<T>(block: () => T | Promise<T>, delayMs: number = 0): Promise<T> {
-            const MonoRuntime = Il2Cpp.Image.corlib.class("Mono.Runtime");
-            const Trampoline = MonoRuntime.tryMethod("GetDisplayName") ?? MonoRuntime.method(".cctor");
-
-            const SendOrPostCallback = Il2Cpp.Image.corlib.class("System.Threading.SendOrPostCallback").alloc();
-            SendOrPostCallback.method(".ctor").invoke(NULL, Trampoline.handle);
-
             const Post = this.synchronizationContext.method("Post");
+            const delegate = Il2Cpp.Image.corlib.class("System.Threading.SendOrPostCallback").alloc();
+            delegate.method(".ctor").invoke(NULL, Post.handle);
 
             return new Promise<T>(resolve => {
-                const listener = Interceptor.attach(Trampoline.virtualAddress, () => {
-                    if (Il2Cpp.Api.threadCurrent().equals(this)) {
-                        listener.detach();
-                        const result = block();
-                        setImmediate(() => resolve(result));
-                    }
-                });
+                // prettier-ignore
+                delegate.field("method_ptr").value = new NativeCallback(() => { 
+                    const result = block(); 
+                    setImmediate(() => resolve(result)); 
+                }, "void", []);
 
-                setTimeout(() => Post.invoke(SendOrPostCallback, NULL), delayMs);
+                setTimeout(() => Post.invoke(delegate, NULL), delayMs);
             });
         }
     }
