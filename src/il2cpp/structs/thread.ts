@@ -58,8 +58,11 @@ namespace Il2Cpp {
         @lazy
         private get synchronizationContext(): Il2Cpp.Object {
             const get_ExecutionContext = this.object.tryMethod<Il2Cpp.Object>("GetMutableExecutionContext") || this.object.method("get_ExecutionContext");
+            const executionContext = get_ExecutionContext.invoke();
 
-            let synchronizationContext = get_ExecutionContext.invoke().tryMethod<Il2Cpp.Object>("get_SynchronizationContext")?.invoke();
+            let synchronizationContext =
+                executionContext.tryField<Il2Cpp.Object>("_syncContext")?.value ??
+                executionContext.tryMethod<Il2Cpp.Object>("get_SynchronizationContext")?.invoke();
 
             if (synchronizationContext == null) {
                 const SystemThreadingSynchronizationContext = Il2Cpp.Image.corlib.class("System.Threading.SynchronizationContext");
