@@ -141,15 +141,8 @@ namespace Il2Cpp {
 
         /** Replaces the body of this method. */
         set implementation(block: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => T) {
-            const startIndex = +!this.isStatic | +Il2Cpp.unityVersionIsBelow201830;
-
-            const callback = (...args: any[]): any => {
-                const parameters = this.parameters.map((e, i) => fromFridaValue(args[i + startIndex], e.type));
-                return toFridaValue(block.call(this.isStatic ? this.class : new Il2Cpp.Object(args[0]), ...parameters) as any);
-            };
-
             try {
-                Interceptor.replace(this.virtualAddress, new NativeCallback(callback, this.returnType.fridaAlias, this.fridaSignature));
+                Interceptor.replace(this.virtualAddress, this.wrap(block));
             } catch (e: any) {
                 switch (e.message) {
                     case "access violation accessing 0x0":
@@ -288,6 +281,18 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                     return Reflect.get(target, property);
                 }
             });
+        }
+
+        /** @internal */
+        wrap(block: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => T): NativeCallback<any, any> {
+            const startIndex = +!this.isStatic | +Il2Cpp.unityVersionIsBelow201830;
+            // prettier-ignore
+            return new NativeCallback((...args: any[]): any => {
+                const thisObject = this.isStatic ? this.class : new Il2Cpp.Object(args[0]);
+                const parameters = this.parameters.map((e, i) => fromFridaValue(args[i + startIndex], e.type));
+                const result = block.call(thisObject, ...parameters) as any;
+                return toFridaValue(result);
+            }, this.returnType.fridaAlias, this.fridaSignature);
         }
     }
 

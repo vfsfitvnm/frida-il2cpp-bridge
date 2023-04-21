@@ -97,18 +97,13 @@ namespace Il2Cpp {
 
         /** Schedules a callback on the current thread. */
         schedule<T>(block: () => T | Promise<T>, delayMs: number = 0): Promise<T> {
-            const Post = this.synchronizationContext.method("Post");
-            const delegate = Il2Cpp.Image.corlib.class("System.Threading.SendOrPostCallback").alloc();
-            delegate.method(".ctor").invoke(NULL, Post.handle);
+            return new Promise(resolve => {
+                const delegate = Il2Cpp.Image.corlib.class("System.Threading.SendOrPostCallback").delegate(() => {
+                    const result = block();
+                    setImmediate(() => resolve(result));
+                });
 
-            return new Promise<T>(resolve => {
-                // prettier-ignore
-                delegate.field("method_ptr").value = new NativeCallback(() => { 
-                    const result = block(); 
-                    setImmediate(() => resolve(result)); 
-                }, "void", []);
-
-                setTimeout(() => Post.invoke(delegate, NULL), delayMs);
+                setTimeout(() => this.synchronizationContext.method("Post").invoke(delegate, NULL), delayMs);
             });
         }
     }
