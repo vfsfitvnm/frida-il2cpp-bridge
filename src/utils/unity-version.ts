@@ -1,3 +1,4 @@
+/** @internal */
 namespace UnityVersion {
     const pattern = /(20\d{2}|\d)\.(\d)\.(\d{1,2})(?:[abcfp]|rc){0,2}\d?/;
 
