@@ -25,6 +25,7 @@
 /// <reference path="./il2cpp/structs/delegate.ts">/>
 /// <reference path="./il2cpp/structs/domain.ts">/>
 /// <reference path="./il2cpp/structs/field.ts">/>
+/// <reference path="./il2cpp/structs/gc-handle.ts">/>
 /// <reference path="./il2cpp/structs/image.ts">/>
 /// <reference path="./il2cpp/structs/memory-snapshot.ts">/>
 /// <reference path="./il2cpp/structs/method.ts">/>

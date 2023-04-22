@@ -49,8 +49,8 @@ namespace Il2Cpp {
         }
 
         /** Creates a reference to this object. */
-        ref(pin: boolean): Il2Cpp.GC.Handle {
-            return new Il2Cpp.GC.Handle(Il2Cpp.Api.gcHandleNew(this, +pin));
+        ref(pin: boolean): Il2Cpp.GCHandle {
+            return new Il2Cpp.GCHandle(Il2Cpp.Api.gcHandleNew(this, +pin));
         }
 
         /** Gets the correct virtual method from the given virtual method. */
@@ -94,8 +94,8 @@ namespace Il2Cpp {
         }
 
         /** Creates a weak reference to this object. */
-        weakRef(trackResurrection: boolean): Il2Cpp.GC.Handle {
-            return new Il2Cpp.GC.Handle(Il2Cpp.Api.gcHandleNewWeakRef(this, +trackResurrection));
+        weakRef(trackResurrection: boolean): Il2Cpp.GCHandle {
+            return new Il2Cpp.GCHandle(Il2Cpp.Api.gcHandleNewWeakRef(this, +trackResurrection));
         }
     }
 }
