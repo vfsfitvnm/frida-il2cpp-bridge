@@ -5,14 +5,6 @@ namespace Il2Cpp {
             return new Il2Cpp.MemorySnapshot();
         }
 
-        /** */
-        static use<T>(block: (memorySnapshot: Omit<Il2Cpp.MemorySnapshot, "free">) => T): T {
-            const memorySnapshot = this.capture();
-            const result = block(memorySnapshot);
-            memorySnapshot.free();
-            return result;
-        }
-
         /** Creates a memory snapshot with the given handle. */
         constructor(handle: NativePointer = Il2Cpp.Api.memorySnapshotCapture()) {
             super(handle);
@@ -45,5 +37,13 @@ namespace Il2Cpp {
         free(): void {
             Il2Cpp.Api.memorySnapshotFree(this);
         }
+    }
+
+    /** */
+    export function memorySnapshot<T>(block: (memorySnapshot: Omit<Il2Cpp.MemorySnapshot, "free">) => T): T {
+        const memorySnapshot = Il2Cpp.MemorySnapshot.capture();
+        const result = block(memorySnapshot);
+        memorySnapshot.free();
+        return result;
     }
 }

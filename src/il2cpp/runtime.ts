@@ -8,7 +8,7 @@ namespace Il2Cpp {
         /** @internal */
         @lazy
         static get information(): [number, number, number, number, number, number] {
-            return Il2Cpp.MemorySnapshot.use(Il2Cpp.Api.memorySnapshotGetRuntimeInformation);
+            return Il2Cpp.memorySnapshot(Il2Cpp.Api.memorySnapshotGetRuntimeInformation);
         }
 
         /** Gets the pointer size. */
