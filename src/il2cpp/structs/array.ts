@@ -1,23 +1,5 @@
 namespace Il2Cpp {
     export class Array<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends NativeStruct implements Iterable<T> {
-        /** Creates a new empty array of the given length. */
-        static from<T extends Il2Cpp.Field.Type>(klass: Il2Cpp.Class, length: number): Il2Cpp.Array<T>;
-
-        /** Creates a new array with the given elements. */
-        static from<T extends Il2Cpp.Field.Type>(klass: Il2Cpp.Class, elements: T[]): Il2Cpp.Array<T>;
-
-        /** @internal */
-        static from<T extends Il2Cpp.Field.Type>(klass: Il2Cpp.Class, lengthOrElements: number | T[]): Il2Cpp.Array<T> {
-            const length = typeof lengthOrElements == "number" ? lengthOrElements : lengthOrElements.length;
-            const array = new Il2Cpp.Array<T>(Il2Cpp.Api.arrayNew(klass, length));
-
-            if (globalThis.Array.isArray(lengthOrElements)) {
-                array.elements.write(lengthOrElements);
-            }
-
-            return array;
-        }
-
         /** Gets the Il2CppArray struct size, possibly equal to `Process.pointerSize * 4`. */
         @lazy
         static get headerSize(): number {
@@ -83,5 +65,23 @@ namespace Il2Cpp {
                 yield this.elements.get(i);
             }
         }
+    }
+
+    /** Creates a new empty array of the given length. */
+    export function array<T extends Il2Cpp.Field.Type>(klass: Il2Cpp.Class, length: number): Il2Cpp.Array<T>;
+
+    /** Creates a new array with the given elements. */
+    export function array<T extends Il2Cpp.Field.Type>(klass: Il2Cpp.Class, elements: T[]): Il2Cpp.Array<T>;
+
+    /** @internal */
+    export function array<T extends Il2Cpp.Field.Type>(klass: Il2Cpp.Class, lengthOrElements: number | T[]): Il2Cpp.Array<T> {
+        const length = typeof lengthOrElements == "number" ? lengthOrElements : lengthOrElements.length;
+        const array = new Il2Cpp.Array<T>(Il2Cpp.Api.arrayNew(klass, length));
+
+        if (globalThis.Array.isArray(lengthOrElements)) {
+            array.elements.write(lengthOrElements);
+        }
+
+        return array;
     }
 }
