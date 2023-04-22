@@ -2,10 +2,6 @@ namespace Il2Cpp {
     /** Gets the attached threads. */
     export declare const attachedThreads: Il2Cpp.Thread[];
     getter(Il2Cpp, "attachedThreads", () => {
-        if (Il2Cpp.currentThread == null) {
-            raise("only Il2Cpp threads can invoke Il2Cpp.attachedThreads");
-        }
-
         return readNativeList(Il2Cpp.Api.threadGetAllAttachedThreads).map(_ => new Il2Cpp.Thread(_));
     });
 
