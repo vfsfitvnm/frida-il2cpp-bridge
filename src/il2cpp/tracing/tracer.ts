@@ -64,4 +64,9 @@ ${returnValue == undefined ? `` : ` = \x1b[36m${fromFridaValue(returnValue, targ
         Default,
         Detailed
     }
+
+    /** Creates a new `Il2Cpp.Tracer` instance. */
+    export function trace(): Pick<Il2Cpp.Tracer, "detailed" | "domain" | "assemblies" | "classes" | "methods"> {
+        return new Il2Cpp.Tracer();
+    }
 }

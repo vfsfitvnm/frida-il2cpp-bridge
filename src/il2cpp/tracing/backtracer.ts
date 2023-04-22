@@ -133,4 +133,9 @@ ${debugSymbol.moduleName}`);
         Distinct = 1 << 1,
         Clean = 1 << 2
     }
+
+    /** Creates a new `Il2Cpp.Backtracer` instance. */
+    export function backtrace(): Pick<Il2Cpp.Backtracer, "accurate" | "fuzzy"> {
+        return new Il2Cpp.Backtracer();
+    }
 }
