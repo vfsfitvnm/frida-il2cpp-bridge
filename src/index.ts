@@ -22,6 +22,7 @@
 /// <reference path="./il2cpp/structs/array.ts">/>
 /// <reference path="./il2cpp/structs/assembly.ts">/>
 /// <reference path="./il2cpp/structs/class.ts">/>
+/// <reference path="./il2cpp/structs/delegate.ts">/>
 /// <reference path="./il2cpp/structs/domain.ts">/>
 /// <reference path="./il2cpp/structs/field.ts">/>
 /// <reference path="./il2cpp/structs/image.ts">/>

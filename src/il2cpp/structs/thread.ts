@@ -98,7 +98,7 @@ namespace Il2Cpp {
         /** Schedules a callback on the current thread. */
         schedule<T>(block: () => T | Promise<T>, delayMs: number = 0): Promise<T> {
             return new Promise(resolve => {
-                const delegate = Il2Cpp.corlib.class("System.Threading.SendOrPostCallback").delegate(() => {
+                const delegate = Il2Cpp.delegate(Il2Cpp.corlib.class("System.Threading.SendOrPostCallback"), () => {
                     const result = block();
                     setImmediate(() => resolve(result));
                 });

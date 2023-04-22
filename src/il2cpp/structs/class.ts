@@ -207,37 +207,6 @@ namespace Il2Cpp {
             return new Il2Cpp.Object(Il2Cpp.Api.objectNew(this));
         }
 
-        /** Creates a delegate object of the current delegate class. */
-        delegate(block: (...args: any[]) => any): Il2Cpp.Object {
-            const SystemDelegate = Il2Cpp.corlib.class("System.Delegate");
-            const SystemMulticastDelegate = Il2Cpp.corlib.class("System.MulticastDelegate");
-
-            if (!SystemDelegate.isAssignableFrom(this)) {
-                raise(`cannot create a delegate for ${this.type.name} as it's a non-delegate class`);
-            }
-
-            if (this.equals(SystemDelegate) || this.equals(SystemMulticastDelegate)) {
-                raise(`cannot create a delegate for neither ${SystemDelegate.type.name} nor ${SystemMulticastDelegate.type.name}, use a subclass instead`);
-            }
-
-            const delegate = this.alloc();
-            const key = delegate.handle.toString();
-
-            const Invoke = delegate.tryMethod("Invoke") ?? raise(`cannot create a delegate for ${this.type.name}, there is no Invoke method`);
-            delegate.method(".ctor").invoke(delegate, Invoke.handle);
-
-            const callback = Invoke.wrap((...args: any[]): any => {
-                delete _delegateNativeCallbacks[key];
-                return block(...args);
-            });
-
-            delegate.field("method_ptr").value = callback;
-            delegate.field("invoke_impl").value = callback;
-            _delegateNativeCallbacks[key] = callback;
-
-            return delegate;
-        }
-
         /** Gets the field identified by the given name. */
         field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> {
             return this.tryField<T>(name) ?? raise(`couldn't find field ${name} in class ${this.type.name}`);
