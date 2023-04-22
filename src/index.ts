@@ -18,7 +18,6 @@
 /// <reference path="./il2cpp/module.ts">/>
 /// <reference path="./il2cpp/perform.ts">/>
 /// <reference path="./il2cpp/runtime.ts">/>
-/// <reference path="./il2cpp/threading.ts">/>
 
 /// <reference path="./il2cpp/structs/array.ts">/>
 /// <reference path="./il2cpp/structs/assembly.ts">/>
