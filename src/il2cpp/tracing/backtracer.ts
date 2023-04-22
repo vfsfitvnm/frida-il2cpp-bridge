@@ -3,7 +3,7 @@ namespace Il2Cpp {
     export class Backtracer extends AbstractTracer {
         #flags: Flags = Flags.Empty;
 
-        readonly #methods = Il2Cpp.Domain.assemblies
+        readonly #methods = Il2Cpp.domain.assemblies
             .flatMap(_ => _.image.classes.flatMap(_ => _.methods.filter(_ => !_.virtualAddress.isNull())))
             .sort((_, __) => _.virtualAddress.compare(__.virtualAddress));
 

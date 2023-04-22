@@ -6,7 +6,7 @@ namespace Il2Cpp {
         const destination = `${path ?? Il2Cpp.applicationDataPath}/${fileName}`;
         const file = new File(destination, "w");
 
-        for (const assembly of Il2Cpp.Domain.assemblies) {
+        for (const assembly of Il2Cpp.domain.assemblies) {
             inform(`dumping ${assembly.name}...`);
 
             for (const klass of assembly.image.classes) {

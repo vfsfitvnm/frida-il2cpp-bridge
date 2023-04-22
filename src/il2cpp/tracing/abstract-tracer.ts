@@ -121,7 +121,7 @@ abstract class AbstractTracer {
             }
         };
 
-        const filterDomain = (domain: typeof Il2Cpp.Domain): void => {
+        const filterDomain = (domain: Il2Cpp.Domain): void => {
             if (this.#assemblyFilter == undefined) {
                 filterAssemblies(domain.assemblies);
                 return;
@@ -140,7 +140,7 @@ abstract class AbstractTracer {
             ? filterClasses(this.#classes)
             : this.#assemblies
             ? filterAssemblies(this.#assemblies)
-            : filterDomain(Il2Cpp.Domain);
+            : filterDomain(Il2Cpp.domain);
 
         this.#assemblies = undefined;
         this.#classes = undefined;

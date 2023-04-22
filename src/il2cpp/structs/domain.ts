@@ -1,11 +1,9 @@
 namespace Il2Cpp {
-    /** Represents a `Il2CppDomain`. */
-    export class Domain {
-        protected constructor() {}
-
+    @recycle
+    export class Domain extends NonNullNativeStruct {
         /** Gets the assemblies that have been loaded into the execution context of the application domain. */
         @lazy
-        static get assemblies(): Il2Cpp.Assembly[] {
+        get assemblies(): Il2Cpp.Assembly[] {
             let handles = readNativeList(_ => Il2Cpp.Api.domainGetAssemblies(this, _));
 
             if (handles.length == 0) {
@@ -16,32 +14,33 @@ namespace Il2Cpp {
             return handles.map(_ => new Il2Cpp.Assembly(_));
         }
 
-        /** Gets the application domain handle. */
-        @lazy
-        static get handle(): NativePointer {
-            return Il2Cpp.Api.domainGet();
-        }
-
         /** Gets the encompassing object of the application domain. */
         @lazy
-        static get object(): Il2Cpp.Object {
+        get object(): Il2Cpp.Object {
             return new Il2Cpp.Object(Il2Cpp.Api.domainGetObject());
         }
 
         /** Opens and loads the assembly with the given name. */
-        static assembly(name: string): Il2Cpp.Assembly {
+        assembly(name: string): Il2Cpp.Assembly {
             return this.tryAssembly(name) ?? raise(`couldn't find assembly ${name}`);
         }
 
         /** Attached a new thread to the application domain. */
-        static attach(): Il2Cpp.Thread {
+        attach(): Il2Cpp.Thread {
             return new Il2Cpp.Thread(Il2Cpp.Api.threadAttach(this));
         }
 
         /** Opens and loads the assembly with the given name. */
-        static tryAssembly(name: string): Il2Cpp.Assembly | null {
+        tryAssembly(name: string): Il2Cpp.Assembly | null {
             const handle = Il2Cpp.Api.domainAssemblyOpen(this, Memory.allocUtf8String(name));
             return handle.isNull() ? null : new Il2Cpp.Assembly(handle);
         }
     }
+
+    /** Gets the application domain. */
+    export declare const domain: Il2Cpp.Domain;
+    // prettier-ignore
+    getter(Il2Cpp, "domain", () => {
+        return new Il2Cpp.Domain(Il2Cpp.Api.domainGet());
+    }, lazy);
 }

@@ -6,7 +6,7 @@ namespace Il2Cpp {
         const isForeignThread = thread == null;
 
         if (thread == null) {
-            thread = Il2Cpp.Domain.attach();
+            thread = Il2Cpp.domain.attach();
         }
 
         try {
