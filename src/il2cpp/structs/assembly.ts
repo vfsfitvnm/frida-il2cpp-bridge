@@ -16,7 +16,7 @@ namespace Il2Cpp {
         /** Gets the encompassing object of the current assembly. */
         @lazy
         get object(): Il2Cpp.Object {
-            return Il2Cpp.corlib.class("System.Reflection.Assembly").method<Il2Cpp.Object>("Load").invoke(Il2Cpp.String.from(this.name));
+            return Il2Cpp.corlib.class("System.Reflection.Assembly").method<Il2Cpp.Object>("Load").invoke(Il2Cpp.string(this.name));
         }
     }
 }

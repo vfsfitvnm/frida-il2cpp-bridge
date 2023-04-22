@@ -25,10 +25,10 @@ namespace Il2Cpp {
         toString(): string {
             return this.isNull() ? "null" : `"${this.content}"`;
         }
+    }
 
-        /** Creates a new string with the specified content. */
-        static from(content: string | null): Il2Cpp.String {
-            return new Il2Cpp.String(Il2Cpp.Api.stringNew(Memory.allocUtf8String(content || "")));
-        }
+    /** Creates a new string with the specified content. */
+    export function string(content: string | null): Il2Cpp.String {
+        return new Il2Cpp.String(Il2Cpp.Api.stringNew(Memory.allocUtf8String(content || "")));
     }
 }
