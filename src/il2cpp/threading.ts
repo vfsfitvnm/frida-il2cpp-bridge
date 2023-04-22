@@ -15,4 +15,12 @@ namespace Il2Cpp {
         const handle = Il2Cpp.Api.threadCurrent();
         return handle.isNull() ? null : new Il2Cpp.Thread(handle);
     });
+
+    /** Gets the current attached thread, if any. */
+    export declare const mainThread: Il2Cpp.Thread;
+    getter(Il2Cpp, "mainThread", () => {
+        // I'm not sure if this is always the case. Alternatively, we could pick the thread
+        // with the lowest managed id, but I'm not sure that always holds true, either.
+        return attachedThreads[0];
+    });
 }
