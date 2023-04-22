@@ -3,14 +3,16 @@
     "target": "es2022",
     "lib": [ "es2020" ],
     "moduleResolution": "node",
-    "experimentalDecorators": true,
-    "declaration": true,
     "outDir": "dist",
     "outFile": "dist/index.js",
-    "esModuleInterop": true,
-    "stripInternal": true,
+    "sourceRoot": ".",
+    "declaration": true,
+    "experimentalDecorators": true,
     "sourceMap": true,
-    "strict": true
-  },
-  "files": [ "src/index.ts" ]
+    "strict": true,
+    "stripInternal": true,
+    "plugins": [ 
+      { "transform": "ts-transformer-inline-file/transformer" }
+    ],
+  }
 }

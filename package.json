@@ -24,7 +24,7 @@
     "dist"
   ],
   "scripts": {
-    "prepare": "tsc && ccatjs dist/index.js dist/index.js --silent"
+    "prepare": "tspc"
   },
   "prettier": {
     "arrowParens": "avoid",
@@ -35,7 +35,12 @@
   },
   "devDependencies": {
     "@types/frida-gum": "^18.3.1",
-    "ccatjs": "^4.1.1",
-    "typescript": "^5.0.4"
+    "ts-patch": "^3.0.0-beta3",
+    "ts-transformer-inline-file": "^0.2.0"
+  },
+  "overrides": {
+    "ts-transformer-inline-file": {
+      "typescript": "^5.0.0"
+    }
   }
 }

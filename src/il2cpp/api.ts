@@ -700,9 +700,7 @@ namespace Il2Cpp {
         /** @internal */
         @lazy
         private static get cModule(): Record<string, NativePointer | null> {
-            const offsetsFinderCModule = new CModule(`
-            @import:(../src/il2cpp/cmodules/offset-of.c)
-            `);
+            const offsetsFinderCModule = new CModule($inline_file("cmodules/offset-of.c"));
 
             const offsetOfInt32 = new NativeFunction(offsetsFinderCModule.offset_of_int32, "int16", ["pointer", "int32"]);
             const offsetOfPointer = new NativeFunction(offsetsFinderCModule.offset_of_pointer, "int16", ["pointer", "pointer"]);
@@ -725,31 +723,28 @@ namespace Il2Cpp {
             const FilterTypeNameMethod = FilterTypeName.field<NativePointer>("method").value;
             const FilterTypeNameInvoke = FilterTypeName.method("Invoke");
 
-            const cModule = new CModule(
-                `
+            const defines = `
                 #define IL2CPP_STRING_SET_LENGTH_OFFSET ${offsetOfInt32(Il2Cpp.string("vfsfitvnm"), 9)}
                 #define IL2CPP_ARRAY_GET_ELEMENTS_OFFSET ${offsetOfInt32(DaysToMonth365, 31) - 1}
                 #define IL2CPP_CLASS_GET_ACTUAL_INSTANCE_SIZE_OFFSET ${offsetOfInt32(SystemString, SystemString.instanceSize - 2)}
                 #define IL2CPP_METHOD_GET_POINTER_OFFSET ${offsetOfPointer(FilterTypeNameMethod, FilterTypeNameMethodPointer)}
                 #define IL2CPP_METHOD_GET_FROM_REFLECTION_OFFSET ${offsetOfPointer(FilterTypeNameInvoke.object, FilterTypeNameInvoke)}
-                @import:(../src/il2cpp/cmodules/api.c)
-                @import:(../src/il2cpp/cmodules/memory-snapshot.c)
-                `,
-                {
-                    il2cpp_class_from_name: this.classFromName,
-                    il2cpp_class_get_method_from_name: this.classGetMethodFromName,
-                    il2cpp_class_get_name: this.classGetName,
-                    il2cpp_field_get_flags: this.fieldGetFlags,
-                    il2cpp_field_get_offset: this.fieldGetOffset,
-                    il2cpp_free: this.free,
-                    il2cpp_image_get_corlib: this.getCorlib,
-                    il2cpp_method_get_flags: this.methodGetFlags,
-                    il2cpp_type_get_name: this.typeGetName,
-                    il2cpp_type_get_type_enum: this.typeGetTypeEnum
-                }
-            );
+            `;
 
             offsetsFinderCModule.dispose();
+
+            const cModule = new CModule(defines + $inline_file("cmodules/api.c") + $inline_file("cmodules/memory-snapshot.c"), {
+                il2cpp_class_from_name: this.classFromName,
+                il2cpp_class_get_method_from_name: this.classGetMethodFromName,
+                il2cpp_class_get_name: this.classGetName,
+                il2cpp_field_get_flags: this.fieldGetFlags,
+                il2cpp_field_get_offset: this.fieldGetOffset,
+                il2cpp_free: this.free,
+                il2cpp_image_get_corlib: this.getCorlib,
+                il2cpp_method_get_flags: this.methodGetFlags,
+                il2cpp_type_get_name: this.typeGetName,
+                il2cpp_type_get_type_enum: this.typeGetTypeEnum
+            });
 
             return cModule;
         }
@@ -766,3 +761,6 @@ namespace Il2Cpp {
         }
     }
 }
+
+/** @internal */
+declare const $inline_file: typeof import("ts-transformer-inline-file").$INLINE_FILE;
