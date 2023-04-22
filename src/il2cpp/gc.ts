@@ -1,44 +1,42 @@
 namespace Il2Cpp {
-    export class GC {
-        protected constructor() {}
-
+    export const gc = {
         /** Gets the heap size in bytes. */
-        static get heapSize(): Int64 {
+        get heapSize(): Int64 {
             return Il2Cpp.Api.gcGetHeapSize();
-        }
+        },
 
         /** Determines whether the garbage collector is disabled. */
-        static get isEnabled(): boolean {
+        get isEnabled(): boolean {
             return !Il2Cpp.Api.gcIsDisabled();
-        }
+        },
 
         /** Determines whether the garbage collector is incremental. */
-        static get isIncremental(): boolean {
+        get isIncremental(): boolean {
             return !!Il2Cpp.Api.gcIsIncremental();
-        }
+        },
 
         /** Gets the number of nanoseconds the garbage collector can spend in a collection step. */
-        static get maxTimeSlice(): Int64 {
+        get maxTimeSlice(): Int64 {
             return Il2Cpp.Api.gcGetMaxTimeSlice();
-        }
+        },
 
         /** Gets the used heap size in bytes. */
-        static get usedHeapSize(): Int64 {
+        get usedHeapSize(): Int64 {
             return Il2Cpp.Api.gcGetUsedSize();
-        }
+        },
 
         /** Enables or disables the garbage collector. */
-        static set isEnabled(value: boolean) {
+        set isEnabled(value: boolean) {
             value ? Il2Cpp.Api.gcEnable() : Il2Cpp.Api.gcDisable();
-        }
+        },
 
         /** Sets the number of nanoseconds the garbage collector can spend in a collection step. */
-        static set maxTimeSlice(nanoseconds: number | Int64) {
+        set maxTimeSlice(nanoseconds: number | Int64) {
             Il2Cpp.Api.gcSetMaxTimeSlice(nanoseconds);
-        }
+        },
 
         /** Returns the heap allocated objects of the specified class. This variant reads GC descriptors. */
-        static choose(klass: Il2Cpp.Class): Il2Cpp.Object[] {
+        choose(klass: Il2Cpp.Class): Il2Cpp.Object[] {
             const matches: Il2Cpp.Object[] = [];
 
             const callback = (objects: NativePointer, size: number) => {
@@ -61,13 +59,13 @@ namespace Il2Cpp {
 
                 const reallocCallback = new NativeCallback(realloc, "pointer", ["pointer", "size_t", "pointer"]);
 
-                Il2Cpp.GC.stopWorld();
+                this.stopWorld();
 
                 const state = Il2Cpp.Api.livenessAllocateStruct(klass, 0, chooseCallback, NULL, reallocCallback);
                 Il2Cpp.Api.livenessCalculationFromStatics(state);
                 Il2Cpp.Api.livenessFinalize(state);
 
-                Il2Cpp.GC.startWorld();
+                this.startWorld();
 
                 Il2Cpp.Api.livenessFreeStruct(state);
             } else {
@@ -79,31 +77,31 @@ namespace Il2Cpp {
             }
 
             return matches;
-        }
+        },
 
         /** Forces a garbage collection of the specified generation. */
-        static collect(generation: 0 | 1 | 2): void {
+        collect(generation: 0 | 1 | 2): void {
             Il2Cpp.Api.gcCollect(generation < 0 ? 0 : generation > 2 ? 2 : generation);
-        }
+        },
 
         /** Forces a garbage collection. */
-        static collectALittle(): void {
+        collectALittle(): void {
             Il2Cpp.Api.gcCollectALittle();
-        }
+        },
 
         /** Resumes all the previously stopped threads. */
-        static startWorld(): void {
+        startWorld(): void {
             return Il2Cpp.Api.gcStartWorld();
-        }
+        },
 
         /** Performs an incremental garbage collection. */
-        static startIncrementalCollection(): void {
+        startIncrementalCollection(): void {
             return Il2Cpp.Api.gcStartIncrementalCollection();
-        }
+        },
 
         /** Stops all threads which may access the garbage collected heap, other than the caller. */
-        static stopWorld(): void {
+        stopWorld(): void {
             return Il2Cpp.Api.gcStopWorld();
         }
-    }
+    };
 }
