@@ -170,7 +170,7 @@ namespace Il2Cpp {
             }
 
             const types = classes.map(_ => _.type.object);
-            const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.class("System.Type"), types);
+            const typeArray = Il2Cpp.Array.from(Il2Cpp.corlib.class("System.Type"), types);
 
             const inflatedMethodObject = this.object.method<Il2Cpp.Object>("MakeGenericMethod", 1).invoke(typeArray);
             return new Il2Cpp.Method(Il2Cpp.Api.methodGetFromReflection(inflatedMethodObject));

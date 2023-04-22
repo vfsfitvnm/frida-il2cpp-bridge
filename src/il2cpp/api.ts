@@ -707,9 +707,9 @@ namespace Il2Cpp {
             const offsetOfInt32 = new NativeFunction(offsetsFinderCModule.offset_of_int32, "int16", ["pointer", "int32"]);
             const offsetOfPointer = new NativeFunction(offsetsFinderCModule.offset_of_pointer, "int16", ["pointer", "pointer"]);
 
-            const SystemString = Il2Cpp.Image.corlib.class("System.String");
-            const SystemDateTime = Il2Cpp.Image.corlib.class("System.DateTime");
-            const SystemReflectionModule = Il2Cpp.Image.corlib.class("System.Reflection.Module");
+            const SystemString = Il2Cpp.corlib.class("System.String");
+            const SystemDateTime = Il2Cpp.corlib.class("System.DateTime");
+            const SystemReflectionModule = Il2Cpp.corlib.class("System.Reflection.Module");
 
             SystemDateTime.initialize();
             SystemReflectionModule.initialize();

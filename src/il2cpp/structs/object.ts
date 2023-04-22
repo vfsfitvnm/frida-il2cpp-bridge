@@ -3,7 +3,7 @@ namespace Il2Cpp {
         /** Gets the Il2CppObject struct size, possibly equal to `Process.pointerSize * 2`. */
         @lazy
         static get headerSize(): number {
-            return Il2Cpp.Image.corlib.class("System.Object").instanceSize;
+            return Il2Cpp.corlib.class("System.Object").instanceSize;
         }
 
         /** Gets the class of this object. */

@@ -209,8 +209,8 @@ namespace Il2Cpp {
 
         /** Creates a delegate object of the current delegate class. */
         delegate(block: (...args: any[]) => any): Il2Cpp.Object {
-            const SystemDelegate = Il2Cpp.Image.corlib.class("System.Delegate");
-            const SystemMulticastDelegate = Il2Cpp.Image.corlib.class("System.MulticastDelegate");
+            const SystemDelegate = Il2Cpp.corlib.class("System.Delegate");
+            const SystemMulticastDelegate = Il2Cpp.corlib.class("System.MulticastDelegate");
 
             if (!SystemDelegate.isAssignableFrom(this)) {
                 raise(`cannot create a delegate for ${this.type.name} as it's a non-delegate class`);
@@ -254,7 +254,7 @@ namespace Il2Cpp {
             }
 
             const types = classes.map(_ => _.type.object);
-            const typeArray = Il2Cpp.Array.from(Il2Cpp.Image.corlib.class("System.Type"), types);
+            const typeArray = Il2Cpp.Array.from(Il2Cpp.corlib.class("System.Type"), types);
 
             const inflatedType = this.type.object.method<Il2Cpp.Object>("MakeGenericType", 1).invoke(typeArray);
             return new Il2Cpp.Class(Il2Cpp.Api.classFromSystemType(inflatedType));

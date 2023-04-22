@@ -29,7 +29,7 @@ namespace Il2Cpp {
 
             switch (typeof value) {
                 case "boolean":
-                    return new Il2Cpp.Reference(handle.writeS8(+value), Il2Cpp.Image.corlib.class("System.Boolean").type);
+                    return new Il2Cpp.Reference(handle.writeS8(+value), Il2Cpp.corlib.class("System.Boolean").type);
                 case "number":
                     switch (type?.typeEnum) {
                         case Il2Cpp.Type.Enum.U1:
@@ -68,9 +68,9 @@ namespace Il2Cpp {
                                 return new Il2Cpp.Reference<T>(handle.writePointer(value), type);
                         }
                     } else if (value instanceof Int64) {
-                        return new Il2Cpp.Reference<T>(handle.writeS64(value), Il2Cpp.Image.corlib.class("System.Int64").type);
+                        return new Il2Cpp.Reference<T>(handle.writeS64(value), Il2Cpp.corlib.class("System.Int64").type);
                     } else if (value instanceof UInt64) {
-                        return new Il2Cpp.Reference<T>(handle.writeU64(value), Il2Cpp.Image.corlib.class("System.UInt64").type);
+                        return new Il2Cpp.Reference<T>(handle.writeU64(value), Il2Cpp.corlib.class("System.UInt64").type);
                     }
                 default:
                     raise(`don't know how to create a reference to ${value} using type ${type?.name}`);

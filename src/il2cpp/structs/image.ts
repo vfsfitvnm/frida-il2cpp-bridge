@@ -1,12 +1,6 @@
 namespace Il2Cpp {
     @recycle
     export class Image extends NonNullNativeStruct {
-        /** Gets the COR library. */
-        @lazy
-        static get corlib(): Il2Cpp.Image {
-            return new Il2Cpp.Image(Il2Cpp.Api.getCorlib());
-        }
-
         /** Gets the assembly in which the current image is defined. */
         @lazy
         get assembly(): Il2Cpp.Assembly {
@@ -54,4 +48,11 @@ namespace Il2Cpp {
             return handle.isNull() ? null : new Il2Cpp.Class(handle);
         }
     }
+
+    /** Gets the COR library. */
+    export declare const corlib: Il2Cpp.Image;
+    // prettier-ignore
+    getter(Il2Cpp, "corlib", () => {
+        return new Il2Cpp.Image(Il2Cpp.Api.getCorlib());
+    }, lazy);
 }

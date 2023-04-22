@@ -65,7 +65,7 @@ namespace Il2Cpp {
                 executionContext.tryMethod<Il2Cpp.Object>("get_SynchronizationContext")?.invoke();
 
             if (synchronizationContext == null) {
-                const SystemThreadingSynchronizationContext = Il2Cpp.Image.corlib.class("System.Threading.SynchronizationContext");
+                const SystemThreadingSynchronizationContext = Il2Cpp.corlib.class("System.Threading.SynchronizationContext");
 
                 for (let i = 0; i < 16; i++) {
                     try {
@@ -98,7 +98,7 @@ namespace Il2Cpp {
         /** Schedules a callback on the current thread. */
         schedule<T>(block: () => T | Promise<T>, delayMs: number = 0): Promise<T> {
             return new Promise(resolve => {
-                const delegate = Il2Cpp.Image.corlib.class("System.Threading.SendOrPostCallback").delegate(() => {
+                const delegate = Il2Cpp.corlib.class("System.Threading.SendOrPostCallback").delegate(() => {
                     const result = block();
                     setImmediate(() => resolve(result));
                 });
