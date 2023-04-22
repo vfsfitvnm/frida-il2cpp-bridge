@@ -15,19 +15,4 @@ namespace Il2Cpp {
         const handle = Il2Cpp.Api.threadCurrent();
         return handle.isNull() ? null : new Il2Cpp.Thread(handle);
     });
-
-    /** Schedules a callback on the Il2Cpp initializer thread. */
-    export function scheduleOnInitializerThread<T>(block: () => T | Promise<T>): Promise<T> {
-        const maybeInitializerThread = Il2Cpp.attachedThreads[0];
-
-        return new Promise<T>(resolve => {
-            const listener = Interceptor.attach(Il2Cpp.Api.threadCurrent, () => {
-                if (Il2Cpp.Api.threadCurrent().equals(maybeInitializerThread)) {
-                    listener.detach();
-                    const result = block();
-                    setImmediate(() => resolve(result));
-                }
-            });
-        });
-    }
 }
