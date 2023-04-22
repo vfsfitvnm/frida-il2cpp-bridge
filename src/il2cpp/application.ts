@@ -1,30 +1,26 @@
 namespace Il2Cpp {
-    /** */
-    export declare const applicationDataPath: string;
-    // prettier-ignore
-    getter(Il2Cpp, "applicationDataPath", () => {
-        const get_persistentDataPath = Il2Cpp.Runtime.internalCall("UnityEngine.Application::get_persistentDataPath", "pointer", [])!;
-        return new Il2Cpp.String(get_persistentDataPath()).content!;
-    }, lazy);
+    export const application = {
+        /** */
+        get dataPath(): string {
+            const get_persistentDataPath = Il2Cpp.Runtime.internalCall("UnityEngine.Application::get_persistentDataPath", "pointer", [])!;
+            return new Il2Cpp.String(get_persistentDataPath()).content!;
+        },
 
-    /** */
-    export declare const applicationIdentifier: string | null;
-    // prettier-ignore
-    getter(Il2Cpp, "applicationIdentifier", () => {
-        const get_identifier =
-            Il2Cpp.Runtime.internalCall("UnityEngine.Application::get_identifier", "pointer", []) ??
-            Il2Cpp.Runtime.internalCall("UnityEngine.Application::get_bundleIdentifier", "pointer", []);
+        /** */
+        get identifier(): string | null {
+            const get_identifier =
+                Il2Cpp.Runtime.internalCall("UnityEngine.Application::get_identifier", "pointer", []) ??
+                Il2Cpp.Runtime.internalCall("UnityEngine.Application::get_bundleIdentifier", "pointer", []);
 
-        return get_identifier ? new Il2Cpp.String(get_identifier()).content : null;
-    }, lazy);
+            return get_identifier ? new Il2Cpp.String(get_identifier()).content : null;
+        },
 
-    /** Gets the version of the application */
-    export declare const applicationVersion: string | null;
-    // prettier-ignore
-    getter(Il2Cpp, "applicationVersion", () => {
-        const get_version = Il2Cpp.Runtime.internalCall("UnityEngine.Application::get_version", "pointer", []);
-        return get_version ? new Il2Cpp.String(get_version()).content : null;
-    }, lazy);
+        /** Gets the version of the application */
+        get version(): string | null {
+            const get_version = Il2Cpp.Runtime.internalCall("UnityEngine.Application::get_version", "pointer", []);
+            return get_version ? new Il2Cpp.String(get_version()).content : null;
+        }
+    };
 
     /** Gets the Unity version of the current application. */
     export declare const unityVersion: string;

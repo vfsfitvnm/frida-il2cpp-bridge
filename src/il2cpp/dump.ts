@@ -1,9 +1,9 @@
 namespace Il2Cpp {
     /** Dumps the application. */
     export function dump(fileName?: string, path?: string): void {
-        fileName = fileName ?? `${Il2Cpp.applicationIdentifier ?? "unknown"}_${Il2Cpp.applicationVersion ?? "unknown"}.cs`;
+        fileName = fileName ?? `${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}.cs`;
 
-        const destination = `${path ?? Il2Cpp.applicationDataPath}/${fileName}`;
+        const destination = `${path ?? Il2Cpp.application.dataPath}/${fileName}`;
         const file = new File(destination, "w");
 
         for (const assembly of Il2Cpp.domain.assemblies) {
