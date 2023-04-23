@@ -1,42 +1,32 @@
 namespace Il2Cpp {
     /** Backtracing utilities. */
-    export class Backtracer extends AbstractTracer {
-        #flags: Flags = Flags.Empty;
+    export class Backtracer extends Il2Cpp.AbstractTracer {
+        /** @internal */
+        private mode?: globalThis.Backtracer;
 
-        readonly #methods = Il2Cpp.domain.assemblies
+        /** @internal */
+        private isVerbose: boolean = true;
+
+        /** @internal */
+        readonly methodList = Il2Cpp.domain.assemblies
             .flatMap(_ => _.image.classes.flatMap(_ => _.methods.filter(_ => !_.virtualAddress.isNull())))
             .sort((_, __) => _.virtualAddress.compare(__.virtualAddress));
 
-        accurate(): Pick<Il2Cpp.Backtracer, "verbose" | "distinct"> {
-            this.#flags |= Flags.Accurate;
+        /** */
+        strategy(value: "fuzzy" | "accurate"): Pick<Il2Cpp.Backtracer, "verbose"> {
+            this.mode = (globalThis as any).Backtracer[value.toUpperCase()];
             return this;
         }
 
-        fuzzy(): ReturnType<Il2Cpp.Backtracer["accurate"]> {
-            return this;
-        }
-
-        verbose(): Pick<Il2Cpp.Backtracer, "clean" | "dirty"> {
-            return this;
-        }
-
-        distinct(): ReturnType<Il2Cpp.Backtracer["verbose"]> {
-            this.#flags |= Flags.Distinct;
-            return this;
-        }
-
-        dirty(): Pick<Il2Cpp.Backtracer, "domain" | "assemblies" | "classes" | "methods"> {
-            return this;
-        }
-
-        clean(): ReturnType<Il2Cpp.Backtracer["dirty"]> {
-            this.#flags |= Flags.Clean;
+        /** Determines whether print duplicate logs. */
+        verbose(value: boolean): Il2Cpp.AbstractTracer.ChooseTargets {
+            this.isVerbose = value;
             return this;
         }
 
         attach(): void {
             const backtracer = this;
-            const history = backtracer.#flags & Flags.Distinct ? new Set<string>() : undefined;
+            const history = this.isVerbose ? undefined : new Set<string>();
 
             for (const target of this.targets) {
                 if (target.virtualAddress.isNull()) {
@@ -45,14 +35,11 @@ namespace Il2Cpp {
 
                 try {
                     Interceptor.attach(target.virtualAddress, function () {
-                        let backtrace = globalThis.Thread.backtrace(
-                            this.context,
-                            backtracer.#flags & Flags.Accurate ? (globalThis as any).Backtracer.ACCURATE : (globalThis as any).Backtracer.FUZZY
-                        ).reverse();
+                        let backtrace = globalThis.Thread.backtrace(this.context, backtracer.mode).reverse();
 
                         backtrace.push(target.virtualAddress);
 
-                        if (backtracer.#flags & Flags.Distinct) {
+                        if (!backtracer.isVerbose) {
                             const key = backtrace.map(_ => _.toString()).join("");
 
                             if (history?.has(key)) {
@@ -67,7 +54,7 @@ namespace Il2Cpp {
                         for (const address of backtrace) {
                             const method =
                                 address >= Il2Cpp.module.base && address < Il2Cpp.module.base.add(Il2Cpp.module.size)
-                                    ? backtracer.#searchInsert(address)
+                                    ? backtracer.searchInsert(address)
                                     : undefined;
 
                             const decoration = i == 0 ? "" : `${" ".repeat((i - 1) * 2)}└─`;
@@ -75,29 +62,19 @@ namespace Il2Cpp {
                             if (method != undefined) {
                                 const offset = address.sub(method.virtualAddress);
 
-                                if (backtracer.#flags & Flags.Clean && address.sub(method.virtualAddress).compare(0xfff) > 0) {
+                                if (address.sub(method.virtualAddress).compare(0xfff) > 0) {
                                     continue;
                                 }
 
                                 inform(`\
 \x1b[2m\
 0x${method.relativeVirtualAddress.toString(16).padStart(8, `0`)}\
-+0x${offset.toString(16).padStart(backtracer.#flags & Flags.Clean ? 3 : 8, `0`)}\
++0x${offset.toString(16).padStart(3, `0`)}\
 \x1b[0m\
  ${decoration}\
 ${method.class.type.name}.\x1b[1m${method.name}\x1b[0m`);
                             } else {
-                                if (backtracer.#flags & Flags.Clean) {
-                                    continue;
-                                }
-
-                                const debugSymbol = DebugSymbol.fromAddress(address);
-                                inform(`\
-\x1b[2m\
-0x${debugSymbol.address.toString(16).padStart(19, `0`)}\
-\x1b[0m\
- ${decoration}\
-${debugSymbol.moduleName}`);
+                                continue;
                             }
 
                             i++;
@@ -107,35 +84,29 @@ ${debugSymbol.moduleName}`);
             }
         }
 
-        #searchInsert(target: NativePointer): Il2Cpp.Method {
+        /** @internal */
+        private searchInsert(target: NativePointer): Il2Cpp.Method {
             let left = 0;
-            let right = this.#methods.length - 1;
+            let right = this.methodList.length - 1;
 
             while (left <= right) {
                 const pivot = Math.floor((left + right) / 2);
-                const comparison = this.#methods[pivot].virtualAddress.compare(target);
+                const comparison = this.methodList[pivot].virtualAddress.compare(target);
 
                 if (comparison == 0) {
-                    return this.#methods[pivot];
+                    return this.methodList[pivot];
                 } else if (comparison > 0) {
                     right = pivot - 1;
                 } else {
                     left = pivot + 1;
                 }
             }
-            return this.#methods[right];
+            return this.methodList[right];
         }
     }
 
-    const enum Flags {
-        Empty = 0,
-        Accurate = 1 << 0,
-        Distinct = 1 << 1,
-        Clean = 1 << 2
-    }
-
     /** Creates a new `Il2Cpp.Backtracer` instance. */
-    export function backtrace(): Pick<Il2Cpp.Backtracer, "accurate" | "fuzzy"> {
+    export function backtrace(): Pick<Il2Cpp.Backtracer, "strategy"> {
         return new Il2Cpp.Backtracer();
     }
 }
