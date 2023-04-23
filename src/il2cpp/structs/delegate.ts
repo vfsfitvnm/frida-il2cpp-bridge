@@ -1,6 +1,9 @@
 namespace Il2Cpp {
     /** Creates a delegate object of the given delegate class. */
-    export function delegate(klass: Il2Cpp.Class, block: (...args: any[]) => any): Il2Cpp.Object {
+    export function delegate<P extends Il2Cpp.Parameter.Type[], R extends Il2Cpp.Method.ReturnType>(
+        klass: Il2Cpp.Class,
+        block: (...args: P) => R
+    ): Il2Cpp.Object {
         const SystemDelegate = Il2Cpp.corlib.class("System.Delegate");
         const SystemMulticastDelegate = Il2Cpp.corlib.class("System.MulticastDelegate");
 
@@ -20,7 +23,7 @@ namespace Il2Cpp {
 
         const callback = Invoke.wrap((...args: any[]): any => {
             delete _delegateNativeCallbacks[key];
-            return block(...args);
+            return block(...(args as any));
         });
 
         delegate.field("method_ptr").value = callback;
