@@ -458,8 +458,8 @@ namespace Il2Cpp {
         }
 
         @lazy
-        static get memorySnapshotGetGCHandles() {
-            return this.r("il2cpp_memory_snapshot_get_gc_handles", ["uint32", "pointer"], ["pointer"]);
+        static get memorySnapshotGetObjects() {
+            return this.r("il2cpp_memory_snapshot_get_objects", "pointer", ["pointer", "pointer"]);
         }
 
         @lazy

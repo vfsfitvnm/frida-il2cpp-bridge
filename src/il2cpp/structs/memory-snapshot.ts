@@ -19,18 +19,8 @@ namespace Il2Cpp {
         /** Gets the objects tracked by this memory snapshot. */
         @lazy
         get objects(): Il2Cpp.Object[] {
-            const array: Il2Cpp.Object[] = [];
-
-            const [count, start] = Il2Cpp.Api.memorySnapshotGetGCHandles(this);
-
-            for (let i = 0; i < count; i++) {
-                const handle = start.add(i * Process.pointerSize).readPointer();
-                if (!handle.isNull()) {
-                    array.push(new Il2Cpp.Object(handle));
-                }
-            }
-
-            return array;
+            // prettier-ignore
+            return readNativeList(_ => Il2Cpp.Api.memorySnapshotGetObjects(this, _)).filter(_ => !_.isNull()).map(_ => new Il2Cpp.Object(_));
         }
 
         /** Frees this memory snapshot. */

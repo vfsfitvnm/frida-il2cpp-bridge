@@ -81,11 +81,12 @@ il2cpp_memory_snapshot_get_classes (
   return 0;
 }
 
-struct Il2CppGCHandles
-il2cpp_memory_snapshot_get_gc_handles (
-    const Il2CppManagedMemorySnapshot * snapshot)
+void **
+il2cpp_memory_snapshot_get_objects (
+    const Il2CppManagedMemorySnapshot * snapshot, uint32_t * size)
 {
-  return snapshot->gc_handles;
+  *size = snapshot->gc_handles.tracked_object_count;
+  return snapshot->gc_handles.pointers_to_objects;
 }
 
 struct Il2CppRuntimeInformation
