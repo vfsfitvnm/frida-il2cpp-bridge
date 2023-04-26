@@ -32,4 +32,7 @@ namespace Il2Cpp {
 
         return delegate;
     }
+
+    /** @internal Used to prevent eager garbage collection against NativeCallbacks. */
+    const _delegateNativeCallbacks: Record<string, NativeCallback<"void", []> | undefined> = {};
 }

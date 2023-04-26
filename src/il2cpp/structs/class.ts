@@ -309,7 +309,4 @@ ${inherited ? ` : ${inherited.map(_ => _?.type.name).join(`, `)}` : ``}
             return Il2Cpp.Api.classForEach(callback, NULL);
         }
     }
-
-    /** @internal Used to prevent eager garbage collection against NativeCallbacks. */
-    export const _delegateNativeCallbacks: Record<string, NativeCallback<"void", []> | undefined> = {};
 }
