@@ -103,7 +103,13 @@ namespace Il2Cpp {
                     setImmediate(() => resolve(result));
                 });
 
-                setTimeout(() => this.synchronizationContext.method("Post").invoke(delegate, NULL), delayMs);
+                const post = this.synchronizationContext.method("Post").invoke.bind(null, delegate, NULL);
+
+                if (delayMs > 0) {
+                    setTimeout(post, delayMs);
+                } else {
+                    post();
+                }
             });
         }
     }
