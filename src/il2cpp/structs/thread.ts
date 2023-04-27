@@ -57,31 +57,13 @@ namespace Il2Cpp {
         /** @internal */
         @lazy
         private get synchronizationContext(): Il2Cpp.Object {
-            const get_ExecutionContext = this.object.tryMethod<Il2Cpp.Object>("GetMutableExecutionContext") || this.object.method("get_ExecutionContext");
+            const get_ExecutionContext = this.object.tryMethod<Il2Cpp.Object>("GetMutableExecutionContext") ?? this.object.method("get_ExecutionContext");
             const executionContext = get_ExecutionContext.invoke();
 
             let synchronizationContext =
                 executionContext.tryField<Il2Cpp.Object>("_syncContext")?.value ??
-                executionContext.tryMethod<Il2Cpp.Object>("get_SynchronizationContext")?.invoke();
-
-            if (synchronizationContext == null) {
-                const SystemThreadingSynchronizationContext = Il2Cpp.corlib.class("System.Threading.SynchronizationContext");
-
-                for (let i = 0; i < 16; i++) {
-                    try {
-                        const candidate = new Il2Cpp.Object(
-                            this.staticData
-                                .add(Process.pointerSize * i)
-                                .readPointer()
-                                .readPointer()
-                        );
-                        if (candidate.class.isSubclassOf(SystemThreadingSynchronizationContext, false)) {
-                            synchronizationContext = candidate;
-                            break;
-                        }
-                    } catch (e) {}
-                }
-            }
+                executionContext.tryMethod<Il2Cpp.Object>("get_SynchronizationContext")?.invoke() ??
+                this.tryLocalValue(Il2Cpp.corlib.class("System.Threading.SynchronizationContext"));
 
             if (synchronizationContext == null || synchronizationContext.isNull()) {
                 raise("couldn't retrieve the SynchronizationContext for this thread.");
@@ -111,6 +93,19 @@ namespace Il2Cpp {
                     post();
                 }
             });
+        }
+
+        /** @internal */
+        tryLocalValue(klass: Il2Cpp.Class): Il2Cpp.Object | undefined {
+            for (let i = 0; i < 16; i++) {
+                const base = this.staticData.add(i * Process.pointerSize).readPointer();
+                if (!base.isNull()) {
+                    const object = new Il2Cpp.Object(base.readPointer());
+                    if (!object.isNull() && object.class.isSubclassOf(klass, false)) {
+                        return object;
+                    }
+                }
+            }
         }
     }
 
