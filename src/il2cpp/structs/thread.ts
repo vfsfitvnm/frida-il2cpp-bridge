@@ -1,27 +1,10 @@
 namespace Il2Cpp {
     export class Thread extends NativeStruct {
-        /** @internal */
-        @lazy
-        private static get idOffset(): number {
-            const handle = ptr(Il2Cpp.currentThread!.internal.field<UInt64>("thread_id").value.toString());
-            const currentThreadId = Process.getCurrentThreadId();
-
-            for (let i = 0; i < 1024; i++) {
-                try {
-                    const candidate = handle.add(i).readS32();
-                    if (candidate == currentThreadId) {
-                        return i;
-                    }
-                } catch (e: any) {}
-            }
-
-            raise(`couldn't find the offset for determining the native id of a thread`);
-        }
-
         /** Gets the native id of the current thread. */
         @lazy
         get id(): number {
-            return ptr(this.internal.field<UInt64>("thread_id").value.toString()).add(Il2Cpp.Thread.idOffset).readS32();
+            const id = this.internal.field<UInt64>("thread_id").value.toNumber();
+            return Process.platform == "windows" ? id : posixThreadGetKernelId(ptr(id));
         }
 
         /** Gets the encompassing internal object (System.Threding.InternalThreead) of the current thread. */
@@ -133,4 +116,28 @@ namespace Il2Cpp {
         // with the lowest managed id, but I'm not sure that always holds true, either.
         return attachedThreads[0];
     });
+
+    /** @internal */
+    let posixThreadKernelIdOffset = -1;
+
+    /** @internal */
+    function posixThreadGetKernelId(posixThread: NativePointer): number {
+        if (posixThreadKernelIdOffset == -1) {
+            const currentPosixThread = ptr(Il2Cpp.currentThread!.internal.field<UInt64>("thread_id").value.toNumber());
+            const currentThreadId = Process.getCurrentThreadId();
+
+            for (let i = 0; i < 1024; i++) {
+                if (currentPosixThread.add(i).readS32() == currentThreadId) {
+                    posixThreadKernelIdOffset = i;
+                    break;
+                }
+            }
+
+            if (posixThreadKernelIdOffset == -1) {
+                raise(`couldn't find the offset for determining the kernel id of a posix thread`);
+            }
+        }
+
+        return posixThread.add(posixThreadKernelIdOffset).readS32();
+    }
 }
