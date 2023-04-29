@@ -74,7 +74,7 @@ namespace Il2Cpp {
                     return new Il2Cpp.Reference<T>(handle.writeU64(value), Il2Cpp.corlib.class("System.UInt64").type);
                 }
             default:
-                raise(`don't know how to create a reference to ${value} using type ${type?.name}`);
+                raise(`couldn't create a reference to ${value} using an unhandled type ${type?.name}`);
         }
     }
 }

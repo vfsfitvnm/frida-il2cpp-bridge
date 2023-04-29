@@ -215,11 +215,11 @@ namespace Il2Cpp {
         /** Builds a generic instance of the current generic class. */
         inflate(...classes: Il2Cpp.Class[]): Il2Cpp.Class {
             if (!this.isGeneric) {
-                raise(`cannot inflate class ${this.type.name}: it has no generic parameters`);
+                raise(`cannot inflate class ${this.type.name} as it has no generic parameters`);
             }
 
             if (this.genericParameterCount != classes.length) {
-                raise(`cannot inflate class ${this.type.name}: it needs ${this.genericParameterCount} generic parameter(s), not ${classes.length}`);
+                raise(`cannot inflate class ${this.type.name} as it needs ${this.genericParameterCount} generic parameter(s), not ${classes.length}`);
             }
 
             const types = classes.map(_ => _.type.object);

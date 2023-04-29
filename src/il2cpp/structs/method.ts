@@ -146,12 +146,12 @@ namespace Il2Cpp {
             } catch (e: any) {
                 switch (e.message) {
                     case "access violation accessing 0x0":
-                        raise(`cannot implement method ${this.name}: it has a NULL virtual address`);
+                        raise(`couldn't set implementation for method ${this.name} as it has a NULL virtual address`);
                     case `unable to intercept function at ${this.virtualAddress}; please file a bug`:
-                        warn(`cannot implement method ${this.name}: it may be a thunk`);
+                        warn(`couldn't set implementation for method ${this.name} as it may be a thunk`);
                         break;
                     case "already replaced this function":
-                        warn(`cannot implement method ${this.name}: already replaced by a thunk`);
+                        warn(`couldn't set implementation for method ${this.name} as it has already been replaced by a thunk`);
                         break;
                     default:
                         throw e;
@@ -162,11 +162,11 @@ namespace Il2Cpp {
         /** Creates a generic instance of the current generic method. */
         inflate<R extends Il2Cpp.Method.ReturnType = T>(...classes: Il2Cpp.Class[]): Il2Cpp.Method<R> {
             if (!this.isGeneric) {
-                raise(`cannot inflate method ${this.name}: it has no generic parameters`);
+                raise(`cannot inflate method ${this.name} as it has no generic parameters`);
             }
 
             if (this.genericParameterCount != classes.length) {
-                raise(`cannot inflate method ${this.name}: it needs ${this.genericParameterCount} generic parameter(s), not ${classes.length}`);
+                raise(`cannot inflate method ${this.name} as it needs ${this.genericParameterCount} generic parameter(s), not ${classes.length}`);
             }
 
             const types = classes.map(_ => _.type.object);
@@ -179,7 +179,7 @@ namespace Il2Cpp {
         /** Invokes this method. */
         invoke(...parameters: Il2Cpp.Parameter.Type[]): T {
             if (!this.isStatic) {
-                raise(`cannot invoke a non-static method ${this.name}: must be invoked throught a Il2Cpp.Object, not a Il2Cpp.Class`);
+                raise(`cannot invoke non-static method ${this.name} as it must be invoked throught a Il2Cpp.Object, not a Il2Cpp.Class`);
             }
             return this.invokeRaw(NULL, ...parameters);
         }
@@ -201,16 +201,16 @@ namespace Il2Cpp {
                 return fromFridaValue(returnValue, this.returnType) as T;
             } catch (e: any) {
                 if (e == null) {
-                    raise("an unexpected native function exception occurred, this is due to parameter types mismatch");
+                    raise("an unexpected native invocation exception occurred, this is due to parameter types mismatch");
                 }
 
                 switch (e.message) {
                     case "bad argument count":
-                        raise(`cannot invoke method ${this.name}: it needs ${this.parameterCount} parameter(s), not ${parameters.length}`);
+                        raise(`couldn't invoke method ${this.name} as it needs ${this.parameterCount} parameter(s), not ${parameters.length}`);
                     case "expected a pointer":
                     case "expected number":
                     case "expected array with fields":
-                        raise(`cannot invoke method ${this.name}: parameter types mismatch`);
+                        raise(`couldn't invoke method ${this.name} using incorrect parameter types`);
                 }
 
                 throw e;
@@ -223,7 +223,7 @@ namespace Il2Cpp {
 
             if (result != undefined) return result;
 
-            raise(`cannot find overloaded method ${this.name}(${parameterTypes})`);
+            raise(`couldn't find overloaded method ${this.name}(${parameterTypes})`);
         }
 
         /** Gets the parameter with the given name. */

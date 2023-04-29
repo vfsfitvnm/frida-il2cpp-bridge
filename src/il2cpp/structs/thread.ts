@@ -15,7 +15,7 @@ namespace Il2Cpp {
                 } catch (e: any) {}
             }
 
-            raise(`couldn't determine the offset for a native thread id value`);
+            raise(`couldn't find the offset for determining the native id of a thread`);
         }
 
         /** Gets the native id of the current thread. */
@@ -66,7 +66,11 @@ namespace Il2Cpp {
                 this.tryLocalValue(Il2Cpp.corlib.class("System.Threading.SynchronizationContext"));
 
             if (synchronizationContext == null || synchronizationContext.isNull()) {
-                raise("couldn't retrieve the SynchronizationContext for this thread.");
+                if (this.managedId == 1) {
+                    raise(`couldn't find the synchronization context of the main thread, perhaps this is early instrumentation?`);
+                } else {
+                    raise(`couldn't find the synchronization context of thread #${this.managedId}, only the main thread is expected to have one`);
+                }
             }
 
             return synchronizationContext;

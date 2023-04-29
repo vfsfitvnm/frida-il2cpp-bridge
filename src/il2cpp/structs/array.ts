@@ -39,7 +39,7 @@ namespace Il2Cpp {
         /** Gets the element at the specified index of the current array. */
         get(index: number): T {
             if (index < 0 || index >= this.length) {
-                raise(`cannot get element at index ${index}: array length is ${this.length}`);
+                raise(`cannot get element at index ${index} as the array length is ${this.length}`);
             }
 
             return this.elements.get(index);
@@ -48,7 +48,7 @@ namespace Il2Cpp {
         /** Sets the element at the specified index of the current array. */
         set(index: number, value: T) {
             if (index < 0 || index >= this.length) {
-                raise(`cannot get element at index ${index}: array length is ${this.length}`);
+                raise(`cannot set element at index ${index} as the array length is ${this.length}`);
             }
 
             this.elements.set(index, value);

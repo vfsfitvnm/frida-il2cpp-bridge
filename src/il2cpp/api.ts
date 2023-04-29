@@ -754,7 +754,7 @@ namespace Il2Cpp {
             const exportPointer = Il2Cpp.module.findExportByName(exportName) ?? this.cModule[exportName];
 
             if (exportPointer == null) {
-                raise(`cannot resolve export ${exportName}`);
+                raise(`couldn't resolve export ${exportName}`);
             }
 
             return new NativeFunction(exportPointer, retType, argTypes);

@@ -55,7 +55,7 @@ namespace Il2Cpp {
                 return new Il2Cpp.Array(pointer.readPointer());
         }
 
-        raise(`read: "${type.name}" (${type.typeEnum}) has not been handled yet. Please file an issue!`);
+        raise(`couldn't read the value from ${pointer} using an unhandled or unknown type ${type.name} (${type.typeEnum}), please file an issue`);
     }
 
     /** @internal */
@@ -103,7 +103,7 @@ namespace Il2Cpp {
                 return pointer.writePointer(value);
         }
 
-        raise(`write: "${type.name}" (${type.typeEnum}) has not been handled yet. Please file an issue!`);
+        raise(`couldn't write value ${value} to ${pointer} using an unhandled or unknown type ${type.name} (${type.typeEnum}), please file an issue`);
     }
 
     /** @internal */

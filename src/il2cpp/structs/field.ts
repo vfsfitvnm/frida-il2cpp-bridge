@@ -65,7 +65,7 @@ namespace Il2Cpp {
         /** Sets the value of this field. Thread static or literal values cannot be altered yet. */
         set value(value: T) {
             if (this.isThreadStatic || this.isLiteral) {
-                raise(`cannot modify the value of field ${this.name}: is thread static or literal`);
+                raise(`cannot write the value of field ${this.name} as it's thread static or literal`);
             }
 
             const handle = Memory.alloc(Process.pointerSize);
