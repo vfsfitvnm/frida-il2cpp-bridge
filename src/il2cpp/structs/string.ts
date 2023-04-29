@@ -29,6 +29,6 @@ namespace Il2Cpp {
 
     /** Creates a new string with the specified content. */
     export function string(content: string | null): Il2Cpp.String {
-        return new Il2Cpp.String(Il2Cpp.Api.stringNew(Memory.allocUtf8String(content || "")));
+        return new Il2Cpp.String(Il2Cpp.Api.stringNew(Memory.allocUtf8String(content ?? "")));
     }
 }
