@@ -5,13 +5,13 @@ namespace Il2Cpp {
 
         /** Gets the object associated to this handle. */
         get target(): Il2Cpp.Object | null {
-            const handle = Il2Cpp.Api.gcHandleGetTarget(this.handle);
+            const handle = Il2Cpp.api.gcHandleGetTarget(this.handle);
             return handle.isNull() ? null : new Il2Cpp.Object(handle);
         }
 
         /** Frees this handle. */
         free(): void {
-            return Il2Cpp.Api.gcHandleFree(this.handle);
+            return Il2Cpp.api.gcHandleFree(this.handle);
         }
     }
 }

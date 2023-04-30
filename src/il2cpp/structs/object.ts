@@ -9,23 +9,23 @@ namespace Il2Cpp {
         /** Gets the class of this object. */
         @lazy
         get class(): Il2Cpp.Class {
-            return new Il2Cpp.Class(Il2Cpp.Api.objectGetClass(this));
+            return new Il2Cpp.Class(Il2Cpp.api.objectGetClass(this));
         }
 
         /** Gets the size of the current object. */
         @lazy
         get size(): number {
-            return Il2Cpp.Api.objectGetSize(this);
+            return Il2Cpp.api.objectGetSize(this);
         }
 
         /** Acquires an exclusive lock on the current object. */
         enter(): void {
-            return Il2Cpp.Api.monitorEnter(this);
+            return Il2Cpp.api.monitorEnter(this);
         }
 
         /** Release an exclusive lock on the current object. */
         exit(): void {
-            return Il2Cpp.Api.monitorExit(this);
+            return Il2Cpp.api.monitorExit(this);
         }
 
         /** Gets the field with the given name. */
@@ -40,27 +40,27 @@ namespace Il2Cpp {
 
         /** Notifies a thread in the waiting queue of a change in the locked object's state. */
         pulse(): void {
-            return Il2Cpp.Api.monitorPulse(this);
+            return Il2Cpp.api.monitorPulse(this);
         }
 
         /** Notifies all waiting threads of a change in the object's state. */
         pulseAll(): void {
-            return Il2Cpp.Api.monitorPulseAll(this);
+            return Il2Cpp.api.monitorPulseAll(this);
         }
 
         /** Creates a reference to this object. */
         ref(pin: boolean): Il2Cpp.GCHandle {
-            return new Il2Cpp.GCHandle(Il2Cpp.Api.gcHandleNew(this, +pin));
+            return new Il2Cpp.GCHandle(Il2Cpp.api.gcHandleNew(this, +pin));
         }
 
         /** Gets the correct virtual method from the given virtual method. */
         virtualMethod<T extends Il2Cpp.Method.ReturnType>(method: Il2Cpp.Method): Il2Cpp.Method<T> {
-            return new Il2Cpp.Method<T>(Il2Cpp.Api.objectGetVirtualMethod(this, method)).withHolder(this);
+            return new Il2Cpp.Method<T>(Il2Cpp.api.objectGetVirtualMethod(this, method)).withHolder(this);
         }
 
         /** Attempts to acquire an exclusive lock on the current object. */
         tryEnter(timeout: number): boolean {
-            return !!Il2Cpp.Api.monitorTryEnter(this, timeout);
+            return !!Il2Cpp.api.monitorTryEnter(this, timeout);
         }
 
         /** Gets the field with the given name. */
@@ -75,7 +75,7 @@ namespace Il2Cpp {
 
         /** Releases the lock on an object and attempts to block the current thread until it reacquires the lock. */
         tryWait(timeout: number): boolean {
-            return !!Il2Cpp.Api.monitorTryWait(this, timeout);
+            return !!Il2Cpp.api.monitorTryWait(this, timeout);
         }
 
         /** */
@@ -85,17 +85,17 @@ namespace Il2Cpp {
 
         /** Unboxes the value type out of this object. */
         unbox(): Il2Cpp.ValueType {
-            return new Il2Cpp.ValueType(Il2Cpp.Api.objectUnbox(this), this.class.type);
+            return new Il2Cpp.ValueType(Il2Cpp.api.objectUnbox(this), this.class.type);
         }
 
         /** Releases the lock on an object and blocks the current thread until it reacquires the lock. */
         wait(): void {
-            return Il2Cpp.Api.monitorWait(this);
+            return Il2Cpp.api.monitorWait(this);
         }
 
         /** Creates a weak reference to this object. */
         weakRef(trackResurrection: boolean): Il2Cpp.GCHandle {
-            return new Il2Cpp.GCHandle(Il2Cpp.Api.gcHandleNewWeakRef(this, +trackResurrection));
+            return new Il2Cpp.GCHandle(Il2Cpp.api.gcHandleNewWeakRef(this, +trackResurrection));
         }
     }
 }

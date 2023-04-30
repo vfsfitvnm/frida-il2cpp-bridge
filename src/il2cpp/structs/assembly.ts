@@ -4,7 +4,7 @@ namespace Il2Cpp {
         /** Gets the image of this assembly. */
         @lazy
         get image(): Il2Cpp.Image {
-            return new Il2Cpp.Image(Il2Cpp.Api.assemblyGetImage(this));
+            return new Il2Cpp.Image(Il2Cpp.api.assemblyGetImage(this));
         }
 
         /** Gets the name of this assembly. */

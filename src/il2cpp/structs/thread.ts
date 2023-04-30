@@ -16,7 +16,7 @@ namespace Il2Cpp {
         /** Determines whether the current thread is the garbage collector finalizer one. */
         @lazy
         get isFinalizer(): boolean {
-            return !Il2Cpp.Api.threadIsVm(this);
+            return !Il2Cpp.api.threadIsVm(this);
         }
 
         /** Gets the managed id of the current thread. */
@@ -61,7 +61,7 @@ namespace Il2Cpp {
 
         /** Detaches the thread from the application domain. */
         detach(): void {
-            return Il2Cpp.Api.threadDetach(this);
+            return Il2Cpp.api.threadDetach(this);
         }
 
         /** Schedules a callback on the current thread. */
@@ -99,13 +99,13 @@ namespace Il2Cpp {
     /** Gets the attached threads. */
     export declare const attachedThreads: Il2Cpp.Thread[];
     getter(Il2Cpp, "attachedThreads", () => {
-        return readNativeList(Il2Cpp.Api.threadGetAllAttachedThreads).map(_ => new Il2Cpp.Thread(_));
+        return readNativeList(Il2Cpp.api.threadGetAllAttachedThreads).map(_ => new Il2Cpp.Thread(_));
     });
 
     /** Gets the current attached thread, if any. */
     export declare const currentThread: Il2Cpp.Thread | null;
     getter(Il2Cpp, "currentThread", () => {
-        const handle = Il2Cpp.Api.threadCurrent();
+        const handle = Il2Cpp.api.threadCurrent();
         return handle.isNull() ? null : new Il2Cpp.Thread(handle);
     });
 

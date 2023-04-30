@@ -44,9 +44,9 @@ namespace Il2Cpp {
             await forModule(Il2Cpp.moduleName);
         }
 
-        if (Il2Cpp.Api.getCorlib().isNull()) {
+        if (Il2Cpp.api.getCorlib().isNull()) {
             await new Promise<void>(resolve => {
-                const interceptor = Interceptor.attach(Il2Cpp.Api.init, {
+                const interceptor = Interceptor.attach(Il2Cpp.api.init, {
                     onLeave() {
                         interceptor.detach();
                         setImmediate(resolve);
