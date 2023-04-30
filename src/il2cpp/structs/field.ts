@@ -1,5 +1,5 @@
 namespace Il2Cpp {
-    export class Field<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends NonNullNativeStruct {
+    export class Field<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends NativeStruct {
         /** Gets the class in which this field is defined. */
         @lazy
         get class(): Il2Cpp.Class {

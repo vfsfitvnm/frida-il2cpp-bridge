@@ -1,5 +1,5 @@
 namespace Il2Cpp {
-    export class Type extends NonNullNativeStruct {
+    export class Type extends NativeStruct {
         /** Gets the class of this type. */
         @lazy
         get class(): Il2Cpp.Class {

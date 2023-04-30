@@ -1,5 +1,5 @@
 namespace Il2Cpp {
-    export class MemorySnapshot extends NonNullNativeStruct {
+    export class MemorySnapshot extends NativeStruct {
         /** Captures a memory snapshot. */
         static capture(): Il2Cpp.MemorySnapshot {
             return new Il2Cpp.MemorySnapshot();

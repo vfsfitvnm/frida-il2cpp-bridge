@@ -1,6 +1,6 @@
 namespace Il2Cpp {
     @recycle
-    export class Domain extends NonNullNativeStruct {
+    export class Domain extends NativeStruct {
         /** Gets the assemblies that have been loaded into the execution context of the application domain. */
         @lazy
         get assemblies(): Il2Cpp.Assembly[] {
@@ -32,8 +32,7 @@ namespace Il2Cpp {
 
         /** Opens and loads the assembly with the given name. */
         tryAssembly(name: string): Il2Cpp.Assembly | null {
-            const handle = Il2Cpp.api.domainAssemblyOpen(this, Memory.allocUtf8String(name));
-            return handle.isNull() ? null : new Il2Cpp.Assembly(handle);
+            return new Il2Cpp.Assembly(Il2Cpp.api.domainAssemblyOpen(this, Memory.allocUtf8String(name))).asNullable();
         }
     }
 

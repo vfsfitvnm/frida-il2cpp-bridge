@@ -1,6 +1,6 @@
 namespace Il2Cpp {
     @recycle
-    export class Class extends NonNullNativeStruct {
+    export class Class extends NativeStruct {
         /** Gets the actual size of the instance of the current class. */
         @lazy
         get actualInstanceSize(): number {
@@ -28,22 +28,19 @@ namespace Il2Cpp {
         /** Gets the class that declares the current nested class. */
         @lazy
         get declaringClass(): Il2Cpp.Class | null {
-            const handle = Il2Cpp.api.classGetDeclaringType(this);
-            return handle.isNull() ? null : new Il2Cpp.Class(handle);
+            return new Il2Cpp.Class(Il2Cpp.api.classGetDeclaringType(this)).asNullable();
         }
 
         /** Gets the encompassed type of this array, reference, pointer or enum type. */
         @lazy
         get baseType(): Il2Cpp.Type | null {
-            const handle = Il2Cpp.api.classGetBaseType(this);
-            return handle.isNull() ? null : new Il2Cpp.Type(handle);
+            return new Il2Cpp.Type(Il2Cpp.api.classGetBaseType(this)).asNullable();
         }
 
         /** Gets the class of the object encompassed or referred to by the current array, pointer or reference class. */
         @lazy
         get elementClass(): Il2Cpp.Class | null {
-            const handle = Il2Cpp.api.classGetElementClass(this);
-            return handle.isNull() ? null : new Il2Cpp.Class(handle);
+            return new Il2Cpp.Class(Il2Cpp.api.classGetElementClass(this)).asNullable();
         }
 
         /** Gets the fields of the current class. */
@@ -174,8 +171,7 @@ namespace Il2Cpp {
         /** Gets the class from which the current class directly inherits. */
         @lazy
         get parent(): Il2Cpp.Class | null {
-            const handle = Il2Cpp.api.classGetParent(this);
-            return handle.isNull() ? null : new Il2Cpp.Class(handle);
+            return new Il2Cpp.Class(Il2Cpp.api.classGetParent(this)).asNullable();
         }
 
         /** Gets the rank (number of dimensions) of the current array class. */
@@ -273,14 +269,12 @@ namespace Il2Cpp {
 
         /** Gets the field with the given name. */
         tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> | null {
-            const handle = Il2Cpp.api.classGetFieldFromName(this, Memory.allocUtf8String(name));
-            return handle.isNull() ? null : new Il2Cpp.Field<T>(handle);
+            return new Il2Cpp.Field<T>(Il2Cpp.api.classGetFieldFromName(this, Memory.allocUtf8String(name))).asNullable();
         }
 
         /** Gets the method with the given name and parameter count. */
         tryMethod<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> | null {
-            const handle = Il2Cpp.api.classGetMethodFromName(this, Memory.allocUtf8String(name), parameterCount);
-            return handle.isNull() ? null : new Il2Cpp.Method<T>(handle);
+            return new Il2Cpp.Method<T>(Il2Cpp.api.classGetMethodFromName(this, Memory.allocUtf8String(name), parameterCount)).asNullable();
         }
 
         /** Gets the nested class with the given name. */

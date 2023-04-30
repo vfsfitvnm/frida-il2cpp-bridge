@@ -17,15 +17,8 @@ class NativeStruct implements ObjectWrapper {
     isNull(): boolean {
         return this.handle.isNull();
     }
-}
 
-/** Scaffold class whom pointer cannot be null. */
-class NonNullNativeStruct extends NativeStruct {
-    constructor(handle: NativePointer) {
-        super(handle);
-
-        if (handle.isNull()) {
-            throw new Error(`Handle for "${this.constructor.name}" cannot be NULL.`);
-        }
+    asNullable(): this | null {
+        return this.isNull() ? null : this;
     }
 }

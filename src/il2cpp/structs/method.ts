@@ -1,5 +1,5 @@
 namespace Il2Cpp {
-    export class Method<T extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType> extends NonNullNativeStruct {
+    export class Method<T extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType> extends NativeStruct {
         /** Gets the class in which this method is defined. */
         @lazy
         get class(): Il2Cpp.Class {

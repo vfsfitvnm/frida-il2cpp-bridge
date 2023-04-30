@@ -5,8 +5,7 @@ namespace Il2Cpp {
 
         /** Gets the object associated to this handle. */
         get target(): Il2Cpp.Object | null {
-            const handle = Il2Cpp.api.gcHandleGetTarget(this.handle);
-            return handle.isNull() ? null : new Il2Cpp.Object(handle);
+            return new Il2Cpp.Object(Il2Cpp.api.gcHandleGetTarget(this.handle)).asNullable();
         }
 
         /** Frees this handle. */

@@ -1,6 +1,6 @@
 namespace Il2Cpp {
     @recycle
-    export class Assembly extends NonNullNativeStruct {
+    export class Assembly extends NativeStruct {
         /** Gets the image of this assembly. */
         @lazy
         get image(): Il2Cpp.Image {

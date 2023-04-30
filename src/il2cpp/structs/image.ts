@@ -1,6 +1,6 @@
 namespace Il2Cpp {
     @recycle
-    export class Image extends NonNullNativeStruct {
+    export class Image extends NativeStruct {
         /** Gets the assembly in which the current image is defined. */
         @lazy
         get assembly(): Il2Cpp.Assembly {
@@ -44,8 +44,7 @@ namespace Il2Cpp {
             const classNamespace = Memory.allocUtf8String(dotIndex == -1 ? "" : name.slice(0, dotIndex));
             const className = Memory.allocUtf8String(name.slice(dotIndex + 1));
 
-            const handle = Il2Cpp.api.classFromName(this, classNamespace, className);
-            return handle.isNull() ? null : new Il2Cpp.Class(handle);
+            return new Il2Cpp.Class(Il2Cpp.api.classFromName(this, classNamespace, className)).asNullable();
         }
     }
 

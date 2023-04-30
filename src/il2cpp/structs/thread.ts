@@ -87,8 +87,8 @@ namespace Il2Cpp {
             for (let i = 0; i < 16; i++) {
                 const base = this.staticData.add(i * Process.pointerSize).readPointer();
                 if (!base.isNull()) {
-                    const object = new Il2Cpp.Object(base.readPointer());
-                    if (!object.isNull() && object.class.isSubclassOf(klass, false)) {
+                    const object = new Il2Cpp.Object(base.readPointer()).asNullable();
+                    if (object?.class?.isSubclassOf(klass, false)) {
                         return object;
                     }
                 }
@@ -105,8 +105,7 @@ namespace Il2Cpp {
     /** Gets the current attached thread, if any. */
     export declare const currentThread: Il2Cpp.Thread | null;
     getter(Il2Cpp, "currentThread", () => {
-        const handle = Il2Cpp.api.threadCurrent();
-        return handle.isNull() ? null : new Il2Cpp.Thread(handle);
+        return new Il2Cpp.Thread(Il2Cpp.api.threadCurrent()).asNullable();
     });
 
     /** Gets the current attached thread, if any. */
