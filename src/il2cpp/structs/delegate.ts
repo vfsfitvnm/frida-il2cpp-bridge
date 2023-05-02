@@ -22,17 +22,17 @@ namespace Il2Cpp {
         delegate.method(".ctor").invoke(delegate, Invoke.handle);
 
         const callback = Invoke.wrap((...args: any[]): any => {
-            delete _delegateNativeCallbacks[key];
+            delete _callbacksToKeepAlive[key];
             return block(...(args as any));
         });
 
         delegate.field("method_ptr").value = callback;
         delegate.field("invoke_impl").value = callback;
-        _delegateNativeCallbacks[key] = callback;
+        _callbacksToKeepAlive[key] = callback;
 
         return delegate;
     }
 
     /** @internal Used to prevent eager garbage collection against NativeCallbacks. */
-    const _delegateNativeCallbacks: Record<string, NativeCallback<"void", []> | undefined> = {};
+    export const _callbacksToKeepAlive: Record<string, NativeCallback<"void", []> | undefined> = {};
 }

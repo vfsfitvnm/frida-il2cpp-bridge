@@ -23,7 +23,7 @@ namespace Il2Cpp {
         const unityVersion = unityEngineCall("get_unityVersion");
 
         if (unityVersion != null) {
-            return unityVersion
+            return unityVersion;
         }
 
         const searchPattern = "45 64 69 74 6f 72 ?? 44 61 74 61 ?? 69 6c 32 63 70 70";
@@ -52,8 +52,9 @@ namespace Il2Cpp {
     }, lazy);
 
     function unityEngineCall(method: string): string | null {
-        const call = Il2Cpp.api.resolveInternalCall(Memory.allocUtf8String("UnityEngine.Application::" + method));
-        const string = call.isNull() ? null : new Il2Cpp.String(new NativeFunction(call, "pointer", [])());
-        return string?.isNull() ? null : string?.content ?? null;
+        const handle = Il2Cpp.api.resolveInternalCall(Memory.allocUtf8String("UnityEngine.Application::" + method));
+        const nativeFunction = new NativeFunction(handle, "pointer", []);
+
+        return nativeFunction.isNull() ? null : new Il2Cpp.String(nativeFunction()).asNullable()?.content ?? null;
     }
 }
