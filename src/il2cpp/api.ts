@@ -380,10 +380,6 @@ namespace Il2Cpp {
             return r("il2cpp_method_get_flags", "uint32", ["pointer", "pointer"]);
         },
 
-        get methodGetFromReflection() {
-            return r("il2cpp_method_get_from_reflection", "pointer", ["pointer"]);
-        },
-
         get methodGetName() {
             return r("il2cpp_method_get_name", "pointer", ["pointer"]);
         },
@@ -578,14 +574,12 @@ namespace Il2Cpp {
         const FilterTypeName = SystemReflectionModule.field<Il2Cpp.Object>("FilterTypeName").value;
         const FilterTypeNameMethodPointer = FilterTypeName.field<NativePointer>("method_ptr").value;
         const FilterTypeNameMethod = FilterTypeName.field<NativePointer>("method").value;
-        const FilterTypeNameInvoke = FilterTypeName.method("Invoke");
 
         const defines = `
             #define IL2CPP_STRING_SET_LENGTH_OFFSET ${offsetOfInt32(Il2Cpp.string("vfsfitvnm"), 9)}
             #define IL2CPP_ARRAY_GET_ELEMENTS_OFFSET ${offsetOfInt32(DaysToMonth365, 31) - 1}
             #define IL2CPP_CLASS_GET_ACTUAL_INSTANCE_SIZE_OFFSET ${offsetOfInt32(SystemString, SystemString.instanceSize - 2)}
             #define IL2CPP_METHOD_GET_POINTER_OFFSET ${offsetOfPointer(FilterTypeNameMethod, FilterTypeNameMethodPointer)}
-            #define IL2CPP_METHOD_GET_FROM_REFLECTION_OFFSET ${offsetOfPointer(FilterTypeNameInvoke.object, FilterTypeNameInvoke)}
         `;
 
         offsetsFinderCModule.dispose();

@@ -173,7 +173,7 @@ namespace Il2Cpp {
             const typeArray = Il2Cpp.array(Il2Cpp.corlib.class("System.Type"), types);
 
             const inflatedMethodObject = this.object.method<Il2Cpp.Object>("MakeGenericMethod", 1).invoke(typeArray);
-            return new Il2Cpp.Method(Il2Cpp.api.methodGetFromReflection(inflatedMethodObject));
+            return new Il2Cpp.Method(inflatedMethodObject.field<NativePointer>("mhandle").value);
         }
 
         /** Invokes this method. */
