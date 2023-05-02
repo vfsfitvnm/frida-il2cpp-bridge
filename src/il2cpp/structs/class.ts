@@ -226,8 +226,9 @@ namespace Il2Cpp {
         }
 
         /** Calls the static constructor of the current class. */
-        initialize(): void {
+        initialize(): Il2Cpp.Class {
             Il2Cpp.api.classInit(this);
+            return this;
         }
 
         /** Determines whether an instance of `other` class can be assigned to a variable of the current type. */
