@@ -368,10 +368,6 @@ namespace Il2Cpp {
             return r("il2cpp_memory_snapshot_get_objects", "pointer", ["pointer", "pointer"]);
         },
 
-        get memorySnapshotGetRuntimeInformation() {
-            return r("il2cpp_memory_snapshot_get_information", ["uint32", "uint32", "uint32", "uint32", "uint32", "uint32"], ["pointer"]);
-        },
-
         get methodGetModifier() {
             return r("il2cpp_method_get_modifier", "pointer", ["pointer"]);
         },
