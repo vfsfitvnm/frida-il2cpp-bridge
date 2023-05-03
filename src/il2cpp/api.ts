@@ -567,9 +567,9 @@ namespace Il2Cpp {
         SystemReflectionModule.initialize();
 
         const DaysToMonth365 =
-            SystemDateTime.tryField<Array<number>>("daysmonth")?.value ??
-            SystemDateTime.tryField<Array<number>>("DaysToMonth365")?.value ??
-            SystemDateTime.field<Array<number>>("s_daysToMonth365")?.value;
+            SystemDateTime.tryField<Il2Cpp.Array<number>>("daysmonth")?.value ??
+            SystemDateTime.tryField<Il2Cpp.Array<number>>("DaysToMonth365")?.value ??
+            SystemDateTime.field<Il2Cpp.Array<number>>("s_daysToMonth365")?.value;
 
         const FilterTypeName = SystemReflectionModule.field<Il2Cpp.Object>("FilterTypeName").value;
         const FilterTypeNameMethodPointer = FilterTypeName.field<NativePointer>("method_ptr").value;
