@@ -8,13 +8,10 @@ namespace Il2Cpp {
 
         /** @internal Gets a pointer to the first element of the current array. */
         get elements(): Il2Cpp.Pointer<T> {
-            const SystemDateTime = Il2Cpp.corlib.class("System.DateTime").initialize();
-            const DaysToMonth365 =
-                SystemDateTime.tryField<Il2Cpp.Array<number>>("daysmonth")?.value ??
-                SystemDateTime.tryField<Il2Cpp.Array<number>>("DaysToMonth365")?.value ??
-                SystemDateTime.field<Il2Cpp.Array<number>>("s_daysToMonth365")?.value;
+            const string = Il2Cpp.string("vfsfitvnm");
+            const array = string.object.method<Il2Cpp.Object>("Split", 1).invoke(NULL);
 
-            const offset = offsetOfInt32(DaysToMonth365.handle, 31) - 4;
+            const offset = offsetOfPointer(array.handle, string.handle);
 
             // prettier-ignore
             getter(Il2Cpp.Array.prototype, "elements", function (this: Il2Cpp.Array) {
