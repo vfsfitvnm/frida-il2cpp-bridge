@@ -61,13 +61,17 @@ namespace Il2Cpp {
         /** Determines whether this type is passed by reference. */
         @lazy
         get isByReference(): boolean {
-            return !!Il2Cpp.api.typeIsByReference(this);
+            return this.name.endsWith("&");
         }
 
         /** Determines whether this type is primitive. */
         @lazy
         get isPrimitive(): boolean {
-            return !!Il2Cpp.api.typeIsPrimitive(this);
+            return (
+                (this.typeEnum >= Il2Cpp.Type.Enum.Boolean && this.typeEnum <= Il2Cpp.Type.Enum.R8) ||
+                this.typeEnum == Il2Cpp.Type.Enum.NativeInteger ||
+                this.typeEnum == Il2Cpp.Type.Enum.UnsignedNativeInteger
+            );
         }
 
         /** Gets the name of this type. */

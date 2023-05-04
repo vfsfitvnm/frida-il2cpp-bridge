@@ -7,8 +7,16 @@ namespace Il2Cpp {
 
         /** Sets the content of this string. */
         set content(value: string | null) {
-            Il2Cpp.api.stringChars(this).writeUtf16String(value ?? "");
-            Il2Cpp.api.stringSetLength(this, value?.length ?? 0);
+            const offset = offsetOfInt32(Il2Cpp.string("vfsfitvnm").handle, 9);
+
+            globalThis.Object.defineProperty(Il2Cpp.String.prototype, "content", {
+                set(this: Il2Cpp.String, value: string | null) {
+                    Il2Cpp.api.stringChars(this).writeUtf16String(value ?? "");
+                    this.handle.add(offset).writeS32(value?.length ?? 0);
+                }
+            });
+
+            this.content = value;
         }
 
         /** Gets the length of this string. */

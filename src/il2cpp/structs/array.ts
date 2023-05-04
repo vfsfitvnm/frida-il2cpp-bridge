@@ -7,9 +7,21 @@ namespace Il2Cpp {
         }
 
         /** @internal Gets a pointer to the first element of the current array. */
-        @lazy
         get elements(): Il2Cpp.Pointer<T> {
-            return new Il2Cpp.Pointer(Il2Cpp.api.arrayGetElements(this), this.elementType);
+            const SystemDateTime = Il2Cpp.corlib.class("System.DateTime").initialize();
+            const DaysToMonth365 =
+                SystemDateTime.tryField<Il2Cpp.Array<number>>("daysmonth")?.value ??
+                SystemDateTime.tryField<Il2Cpp.Array<number>>("DaysToMonth365")?.value ??
+                SystemDateTime.field<Il2Cpp.Array<number>>("s_daysToMonth365")?.value;
+
+            const offset = offsetOfInt32(DaysToMonth365.handle, 31) - 4;
+
+            // prettier-ignore
+            getter(Il2Cpp.Array.prototype, "elements", function (this: Il2Cpp.Array) {
+                return new Il2Cpp.Pointer(this.handle.add(offset), this.elementType);
+            }, lazy);
+
+            return this.elements;
         }
 
         /** Gets the size of the object encompassed by the current array. */

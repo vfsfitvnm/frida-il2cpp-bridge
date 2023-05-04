@@ -2,9 +2,17 @@ namespace Il2Cpp {
     @recycle
     export class Class extends NativeStruct {
         /** Gets the actual size of the instance of the current class. */
-        @lazy
         get actualInstanceSize(): number {
-            return Il2Cpp.api.classGetActualInstanceSize(this);
+            const SystemString = Il2Cpp.corlib.class("System.String");
+
+            const offset = offsetOfInt32(SystemString.handle, SystemString.instanceSize - 2);
+
+            // prettier-ignore
+            getter(Il2Cpp.Class.prototype, "actualInstanceSize", function (this: Il2Cpp.Class) {
+                return this.handle.add(offset).readS32();
+            }, lazy);
+
+            return this.actualInstanceSize;
         }
 
         /** Gets the array class which encompass the current class. */
@@ -177,7 +185,19 @@ namespace Il2Cpp {
         /** Gets the rank (number of dimensions) of the current array class. */
         @lazy
         get rank(): number {
-            return Il2Cpp.api.classGetRank(this);
+            let rank = 0;
+            const name = this.name;
+
+            for (let i = this.name.length - 1; i > 0; i--) {
+                const c = name[i];
+
+                if (c == "]") rank++;
+                else if (c == "[" || rank == 0) break;
+                else if (c == ",") rank++;
+                else break;
+            }
+
+            return rank;
         }
 
         /** Gets a pointer to the static fields of the current class. */

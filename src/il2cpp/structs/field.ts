@@ -15,25 +15,38 @@ namespace Il2Cpp {
         /** Determines whether this field value is known at compile time. */
         @lazy
         get isLiteral(): boolean {
-            return !!Il2Cpp.api.fieldIsLiteral(this);
+            return (this.flags & Il2Cpp.Field.Attributes.Literal) != 0;
         }
 
         /** Determines whether this field is static. */
         @lazy
         get isStatic(): boolean {
-            return !!Il2Cpp.api.fieldIsStatic(this);
+            return (this.flags & Il2Cpp.Field.Attributes.Static) != 0;
         }
 
         /** Determines whether this field is thread static. */
         @lazy
         get isThreadStatic(): boolean {
-            return !!Il2Cpp.api.fieldIsThreadStatic(this);
+            return this.offset == -1;
         }
 
         /** Gets the access modifier of this field. */
         @lazy
-        get modifier(): string {
-            return Il2Cpp.api.fieldGetModifier(this).readUtf8String()!;
+        get modifier(): string | undefined {
+            switch (this.flags & Il2Cpp.Field.Attributes.FieldAccessMask) {
+                case Il2Cpp.Field.Attributes.Private:
+                    return "private";
+                case Il2Cpp.Field.Attributes.FamilyAndAssembly:
+                    return "private protected";
+                case Il2Cpp.Field.Attributes.Assembly:
+                    return "internal";
+                case Il2Cpp.Field.Attributes.Family:
+                    return "protected";
+                case Il2Cpp.Field.Attributes.FamilyOrAssembly:
+                    return "protected internal";
+                case Il2Cpp.Field.Attributes.Public:
+                    return "public";
+            }
         }
 
         /** Gets the name of this field. */

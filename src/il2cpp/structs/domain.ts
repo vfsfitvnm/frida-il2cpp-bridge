@@ -17,7 +17,7 @@ namespace Il2Cpp {
         /** Gets the encompassing object of the application domain. */
         @lazy
         get object(): Il2Cpp.Object {
-            return new Il2Cpp.Object(Il2Cpp.api.domainGetObject());
+            return Il2Cpp.corlib.class("System.AppDomain").method<Il2Cpp.Object>("get_CurrentDomain").invoke();
         }
 
         /** Opens and loads the assembly with the given name. */

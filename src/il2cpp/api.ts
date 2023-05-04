@@ -4,10 +4,6 @@ namespace Il2Cpp {
             return r("il2cpp_alloc", "pointer", ["size_t"]);
         },
 
-        get arrayGetElements() {
-            return r("il2cpp_array_get_elements", "pointer", ["pointer"]);
-        },
-
         get arrayGetLength() {
             return r("il2cpp_array_length", "uint32", ["pointer"]);
         },
@@ -34,10 +30,6 @@ namespace Il2Cpp {
 
         get classFromType() {
             return r("il2cpp_class_from_type", "pointer", ["pointer"]);
-        },
-
-        get classGetActualInstanceSize() {
-            return r("il2cpp_class_get_actual_instance_size", "int32", ["pointer"]);
         },
 
         get classGetArrayClass() {
@@ -112,10 +104,6 @@ namespace Il2Cpp {
             return r("il2cpp_class_get_parent", "pointer", ["pointer"]);
         },
 
-        get classGetRank() {
-            return r("il2cpp_class_get_rank", "int", ["pointer"]);
-        },
-
         get classGetStaticFieldData() {
             return r("il2cpp_class_get_static_field_data", "pointer", ["pointer"]);
         },
@@ -184,14 +172,6 @@ namespace Il2Cpp {
             return r("il2cpp_domain_get_assemblies", "pointer", ["pointer", "pointer"]);
         },
 
-        get domainGetObject() {
-            return r("il2cpp_domain_get_object", "pointer", []);
-        },
-
-        get fieldGetModifier() {
-            return r("il2cpp_field_get_modifier", "pointer", ["pointer"]);
-        },
-
         get fieldGetClass() {
             return r("il2cpp_field_get_parent", "pointer", ["pointer"]);
         },
@@ -214,18 +194,6 @@ namespace Il2Cpp {
 
         get fieldGetType() {
             return r("il2cpp_field_get_type", "pointer", ["pointer"]);
-        },
-
-        get fieldIsLiteral() {
-            return r("il2cpp_field_is_literal", "bool", ["pointer"]);
-        },
-
-        get fieldIsStatic() {
-            return r("il2cpp_field_is_static", "bool", ["pointer"]);
-        },
-
-        get fieldIsThreadStatic() {
-            return r("il2cpp_field_is_thread_static", "bool", ["pointer"]);
         },
 
         get fieldSetStaticValue() {
@@ -368,10 +336,6 @@ namespace Il2Cpp {
             return r("il2cpp_memory_snapshot_get_objects", "pointer", ["pointer", "pointer"]);
         },
 
-        get methodGetModifier() {
-            return r("il2cpp_method_get_modifier", "pointer", ["pointer"]);
-        },
-
         get methodGetClass() {
             return r("il2cpp_method_get_class", "pointer", ["pointer"]);
         },
@@ -404,16 +368,8 @@ namespace Il2Cpp {
             return r("il2cpp_method_get_param", "pointer", ["pointer", "uint32"]);
         },
 
-        get methodGetPointer() {
-            return r("il2cpp_method_get_pointer", "pointer", ["pointer"]);
-        },
-
         get methodGetReturnType() {
             return r("il2cpp_method_get_return_type", "pointer", ["pointer"]);
-        },
-
-        get methodIsExternal() {
-            return r("il2cpp_method_is_external", "bool", ["pointer"]);
         },
 
         get methodIsGeneric() {
@@ -426,10 +382,6 @@ namespace Il2Cpp {
 
         get methodIsInstance() {
             return r("il2cpp_method_is_instance", "bool", ["pointer"]);
-        },
-
-        get methodIsSynchronized() {
-            return r("il2cpp_method_is_synchronized", "bool", ["pointer"]);
         },
 
         get monitorEnter() {
@@ -500,10 +452,6 @@ namespace Il2Cpp {
             return r("il2cpp_string_new", "pointer", ["pointer"]);
         },
 
-        get stringSetLength() {
-            return r("il2cpp_string_set_length", "void", ["pointer", "int32"]);
-        },
-
         get valueBox() {
             return r("il2cpp_value_box", "pointer", ["pointer", "pointer"]);
         },
@@ -538,70 +486,17 @@ namespace Il2Cpp {
 
         get typeGetTypeEnum() {
             return r("il2cpp_type_get_type", "int", ["pointer"]);
-        },
-
-        get typeIsByReference() {
-            return r("il2cpp_type_is_byref", "bool", ["pointer"]);
-        },
-
-        get typeIsPrimitive() {
-            return r("il2cpp_type_is_primitive", "bool", ["pointer"]);
         }
     };
 
     decorate(api, lazy);
 
-    let cModule: Record<string, NativePointer | null> | null = null;
-
-    function buildCModule(): Record<string, NativePointer | null> {
-        const offsetsFinderCModule = new CModule($inline_file("cmodules/offset-of.c"));
-
-        const offsetOfInt32 = new NativeFunction(offsetsFinderCModule.offset_of_int32, "int16", ["pointer", "int32"]);
-        const offsetOfPointer = new NativeFunction(offsetsFinderCModule.offset_of_pointer, "int16", ["pointer", "pointer"]);
-
-        const SystemString = Il2Cpp.corlib.class("System.String");
-        const SystemDateTime = Il2Cpp.corlib.class("System.DateTime");
-        const SystemReflectionModule = Il2Cpp.corlib.class("System.Reflection.Module");
-
-        SystemDateTime.initialize();
-        SystemReflectionModule.initialize();
-
-        const DaysToMonth365 =
-            SystemDateTime.tryField<Il2Cpp.Array<number>>("daysmonth")?.value ??
-            SystemDateTime.tryField<Il2Cpp.Array<number>>("DaysToMonth365")?.value ??
-            SystemDateTime.field<Il2Cpp.Array<number>>("s_daysToMonth365")?.value;
-
-        const FilterTypeName = SystemReflectionModule.field<Il2Cpp.Object>("FilterTypeName").value;
-        const FilterTypeNameMethodPointer = FilterTypeName.field<NativePointer>("method_ptr").value;
-        const FilterTypeNameMethod = FilterTypeName.field<NativePointer>("method").value;
-
-        const defines = `
-            #define IL2CPP_STRING_SET_LENGTH_OFFSET ${offsetOfInt32(Il2Cpp.string("vfsfitvnm"), 9)}
-            #define IL2CPP_ARRAY_GET_ELEMENTS_OFFSET ${offsetOfInt32(DaysToMonth365, 31) - 1}
-            #define IL2CPP_CLASS_GET_ACTUAL_INSTANCE_SIZE_OFFSET ${offsetOfInt32(SystemString, SystemString.instanceSize - 2)}
-            #define IL2CPP_METHOD_GET_POINTER_OFFSET ${offsetOfPointer(FilterTypeNameMethod, FilterTypeNameMethodPointer)}
-        `;
-
-        offsetsFinderCModule.dispose();
-
-        const cModule = new CModule(defines + $inline_file("cmodules/api.c") + $inline_file("cmodules/memory-snapshot.c"), {
-            il2cpp_class_from_name: api.classFromName,
-            il2cpp_class_get_method_from_name: api.classGetMethodFromName,
-            il2cpp_class_get_name: api.classGetName,
-            il2cpp_field_get_flags: api.fieldGetFlags,
-            il2cpp_field_get_offset: api.fieldGetOffset,
-            il2cpp_free: api.free,
-            il2cpp_image_get_corlib: api.getCorlib,
-            il2cpp_method_get_flags: api.methodGetFlags,
-            il2cpp_type_get_name: api.typeGetName,
-            il2cpp_type_get_type_enum: api.typeGetTypeEnum
-        });
-
-        return cModule;
-    }
+    /** @internal */
+    export declare const memorySnapshotApi: CModule;
+    getter(Il2Cpp, "memorySnapshotApi", () => new CModule($inline_file("cmodules/memory-snapshot.c")), lazy);
 
     function r<R extends NativeFunctionReturnType, A extends NativeFunctionArgumentType[] | []>(exportName: string, retType: R, argTypes: A) {
-        const handle = Il2Cpp.module.findExportByName(exportName) ?? (cModule ??= buildCModule())[exportName];
+        const handle = Il2Cpp.module.findExportByName(exportName) ?? memorySnapshotApi[exportName];
 
         return new NativeFunction(handle ?? raise(`couldn't resolve export ${exportName}`), retType, argTypes);
     }

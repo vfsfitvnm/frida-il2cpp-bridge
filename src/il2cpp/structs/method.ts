@@ -54,7 +54,7 @@ namespace Il2Cpp {
         /** Determines whether this method is external. */
         @lazy
         get isExternal(): boolean {
-            return !!Il2Cpp.api.methodIsExternal(this);
+            return (this.implementationFlags & Il2Cpp.Method.ImplementationAttribute.InternalCall) != 0;
         }
 
         /** Determines whether this method is generic. */
@@ -78,13 +78,26 @@ namespace Il2Cpp {
         /** Determines whether this method is synchronized. */
         @lazy
         get isSynchronized(): boolean {
-            return !!Il2Cpp.api.methodIsSynchronized(this);
+            return (this.implementationFlags & Il2Cpp.Method.ImplementationAttribute.Synchronized) != 0;
         }
 
         /** Gets the access modifier of this method. */
         @lazy
-        get modifier(): string {
-            return Il2Cpp.api.methodGetModifier(this).readUtf8String()!;
+        get modifier(): string | undefined {
+            switch (this.flags & Il2Cpp.Method.Attributes.MemberAccessMask) {
+                case Il2Cpp.Method.Attributes.Private:
+                    return "private";
+                case Il2Cpp.Method.Attributes.FamilyAndAssembly:
+                    return "private protected";
+                case Il2Cpp.Method.Attributes.Assembly:
+                    return "internal";
+                case Il2Cpp.Method.Attributes.Family:
+                    return "protected";
+                case Il2Cpp.Method.Attributes.FamilyOrAssembly:
+                    return "protected internal";
+                case Il2Cpp.Method.Attributes.Public:
+                    return "public";
+            }
         }
 
         /** Gets the name of this method. */
@@ -134,9 +147,19 @@ namespace Il2Cpp {
         }
 
         /** Gets the virtual address (VA) to this method. */
-        @lazy
         get virtualAddress(): NativePointer {
-            return Il2Cpp.api.methodGetPointer(this);
+            const FilterTypeName = Il2Cpp.corlib.class("System.Reflection.Module").initialize().field<Il2Cpp.Object>("FilterTypeName").value;
+            const FilterTypeNameMethodPointer = FilterTypeName.field<NativePointer>("method_ptr").value;
+            const FilterTypeNameMethod = FilterTypeName.field<NativePointer>("method").value;
+
+            const offset = offsetOfPointer(FilterTypeNameMethod, FilterTypeNameMethodPointer);
+
+            // prettier-ignore
+            getter(Il2Cpp.Method.prototype, "virtualAddress", function (this: Il2Cpp.Method) {
+                return this.handle.add(offset).readPointer();
+            }, lazy);
+
+            return this.virtualAddress;
         }
 
         /** Replaces the body of this method. */
@@ -303,10 +326,10 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
             MemberAccessMask = 0x0007,
             PrivateScope = 0x0000,
             Private = 0x0001,
-            FamANDAssem = 0x0002,
+            FamilyAndAssembly = 0x0002,
             Assembly = 0x0003,
             Family = 0x0004,
-            FamORAssem = 0x0005,
+            FamilyOrAssembly = 0x0005,
             Public = 0x0006,
             Static = 0x0010,
             Final = 0x0020,
