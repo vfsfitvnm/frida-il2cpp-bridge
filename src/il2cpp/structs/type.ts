@@ -3,7 +3,7 @@ namespace Il2Cpp {
         /** Gets the class of this type. */
         @lazy
         get class(): Il2Cpp.Class {
-            return new Il2Cpp.Class(Il2Cpp.api.classFromType(this));
+            return new Il2Cpp.Class(Il2Cpp.api.typeGetClass(this));
         }
 
         /** */

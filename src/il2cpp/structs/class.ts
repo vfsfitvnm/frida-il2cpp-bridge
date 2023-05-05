@@ -211,7 +211,7 @@ namespace Il2Cpp {
         /** Gets the size of the instance - as a value type - of the current class. */
         @lazy
         get valueSize(): number {
-            return Il2Cpp.api.classGetValueSize(this, NULL);
+            return Il2Cpp.api.classGetValueTypeSize(this, NULL);
         }
 
         /** Gets the type of the current class. */
@@ -244,12 +244,12 @@ namespace Il2Cpp {
             const typeArray = Il2Cpp.array(Il2Cpp.corlib.class("System.Type"), types);
 
             const inflatedType = this.type.object.method<Il2Cpp.Object>("MakeGenericType", 1).invoke(typeArray);
-            return new Il2Cpp.Class(Il2Cpp.api.classFromSystemType(inflatedType));
+            return new Il2Cpp.Class(Il2Cpp.api.classFromObject(inflatedType));
         }
 
         /** Calls the static constructor of the current class. */
         initialize(): Il2Cpp.Class {
-            Il2Cpp.api.classInit(this);
+            Il2Cpp.api.classInitialize(this);
             return this;
         }
 
@@ -279,7 +279,7 @@ namespace Il2Cpp {
 
             const exceptionArray = Memory.alloc(Process.pointerSize);
 
-            Il2Cpp.api.objectInit(object, exceptionArray);
+            Il2Cpp.api.objectInitialize(object, exceptionArray);
 
             const exception = exceptionArray.readPointer();
 

@@ -118,13 +118,13 @@ namespace Il2Cpp {
     /** Gets the attached threads. */
     export declare const attachedThreads: Il2Cpp.Thread[];
     getter(Il2Cpp, "attachedThreads", () => {
-        return readNativeList(Il2Cpp.api.threadGetAllAttachedThreads).map(_ => new Il2Cpp.Thread(_));
+        return readNativeList(Il2Cpp.api.threadGetAttachedThreads).map(_ => new Il2Cpp.Thread(_));
     });
 
     /** Gets the current attached thread, if any. */
     export declare const currentThread: Il2Cpp.Thread | null;
     getter(Il2Cpp, "currentThread", () => {
-        return new Il2Cpp.Thread(Il2Cpp.api.threadCurrent()).asNullable();
+        return new Il2Cpp.Thread(Il2Cpp.api.threadGetCurrent()).asNullable();
     });
 
     /** Gets the current attached thread, if any. */

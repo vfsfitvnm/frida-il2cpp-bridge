@@ -32,7 +32,7 @@ namespace Il2Cpp {
 
         /** Opens and loads the assembly with the given name. */
         tryAssembly(name: string): Il2Cpp.Assembly | null {
-            return new Il2Cpp.Assembly(Il2Cpp.api.domainAssemblyOpen(this, Memory.allocUtf8String(name))).asNullable();
+            return new Il2Cpp.Assembly(Il2Cpp.api.domainGetAssemblyFromName(this, Memory.allocUtf8String(name))).asNullable();
         }
     }
 

@@ -24,12 +24,8 @@ namespace Il2Cpp {
             return r("il2cpp_class_from_name", "pointer", ["pointer", "pointer", "pointer"]);
         },
 
-        get classFromSystemType() {
+        get classFromObject() {
             return r("il2cpp_class_from_system_type", "pointer", ["pointer"]);
-        },
-
-        get classFromType() {
-            return r("il2cpp_class_from_type", "pointer", ["pointer"]);
         },
 
         get classGetArrayClass() {
@@ -108,7 +104,7 @@ namespace Il2Cpp {
             return r("il2cpp_class_get_static_field_data", "pointer", ["pointer"]);
         },
 
-        get classGetValueSize() {
+        get classGetValueTypeSize() {
             return r("il2cpp_class_value_size", "int32", ["pointer", "pointer"]);
         },
 
@@ -120,7 +116,7 @@ namespace Il2Cpp {
             return r("il2cpp_class_has_references", "bool", ["pointer"]);
         },
 
-        get classInit() {
+        get classInitialize() {
             return r("il2cpp_runtime_class_init", "void", ["pointer"]);
         },
 
@@ -160,7 +156,7 @@ namespace Il2Cpp {
             return r("il2cpp_class_is_valuetype", "bool", ["pointer"]);
         },
 
-        get domainAssemblyOpen() {
+        get domainGetAssemblyFromName() {
             return r("il2cpp_domain_assembly_open", "pointer", ["pointer", "pointer"]);
         },
 
@@ -292,7 +288,7 @@ namespace Il2Cpp {
             return r("il2cpp_image_get_name", "pointer", ["pointer"]);
         },
 
-        get init() {
+        get initialize() {
             return r("il2cpp_init", "void", ["pointer"]);
         },
 
@@ -420,7 +416,7 @@ namespace Il2Cpp {
             return r("il2cpp_object_get_virtual_method", "pointer", ["pointer", "pointer"]);
         },
 
-        get objectInit() {
+        get objectInitialize() {
             return r("il2cpp_runtime_object_init_exception", "void", ["pointer", "pointer"]);
         },
 
@@ -440,11 +436,11 @@ namespace Il2Cpp {
             return r("il2cpp_resolve_icall", "pointer", ["pointer"]);
         },
 
-        get stringChars() {
+        get stringGetChars() {
             return r("il2cpp_string_chars", "pointer", ["pointer"]);
         },
 
-        get stringLength() {
+        get stringGetLength() {
             return r("il2cpp_string_length", "int32", ["pointer"]);
         },
 
@@ -452,7 +448,7 @@ namespace Il2Cpp {
             return r("il2cpp_string_new", "pointer", ["pointer"]);
         },
 
-        get valueBox() {
+        get valueTypeBox() {
             return r("il2cpp_value_box", "pointer", ["pointer", "pointer"]);
         },
 
@@ -460,20 +456,24 @@ namespace Il2Cpp {
             return r("il2cpp_thread_attach", "pointer", ["pointer"]);
         },
 
-        get threadCurrent() {
-            return r("il2cpp_thread_current", "pointer", []);
+        get threadDetach() {
+            return r("il2cpp_thread_detach", "void", ["pointer"]);
         },
 
-        get threadGetAllAttachedThreads() {
+        get threadGetAttachedThreads() {
             return r("il2cpp_thread_get_all_attached_threads", "pointer", ["pointer"]);
+        },
+
+        get threadGetCurrent() {
+            return r("il2cpp_thread_current", "pointer", []);
         },
 
         get threadIsVm() {
             return r("il2cpp_is_vm_thread", "bool", ["pointer"]);
         },
 
-        get threadDetach() {
-            return r("il2cpp_thread_detach", "void", ["pointer"]);
+        get typeGetClass() {
+            return r("il2cpp_class_from_type", "pointer", ["pointer"]);
         },
 
         get typeGetName() {

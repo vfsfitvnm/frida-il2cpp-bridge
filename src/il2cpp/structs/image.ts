@@ -21,7 +21,7 @@ namespace Il2Cpp {
                 // In Unity 5.3.8f1, getting System.Reflection.Emit.OpCodes type name
                 // without iterating all the classes first somehow blows things up at
                 // app startup, hence the `Array.from`.
-                return globalThis.Array.from(types).map(_ => new Il2Cpp.Class(Il2Cpp.api.classFromSystemType(_)));
+                return globalThis.Array.from(types).map(_ => new Il2Cpp.Class(Il2Cpp.api.classFromObject(_)));
             } else {
                 return globalThis.Array.from(globalThis.Array(this.classCount), (_, i) => new Il2Cpp.Class(Il2Cpp.api.imageGetClass(this, i)));
             }
