@@ -5,7 +5,9 @@ namespace Il2Cpp {
         get actualInstanceSize(): number {
             const SystemString = Il2Cpp.corlib.class("System.String");
 
-            const offset = offsetOfInt32(SystemString.handle, SystemString.instanceSize - 2);
+            // prettier-ignore
+            const offset = SystemString.handle.offsetOf(_ => _.readInt() == SystemString.instanceSize - 2) 
+                ?? raise("couldn't find the actual instance size offset in the native class struct");
 
             // prettier-ignore
             getter(Il2Cpp.Class.prototype, "actualInstanceSize", function (this: Il2Cpp.Class) {

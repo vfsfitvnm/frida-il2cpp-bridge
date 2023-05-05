@@ -11,7 +11,9 @@ namespace Il2Cpp {
             const string = Il2Cpp.string("vfsfitvnm");
             const array = string.object.method<Il2Cpp.Object>("Split", 1).invoke(NULL);
 
-            const offset = offsetOfPointer(array.handle, string.handle);
+            // prettier-ignore
+            const offset = array.handle.offsetOf(_ => _.readPointer().equals(string.handle)) 
+                ?? raise("couldn't find the elements offset in the native array struct");
 
             // prettier-ignore
             getter(Il2Cpp.Array.prototype, "elements", function (this: Il2Cpp.Array) {

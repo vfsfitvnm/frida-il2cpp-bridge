@@ -152,7 +152,9 @@ namespace Il2Cpp {
             const FilterTypeNameMethodPointer = FilterTypeName.field<NativePointer>("method_ptr").value;
             const FilterTypeNameMethod = FilterTypeName.field<NativePointer>("method").value;
 
-            const offset = offsetOfPointer(FilterTypeNameMethod, FilterTypeNameMethodPointer);
+            // prettier-ignore
+            const offset = FilterTypeNameMethod.offsetOf(_ => _.readPointer().equals(FilterTypeNameMethodPointer)) 
+                ?? raise("couldn't find the virtual address offset in the native method struct");
 
             // prettier-ignore
             getter(Il2Cpp.Method.prototype, "virtualAddress", function (this: Il2Cpp.Method) {

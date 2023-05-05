@@ -1,19 +1,16 @@
 /** @internal */
-function offsetOfPointer(handle: NativePointer, value: NativePointer): number {
-    for (let i = 0; i < 512; i++) {
-        if (handle.add(i).readPointer().equals(value)) {
-            return i;
-        }
-    }
-    return -1;
+interface NativePointer {
+    offsetOf(condition: (handle: NativePointer) => boolean, depth?: number): number | null;
 }
 
-/** @internal */
-function offsetOfInt32(handle: NativePointer, value: number): number {
-    for (let i = 0; i < 512; i++) {
-        if (handle.add(i).readS32() == value) {
+NativePointer.prototype.offsetOf = function (condition, depth) {
+    depth ??= 512;
+
+    for (let i = 0; i < depth; i++) {
+        if (condition(this.add(i))) {
             return i;
         }
     }
-    return -1;
-}
+
+    return null;
+};

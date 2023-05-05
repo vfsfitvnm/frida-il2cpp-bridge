@@ -117,24 +117,17 @@ namespace Il2Cpp {
     });
 
     /** @internal */
-    let posixThreadKernelIdOffset = -1;
+    let posixThreadKernelIdOffset: number | null = null;
 
     /** @internal */
     function posixThreadGetKernelId(posixThread: NativePointer): number {
-        if (posixThreadKernelIdOffset == -1) {
+        if (posixThreadKernelIdOffset == null) {
             const currentPosixThread = ptr(Il2Cpp.currentThread!.internal.field<UInt64>("thread_id").value.toNumber());
             const currentThreadId = Process.getCurrentThreadId();
 
-            for (let i = 0; i < 1024; i++) {
-                if (currentPosixThread.add(i).readS32() == currentThreadId) {
-                    posixThreadKernelIdOffset = i;
-                    break;
-                }
-            }
-
-            if (posixThreadKernelIdOffset == -1) {
+            // prettier-ignore
+            posixThreadKernelIdOffset = currentPosixThread.offsetOf(_ => _.readS32() == currentThreadId, 1024) ??
                 raise(`couldn't find the offset for determining the kernel id of a posix thread`);
-            }
         }
 
         return posixThread.add(posixThreadKernelIdOffset).readS32();
