@@ -1,10 +1,29 @@
 namespace Il2Cpp {
     export class Thread extends NativeStruct {
         /** Gets the native id of the current thread. */
-        @lazy
         get id(): number {
-            const id = this.internal.field<UInt64>("thread_id").value.toNumber();
-            return Process.platform == "windows" ? id : posixThreadGetKernelId(ptr(id));
+            let get = function (this: Il2Cpp.Thread) {
+                return this.internal.field<UInt64>("thread_id").value.toNumber();
+            };
+
+            // https://github.com/mono/linux-packaging-mono/blob/d586f84dfea30217f34b076a616a098518aa72cd/mono/utils/mono-threads.h#L642
+            if (Process.platform != "windows") {
+                const currentThreadId = Process.getCurrentThreadId();
+                const currentPosixThread = ptr(get.apply(Il2Cpp.currentThread!));
+
+                // prettier-ignore
+                const offset = currentPosixThread.offsetOf(_ => _.readS32() == currentThreadId, 1024) ??
+                    raise(`couldn't find the offset for determining the kernel id of a posix thread`);
+
+                const _get = get;
+                get = function (this: Il2Cpp.Thread) {
+                    return ptr(_get.apply(this)).add(offset).readS32();
+                };
+            }
+
+            getter(Il2Cpp.Thread.prototype, "id", get, lazy);
+
+            return this.id;
         }
 
         /** Gets the encompassing internal object (System.Threding.InternalThreead) of the current thread. */
@@ -115,21 +134,4 @@ namespace Il2Cpp {
         // with the lowest managed id, but I'm not sure that always holds true, either.
         return attachedThreads[0];
     });
-
-    /** @internal */
-    let posixThreadKernelIdOffset: number | null = null;
-
-    /** @internal */
-    function posixThreadGetKernelId(posixThread: NativePointer): number {
-        if (posixThreadKernelIdOffset == null) {
-            const currentPosixThread = ptr(Il2Cpp.currentThread!.internal.field<UInt64>("thread_id").value.toNumber());
-            const currentThreadId = Process.getCurrentThreadId();
-
-            // prettier-ignore
-            posixThreadKernelIdOffset = currentPosixThread.offsetOf(_ => _.readS32() == currentThreadId, 1024) ??
-                raise(`couldn't find the offset for determining the kernel id of a posix thread`);
-        }
-
-        return posixThread.add(posixThreadKernelIdOffset).readS32();
-    }
 }
