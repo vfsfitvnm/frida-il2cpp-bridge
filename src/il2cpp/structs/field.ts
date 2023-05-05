@@ -69,6 +69,10 @@ namespace Il2Cpp {
 
         /** Gets the value of this field. */
         get value(): T {
+            if (!this.isStatic) {
+                raise(`cannot access instance field ${this.class.type.name}::${this.name} from a class, use an object instead`);
+            }
+
             const handle = Memory.alloc(Process.pointerSize);
             Il2Cpp.api.fieldGetStaticValue(this.handle, handle);
 
@@ -77,6 +81,10 @@ namespace Il2Cpp {
 
         /** Sets the value of this field. Thread static or literal values cannot be altered yet. */
         set value(value: T) {
+            if (!this.isStatic) {
+                raise(`cannot access instance field ${this.class.type.name}::${this.name} from a class, use an object instead`);
+            }
+
             if (this.isThreadStatic || this.isLiteral) {
                 raise(`cannot write the value of field ${this.name} as it's thread static or literal`);
             }
