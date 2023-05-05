@@ -290,6 +290,10 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
 
         /** @internal */
         withHolder(instance: Il2Cpp.Object): Il2Cpp.Method<T> {
+            if (this.isStatic) {
+                raise(`cannot access static method ${this.class.type.name}::${this.name} from an object, use a class instead`);
+            }
+
             return new Proxy(this, {
                 get(target: Il2Cpp.Method<T>, property: keyof Il2Cpp.Method<T>): any {
                     switch (property) {

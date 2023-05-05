@@ -100,6 +100,10 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
 
         /** @internal */
         withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Field<T> {
+            if (this.isStatic) {
+                raise(`cannot access static field ${this.class.type.name}::${this.name} from an object, use a class instead`);
+            }
+
             let valueHandle = instance.handle.add(this.offset);
             if (instance instanceof Il2Cpp.ValueType) {
                 valueHandle = valueHandle.sub(Il2Cpp.Object.headerSize);
