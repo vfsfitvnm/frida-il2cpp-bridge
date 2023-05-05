@@ -210,7 +210,7 @@ namespace Il2Cpp {
 
         /** Gets the size of the instance - as a value type - of the current class. */
         @lazy
-        get valueSize(): number {
+        get valueTypeSize(): number {
             return Il2Cpp.api.classGetValueTypeSize(this, NULL);
         }
 

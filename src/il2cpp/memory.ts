@@ -96,7 +96,7 @@ namespace Il2Cpp {
             case Il2Cpp.Type.Enum.Array:
             case Il2Cpp.Type.Enum.GenericInstance:
                 if (value instanceof Il2Cpp.ValueType) {
-                    Memory.copy(pointer, value, type.class.valueSize);
+                    Memory.copy(pointer, value, type.class.valueTypeSize);
                     return pointer;
                 }
 
@@ -193,7 +193,7 @@ namespace Il2Cpp {
             return arr;
         }
 
-        const valueType = Memory.alloc(type.class.valueSize);
+        const valueType = Memory.alloc(type.class.valueTypeSize);
 
         nativeValues = nativeValues.flat(Infinity);
         const typesAndOffsets = iter(type);
