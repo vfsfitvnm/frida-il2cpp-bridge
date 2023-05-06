@@ -27,7 +27,14 @@ namespace Il2Cpp {
         /** Determines whether this field is thread static. */
         @lazy
         get isThreadStatic(): boolean {
-            return this.offset == -1;
+            const offset = Il2Cpp.corlib.class("System.AppDomain").field("type_resolve_in_progress").offset;
+
+            // prettier-ignore
+            getter(Il2Cpp.Field.prototype, "isThreadStatic", function (this: Il2Cpp.Field) {
+                return this.offset == offset;
+            }, lazy);
+
+            return this.isThreadStatic;
         }
 
         /** Gets the access modifier of this field. */
