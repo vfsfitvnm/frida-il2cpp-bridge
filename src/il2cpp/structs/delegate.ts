@@ -21,10 +21,7 @@ namespace Il2Cpp {
         const Invoke = delegate.tryMethod("Invoke") ?? raise(`cannot create a delegate for ${klass.type.name}, there is no Invoke method`);
         delegate.method(".ctor").invoke(delegate, Invoke.handle);
 
-        const callback = Invoke.wrap((...args: any[]): any => {
-            delete _callbacksToKeepAlive[key];
-            return block(...(args as any));
-        });
+        const callback = Invoke.wrap(block as any);
 
         delegate.field("method_ptr").value = callback;
         delegate.field("invoke_impl").value = callback;
