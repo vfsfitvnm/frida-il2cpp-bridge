@@ -35,7 +35,6 @@
 /// <reference path="./il2cpp/structs/reference.ts">/>
 /// <reference path="./il2cpp/structs/string.ts">/>
 /// <reference path="./il2cpp/structs/thread.ts">/>
-/// <reference path="./il2cpp/structs/type-enum.ts">/>
 /// <reference path="./il2cpp/structs/type.ts">/>
 /// <reference path="./il2cpp/structs/value-type.ts">/>
 

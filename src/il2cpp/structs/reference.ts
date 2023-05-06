@@ -33,26 +33,26 @@ namespace Il2Cpp {
                 return new Il2Cpp.Reference(handle.writeS8(+value), Il2Cpp.corlib.class("System.Boolean").type);
             case "number":
                 switch (type?.typeEnum) {
-                    case Il2Cpp.Type.Enum.U1:
+                    case Il2Cpp.Type.enum.unsignedByte:
                         return new Il2Cpp.Reference<T>(handle.writeU8(value), type);
-                    case Il2Cpp.Type.Enum.I1:
+                    case Il2Cpp.Type.enum.byte:
                         return new Il2Cpp.Reference<T>(handle.writeS8(value), type);
-                    case Il2Cpp.Type.Enum.Char:
-                    case Il2Cpp.Type.Enum.U2:
+                    case Il2Cpp.Type.enum.char:
+                    case Il2Cpp.Type.enum.unsignedShort:
                         return new Il2Cpp.Reference<T>(handle.writeU16(value), type);
-                    case Il2Cpp.Type.Enum.I2:
+                    case Il2Cpp.Type.enum.short:
                         return new Il2Cpp.Reference<T>(handle.writeS16(value), type);
-                    case Il2Cpp.Type.Enum.U4:
+                    case Il2Cpp.Type.enum.unsignedInt:
                         return new Il2Cpp.Reference<T>(handle.writeU32(value), type);
-                    case Il2Cpp.Type.Enum.I4:
+                    case Il2Cpp.Type.enum.int:
                         return new Il2Cpp.Reference<T>(handle.writeS32(value), type);
-                    case Il2Cpp.Type.Enum.U8:
+                    case Il2Cpp.Type.enum.unsignedLong:
                         return new Il2Cpp.Reference<T>(handle.writeU64(value), type);
-                    case Il2Cpp.Type.Enum.I8:
+                    case Il2Cpp.Type.enum.long:
                         return new Il2Cpp.Reference<T>(handle.writeS64(value), type);
-                    case Il2Cpp.Type.Enum.R4:
+                    case Il2Cpp.Type.enum.float:
                         return new Il2Cpp.Reference<T>(handle.writeFloat(value), type);
-                    case Il2Cpp.Type.Enum.R8:
+                    case Il2Cpp.Type.enum.double:
                         return new Il2Cpp.Reference<T>(handle.writeDouble(value), type);
                 }
             case "object":
@@ -64,8 +64,8 @@ namespace Il2Cpp {
                     return new Il2Cpp.Reference<T>(handle.writePointer(value), value.object.class.type);
                 } else if (value instanceof NativePointer) {
                     switch (type?.typeEnum) {
-                        case Il2Cpp.Type.Enum.UnsignedNativeInteger:
-                        case Il2Cpp.Type.Enum.NativeInteger:
+                        case Il2Cpp.Type.enum.unsignedNativePointer:
+                        case Il2Cpp.Type.enum.nativePointer:
                             return new Il2Cpp.Reference<T>(handle.writePointer(value), type);
                     }
                 } else if (value instanceof Int64) {
