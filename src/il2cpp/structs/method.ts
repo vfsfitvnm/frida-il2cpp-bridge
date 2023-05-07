@@ -161,6 +161,13 @@ namespace Il2Cpp {
                 return this.handle.add(offset).readPointer();
             }, lazy);
 
+            // In Unity 2017.4.40f1 (don't know about others), Il2Cpp.Class::initialize
+            // somehow triggers a nasty bug during early instrumentation, so that we aren't
+            // able to obtain the offset to get the virtual address of a method when the script
+            // is reloaded.
+            // A workaround consists in manually re-invoking the static constructor.
+            Il2Cpp.corlib.class("System.Reflection.Module").method(".cctor").invoke();
+
             return this.virtualAddress;
         }
 
