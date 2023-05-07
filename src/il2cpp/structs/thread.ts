@@ -93,6 +93,24 @@ namespace Il2Cpp {
                     setImmediate(() => resolve(result));
                 });
 
+                // This is to replace pending scheduled callbacks when the script is about to get unlaoded.
+                // If we skip this cleanup, Frida's native callbacks will point to invalid memory, making
+                // the application crash as soon as the IL2CPP runtime tries to execute such callbacks.
+                // For instance, without the following code, this is how you can trigger a crash:
+                // 1) unfocus the application;
+                // 2) schedule a callback;
+                // 3) reload the script;
+                // 4) focus application.
+                //
+                // The "proper" solution consists in removing our delegates from the Unity synchroniztion
+                // context, but the interface is not consisent across Unity versions - e.g. 2017.4.40f1 uses
+                // a queue instead of a list, whereas newer versions do not allow null work requests.
+                // The following solution, which basically redirects the invocation to a native function that
+                // survives the script reloading, is much simpler, honestly.
+                Script.bindWeak(globalThis, () => {
+                    delegate.field("method_ptr").value = delegate.field("invoke_impl").value = Il2Cpp.api.domainGet;
+                });
+
                 if (delayMs > 0) {
                     setTimeout(() => Post.invoke(delegate, NULL), delayMs);
                 } else {
