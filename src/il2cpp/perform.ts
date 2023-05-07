@@ -15,8 +15,14 @@ namespace Il2Cpp {
             return Promise.reject<T>(error);
         } finally {
             if (isForeignThread) {
-                thread.detach();
+                if (Process.getCurrentThreadId() == fridaThreadId) {
+                    Script.bindWeak(globalThis, () => thread?.detach());
+                } else {
+                    thread.detach();
+                }
             }
         }
     }
+
+    const fridaThreadId = Process.getCurrentThreadId();
 }
