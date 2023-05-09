@@ -1,6 +1,6 @@
 namespace Il2Cpp {
     /** Attaches the caller thread to Il2Cpp domain and executes the given block.  */
-    export async function perform<T>(block: () => T | Promise<T>): Promise<T> {
+    export async function perform<T>(block: () => T | Promise<T>, detach: "always" | "lazy" | "never" = "lazy"): Promise<T> {
         await initialize();
 
         let thread = Il2Cpp.currentThread;
@@ -15,14 +15,18 @@ namespace Il2Cpp {
             return Promise.reject<T>(error);
         } finally {
             if (isForeignThread) {
-                if (Process.getCurrentThreadId() == fridaThreadId) {
-                    Script.bindWeak(globalThis, () => thread?.detach());
-                } else {
-                    thread.detach();
+                switch (detach) {
+                    case "lazy":
+                        Script.bindWeak(globalThis, () => thread?.detach());
+                        break;
+                    case "never":
+                        break;
+                    case "always":
+                    default:
+                        thread.detach();
+                        break;
                 }
             }
         }
     }
-
-    const fridaThreadId = Process.getCurrentThreadId();
 }
