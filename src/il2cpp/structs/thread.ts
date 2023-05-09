@@ -68,7 +68,7 @@ namespace Il2Cpp {
                 this.tryLocalValue(Il2Cpp.corlib.class("System.Threading.SynchronizationContext"));
 
             if (synchronizationContext == null || synchronizationContext.isNull()) {
-                if (this.managedId == 1) {
+                if (this.handle.equals(Il2Cpp.mainThread.handle)) {
                     raise(`couldn't find the synchronization context of the main thread, perhaps this is early instrumentation?`);
                 } else {
                     raise(`couldn't find the synchronization context of thread #${this.managedId}, only the main thread is expected to have one`);
@@ -148,8 +148,11 @@ namespace Il2Cpp {
     /** Gets the current attached thread, if any. */
     export declare const mainThread: Il2Cpp.Thread;
     getter(Il2Cpp, "mainThread", () => {
-        // I'm not sure if this is always the case. Alternatively, we could pick the thread
-        // with the lowest managed id, but I'm not sure that always holds true, either.
+        // I'm not sure if this is always the case. Typically, the main
+        // thread managed id is 1, but this isn't always true: spawning
+        // an Android application with Unity 5.3.8f1 will cause the Frida
+        // thread to have the managed id equal to 1, whereas the main thread
+        // managed id is 2.
         return attachedThreads[0];
     });
 }
