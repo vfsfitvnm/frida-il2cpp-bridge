@@ -26,7 +26,7 @@ namespace Il2Cpp {
 
         attach(): void {
             const backtracer = this;
-            const history = this.isVerbose ? undefined : new Set<string>();
+            const mainThreadId = Il2Cpp.mainThread.id;
 
             for (const target of this.targets) {
                 if (target.virtualAddress.isNull()) {
@@ -35,50 +35,30 @@ namespace Il2Cpp {
 
                 try {
                     Interceptor.attach(target.virtualAddress, function () {
-                        let backtrace = globalThis.Thread.backtrace(this.context, backtracer.mode).reverse();
-
-                        backtrace.push(target.virtualAddress);
-
-                        if (!backtracer.isVerbose) {
-                            const key = backtrace.map(_ => _.toString()).join("");
-
-                            if (history?.has(key)) {
-                                return;
-                            }
-
-                            history?.add(key);
+                        if (this.threadId != mainThreadId) {
+                            return;
                         }
 
-                        let i = 0;
+                        const handles = globalThis.Thread.backtrace(this.context, backtracer.mode);
+                        handles.unshift(target.virtualAddress);
 
-                        for (const address of backtrace) {
-                            const method =
-                                address >= Il2Cpp.module.base && address < Il2Cpp.module.base.add(Il2Cpp.module.size)
-                                    ? backtracer.searchInsert(address)
-                                    : undefined;
+                        for (const handle of handles) {
+                            if (handle.compare(Il2Cpp.module.base) > 0 && handle.compare(Il2Cpp.module.base.add(Il2Cpp.module.size)) < 0) {
+                                const method = backtracer.searchInsert(handle);
 
-                            const decoration = i == 0 ? "" : `${" ".repeat((i - 1) * 2)}└─`;
+                                if (method) {
+                                    const offset = handle.sub(method.virtualAddress);
 
-                            if (method != undefined) {
-                                const offset = address.sub(method.virtualAddress);
-
-                                if (address.sub(method.virtualAddress).compare(0xfff) > 0) {
-                                    continue;
+                                    if (offset.compare(0xfff) < 0) {
+                                        backtracer.events.buffer.push(`\
+\x1b[2m0x${method.relativeVirtualAddress.toString(16).padStart(8, `0`)}+0x${offset.toString(16).padStart(3, `0`)}\x1b[0m \
+${method.class.type.name}::\x1b[1m${method.name}\x1b[0m`);
+                                    }
                                 }
-
-                                inform(`\
-\x1b[2m\
-0x${method.relativeVirtualAddress.toString(16).padStart(8, `0`)}\
-+0x${offset.toString(16).padStart(3, `0`)}\
-\x1b[0m\
- ${decoration}\
-${method.class.type.name}.\x1b[1m${method.name}\x1b[0m`);
-                            } else {
-                                continue;
                             }
-
-                            i++;
                         }
+
+                        backtracer.maybeFlush(!backtracer.isVerbose);
                     });
                 } catch (e: any) {}
             }

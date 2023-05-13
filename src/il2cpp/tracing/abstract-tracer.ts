@@ -1,6 +1,9 @@
 namespace Il2Cpp {
     export abstract class AbstractTracer {
         /** @internal */
+        readonly events = { depth: 0, buffer: [] as string[], history: new Set() };
+
+        /** @internal */
         readonly targets: Il2Cpp.Method[] = [];
 
         /** @internal */
@@ -165,6 +168,45 @@ namespace Il2Cpp {
 
         /** Starts tracing. */
         abstract attach(): void;
+
+        /** @internal */
+        maybeFlush(useHistory: boolean = false) {
+            if (this.events.depth == 0) {
+                const message = `\n${this.events.buffer.join("\n")}\n`;
+
+                if (useHistory) {
+                    const hash = this.cyrb53(message);
+                    if (!this.events.history.has(hash)) {
+                        this.events.history.add(hash);
+                        inform(message);
+                    }
+                } else {
+                    inform(message);
+                }
+
+                this.events.buffer.length = 0;
+            }
+        }
+
+        /** @internal https://stackoverflow.com/a/52171480/16885569 */
+        cyrb53(str: string): number {
+            let h1 = 0xdeadbeef;
+            let h2 = 0x41c6ce57;
+
+            for (let i = 0, ch; i < str.length; i++) {
+                ch = str.charCodeAt(i);
+                h1 = Math.imul(h1 ^ ch, 2654435761);
+                h2 = Math.imul(h2 ^ ch, 1597334677);
+            }
+
+            h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+            h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+
+            h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+            h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+
+            return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+        }
     }
 
     export declare namespace AbstractTracer {
