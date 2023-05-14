@@ -315,7 +315,7 @@ namespace Il2Cpp {
     }
 
     /** */
-    export function backtrace(mode: Backtracer): Il2Cpp.Tracer.Configure {
+    export function backtrace(mode?: Backtracer): Il2Cpp.Tracer.Configure {
         const methods = Il2Cpp.domain.assemblies
             .flatMap(_ => _.image.classes.flatMap(_ => _.methods.filter(_ => !_.virtualAddress.isNull())))
             .sort((_, __) => _.virtualAddress.compare(__.virtualAddress));
