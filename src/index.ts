@@ -18,6 +18,7 @@
 /// <reference path="./il2cpp/memory.ts">/>
 /// <reference path="./il2cpp/module.ts">/>
 /// <reference path="./il2cpp/perform.ts">/>
+/// <reference path="./il2cpp/tracer.ts">/>
 
 /// <reference path="./il2cpp/structs/array.ts">/>
 /// <reference path="./il2cpp/structs/assembly.ts">/>
@@ -37,9 +38,5 @@
 /// <reference path="./il2cpp/structs/thread.ts">/>
 /// <reference path="./il2cpp/structs/type.ts">/>
 /// <reference path="./il2cpp/structs/value-type.ts">/>
-
-/// <reference path="./il2cpp/tracing/abstract-tracer.ts">/>
-/// <reference path="./il2cpp/tracing/backtracer.ts">/>
-/// <reference path="./il2cpp/tracing/tracer.ts">/>
 
 globalThis.Il2Cpp = Il2Cpp;
