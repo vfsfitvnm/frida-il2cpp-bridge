@@ -1,4 +1,5 @@
 namespace Il2Cpp {
+    @recycle
     export class Type extends NativeStruct {
         /** */
         @lazy
