@@ -5,7 +5,7 @@
 
 A Frida module to dump, trace or hijack any Il2Cpp application at runtime, without needing the `global-metadata.dat` file.
 
-![code](https://user-images.githubusercontent.com/46219656/153902126-062ee74c-df0b-49d0-8c0f-3a306bf1a52d.png)
+![code](https://github.com/vfsfitvnm/frida-il2cpp-bridge/assets/46219656/d8e81811-b98c-4d67-9cea-be8cab8947ef)
 
 ## Features
 
