@@ -37,6 +37,9 @@ namespace Il2Cpp {
         #targets: Il2Cpp.Method[] = [];
 
         /** @internal */
+        #domain?: Il2Cpp.Domain;
+
+        /** @internal */
         #assemblies?: Il2Cpp.Assembly[];
 
         /** @internal */
@@ -44,10 +47,6 @@ namespace Il2Cpp {
 
         /** @internal */
         #methods?: Il2Cpp.Method[];
-
-        constructor(applier: Il2Cpp.Tracer.Apply) {
-            this.#applier = applier;
-        }
 
         /** @internal */
         #assemblyFilter?: (assembly: Il2Cpp.Assembly) => boolean;
@@ -60,6 +59,10 @@ namespace Il2Cpp {
 
         /** @internal */
         #parameterFilter?: (parameter: Il2Cpp.Parameter) => boolean;
+
+        constructor(applier: Il2Cpp.Tracer.Apply) {
+            this.#applier = applier;
+        }
 
         /** */
         thread(thread: Il2Cpp.Thread): Pick<Il2Cpp.Tracer, "verbose"> & Il2Cpp.Tracer.ChooseTargets {
@@ -75,6 +78,7 @@ namespace Il2Cpp {
 
         /** Sets the application domain as the place where to find the target methods. */
         domain(): Il2Cpp.Tracer.FilterAssemblies {
+            this.#domain = Il2Cpp.domain;
             return this;
         }
 
@@ -199,7 +203,9 @@ namespace Il2Cpp {
                 ? filterClasses(this.#classes)
                 : this.#assemblies
                 ? filterAssemblies(this.#assemblies)
-                : filterDomain(Il2Cpp.domain);
+                : this.#domain
+                ? filterDomain(this.#domain)
+                : undefined;
 
             this.#assemblies = undefined;
             this.#classes = undefined;
@@ -214,10 +220,6 @@ namespace Il2Cpp {
 
         /** Starts tracing. */
         attach(): void {
-            const isInThread = (context: PortableInvocationContext) => {
-                return context.threadId == this.#threadId;
-            };
-
             for (const target of this.#targets) {
                 if (!target.virtualAddress.isNull()) {
                     try {
@@ -311,7 +313,7 @@ namespace Il2Cpp {
             Interceptor.replace(method.virtualAddress, nativeCallback);
         };
 
-        return new Il2Cpp.Tracer(parameters ? applier() : applierWithParameters());
+        return new Il2Cpp.Tracer(parameters ? applierWithParameters() : applier());
     }
 
     /** */
