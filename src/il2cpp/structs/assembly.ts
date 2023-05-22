@@ -16,7 +16,13 @@ namespace Il2Cpp {
         /** Gets the encompassing object of the current assembly. */
         @lazy
         get object(): Il2Cpp.Object {
-            return Il2Cpp.corlib.class("System.Reflection.Assembly").method<Il2Cpp.Object>("Load").invoke(Il2Cpp.string(this.name));
+            for (const _ of Il2Cpp.domain.object.method<Il2Cpp.Array<Il2Cpp.Object>>("GetAssemblies", 1).invoke(false)) {
+                if (_.field<NativePointer>("_mono_assembly").value.equals(this)) {
+                    return _;
+                }
+            }
+
+            raise("couldn't find the object of the native assembly struct");
         }
     }
 }
