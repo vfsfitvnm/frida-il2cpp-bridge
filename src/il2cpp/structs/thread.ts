@@ -84,7 +84,7 @@ namespace Il2Cpp {
         }
 
         /** Schedules a callback on the current thread. */
-        schedule<T>(block: () => T | Promise<T>, delayMs: number = 0): Promise<T> {
+        schedule<T>(block: () => T | Promise<T>): Promise<T> {
             const Post = this.synchronizationContext.method("Post");
 
             return new Promise(resolve => {
@@ -111,11 +111,7 @@ namespace Il2Cpp {
                     delegate.field("method_ptr").value = delegate.field("invoke_impl").value = Il2Cpp.api.domainGet;
                 });
 
-                if (delayMs > 0) {
-                    setTimeout(() => Post.invoke(delegate, NULL), delayMs);
-                } else {
-                    Post.invoke(delegate, NULL);
-                }
+                Post.invoke(delegate, NULL);
             });
         }
 
