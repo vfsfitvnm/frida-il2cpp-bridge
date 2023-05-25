@@ -226,7 +226,7 @@ namespace Il2Cpp {
                         this.#applier(target, this.#state, this.#threadId);
                     } catch (e: any) {
                         switch (e.message) {
-                            case `unable to intercept function at ${target.virtualAddress}; please file a bug`:
+                            case /unable to intercept function at \w+; please file a bug/.exec(e.message)?.input:
                             case "already replaced this function":
                                 break;
                             default:

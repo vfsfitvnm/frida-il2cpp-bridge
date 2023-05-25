@@ -179,7 +179,7 @@ namespace Il2Cpp {
                 switch (e.message) {
                     case "access violation accessing 0x0":
                         raise(`couldn't set implementation for method ${this.name} as it has a NULL virtual address`);
-                    case `unable to intercept function at ${this.virtualAddress}; please file a bug`:
+                    case /unable to intercept function at \w+; please file a bug/.exec(e.message)?.input:
                         warn(`couldn't set implementation for method ${this.name} as it may be a thunk`);
                         break;
                     case "already replaced this function":
