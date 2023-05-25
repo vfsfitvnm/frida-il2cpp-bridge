@@ -31,7 +31,7 @@ namespace Il2Cpp {
     }, lazy);
 
     /** @internal Waits for Unity and Il2Cpp native libraries to be loaded and initialized. */
-    export async function initialize(): Promise<void> {
+    export async function initialize(blocking = false): Promise<boolean> {
         if (Process.platform == "darwin") {
             Reflect.defineProperty(Il2Cpp, "moduleName", {
                 value: DebugSymbol.fromName("il2cpp_init").moduleName ?? (await forModule("UnityFramework", "GameAssembly.dylib"))
@@ -41,14 +41,16 @@ namespace Il2Cpp {
         }
 
         if (Il2Cpp.api.getCorlib().isNull()) {
-            await new Promise<void>(resolve => {
+            return await new Promise<boolean>(resolve => {
                 const interceptor = Interceptor.attach(Il2Cpp.api.initialize, {
                     onLeave() {
                         interceptor.detach();
-                        setImmediate(resolve);
+                        blocking ? resolve(true) : setImmediate(() => resolve(false));
                     }
                 });
             });
         }
+
+        return false;
     }
 }

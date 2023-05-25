@@ -1,32 +1,31 @@
 namespace Il2Cpp {
     /** Attaches the caller thread to Il2Cpp domain and executes the given block.  */
-    export async function perform<T>(block: () => T | Promise<T>, detach: "always" | "lazy" | "never" = "lazy"): Promise<T> {
-        await initialize();
-
-        let thread = Il2Cpp.currentThread;
-        const isForeignThread = thread == null;
-        thread ??= Il2Cpp.domain.attach();
-
+    export async function perform<T>(block: () => T | Promise<T>, flag: "always" | "lazy" | "never" | "main" = "lazy"): Promise<T> {
         try {
+            const isInMainThread = await initialize(flag == "main");
+
+            if (flag == "main" && !isInMainThread) {
+                return perform(() => Il2Cpp.mainThread.schedule(block), "always");
+            }
+
+            let thread = Il2Cpp.currentThread;
+            const isForeignThread = thread == null;
+            thread ??= Il2Cpp.domain.attach();
+
             const result = block();
+
+            if (isForeignThread) {
+                if (flag == "always") {
+                    thread.detach();
+                } else if (flag == "lazy") {
+                    Script.bindWeak(globalThis, () => thread!.detach());
+                }
+            }
+
             return result instanceof Promise ? await result : result;
         } catch (error: any) {
             Script.nextTick(_ => { throw _; }, error); // prettier-ignore
             return Promise.reject<T>(error);
-        } finally {
-            if (isForeignThread) {
-                switch (detach) {
-                    case "lazy":
-                        Script.bindWeak(globalThis, () => thread?.detach());
-                        break;
-                    case "never":
-                        break;
-                    case "always":
-                    default:
-                        thread.detach();
-                        break;
-                }
-            }
         }
     }
 }
