@@ -10,7 +10,7 @@ namespace Il2Cpp {
 
             let thread = Il2Cpp.currentThread;
             const isForeignThread = thread == null;
-            thread ??= Il2Cpp.domain.attach();
+            thread || (thread = Il2Cpp.domain.attach());
 
             const result = block();
 

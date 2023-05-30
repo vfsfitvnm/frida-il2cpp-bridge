@@ -4,7 +4,7 @@ interface NativePointer {
 }
 
 NativePointer.prototype.offsetOf = function (condition, depth) {
-    depth ??= 512;
+    depth || (depth = 512);
 
     for (let i = 0; i < depth; i++) {
         if (condition(this.add(i))) {
