@@ -82,12 +82,6 @@ namespace Il2Cpp {
             return globalThis.Array.from(types).map(_ => new Il2Cpp.Class(Il2Cpp.api.classFromObject(_)));
         }
 
-        /** Gets the amount of generic parameters of this generic class. */
-        @lazy
-        get genericParameterCount(): number {
-            return this.generics.length;
-        }
-
         /** Determines whether the GC has tracking references to the current class instances. */
         @lazy
         get hasReferences(): boolean {
@@ -243,8 +237,8 @@ namespace Il2Cpp {
                 raise(`cannot inflate class ${this.type.name} as it has no generic parameters`);
             }
 
-            if (this.genericParameterCount != classes.length) {
-                raise(`cannot inflate class ${this.type.name} as it needs ${this.genericParameterCount} generic parameter(s), not ${classes.length}`);
+            if (this.generics.length != classes.length) {
+                raise(`cannot inflate class ${this.type.name} as it needs ${this.generics.length} generic parameter(s), not ${classes.length}`);
             }
 
             const types = classes.map(_ => _.type.object);
