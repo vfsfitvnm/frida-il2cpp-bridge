@@ -41,14 +41,21 @@ namespace Il2Cpp {
             return types;
         }
 
+        /** Gets the generic parameters of this generic method. */
+        @lazy
+        get generics(): Il2Cpp.Class[] {
+            if (!this.isGeneric && !this.isInflated) {
+                return [];
+            }
+
+            const types = this.object.method<Il2Cpp.Array<Il2Cpp.Object>>("GetGenericArguments").invoke();
+            return globalThis.Array.from(types).map(_ => new Il2Cpp.Class(Il2Cpp.api.classFromObject(_)));
+        }
+
         /** Gets the amount of generic parameters of this generic method. */
         @lazy
         get genericParameterCount(): number {
-            if (!this.isGeneric) {
-                return 0;
-            }
-
-            return this.object.method<Il2Cpp.Array>("GetGenericArguments").invoke().length;
+            return this.generics.length;
         }
 
         /** Determines whether this method is external. */
