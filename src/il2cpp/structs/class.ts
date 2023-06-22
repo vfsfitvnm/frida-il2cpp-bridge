@@ -71,14 +71,21 @@ namespace Il2Cpp {
             return this.namespace ? `${this.namespace}.${this.name}` : this.name;
         }
 
+        /** Gets the generics parameters of this generic class. */
+        @lazy
+        get generics(): Il2Cpp.Class[] {
+            if (!this.isGeneric && !this.isInflated) {
+                return [];
+            }
+
+            const types = this.type.object.method<Il2Cpp.Array<Il2Cpp.Object>>("GetGenericArguments").invoke();
+            return globalThis.Array.from(types).map(_ => new Il2Cpp.Class(Il2Cpp.api.classFromObject(_)));
+        }
+
         /** Gets the amount of generic parameters of this generic class. */
         @lazy
         get genericParameterCount(): number {
-            if (!this.isGeneric) {
-                return 0;
-            }
-
-            return this.type.object.method<Il2Cpp.Array>("GetGenericArguments").invoke().length;
+            return this.generics.length;
         }
 
         /** Determines whether the GC has tracking references to the current class instances. */
