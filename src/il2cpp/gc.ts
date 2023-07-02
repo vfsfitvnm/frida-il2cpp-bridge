@@ -47,7 +47,13 @@ namespace Il2Cpp {
 
             const chooseCallback = new NativeCallback(callback, "void", ["pointer", "int", "pointer"]);
 
-            if (UnityVersion.gte(Il2Cpp.unityVersion, "2021.2.0")) {
+            if (Il2Cpp.unityVersionIsBelow202120) {
+                const onWorld = new NativeCallback(() => {}, "void", []);
+                const state = Il2Cpp.api.livenessCalculationBegin(klass, 0, chooseCallback, NULL, onWorld, onWorld);
+
+                Il2Cpp.api.livenessCalculationFromStatics(state);
+                Il2Cpp.api.livenessCalculationEnd(state);
+            } else {
                 const realloc = (handle: NativePointer, size: UInt64) => {
                     if (!handle.isNull() && size.compare(0) == 0) {
                         Il2Cpp.free(handle);
@@ -68,12 +74,6 @@ namespace Il2Cpp {
                 this.startWorld();
 
                 Il2Cpp.api.livenessFreeStruct(state);
-            } else {
-                const onWorld = new NativeCallback(() => {}, "void", []);
-                const state = Il2Cpp.api.livenessCalculationBegin(klass, 0, chooseCallback, NULL, onWorld, onWorld);
-
-                Il2Cpp.api.livenessCalculationFromStatics(state);
-                Il2Cpp.api.livenessCalculationEnd(state);
             }
 
             return matches;

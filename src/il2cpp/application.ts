@@ -51,6 +51,13 @@ namespace Il2Cpp {
         return UnityVersion.lt(unityVersion, "2018.3.0");
     }, lazy);
 
+    /** @internal */
+    export declare const unityVersionIsBelow202120: boolean;
+    // prettier-ignore
+    getter(Il2Cpp, "unityVersionIsBelow202120", () => {
+        return UnityVersion.lt(unityVersion, "2021.2.0");
+    }, lazy);
+
     function unityEngineCall(method: string): string | null {
         const handle = Il2Cpp.api.resolveInternalCall(Memory.allocUtf8String("UnityEngine.Application::" + method));
         const nativeFunction = new NativeFunction(handle, "pointer", []);
