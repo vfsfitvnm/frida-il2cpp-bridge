@@ -3,7 +3,7 @@ function raise(message: any): never {
     const error = new Error(`\x1B[0m${message}`);
     error.name = `\x1B[0m\x1B[38;5;9mil2cpp\x1B[0m`;
     error.stack = error.stack
-        ?.replace("Error", error.name)
+        ?.replace(/^Error/, error.name)
         ?.replace(/\n    at (.+) \((.+):(.+)\)/, "\x1b[3m\x1b[2m")
         ?.concat("\x1B[0m");
 
