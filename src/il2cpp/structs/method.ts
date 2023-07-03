@@ -307,7 +307,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                     switch (property) {
                         case "invoke":
                             let instanceHandle = instance.handle;
-                            if (instance.class.isValueType && !Il2Cpp.unityVersionIsBelow202120) {
+                            if (!Il2Cpp.unityVersionIsBelow202120 && instance.class.isValueType && !instance.class.isEnum) {
                                 instanceHandle = instanceHandle.add(Il2Cpp.Object.headerSize);
                             }
 
