@@ -24,6 +24,7 @@
     "dist"
   ],
   "scripts": {
+    "test": "make -C test test",
     "prepare": "tspc"
   },
   "prettier": {

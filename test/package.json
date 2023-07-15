@@ -1,0 +1,23 @@
+{
+  "name": "test",
+  "private": true,
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "vfsfitvnm",
+  "main": "index.js",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "prettier": {
+    "arrowParens": "avoid",
+    "bracketSpacing": true,
+    "printWidth": 160,
+    "tabWidth": 4,
+    "trailingComma": "none"
+  },
+  "dependencies": {
+    "frida": "^16.1.3"
+  }
+}
