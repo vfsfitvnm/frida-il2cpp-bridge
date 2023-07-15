@@ -39,7 +39,7 @@ function test(title, expected, getActual) {
     } catch (error) {
         send({
             title: title,
-            error: error.message
+            error: error.message.replace("\x1B[0m", "")
         });
     }
 }
