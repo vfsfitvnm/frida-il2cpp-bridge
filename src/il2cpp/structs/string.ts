@@ -8,7 +8,7 @@ namespace Il2Cpp {
         /** Sets the content of this string. */
         set content(value: string | null) {
             // prettier-ignore
-            const offset = Il2Cpp.string("vfsfitvnm").handle.offsetOf(_ => _.readInt() == 32) 
+            const offset = Il2Cpp.string("vfsfitvnm").handle.offsetOf(_ => _.readInt() == 9) 
                 ?? raise("couldn't find the length offset in the native string struct");
 
             globalThis.Object.defineProperty(Il2Cpp.String.prototype, "content", {
