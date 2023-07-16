@@ -8,12 +8,14 @@ namespace Il2Cpp {
 
         /** @internal Gets a pointer to the first element of the current array. */
         get elements(): Il2Cpp.Pointer<T> {
-            const string = Il2Cpp.string("vfsfitvnm");
-            const array = string.object.method<Il2Cpp.Object>("Split", 1).invoke(NULL);
+            // We previosly obtained an array whose content is known by calling
+            // 'System.String::Split(NULL)' on a known string. However, that
+            // method invocation somehow blows things up in Unity 2018.3.0f1.
+            const array = Il2Cpp.string("v").object.method<Il2Cpp.Array>("ToCharArray", 0).invoke();
 
             // prettier-ignore
-            const offset = array.handle.offsetOf(_ => _.readPointer().equals(string.handle)) 
-                ?? raise("couldn't find the elements offset in the native array struct");
+            const offset = array.handle.offsetOf(_ => _.readS16() == 118) ??
+                raise("couldn't find the elements offset in the native array struct");
 
             // prettier-ignore
             getter(Il2Cpp.Array.prototype, "elements", function (this: Il2Cpp.Array) {
