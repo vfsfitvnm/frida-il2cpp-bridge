@@ -9,7 +9,7 @@ assembly: prepare .build/out/GameAssembly.so
 
 .build/out/%.so: .build/cpp/Bulk_%_0.cpp
 	@ echo "Compiling $(<F)"
-	$(il2cpp) \
+	@ $(il2cpp) \
 		--generatedcppdir="$(<D)" \
 		--compile-cpp \
 		--libil2cpp-static \
@@ -58,6 +58,20 @@ prepare:
 
 clean:
 	@ rm -r .build
+
+editor.deb:
+	@ echo "Downloading Unity 5.3.5f1..."
+	@ curl -L -s -A "" --fail "http://download.unity3d.com/download_unity/linux/unity-editor-5.3.5f1+20160525_amd64.deb" -o "$@"
+
+data.tar.gz: editor.deb
+	@ ar x editor.deb
+	@ ar t editor.deb | grep -v -e data.tar.gz | xargs rm
+	@ rm $<
+
+Editor: data.tar.gz
+	@ tar -xf $< --strip-components=3 --files-from=.tarinclude
+	@ rm $<
+	@ touch -m Editor
 
 .PHONY: assembly clean prepare
 

@@ -1,0 +1,15 @@
+./opt/Unity/Editor/Data/il2cpp/
+./opt/Unity/Editor/Data/Mono/bin/mono
+./opt/Unity/Editor/Data/Mono/etc/
+./opt/Unity/Editor/Data/Mono/lib/mono/unity/
+./opt/Unity/Editor/Data/MonoBleedingEdge/bin/mono
+./opt/Unity/Editor/Data/MonoBleedingEdge/lib/mono/2.0/mono-env
+./opt/Unity/Editor/Data/MonoBleedingEdge/lib/mono/4.5/mscorlib.dll
+./opt/Unity/Editor/Data/MonoBleedingEdge/lib/mono/gac/Mono.Security/
+./opt/Unity/Editor/Data/MonoBleedingEdge/lib/mono/gac/System/
+./opt/Unity/Editor/Data/MonoBleedingEdge/lib/mono/gac/System.Configuration/
+./opt/Unity/Editor/Data/MonoBleedingEdge/lib/mono/gac/System.Core/
+./opt/Unity/Editor/Data/MonoBleedingEdge/lib/mono/gac/System.Xml/
+./opt/Unity/Editor/Data/Tools/link.xml
+./opt/Unity/Editor/Data/Tools/monolinker.exe
+./opt/Unity/Editor/Data/Tools/UnusedBytecodeStripper.exe

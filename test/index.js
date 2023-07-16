@@ -1,14 +1,16 @@
 import { test } from "node:test";
 import { strict as assert } from "node:assert";
 import { promises as fs } from "node:fs";
+import path from "node:path";
 import { clearInterval } from "node:timers";
 const frida = await import("frida");
 
-const unityVersions = ["5.3.5f1", "2018.3.0f1", "2019.3.0f1", "2021.2.0f1"];
-const src = (await fs.readFile("../dist/index.js", "utf-8")) + (await fs.readFile("./test.js", "utf-8"));
+const __dirname = path.dirname(import.meta.url).replace(/^file:\/\//, "");
 
-for (const unityVersion of unityVersions) {
-    const host = await frida.spawn(["host", `./${unityVersion}/.build/out`]);
+const src = (await fs.readFile(`${__dirname}/../dist/index.js`, "utf-8")) + (await fs.readFile(`${__dirname}/test.js`, "utf-8"));
+
+for (const unityVersion of process.env["UNITY_VERSIONS"].split(" ")) {
+    const host = await frida.spawn([`${__dirname}/host`, `${__dirname}/${unityVersion}/.build/out`]);
     const session = await frida.attach(host);
 
     const script = await session.createScript(`${src}\nconst $EXPECTED_UNITY_VERSION = "${unityVersion}";`);
