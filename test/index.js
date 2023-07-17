@@ -7,7 +7,7 @@ const frida = await import("frida");
 
 const root = path.join(path.dirname(import.meta.url.replace(/^file:\/\//, "")), "..");
 
-const src = (await fs.readFile(path.join(root, "dist", "index.js"), "utf-8")) + (await fs.readFile(path.join(root, "test", "test.js"), "utf-8"));
+const src = (await fs.readFile(path.join(root, "dist", "index.js"), "utf-8")) + (await fs.readFile(path.join(root, "test", "agent.js"), "utf-8"));
 
 const unityVersions = await fs.readdir(path.join(root, "build"));
 

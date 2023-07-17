@@ -9,7 +9,7 @@ node_modules:
 	@ npm i
 	@ touch -m node_modules
 
-test: test/index.js test/test.js dist build/host
+test: test/index.js test/agent.js dist build/host
 	@ node --test "$<"
 
 build/host: test/host.c
