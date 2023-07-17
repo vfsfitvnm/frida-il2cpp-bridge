@@ -1,3 +1,5 @@
 package-lock.json
+build
 dist
 node_modules
+unity/*/Editor

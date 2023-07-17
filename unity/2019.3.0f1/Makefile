@@ -1,12 +1,17 @@
-mono_dir := ./Editor/Data/MonoBleedingEdge
-il2cpp_dir := ./Editor/Data/il2cpp/build
+THIS_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+ROOT_DIR := $(shell realpath $(THIS_DIR)/../..)
+UNITY_VERSION := $(shell basename $(THIS_DIR))
+BUILD_DIR = $(ROOT_DIR)/build/$(UNITY_VERSION)
+
+mono_dir := $(THIS_DIR)/Editor/Data/MonoBleedingEdge
+il2cpp_dir := $(THIS_DIR)/Editor/Data/il2cpp/build/deploy/net471
 
 export TERM = xterm
 
-assembly: prepare .build/out/GameAssembly.so
+assembly: $(BUILD_DIR) $(BUILD_DIR)/out/GameAssembly.so
 
-.build/out/%.so: .build/cpp/Bulk_%_0.cpp
-	@ echo "Compiling $(<F)"
+$(BUILD_DIR)/out/%.so: $(BUILD_DIR)/cpp/%.cpp
+	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
 	"$(mono_dir)/bin-linux64/mono" \
 		"$(il2cpp_dir)/il2cpp.exe" \
 		--generatedcppdir="$(<D)" \
@@ -16,12 +21,12 @@ assembly: prepare .build/out/GameAssembly.so
 		--platform=Linux \
 		--architecture=x64 \
 		--dotnetprofile=unityaot \
-		--outputpath="$(CURDIR)/$@" \
+		--outputpath="$@" \
 		--cachedirectory="$(@D)/../buildstate"
 	@ strip "$@"
 
-.build/cpp/Bulk_%_0.cpp: .build/linked/%.dll
-	@ echo "Generating $(@F)"
+$(BUILD_DIR)/cpp/%.cpp: $(BUILD_DIR)/linked/%.dll
+	@ echo "[$(UNITY_VERSION)] Generating $(@F)"
 	@ "$(mono_dir)/bin-linux64/mono" \
 		"$(il2cpp_dir)/il2cpp.exe" \
 		--directory="$(<D)" \
@@ -32,8 +37,8 @@ assembly: prepare .build/out/GameAssembly.so
 		--copy-level=None \
 		--generatedcppdir="$(@D)"
 
-.build/linked/%.dll: .build/dll/%.dll
-	@ echo "Linking $(<F)"
+$(BUILD_DIR)/linked/%.dll: $(BUILD_DIR)/dll/%.dll
+	@ echo "[$(UNITY_VERSION)] Linking $(<F)"
 	@ "$(mono_dir)/bin-linux64/mono" \
 		"$(il2cpp_dir)/UnityLinker.exe" \
 		--include-assembly="$<,$(mono_dir)/lib/mono/unityaot/mscorlib.dll" \
@@ -44,8 +49,8 @@ assembly: prepare .build/out/GameAssembly.so
 		--use-editor-options \
 		--out="$(@D)"
 
-.build/dll/%.dll:
-	@ echo "Compiling $*.cs"
+$(BUILD_DIR)/dll/%.dll:
+	@ echo "[$(UNITY_VERSION)] Compiling $*.cs"
 	@ mkdir -p $(@D)
 	@ "$(mono_dir)/bin-linux64/mono" \
 		"$(mono_dir)/lib/mono/4.5/csc.exe" \
@@ -53,14 +58,14 @@ assembly: prepare .build/out/GameAssembly.so
 		-nologo \
 		-unsafe \
 		-out:"$@" \
-		"../$*.cs"
+		"$(ROOT_DIR)/test/$*.cs"
 
-prepare:
-	@ mkdir -p .build
+$(BUILD_DIR):
+	@ mkdir -p "$@"
 
 clean:
-	@ rm -r .build
+	@ rm -r "$(BUILD_DIR)"
 
-.PHONY: assembly clean prepare
+.PHONY: assembly clean
 
 .SECONDARY:

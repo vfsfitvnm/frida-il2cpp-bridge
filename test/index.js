@@ -5,12 +5,18 @@ import path from "node:path";
 import { clearInterval } from "node:timers";
 const frida = await import("frida");
 
-const __dirname = path.dirname(import.meta.url).replace(/^file:\/\//, "");
+const root = path.join(path.dirname(import.meta.url.replace(/^file:\/\//, "")), "..");
 
-const src = (await fs.readFile(`${__dirname}/../dist/index.js`, "utf-8")) + (await fs.readFile(`${__dirname}/test.js`, "utf-8"));
+const src = (await fs.readFile(path.join(root, "dist", "index.js"), "utf-8")) + (await fs.readFile(path.join(root, "test", "test.js"), "utf-8"));
 
-for (const unityVersion of process.env["UNITY_VERSIONS"].split(" ")) {
-    const host = await frida.spawn([`${__dirname}/host`, `${__dirname}/${unityVersion}/.build/out`]);
+const unityVersions = await fs.readdir(path.join(root, "build"));
+
+for (const unityVersion of unityVersions) {
+    const buildPath = path.join(root, "build", unityVersion);
+
+    if (!(await fs.lstat(buildPath)).isDirectory()) continue;
+
+    const host = await frida.spawn([path.join(root, "build", "host"), path.join(buildPath, "out")]);
     const session = await frida.attach(host);
 
     const script = await session.createScript(`${src}\nconst $EXPECTED_UNITY_VERSION = "${unityVersion}";`);
