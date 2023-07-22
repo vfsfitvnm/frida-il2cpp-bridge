@@ -10,7 +10,7 @@ node_modules:
 	@ touch -m node_modules
 
 test: test/index.js test/agent.js dist build/host
-	@ node --test "$<"
+	@ node "$<"
 
 build/host: test/host.c
 	@ mkdir -p build

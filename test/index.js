@@ -1,8 +1,5 @@
-import { test } from "node:test";
-import { strict as assert } from "node:assert";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { clearInterval } from "node:timers";
 const frida = await import("frida");
 
 const root = path.join(path.dirname(import.meta.url.replace(/^file:\/\//, "")), "..");
@@ -10,6 +7,8 @@ const root = path.join(path.dirname(import.meta.url.replace(/^file:\/\//, "")), 
 const src = (await fs.readFile(path.join(root, "dist", "index.js"), "utf-8")) + (await fs.readFile(path.join(root, "test", "agent.js"), "utf-8"));
 
 const unityVersions = await fs.readdir(path.join(root, "build"));
+
+const summary = { passed: 0, failed: 0 };
 
 for (const unityVersion of unityVersions) {
     const buildPath = path.join(root, "build", unityVersion);
@@ -22,34 +21,27 @@ for (const unityVersion of unityVersions) {
     const script = await session.createScript(`${src}\nconst $EXPECTED_UNITY_VERSION = "${unityVersion}";`);
     await script.load();
 
-    let queue = [];
-    script.message.connect(_ => queue.push(_));
-
-    const tests = test(unityVersion, async tester => {
-        await new Promise(resolve => {
-            const i = setInterval(async () => {
-                const messages = queue;
-                queue = [];
-
-                for (const message of messages) {
-                    if (message["payload"] == "done") {
-                        clearInterval(i);
+    const tests = new Promise((resolve, reject) => {
+        script.message.connect(message => {
+            switch (message.type) {
+                case frida.MessageType.Send: {
+                    if (message.payload?.type == "summary") {
+                        console.log();
+                        summary.passed += message.payload.passed;
+                        summary.failed += message.payload.failed;
                         resolve();
                         return;
                     }
 
-                    const { title, actual, expected, duration, error } = message["payload"];
-
-                    await tester.test(title, async () => {
-                        if (error) {
-                            throw error;
-                        }
-                        // No comment
-                        await new Promise(resolve => setTimeout(resolve, duration));
-                        assert.strictEqual(actual, expected);
-                    });
+                    console.log(message.payload);
+                    break;
                 }
-            }, 20);
+                case frida.MessageType.Error: {
+                    console.log(message);
+                    reject(message);
+                    break;
+                }
+            }
         });
     });
 
@@ -57,4 +49,11 @@ for (const unityVersion of unityVersions) {
     await tests;
     await script.unload();
     await frida.kill(host);
+}
+
+if (summary.failed > 0) {
+    console.log(`\x1b[31m\x1b[1m𐄂\x1b[22m ${summary.failed} tests failed`);
+    process.exit(1);
+} else {
+    console.log(`\x1b[94m\x1b[1m✓\x1b[22m ${summary.passed} tests passed\x1b[0m`);
 }
