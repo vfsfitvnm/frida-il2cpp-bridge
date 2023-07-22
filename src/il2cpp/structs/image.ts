@@ -10,7 +10,11 @@ namespace Il2Cpp {
         /** Gets the amount of classes defined in this image. */
         @lazy
         get classCount(): number {
-            return Il2Cpp.api.imageGetClassCount(this);
+            if (Il2Cpp.unityVersionIsBelow201830) {
+                return this.classes.length;
+            } else {
+                return Il2Cpp.api.imageGetClassCount(this);
+            }
         }
 
         /** Gets the classes defined in this image. */
