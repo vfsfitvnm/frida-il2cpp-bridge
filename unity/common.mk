@@ -12,6 +12,7 @@ ASSEMBLY_TARGET := $(BUILD_DIR)/out/%.so
 CPP_TARGET := $(BUILD_DIR)/cpp/$(GENERATED_CPP_FILENAME).cpp
 LINKED_DLL_TARGET := $(BUILD_DIR)/linked/%.dll
 DLL_TARGET := $(BUILD_DIR)/dll/%.dll
+CS_SRC := $(ROOT_DIR)/test/%.cs
 
 $(BUILD_DIR):
 	@ mkdir -p "$@"

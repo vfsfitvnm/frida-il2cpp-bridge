@@ -46,14 +46,14 @@ $(LINKED_DLL_TARGET): $(DLL_TARGET)
 		-a "$<"
 
 $(DLL_TARGET): export MONO_PATH=$(mono_lib)
-$(DLL_TARGET): $(EDITOR_DIR) $(BUILD_DIR)
-	@ echo "[$(UNITY_VERSION)] Compiling $*.cs"
+$(DLL_TARGET): $(CS_SRC) $(EDITOR_DIR) $(BUILD_DIR) 
+	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
 	@ mkdir -p $(@D)
 	@ $(MAYBE_STRACE) $(mono) \
 		"$(mono_lib)/smcs.exe" \
 		-target:library \
 		-out:"$@" \
-		"$(ROOT_DIR)/test/$*.cs"
+		"$<"
 
 $(EDITOR_DIR):
 	@ echo "[$(UNITY_VERSION)] Downloading editor..."

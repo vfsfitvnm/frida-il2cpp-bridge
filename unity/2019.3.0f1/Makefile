@@ -44,8 +44,8 @@ $(LINKED_DLL_TARGET): $(DLL_TARGET)
 		--use-editor-options \
 		--out="$(@D)"
 
-$(DLL_TARGET): $(EDITOR_DIR) $(BUILD_DIR) 
-	@ echo "[$(UNITY_VERSION)] Compiling $*.cs"
+$(DLL_TARGET): $(CS_SRC) $(EDITOR_DIR) $(BUILD_DIR)
+	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
 	@ mkdir -p $(@D)
 	@ $(MAYBE_STRACE) "$(mono_dir)/bin-linux64/mono" \
 		"$(mono_dir)/lib/mono/4.5/csc.exe" \
@@ -53,7 +53,7 @@ $(DLL_TARGET): $(EDITOR_DIR) $(BUILD_DIR)
 		-nologo \
 		-unsafe \
 		-out:"$@" \
-		"$(ROOT_DIR)/test/$*.cs"
+		"$<"
 
 $(EDITOR_DIR):
 	@ echo "[$(UNITY_VERSION)] Downloading editor..."
