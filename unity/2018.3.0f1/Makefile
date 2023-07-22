@@ -1,18 +1,15 @@
-THIS_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-ROOT_DIR := $(shell realpath $(THIS_DIR)/../..)
-UNITY_VERSION := $(shell basename $(THIS_DIR))
-BUILD_DIR = $(ROOT_DIR)/build/$(UNITY_VERSION)
+GENERATED_CPP_FILENAME := Bulk_%_0
 
-mono_dir := $(THIS_DIR)/Editor/Data/MonoBleedingEdge
-il2cpp_dir := $(THIS_DIR)/Editor/Data/il2cpp/build
+include ../common.mk
+
+mono_dir := $(EDITOR_DIR)/Data/MonoBleedingEdge
+il2cpp_dir := $(EDITOR_DIR)/Data/il2cpp/build
 
 export TERM = xterm
 
-assembly: $(BUILD_DIR) $(BUILD_DIR)/out/GameAssembly.so
-
-$(BUILD_DIR)/out/%.so: $(BUILD_DIR)/cpp/Bulk_%_0.cpp
+$(ASSEMBLY_TARGET): $(CPP_TARGET)
 	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
-	"$(mono_dir)/bin-linux64/mono" \
+	@ $(MAYBE_STRACE) "$(mono_dir)/bin-linux64/mono" \
 		"$(il2cpp_dir)/il2cpp.exe" \
 		--generatedcppdir="$(<D)" \
 		--compile-cpp \
@@ -25,9 +22,9 @@ $(BUILD_DIR)/out/%.so: $(BUILD_DIR)/cpp/Bulk_%_0.cpp
 		--cachedirectory="$(@D)/../buildstate"
 	@ strip "$@"
 
-$(BUILD_DIR)/cpp/Bulk_%_0.cpp: $(BUILD_DIR)/linked/%.dll
+$(CPP_TARGET): $(LINKED_DLL_TARGET)
 	@ echo "[$(UNITY_VERSION)] Generating $(@F)"
-	@ "$(mono_dir)/bin-linux64/mono" \
+	@ $(MAYBE_STRACE) "$(mono_dir)/bin-linux64/mono" \
 		"$(il2cpp_dir)/il2cpp.exe" \
 		--directory="$(<D)" \
 		--convert-to-cpp \
@@ -37,9 +34,9 @@ $(BUILD_DIR)/cpp/Bulk_%_0.cpp: $(BUILD_DIR)/linked/%.dll
 		--copy-level=None \
 		--generatedcppdir="$(@D)"
 
-$(BUILD_DIR)/linked/%.dll: $(BUILD_DIR)/dll/%.dll
+$(LINKED_DLL_TARGET): $(DLL_TARGET)
 	@ echo "[$(UNITY_VERSION)] Linking $(<F)"
-	@ "$(mono_dir)/bin-linux64/mono" \
+	@ $(MAYBE_STRACE) "$(mono_dir)/bin-linux64/mono" \
 		"$(il2cpp_dir)/UnityLinker.exe" \
 		--include-assembly="$<,$(mono_dir)/lib/mono/unityaot/mscorlib.dll" \
 		--i18n=none \
@@ -49,23 +46,25 @@ $(BUILD_DIR)/linked/%.dll: $(BUILD_DIR)/dll/%.dll
 		--use-editor-options \
 		--out="$(@D)"
 
-$(BUILD_DIR)/dll/%.dll:
+$(DLL_TARGET): $(EDITOR_DIR) $(BUILD_DIR)
 	@ echo "[$(UNITY_VERSION)] Compiling $*.cs"
 	@ mkdir -p $(@D)
-	@ "$(mono_dir)/bin-linux64/mono" \
+	@ $(MAYBE_STRACE) "$(mono_dir)/bin-linux64/mono" \
 		"$(mono_dir)/lib/mono/4.5/csc.exe" \
 		-target:library \
 		-nologo \
+		-noconfig \
 		-unsafe \
 		-out:"$@" \
 		"$(ROOT_DIR)/test/$*.cs"
 
-$(BUILD_DIR):
-	@ mkdir -p "$@"
+$(EDITOR_DIR):
+	@ echo "[$(UNITY_VERSION)] Downloading editor..."
+	@ curl -L -s -A "" --fail https://netstorage.unity3d.com/unity/6e9a27477296/LinuxEditorInstaller/Unity.tar.xz -O
 
-clean:
-	@ rm -r "$(BUILD_DIR)"
+	@ echo "[$(UNITY_VERSION)] Extracting editor..."
+	@ tar -xf Unity.tar.xz
+	@ touch -m Editor
 
-.PHONY: assembly clean
-
-.SECONDARY:
+	@ echo "[$(UNITY_VERSION)] Cleanup..."
+	@ rm Unity.tar.xz
