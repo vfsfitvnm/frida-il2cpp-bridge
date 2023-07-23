@@ -8,33 +8,33 @@ MSCORLIB := $(MONO_DIR)/lib/mono/2.0/mscorlib.dll
 export TERM = xterm
 
 ASSEMBLY_TARGET_CMD = $(IL2CPP) \
-	--generatedcppdir="$(<D)" \
 	--compile-cpp \
 	--libil2cpp-static \
 	--configuration=Release \
 	--platform=Linux \
 	--architecture=x64 \
 	--dotnetprofile=net20 \
-	--outputpath="$@" \
 	--cachedirectory="$(@D)/../buildstate"
+	--generatedcppdir="$(<D)" \
+	--outputpath="$@" \
 
 CPP_TARGET_CMD = $(IL2CPP) \
-	--directory="$(<D)" \
 	--convert-to-cpp \
 	--emit-null-checks \
 	--enable-array-bounds-check \
-	--dotnetprofile=net20 \
 	--copy-level=None \
+	--dotnetprofile=net20 \
+	--directory="$(<D)" \
 	--generatedcppdir="$(@D)"
 
 LINKED_DLL_TARGET_CMD = $(UNITY_LINKER) \
-	--dotnetruntime=il2cpp \
-	--dotnetprofile=net20 \
-	--include-assembly="$<,$(MSCORLIB)" \
-	--descriptor-directory="$(LINKER_DESCRIPTORS_DIR)" \
 	--disable-keep-facades \
 	--i18n=none \
 	--core-action=link \
+	--dotnetruntime=il2cpp \
+	--dotnetprofile=net20 \
+	--descriptor-directory="$(LINKER_DESCRIPTORS_DIR)" \
+	--include-assembly="$<,$(MSCORLIB)" \
 	--out="$(@D)"
 
 $(EDITOR_DIR):

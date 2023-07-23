@@ -8,35 +8,35 @@ MSCORLIB := $(MONOBL_DIR)/lib/mono/unityaot/mscorlib.dll
 export TERM = xterm
 
 ASSEMBLY_TARGET_CMD = $(IL2CPP) \
-	--generatedcppdir="$(<D)" \
 	--compile-cpp \
 	--libil2cpp-static \
 	--configuration=Release \
 	--platform=Linux \
 	--architecture=x64 \
 	--dotnetprofile=unityaot \
-	--outputpath="$@" \
 	--cachedirectory="$(@D)/../buildstate"
+	--generatedcppdir="$(<D)" \
+	--outputpath="$@" \
 
 CPP_TARGET_CMD = $(IL2CPP) \
-	--directory="$(<D)" \
 	--convert-to-cpp \
 	--emit-null-checks \
 	--enable-array-bounds-check \
-	--dotnetprofile=unityaot \
 	--copy-level=None \
+	--dotnetprofile=unityaot \
+	--directory="$(<D)" \
 	--generatedcppdir="$(@D)"
 
 LINKED_DLL_TARGET_CMD = $(UNITY_LINKER) \
 	--silent \
+	--i18n=none \
+	--core-action=link \
 	--strip-security \
 	--rule-set=aggressive \
 	--dotnetruntime=il2cpp \
 	--dotnetprofile=unityaot \
-	--include-assembly="$<,$(MSCORLIB)" \
 	--descriptor-directory="$(LINKER_DESCRIPTORS_DIR)" \
-	--i18n=none \
-	--core-action=link \
+	--include-assembly="$<,$(MSCORLIB)" \
 	--out="$(@D)"
 
 $(EDITOR_DIR):
