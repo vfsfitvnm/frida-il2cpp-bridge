@@ -14,9 +14,9 @@ ASSEMBLY_TARGET_CMD = $(IL2CPP) \
 	--platform=Linux \
 	--architecture=x64 \
 	--dotnetprofile=net20 \
-	--cachedirectory="$(@D)/.."
+	--cachedirectory="$(@D)/.." \
 	--generatedcppdir="$(<D)" \
-	--outputpath="$@" \
+	--outputpath="$@"
 
 CPP_TARGET_CMD = $(IL2CPP) \
 	--convert-to-cpp \
