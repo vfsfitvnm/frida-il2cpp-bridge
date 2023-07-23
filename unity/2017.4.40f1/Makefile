@@ -1,5 +1,3 @@
-GENERATED_CPP_FILENAME := Bulk_%_0
-
 include ../common.mk
 
 UNITY_LINKER := $(MONO) $(IL2CPP_DIR)/build/UnityLinker.exe

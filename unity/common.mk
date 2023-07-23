@@ -1,3 +1,5 @@
+VER_GTE = $(shell printf '%s\n' "$2" "$1" | sort -C -V && echo YES || echo NO)
+
 MAKEFLAGS += --no-builtin-rules
 
 THIS_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
@@ -15,7 +17,11 @@ MCS := $(MONO) $(MONOBL_DIR)/lib/mono/4.5/mcs.exe
 
 LINKER_DESCRIPTORS_DIR := $(IL2CPP_DIR)/LinkerDescriptors
 
-GENERATED_CPP_FILENAME ?= %
+ifeq "$(call VER_GTE,$(UNITY_VERSION),2019.1.0f1)" "YES"
+GENERATED_CPP_FILENAME := %
+else
+GENERATED_CPP_FILENAME := Bulk_%_0
+endif
 
 ASSEMBLY_TARGET := $(BUILD_DIR)/out/%.so
 CPP_TARGET := $(BUILD_DIR)/cpp/$(GENERATED_CPP_FILENAME).cpp

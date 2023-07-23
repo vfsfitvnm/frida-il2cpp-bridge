@@ -1,5 +1,3 @@
-GENERATED_CPP_FILENAME := Bulk_%_0
-
 include ../common.mk
 
 UNITY_LINKER := $(MONO) $(EDITOR_DIR)/Data/Tools/UnusedBytecodeStripper.exe
