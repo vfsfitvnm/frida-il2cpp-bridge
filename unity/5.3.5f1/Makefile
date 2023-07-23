@@ -7,41 +7,34 @@ MSCORLIB := $(MONO_DIR)/lib/mono/2.0/mscorlib.dll
 
 export TERM = xterm
 
-$(ASSEMBLY_TARGET): $(CPP_TARGET)
-	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
-	@ $(IL2CPP) \
-		--generatedcppdir="$(<D)" \
-		--compile-cpp \
-		--libil2cpp-static \
-		--configuration=Release \
-		--platform=Linux \
-		--architecture=x64 \
-		--dotnetprofile=net20 \
-		--outputpath="$@" \
-		--cachedirectory="$(@D)/.."
-	@ strip "$@"
+ASSEMBLY_TARGET_CMD = $(IL2CPP) \
+	--generatedcppdir="$(<D)" \
+	--compile-cpp \
+	--libil2cpp-static \
+	--configuration=Release \
+	--platform=Linux \
+	--architecture=x64 \
+	--dotnetprofile=net20 \
+	--outputpath="$@" \
+	--cachedirectory="$(@D)/.."
 
-$(CPP_TARGET): $(LINKED_DLL_TARGET)
-	@ echo "[$(UNITY_VERSION)] Generating $(@F)"
-	@ $(IL2CPP) \
-		--assembly="$^" \
-		--convert-to-cpp \
-		--emit-null-checks \
-		--enable-array-bounds-check \
-		--copy-level=None \
-		--dotnetprofile=net20 \
-		--generatedcppdir="$(@D)"
+CPP_TARGET_CMD = $(IL2CPP) \
+	--assembly="$^" \
+	--convert-to-cpp \
+	--emit-null-checks \
+	--enable-array-bounds-check \
+	--copy-level=None \
+	--dotnetprofile=net20 \
+	--generatedcppdir="$(@D)"
 
-$(LINKED_DLL_TARGET): $(DLL_TARGET)
-	@ echo "[$(UNITY_VERSION)] Linking $(<F)"
-	@ $(UNITY_LINKER) \
-		-l none \
-		-c link \
-		-b false \
-		-x "$(LINKER_DESCRIPTORS_DIR)/mscorlib.xml" \
-		-a "$(MSCORLIB)" \
-		-a "$<" \
-		-out "$(@D)"
+LINKED_DLL_TARGET_CMD = $(UNITY_LINKER) \
+	-l none \
+	-c link \
+	-b false \
+	-x "$(LINKER_DESCRIPTORS_DIR)/mscorlib.xml" \
+	-a "$(MSCORLIB)" \
+	-a "$<" \
+	-out "$(@D)"
 
 $(EDITOR_DIR):
 	@ echo "[$(UNITY_VERSION)] Downloading editor..."

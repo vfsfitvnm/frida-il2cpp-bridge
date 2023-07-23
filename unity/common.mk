@@ -29,19 +29,34 @@ LINKED_DLL_TARGET := $(BUILD_DIR)/linked/%.dll
 DLL_TARGET := $(BUILD_DIR)/dll/%.dll
 CS_SRC := $(ROOT_DIR)/test/%.cs
 
+$(ASSEMBLY_TARGET): $(CPP_TARGET)
+	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
+	@ $(ASSEMBLY_TARGET_CMD)
+	@ strip "$@"
+
+$(CPP_TARGET): $(LINKED_DLL_TARGET)
+	@ echo "[$(UNITY_VERSION)] Generating $(@F)"
+	@ $(CPP_TARGET_CMD)
+
+$(LINKED_DLL_TARGET): $(DLL_TARGET)
+	@ echo "[$(UNITY_VERSION)] Linking $(<F)"
+	@ $(LINKED_DLL_TARGET_CMD)
+
 $(DLL_TARGET): $(CS_SRC) $(EDITOR_DIR) $(BUILD_DIR)
 	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
 	@ mkdir -p $(@D)
-	@ $(MCS) \
-		-target:library \
-		-nologo \
-		-noconfig \
-		-unsafe \
-		-out:"$@" \
-		"$<"
+	@ $(DLL_TARGET_CMD)
 
 $(BUILD_DIR):
 	@ mkdir -p "$@"
+
+DLL_TARGET_CMD ?= $(MCS) \
+	-target:library \
+	-nologo \
+	-noconfig \
+	-unsafe \
+	-out:"$@" \
+	"$<"
 
 .PHONY: assembly
 assembly: $(BUILD_DIR)/out/GameAssembly.so
