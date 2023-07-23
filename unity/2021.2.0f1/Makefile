@@ -39,22 +39,19 @@ LINKED_DLL_TARGET_CMD = $(UNITY_LINKER) \
 	--out="$(@D)"
 
 $(EDITOR_DIR):
-	@ echo "[$(UNITY_VERSION)] Downloading editor..."
+	@ $(ECHO) downloading editor...
 	@ curl -L -s -A "" --fail https://netstorage.unity3d.com/unity/4bf1ec4b23c9/LinuxEditorInstaller/Unity.tar.xz -O
 
-	@ echo "[$(UNITY_VERSION)] Extracting editor..."
+	@ $(ECHO) extracting editor...
 	@ tar -xf Unity.tar.xz
 	@ touch -m Editor
 
-	@ echo "[$(UNITY_VERSION)] Cleanup..."
-	@ rm Unity.tar.xz
+	@ $(ECHO) downloading editor support...
+	@ curl -L -s -A "" --fail https://download.unity3d.com/download_unity/4bf1ec4b23c9/LinuxEditorTargetInstaller/UnitySetup-Linux-IL2CPP-Support-for-Editor-2021.2.0f1.tar.xz -o Support.tar.xz
 
-	@ echo "[$(UNITY_VERSION)] Downloading editor support..."
-	@ curl --progress-bar -L -s -A "" --fail https://download.unity3d.com/download_unity/4bf1ec4b23c9/LinuxEditorTargetInstaller/UnitySetup-Linux-IL2CPP-Support-for-Editor-2021.2.0f1.tar.xz -o Support.tar.xz
-
-	@ echo "[$(UNITY_VERSION)] Extracting editor support..."
+	@ $(ECHO) extracting editor support...
 	@ tar -xf Support.tar.xz
 	@ touch -m Editor
 
-	@ echo "[$(UNITY_VERSION)] Cleanup..."
+	@ rm Unity.tar.xz
 	@ rm Support.tar.xz

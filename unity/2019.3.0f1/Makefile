@@ -40,10 +40,10 @@ LINKED_DLL_TARGET_CMD = $(UNITY_LINKER) \
 	--out="$(@D)"
 
 $(EDITOR_DIR):
-	@ echo "[$(UNITY_VERSION)] Downloading editor..."
+	@ $(ECHO) downloading editor...
 	@ curl -L -s -A "" --fail https://download.unity3d.com/download_unity/ffacea4b84e7/LinuxEditorInstaller/Unity.tar.xz -O
 
-	@ echo "[$(UNITY_VERSION)] Extracting editor..."
+	@ $(ECHO) extracting editor...
 	@ tar -xf Unity.tar.xz
 	@ touch -m Editor
 

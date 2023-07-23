@@ -37,14 +37,13 @@ LINKED_DLL_TARGET_CMD = $(UNITY_LINKER) \
 	-out "$(@D)"
 
 $(EDITOR_DIR):
-	@ echo "[$(UNITY_VERSION)] Downloading editor..."
+	@ $(ECHO) downloading editor...
 	@ curl -L -s -A "" --fail "http://download.unity3d.com/download_unity/linux/unity-editor-5.3.5f1+20160525_amd64.deb" -o editor.deb
 
-	@ echo "[$(UNITY_VERSION)] Extracting editor..."
+	@ $(ECHO) extracting editor...
 	@ ar x editor.deb
 	@ tar -xf data.tar.gz --strip-components=3 --exclude="usr*" --exclude="opt/Unity/MonoDevelop*"
 
-	@ echo "[$(UNITY_VERSION)] Cleanup..."
 	@ ar t editor.deb | xargs rm
 	@ rm editor.deb
 	@ touch -m Editor

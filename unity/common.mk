@@ -1,6 +1,6 @@
-VER_GTE = $(shell printf '%s\n' "$2" "$1" | sort -C -V && echo YES || echo NO)
-
 MAKEFLAGS += --no-builtin-rules
+
+VER_GTE = $(shell printf '%s\n' "$2" "$1" | sort -C -V && echo YES || echo NO)
 
 THIS_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 ROOT_DIR := $(shell realpath $(THIS_DIR)/../..)
@@ -29,21 +29,23 @@ LINKED_DLL_TARGET := $(BUILD_DIR)/linked/%.dll
 DLL_TARGET := $(BUILD_DIR)/dll/%.dll
 CS_SRC := $(ROOT_DIR)/test/%.cs
 
+ECHO := echo -e "\e[1;34m$(UNITY_VERSION)\e[0m ►"
+
 $(ASSEMBLY_TARGET): $(CPP_TARGET)
-	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
+	@ $(ECHO) compiling $(<F)
 	@ $(ASSEMBLY_TARGET_CMD)
 	@ strip "$@"
 
 $(CPP_TARGET): $(LINKED_DLL_TARGET)
-	@ echo "[$(UNITY_VERSION)] Generating $(@F)"
+	@ $(ECHO) generating $(@F)
 	@ $(CPP_TARGET_CMD)
 
 $(LINKED_DLL_TARGET): $(DLL_TARGET)
-	@ echo "[$(UNITY_VERSION)] Linking $(<F)"
+	@ $(ECHO) linking $(<F)
 	@ $(LINKED_DLL_TARGET_CMD)
 
 $(DLL_TARGET): $(CS_SRC) $(EDITOR_DIR) $(BUILD_DIR)
-	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
+	@ $(ECHO) compiling $(<F)
 	@ mkdir -p $(@D)
 	@ $(DLL_TARGET_CMD)
 
@@ -74,8 +76,6 @@ clean:
 	@ rm -rf "$(BUILD_DIR)"
 
 .SECONDARY:
-
-.SUFFIXES:
 
 assembly/5.3.5f1:
 	@ make -C 5.3.5f1 assembly
