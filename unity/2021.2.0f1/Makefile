@@ -1,13 +1,15 @@
 include ../common.mk
 
-mono_dir := $(EDITOR_DIR)/Data/MonoBleedingEdge
-il2cpp_dir := $(EDITOR_DIR)/Data/il2cpp/build/deploy
+UNITY_LINKER := $(MAYBE_STRACE) $(IL2CPP_DIR)/build/deploy/UnityLinker
+IL2CPP := $(MAYBE_STRACE) $(IL2CPP_DIR)/build/deploy/il2cpp
+
+MSCORLIB := $(MONOBL_DIR)/lib/mono/unityaot-linux/mscorlib.dll
 
 $(ASSEMBLY_TARGET): $(CPP_TARGET)
 	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
-	@ $(MAYBE_STRACE) "$(il2cpp_dir)/il2cpp" \
-		--generatedcppdir="$(<D)" \
+	@ $(IL2CPP) \
 		--baselib-directory="$(EDITOR_DIR)/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_player_nondevelopment_il2cpp/" \
+		--generatedcppdir="$(<D)" \
 		--compile-cpp \
 		--libil2cpp-static \
 		--configuration=Release \
@@ -15,41 +17,33 @@ $(ASSEMBLY_TARGET): $(CPP_TARGET)
 		--architecture=x64 \
 		--dotnetprofile=unityaot-linux \
 		--outputpath="$@" \
-		--cachedirectory="$(@D)/.."
+		--cachedirectory="$(@D)/../buildstate"
 	@ strip "$@"
 
 $(CPP_TARGET): $(LINKED_DLL_TARGET)
 	@ echo "[$(UNITY_VERSION)] Generating $(@F)"
-	@ $(MAYBE_STRACE) "$(il2cpp_dir)/il2cpp" \
+	@ $(IL2CPP) \
 		--directory="$(<D)" \
 		--convert-to-cpp \
 		--emit-null-checks \
 		--enable-array-bounds-check \
-		--dotnetprofile="unityaot-linux" \
+		--dotnetprofile=unityaot-linux \
 		--copy-level=None \
 		--generatedcppdir="$(@D)"
 
 $(LINKED_DLL_TARGET): $(DLL_TARGET)
 	@ echo "[$(UNITY_VERSION)] Linking $(<F)"
-	@ $(MAYBE_STRACE) "$(il2cpp_dir)/UnityLinker" \
-		--include-assembly="$<,$(mono_dir)/lib/mono/unityaot-linux/mscorlib.dll" \
-		--i18n=none \
-		--core-action=link \
+	@ $(UNITY_LINKER) \
+		--silent \
+		--strip-security \
+		--rule-set=aggressive \
 		--dotnetruntime=il2cpp \
 		--dotnetprofile=unityaot-linux \
-		--use-editor-options \
+		--include-assembly="$<,$(MSCORLIB)" \
+		--descriptor-directory="$(LINKER_DESCRIPTORS_DIR)" \
+		--i18n=none \
+		--core-action=link \
 		--out="$(@D)"
-
-$(DLL_TARGET): $(CS_SRC) $(EDITOR_DIR) $(BUILD_DIR)
-	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
-	@ mkdir -p $(@D)
-	@ $(MAYBE_STRACE) "$(mono_dir)/bin-linux64/mono" \
-		"$(mono_dir)/lib/mono/4.5/csc.exe" \
-		-target:library \
-		-nologo \
-		-unsafe \
-		-out:"$@" \
-		"$<"
 
 $(EDITOR_DIR):
 	@ echo "[$(UNITY_VERSION)] Downloading editor..."

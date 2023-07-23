@@ -6,6 +6,15 @@ UNITY_VERSION := $(shell basename $(THIS_DIR))
 BUILD_DIR = $(ROOT_DIR)/build/$(UNITY_VERSION)
 EDITOR_DIR = $(THIS_DIR)/Editor
 
+MONO_DIR = $(EDITOR_DIR)/Data/Mono
+MONOBL_DIR = $(EDITOR_DIR)/Data/MonoBleedingEdge
+IL2CPP_DIR = $(EDITOR_DIR)/Data/il2cpp
+
+MONO := $(MAYBE_STRACE) $(MONOBL_DIR)/bin/mono
+MCS := $(MONO) $(MONOBL_DIR)/lib/mono/4.5/mcs.exe
+
+LINKER_DESCRIPTORS_DIR := $(IL2CPP_DIR)/LinkerDescriptors
+
 GENERATED_CPP_FILENAME ?= %
 
 ASSEMBLY_TARGET := $(BUILD_DIR)/out/%.so
@@ -13,6 +22,17 @@ CPP_TARGET := $(BUILD_DIR)/cpp/$(GENERATED_CPP_FILENAME).cpp
 LINKED_DLL_TARGET := $(BUILD_DIR)/linked/%.dll
 DLL_TARGET := $(BUILD_DIR)/dll/%.dll
 CS_SRC := $(ROOT_DIR)/test/%.cs
+
+$(DLL_TARGET): $(CS_SRC) $(EDITOR_DIR) $(BUILD_DIR)
+	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
+	@ mkdir -p $(@D)
+	@ $(MCS) \
+		-target:library \
+		-nologo \
+		-noconfig \
+		-unsafe \
+		-out:"$@" \
+		"$<"
 
 $(BUILD_DIR):
 	@ mkdir -p "$@"

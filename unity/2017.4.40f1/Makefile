@@ -2,17 +2,10 @@ GENERATED_CPP_FILENAME := Bulk_%_0
 
 include ../common.mk
 
-MONO_DIR = $(EDITOR_DIR)/Data/Mono
-MONOBL_DIR = $(EDITOR_DIR)/Data/MonoBleedingEdge
-IL2CPP_DIR = $(EDITOR_DIR)/Data/il2cpp
-
-MONO := $(MAYBE_STRACE) $(MONOBL_DIR)/bin/mono
-MCS := $(MONO) $(MONOBL_DIR)/lib/mono/4.5/mcs.exe
 UNITY_LINKER := $(MONO) $(IL2CPP_DIR)/build/UnityLinker.exe
 IL2CPP := $(MONO) $(IL2CPP_DIR)/build/il2cpp.exe
 
 MSCORLIB := $(MONO_DIR)/lib/mono/2.0/mscorlib.dll
-LINKER_DESCRIPTORS_DIR := $(IL2CPP_DIR)/LinkerDescriptors
 
 export TERM = xterm
 
@@ -50,17 +43,6 @@ $(LINKED_DLL_TARGET): $(DLL_TARGET)
 		--i18n=none \
 		--core-action=link \
 		--out="$(@D)"
-
-$(DLL_TARGET): $(CS_SRC) $(EDITOR_DIR) $(BUILD_DIR)
-	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
-	@ mkdir -p $(@D)
-	@ $(MCS) \
-		-target:library \
-		-nologo \
-		-noconfig \
-		-unsafe \
-		-out:"$@" \
-		"$<"
 
 $(EDITOR_DIR):
 	@ echo "[$(UNITY_VERSION)] Downloading editor..."

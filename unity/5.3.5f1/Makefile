@@ -2,58 +2,48 @@ GENERATED_CPP_FILENAME := Bulk_%_0
 
 include ../common.mk
 
-mono := "$(EDITOR_DIR)/Data/Mono/bin/mono"
-mono_lib := $(EDITOR_DIR)/Data/Mono/lib/mono/unity
-mono_be := "$(EDITOR_DIR)/Data/MonoBleedingEdge/bin/mono"
-il2cpp := $(mono_be) "$(EDITOR_DIR)/Data/il2cpp/build/il2cpp.exe"
+UNITY_LINKER := $(MONO) $(EDITOR_DIR)/Data/Tools/UnusedBytecodeStripper.exe
+IL2CPP := $(MONO) $(IL2CPP_DIR)/build/il2cpp.exe
+
+MSCORLIB := $(MONO_DIR)/lib/mono/2.0/mscorlib.dll
 
 export TERM = xterm
 
 $(ASSEMBLY_TARGET): $(CPP_TARGET)
 	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
-	@ $(MAYBE_STRACE) $(il2cpp) \
+	@ $(IL2CPP) \
 		--generatedcppdir="$(<D)" \
 		--compile-cpp \
 		--libil2cpp-static \
 		--configuration=Release \
 		--platform=Linux \
 		--architecture=x64 \
+		--dotnetprofile=net20 \
 		--outputpath="$@" \
 		--cachedirectory="$(@D)/.."
 	@ strip "$@"
 
 $(CPP_TARGET): $(LINKED_DLL_TARGET)
 	@ echo "[$(UNITY_VERSION)] Generating $(@F)"
-	@ $(MAYBE_STRACE) $(il2cpp) \
+	@ $(IL2CPP) \
 		--assembly="$^" \
 		--convert-to-cpp \
 		--emit-null-checks \
 		--enable-array-bounds-check \
 		--copy-level=None \
+		--dotnetprofile=net20 \
 		--generatedcppdir="$(@D)"
 
-$(LINKED_DLL_TARGET): export MONO_PATH=$(mono_lib)
 $(LINKED_DLL_TARGET): $(DLL_TARGET)
 	@ echo "[$(UNITY_VERSION)] Linking $(<F)"
-	@ $(MAYBE_STRACE) $(mono) \
-		"$(EDITOR_DIR)/Data/Tools/UnusedBytecodeStripper.exe" \
+	@ $(UNITY_LINKER) \
 		-l none \
 		-c link \
 		-b false \
-		-x "$(EDITOR_DIR)/Data/Tools/link.xml" \
-		-out "$(@D)" \
-		-a "$(mono_lib)/mscorlib.dll" \
-		-a "$<"
-
-$(DLL_TARGET): export MONO_PATH=$(mono_lib)
-$(DLL_TARGET): $(CS_SRC) $(EDITOR_DIR) $(BUILD_DIR) 
-	@ echo "[$(UNITY_VERSION)] Compiling $(<F)"
-	@ mkdir -p $(@D)
-	@ $(MAYBE_STRACE) $(mono) \
-		"$(mono_lib)/smcs.exe" \
-		-target:library \
-		-out:"$@" \
-		"$<"
+		-x "$(LINKER_DESCRIPTORS_DIR)/mscorlib.xml" \
+		-a "$(MSCORLIB)" \
+		-a "$<" \
+		-out "$(@D)"
 
 $(EDITOR_DIR):
 	@ echo "[$(UNITY_VERSION)] Downloading editor..."
