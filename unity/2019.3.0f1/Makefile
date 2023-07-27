@@ -1,5 +1,6 @@
 include ../common.mk
 
+UNITY_CHANGESET := ffacea4b84e7
 UNITY_LINKER := $(MONO) $(IL2CPP_DIR)/build/deploy/net471/UnityLinker.exe
 IL2CPP := $(MONO) $(IL2CPP_DIR)/build/deploy/net471/il2cpp.exe
 
@@ -28,8 +29,8 @@ CPP_TARGET_CMD = $(IL2CPP) \
 	--generatedcppdir="$(@D)"
 
 LINKED_DLL_TARGET_CMD = $(UNITY_LINKER) \
-	--silent \
 	--i18n=none \
+	--silent \
 	--core-action=link \
 	--strip-security \
 	--rule-set=aggressive \
@@ -38,14 +39,3 @@ LINKED_DLL_TARGET_CMD = $(UNITY_LINKER) \
 	--descriptor-directory="$(LINKER_DESCRIPTORS_DIR)" \
 	--include-assembly="$<,$(MSCORLIB)" \
 	--out="$(@D)"
-
-$(EDITOR_DIR):
-	@ $(ECHO) downloading editor...
-	@ curl -L -s -A "" --fail https://download.unity3d.com/download_unity/ffacea4b84e7/LinuxEditorInstaller/Unity.tar.xz -O
-
-	@ $(ECHO) extracting editor...
-	@ tar -xf Unity.tar.xz
-	@ touch -m Editor
-
-	@ echo "[$(UNITY_VERSION)] Cleanup..."
-	@ rm Unity.tar.xz

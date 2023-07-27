@@ -30,6 +30,7 @@ DLL_TARGET := $(BUILD_DIR)/dll/%.dll
 CS_SRC := $(ROOT_DIR)/test/%.cs
 
 ECHO := echo -e "\e[1;34m$(UNITY_VERSION)\e[0m ►"
+CURL := curl -L -s -A "" --fail
 
 $(ASSEMBLY_TARGET): $(CPP_TARGET)
 	@ $(ECHO) compiling $(<F)
@@ -43,14 +44,38 @@ $(CPP_TARGET): $(LINKED_DLL_TARGET)
 $(LINKED_DLL_TARGET): $(DLL_TARGET)
 	@ $(ECHO) linking $(<F)
 	@ $(LINKED_DLL_TARGET_CMD)
+	@ touch "$@"
 
 $(DLL_TARGET): $(CS_SRC) $(EDITOR_DIR) $(BUILD_DIR)
 	@ $(ECHO) compiling $(<F)
-	@ mkdir -p $(@D)
+	@ mkdir -p "$(@D)"
 	@ $(DLL_TARGET_CMD)
 
 $(BUILD_DIR):
 	@ mkdir -p "$@"
+
+ifdef $(UNITY_CHANGESET)
+$(EDITOR_DIR):
+	@ $(ECHO) downloading editor...
+	@ $(CURL) https://netstorage.unity3d.com/unity/$(UNITY_CHANGESET)/LinuxEditorInstaller/Unity.tar.xz -O
+
+	@ $(ECHO) extracting editor...
+	@ tar -xf Unity.tar.xz
+	@ touch -m Editor
+
+	@ rm Unity.tar.xz
+
+ifeq "$(call VER_GTE,$(UNITY_VERSION),2019.4.0f1)" "YES"
+	@ $(ECHO) downloading editor support...
+	@ $(CURL) https://download.unity3d.com/download_unity/$(UNITY_CHANGESET)/LinuxEditorTargetInstaller/UnitySetup-Linux-IL2CPP-Support-for-Editor-$(UNITY_VERSION).tar.xz -o Support.tar.xz
+
+	@ $(ECHO) extracting editor support...
+	@ tar -xf Support.tar.xz
+	@ touch -m Editor
+	
+	@ rm Support.tar.xz
+endif
+endif
 
 DLL_TARGET_CMD ?= $(MCS) \
 	-target:library \

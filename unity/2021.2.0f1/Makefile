@@ -1,5 +1,6 @@
 include ../common.mk
 
+UNITY_CHANGESET := 4bf1ec4b23c9
 UNITY_LINKER := $(MAYBE_STRACE) $(IL2CPP_DIR)/build/deploy/UnityLinker
 IL2CPP := $(MAYBE_STRACE) $(IL2CPP_DIR)/build/deploy/il2cpp
 
@@ -37,21 +38,3 @@ LINKED_DLL_TARGET_CMD = $(UNITY_LINKER) \
 	--descriptor-directory="$(LINKER_DESCRIPTORS_DIR)" \
 	--include-assembly="$<,$(MSCORLIB)" \
 	--out="$(@D)"
-
-$(EDITOR_DIR):
-	@ $(ECHO) downloading editor...
-	@ curl -L -s -A "" --fail https://netstorage.unity3d.com/unity/4bf1ec4b23c9/LinuxEditorInstaller/Unity.tar.xz -O
-
-	@ $(ECHO) extracting editor...
-	@ tar -xf Unity.tar.xz
-	@ touch -m Editor
-
-	@ $(ECHO) downloading editor support...
-	@ curl -L -s -A "" --fail https://download.unity3d.com/download_unity/4bf1ec4b23c9/LinuxEditorTargetInstaller/UnitySetup-Linux-IL2CPP-Support-for-Editor-2021.2.0f1.tar.xz -o Support.tar.xz
-
-	@ $(ECHO) extracting editor support...
-	@ tar -xf Support.tar.xz
-	@ touch -m Editor
-
-	@ rm Unity.tar.xz
-	@ rm Support.tar.xz

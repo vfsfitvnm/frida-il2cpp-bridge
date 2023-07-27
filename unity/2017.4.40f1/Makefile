@@ -1,5 +1,6 @@
 include ../common.mk
 
+UNITY_CHANGESET := 6e14067f8a9a
 UNITY_LINKER := $(MONO) $(IL2CPP_DIR)/build/UnityLinker.exe
 IL2CPP := $(MONO) $(IL2CPP_DIR)/build/il2cpp.exe
 
@@ -34,14 +35,3 @@ LINKED_DLL_TARGET_CMD = $(UNITY_LINKER) \
 	--descriptor-directory="$(LINKER_DESCRIPTORS_DIR)" \
 	--include-assembly="$<,$(MSCORLIB)" \
 	--out="$(@D)"
-
-$(EDITOR_DIR):
-	@ $(ECHO) downloading editor...
-	@ curl -L -s -A "" --fail https://netstorage.unity3d.com/unity/6e14067f8a9a/LinuxEditorInstaller/Unity.tar.xz -O
-
-	@ $(ECHO) extracting editor...
-	@ tar -xf Unity.tar.xz
-	@ touch -m Editor
-
-	@ echo "[$(UNITY_VERSION)] Cleanup..."
-	@ rm Unity.tar.xz
