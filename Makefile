@@ -1,6 +1,8 @@
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
+UNITY_DIRS := $(wildcard unity/*/)
+
 dist: node_modules $(shell find src) tsconfig.json
 	@ ./node_modules/.bin/tspc
 	@ touch -m dist
@@ -16,8 +18,13 @@ build/host: test/host.c
 	@ mkdir -p build
 	@ gcc -o "$(@)" "$<"
 
+$(UNITY_DIRS):
+	make -C "$@" assembly
+
+assembly: $(UNITY_DIRS);
+
 clean:
 	@ rm -r dist
 
 .DEFAULT_GOAL := dist
-.PHONY: clean test
+.PHONY: clean test assembly $(UNITY_DIRS)

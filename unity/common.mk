@@ -101,6 +101,3 @@ clean:
 	@ rm -rf "$(BUILD_DIR)"
 
 .SECONDARY:
-
-assembly/5.3.5f1:
-	@ make -C 5.3.5f1 assembly
