@@ -32,7 +32,7 @@ namespace Il2Cpp {
         /** Gets the name of the assembly in which the current class is defined. */
         @lazy
         get assemblyName(): string {
-            return Il2Cpp.api.classGetAssemblyName(this).readUtf8String()!;
+            return Il2Cpp.api.classGetAssemblyName(this).readUtf8String()!.replace(".dll", "");
         }
 
         /** Gets the class that declares the current nested class. */
