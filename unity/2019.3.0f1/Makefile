@@ -30,6 +30,7 @@ CPP_TARGET_CMD = $(IL2CPP) \
 
 LINKED_DLL_TARGET_CMD = $(UNITY_LINKER) \
 	--i18n=none \
+	--disable-keep-facades \
 	--silent \
 	--core-action=link \
 	--strip-security \
