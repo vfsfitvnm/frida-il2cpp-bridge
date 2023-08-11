@@ -9,17 +9,6 @@
 /// <reference path="./utils/recycle.ts">/>
 /// <reference path="./utils/unity-version.ts">/>
 
-/// <reference path="./il2cpp/api.ts">/>
-/// <reference path="./il2cpp/application.ts">/>
-/// <reference path="./il2cpp/dump.ts">/>
-/// <reference path="./il2cpp/exception-listener.ts">/>
-/// <reference path="./il2cpp/filters.ts">/>
-/// <reference path="./il2cpp/gc.ts">/>
-/// <reference path="./il2cpp/memory.ts">/>
-/// <reference path="./il2cpp/module.ts">/>
-/// <reference path="./il2cpp/perform.ts">/>
-/// <reference path="./il2cpp/tracer.ts">/>
-
 /// <reference path="./il2cpp/structs/array.ts">/>
 /// <reference path="./il2cpp/structs/assembly.ts">/>
 /// <reference path="./il2cpp/structs/class.ts">/>
@@ -38,5 +27,17 @@
 /// <reference path="./il2cpp/structs/thread.ts">/>
 /// <reference path="./il2cpp/structs/type.ts">/>
 /// <reference path="./il2cpp/structs/value-type.ts">/>
+
+/// <reference path="./il2cpp/api.ts">/>
+/// <reference path="./il2cpp/application.ts">/>
+/// <reference path="./il2cpp/dictionary.ts">/>
+/// <reference path="./il2cpp/dump.ts">/>
+/// <reference path="./il2cpp/exception-listener.ts">/>
+/// <reference path="./il2cpp/filters.ts">/>
+/// <reference path="./il2cpp/gc.ts">/>
+/// <reference path="./il2cpp/memory.ts">/>
+/// <reference path="./il2cpp/module.ts">/>
+/// <reference path="./il2cpp/perform.ts">/>
+/// <reference path="./il2cpp/tracer.ts">/>
 
 globalThis.Il2Cpp = Il2Cpp;
