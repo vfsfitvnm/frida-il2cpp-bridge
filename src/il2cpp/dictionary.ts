@@ -32,16 +32,16 @@ namespace Il2Cpp {
         /** Gets the value by the specified key of the current dictionary. */
         get(key: K): V {
             if (!this.containsKey(key)) {
-                raise(``);
+                raise(`the given key ${key} is not in the dictionary`);
             }
-
+            
             return this.method<V>("get_Item").invoke(key);
         }
 
         /** Sets the pair of the current dictionary. */
         set(key: K, value: V) {
             if (this.containsKey(key)) {
-                warn(``);
+                warn(`the given key ${key} is already in the dictionary. It will be overwritten with the new value ${value}`);
             }
 
             this.method("set_Item").invoke(key, value);
