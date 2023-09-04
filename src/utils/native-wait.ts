@@ -1,53 +1,22 @@
 /** @internal */
-type StringEncoding = "utf8" | "utf16" | "ansi";
-
-/** @internal */
-class Target {
-    readonly address: NativePointer;
-
-    private constructor(responsible: string | null, name: string, readonly stringEncoding: StringEncoding) {
-        this.address = Module.findExportByName(responsible, name) ?? NULL;
-    }
-
-    static get targets(): Target[] {
-        function info(): [string | null, ...[string, StringEncoding][]] | undefined {
-            switch (Process.platform) {
-                case "linux":
-                    try {
-                        if (UnityVersion.gte(Java.androidVersion, "12")) {
-                            return [null, ["__loader_dlopen", "utf8"]];
-                        } else {
-                            return ["libdl.so", ["dlopen", "utf8"], ["android_dlopen_ext", "utf8"]];
-                        }
-                    } catch (e) {
-                        return [null, ["dlopen", "utf8"]];
-                    }
-                case "darwin":
-                    return ["libdyld.dylib", ["dlopen", "utf8"]];
-                case "windows":
-                    const ll = "LoadLibrary";
-                    return ["kernel32.dll", [`${ll}W`, "utf16"], [`${ll}ExW`, "utf16"], [`${ll}A`, "ansi"], [`${ll}ExA`, "ansi"]];
-            }
-        }
-
-        const [responsible, ...targets] = info()!;
-        return targets.map(([name, encoding]) => new Target(responsible, name, encoding)).filter(_ => !_.address.isNull());
-    }
-
-    readString(pointer: NativePointer): string | null {
-        switch (this.stringEncoding) {
-            case "utf8":
-                return pointer.readUtf8String();
-            case "utf16":
-                return pointer.readUtf16String();
-            case "ansi":
-                return pointer.readAnsiString();
-        }
-    }
+interface ResolvedExport {
+    handle: NativePointer;
+    readString: (handle: NativePointer) => string | null;
 }
 
 /** @internal */
 function forModule(...moduleNames: string[]): Promise<string> {
+    function find(
+        moduleName: string | null,
+        name: string,
+        readString: (handle: NativePointer) => string | null = _ => _.readUtf8String()
+    ): ResolvedExport | undefined {
+        const handle = Module.findExportByName(moduleName, name) ?? NULL;
+        if (!handle.isNull()) {
+            return { handle, readString };
+        }
+    }
+
     return new Promise<string>(resolve => {
         for (const moduleName of moduleNames) {
             const module = Process.findModuleByName(moduleName);
@@ -57,10 +26,44 @@ function forModule(...moduleNames: string[]): Promise<string> {
             }
         }
 
-        const interceptors = Target.targets.map(target =>
-            Interceptor.attach(target.address, {
+        let targets: (ResolvedExport | undefined)[] = [];
+
+        switch (Process.platform) {
+            case "linux":
+                switch (Android.apiLevel) {
+                    case null:
+                        targets = [find(null, "dlopen")];
+                        break;
+                    default:
+                        // prettier-ignore
+                        targets = Android.apiLevel >= 31
+                            ? [find(null, "__loader_dlopen")]
+                            : [find("libdl.so", "dlopen"), find("libdl.so", "android_dlopen_ext")];
+                }
+                break;
+            case "darwin":
+                targets = [find("libdyld.dylib", "dlopen")];
+                break;
+            case "windows":
+                targets = [
+                    find("kernel32.dll", "LoadLibraryW", _ => _.readUtf16String()),
+                    find("kernel32.dll", "LoadLibraryExW", _ => _.readUtf16String()),
+                    find("kernel32.dll", "LoadLibraryA", _ => _.readAnsiString()),
+                    find("kernel32.dll", "LoadLibraryExA", _ => _.readAnsiString())
+                ];
+                break;
+        }
+
+        targets = targets.filter(_ => _);
+
+        if (targets.length == 0) {
+            throw new Error("There are no targets to hook, please file a bug");
+        }
+
+        const interceptors = targets.map(_ =>
+            Interceptor.attach(_!.handle, {
                 onEnter(args: InvocationArguments) {
-                    this.modulePath = target.readString(args[0]) ?? "";
+                    this.modulePath = _!.readString(args[0]) ?? "";
                 },
                 onLeave(returnValue: InvocationReturnValue) {
                     if (returnValue.isNull()) return;
