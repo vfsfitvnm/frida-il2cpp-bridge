@@ -20,13 +20,16 @@ namespace Il2Cpp {
     export declare const unityVersion: string;
     // prettier-ignore
     getter(Il2Cpp, "unityVersion", () => {
-        const unityVersion = unityEngineCall("get_unityVersion");
+        try {
+            const unityVersion = unityEngineCall("get_unityVersion");
 
-        if (unityVersion != null) {
-            return unityVersion;
+            if (unityVersion != null) {
+                return unityVersion;
+            }
+        } catch(_) {
         }
 
-        const searchPattern = "45 64 69 74 6f 72 ?? 44 61 74 61 ?? 69 6c 32 63 70 70";
+        const searchPattern = "69 6c 32 63 70 70";
 
         for (const range of module.enumerateRanges("r--").concat(Process.getRangeByAddress(module.base))) {
             for (let { address } of Memory.scanSync(range.base, range.size, searchPattern)) {
