@@ -41,7 +41,7 @@ function forModule(...moduleNames: string[]): Promise<string> {
                 // A9, A10, A12, A13: __dl___loader_dlopen
                 targets = (Process.findModuleByName("linker64") ?? Process.getModuleByName("linker"))
                     .enumerateSymbols()
-                    .filter(_ => _.name in ["__dl___loader_dlopen", "__dl__Z8__dlopenPKciPKv", "__dl_open"])
+                    .filter(_ => ["__dl___loader_dlopen", "__dl__Z8__dlopenPKciPKv", "__dl_open"].includes(_.name))
                     .map(_ => ({ handle: _.address, readString: _ => _.readCString() }));
                 break;
             case "darwin":
