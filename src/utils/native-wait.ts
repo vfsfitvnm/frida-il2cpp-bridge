@@ -63,6 +63,20 @@ function forModule(...moduleNames: string[]): Promise<string> {
             throw new Error("There are no targets to hook, please file a bug");
         }
 
+        const timeout = setTimeout(() => {
+            for (const moduleName of moduleNames) {
+                const module = Process.findModuleByName(moduleName);
+                if (module != null) {
+                    warn(`\x1b[3m${module.name}\x1b[0m has been loaded, but such event hasn't been detected - please file a bug`);
+                    clearTimeout(timeout);
+                    resolve(moduleName);
+                    return;
+                }
+            }
+
+            warn(`10 seconds have passed and \x1b[3m${moduleNames}\x1b[0m has not been loaded yet, is the app running?`);
+        }, 10000);
+
         const interceptors = targets.map(_ =>
             Interceptor.attach(_!.handle, {
                 onEnter(args: InvocationArguments) {
@@ -74,6 +88,7 @@ function forModule(...moduleNames: string[]): Promise<string> {
                     for (const moduleName of moduleNames) {
                         if (!this.modulePath.endsWith(moduleName)) continue;
 
+                        clearTimeout(timeout);
                         setImmediate(() => interceptors.forEach(_ => _.detach()));
                         resolve(moduleName);
                     }
