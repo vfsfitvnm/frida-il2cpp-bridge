@@ -60,7 +60,7 @@ function forModule(...moduleNames: string[]): Promise<string> {
         targets = targets.filter(_ => _);
 
         if (targets.length == 0) {
-            throw new Error("There are no targets to hook, please file a bug");
+            raise(`there are no targets to hook the loading of \x1b[3m${moduleNames}\x1b[0m, please file a bug`);
         }
 
         const timeout = setTimeout(() => {
