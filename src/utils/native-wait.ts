@@ -30,16 +30,19 @@ function forModule(...moduleNames: string[]): Promise<string> {
 
         switch (Process.platform) {
             case "linux":
-                switch (Android.apiLevel) {
-                    case null:
-                        targets = [find(null, "dlopen")];
-                        break;
-                    default:
-                        // prettier-ignore
-                        targets = Android.apiLevel >= 31
-                            ? [find(null, "__loader_dlopen")]
-                            : [find("libdl.so", "dlopen"), find("libdl.so", "android_dlopen_ext")];
+                if (Android.apiLevel == null) {
+                    targets = [find(null, "dlopen")];
+                    break;
                 }
+
+                // A5: device reboot, can't hook symbols
+                // A6, A7: __dl_open
+                // A8, A8.1: __dl__Z8__dlopenPKciPKv
+                // A9, A10, A12, A13: __dl___loader_dlopen
+                targets = (Process.findModuleByName("linker64") ?? Process.getModuleByName("linker"))
+                    .enumerateSymbols()
+                    .filter(_ => _.name in ["__dl___loader_dlopen", "__dl__Z8__dlopenPKciPKv", "__dl_open"])
+                    .map(_ => ({ handle: _.address, readString: _ => _.readCString() }));
                 break;
             case "darwin":
                 targets = [find("libdyld.dylib", "dlopen")];
