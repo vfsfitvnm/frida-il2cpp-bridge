@@ -4,12 +4,7 @@ namespace Il2Cpp {
     getter(Il2Cpp, "moduleName", () => {
         switch (Process.platform) {
             case "linux":
-                try {
-                    const _ = Java.androidVersion;
-                    return "libil2cpp.so";
-                } catch (e) {
-                    return "GameAssembly.so";
-                }
+                return Android.apiLevel ? "libil2cpp.so" : "GameAssembly.so";
             case "windows":
                 return "GameAssembly.dll";
             case "darwin":
