@@ -1,11 +1,10 @@
 namespace Il2Cpp {
     /** Gets the Il2Cpp module as a Frida module. */
     export declare const module: Module;
-    // prettier-ignore
     getter(Il2Cpp, "module", () => {
         const [moduleName, fallback] = getExpectedModuleNames();
         return Process.findModuleByName(moduleName) ?? Process.getModuleByName(fallback);
-    }, lazy);
+    });
 
     /** @internal Waits for Unity and Il2Cpp native libraries to be loaded and initialized. */
     export async function initialize(blocking = false): Promise<boolean> {
