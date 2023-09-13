@@ -27,13 +27,13 @@ namespace Il2Cpp {
 
     /** @internal Waits for Unity and Il2Cpp native libraries to be loaded and initialized. */
     export async function initialize(blocking = false): Promise<boolean> {
-        if (Process.platform == "darwin") {
-            Reflect.defineProperty(Il2Cpp, "moduleName", {
-                value: DebugSymbol.fromName("il2cpp_init").moduleName ?? (await forModule("UnityFramework", "GameAssembly.dylib"))
-            });
-        } else {
-            await forModule(Il2Cpp.moduleName);
-        }
+        Reflect.defineProperty(Il2Cpp, "module", {
+            // prettier-ignore
+            value: Process.platform == "darwin"
+                ? Process.findModuleByAddress(DebugSymbol.fromName("il2cpp_init").address) 
+                    ?? await forModule("UnityFramework", "GameAssembly.dylib")
+                : await forModule(Il2Cpp.moduleName)
+        });
 
         if (Il2Cpp.api.getCorlib().isNull()) {
             return await new Promise<boolean>(resolve => {

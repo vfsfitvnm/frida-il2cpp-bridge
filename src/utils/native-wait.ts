@@ -5,7 +5,7 @@ interface ResolvedExport {
 }
 
 /** @internal */
-function forModule(...moduleNames: string[]): Promise<string> {
+function forModule(...moduleNames: string[]): Promise<Module> {
     function find(
         moduleName: string | null,
         name: string,
@@ -17,11 +17,11 @@ function forModule(...moduleNames: string[]): Promise<string> {
         }
     }
 
-    return new Promise<string>(resolve => {
+    return new Promise<Module>(resolve => {
         for (const moduleName of moduleNames) {
             const module = Process.findModuleByName(moduleName);
             if (module != null) {
-                resolve(moduleName);
+                resolve(module);
                 return;
             }
         }
@@ -69,7 +69,8 @@ function forModule(...moduleNames: string[]): Promise<string> {
                 if (module != null) {
                     warn(`\x1b[3m${module.name}\x1b[0m has been loaded, but such event hasn't been detected - please file a bug`);
                     clearTimeout(timeout);
-                    resolve(moduleName);
+                    interceptors.forEach(_ => _.detach());
+                    resolve(module);
                     return;
                 }
             }
@@ -82,15 +83,20 @@ function forModule(...moduleNames: string[]): Promise<string> {
                 onEnter(args: InvocationArguments) {
                     this.modulePath = _!.readString(args[0]) ?? "";
                 },
-                onLeave(returnValue: InvocationReturnValue) {
-                    if (returnValue.isNull()) return;
-
+                onLeave(_: InvocationReturnValue) {
                     for (const moduleName of moduleNames) {
-                        if (!this.modulePath.endsWith(moduleName)) continue;
+                        if (this.modulePath.endsWith(moduleName)) {
+                            const module = Process.findModuleByName(this.modulePath);
 
-                        clearTimeout(timeout);
-                        setImmediate(() => interceptors.forEach(_ => _.detach()));
-                        resolve(moduleName);
+                            if (module != null) {
+                                setImmediate(() => {
+                                    clearTimeout(timeout);
+                                    interceptors.forEach(_ => _.detach());
+                                });
+                                resolve(module);
+                                break;
+                            }
+                        }
                     }
                 }
             })
