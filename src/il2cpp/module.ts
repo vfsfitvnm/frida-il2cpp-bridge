@@ -32,6 +32,10 @@ namespace Il2Cpp {
     }
 
     function getExpectedModuleNames(): string[] {
+        if ((globalThis as any).IL2CPP_MODULE_NAME) {
+            return [(globalThis as any).IL2CPP_MODULE_NAME];
+        }
+
         switch (Process.platform) {
             case "linux":
                 return [Android.apiLevel ? "libil2cpp.so" : "GameAssembly.so"];
