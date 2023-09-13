@@ -1,28 +1,10 @@
 namespace Il2Cpp {
-    /** @internal Gets the Il2Cpp module name. */
-    export declare const moduleName: string;
-    getter(Il2Cpp, "moduleName", () => {
-        switch (Process.platform) {
-            case "linux":
-                return Android.apiLevel ? "libil2cpp.so" : "GameAssembly.so";
-            case "windows":
-                return "GameAssembly.dll";
-            case "darwin":
-                try {
-                    return "UnityFramework";
-                } catch (e) {
-                    return "GameAssembly.dylib";
-                }
-        }
-
-        raise(`${Process.platform} is not supported yet`);
-    });
-
     /** Gets the Il2Cpp module as a Frida module. */
     export declare const module: Module;
     // prettier-ignore
     getter(Il2Cpp, "module", () => {
-        return Process.getModuleByName(moduleName);
+        const [moduleName, fallback] = getExpectedModuleNames();
+        return Process.findModuleByName(moduleName) ?? Process.getModuleByName(fallback);
     }, lazy);
 
     /** @internal Waits for Unity and Il2Cpp native libraries to be loaded and initialized. */
@@ -31,8 +13,8 @@ namespace Il2Cpp {
             // prettier-ignore
             value: Process.platform == "darwin"
                 ? Process.findModuleByAddress(DebugSymbol.fromName("il2cpp_init").address) 
-                    ?? await forModule("UnityFramework", "GameAssembly.dylib")
-                : await forModule(Il2Cpp.moduleName)
+                    ?? await forModule(...getExpectedModuleNames())
+                : await forModule(...getExpectedModuleNames())
         });
 
         if (Il2Cpp.api.getCorlib().isNull()) {
@@ -47,5 +29,18 @@ namespace Il2Cpp {
         }
 
         return false;
+    }
+
+    function getExpectedModuleNames(): string[] {
+        switch (Process.platform) {
+            case "linux":
+                return [Android.apiLevel ? "libil2cpp.so" : "GameAssembly.so"];
+            case "windows":
+                return ["GameAssembly.dll"];
+            case "darwin":
+                return ["UnityFramework", "GameAssembly.dylib"];
+        }
+
+        raise(`${Process.platform} is not supported yet`);
     }
 }
