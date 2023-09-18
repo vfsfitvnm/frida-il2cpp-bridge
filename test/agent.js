@@ -239,6 +239,10 @@ Il2Cpp.perform(() => {
         });
     });
 
+    test("Il2Cpp.Method::invoke", () => {
+        assert("Unix", () => Il2Cpp.corlib.class("System.Environment").method("get_Platform").invoke().toString());
+    });
+
     test("Every enum base type matches its 'value__' field type", () => {
         Il2Cpp.domain.assemblies.forEach(_ => {
             _.image.classes

@@ -132,6 +132,8 @@ namespace Il2Cpp {
             }
         } else if (type.typeEnum == Il2Cpp.Type.enum.boolean) {
             return !!(value as number);
+        } else if (type.class.isEnum) {
+            return arrayToValueType(type, [value]);
         } else {
             return value;
         }
@@ -142,7 +144,7 @@ namespace Il2Cpp {
         if (typeof value == "boolean") {
             return +value;
         } else if (value instanceof Il2Cpp.ValueType) {
-            return valueTypeToArray(value);
+            return value.type.class.isEnum ? value.field<number>("value__").value : valueTypeToArray(value);
         } else {
             return value;
         }

@@ -74,7 +74,7 @@ namespace Il2Cpp {
                 case Il2Cpp.Type.enum.double:
                     return "double";
                 case Il2Cpp.Type.enum.valueType:
-                    return getValueTypeFields(this);
+                    return this.class.isEnum ? this.class.baseType!.fridaAlias : getValueTypeFields(this);
                 case Il2Cpp.Type.enum.nativePointer:
                 case Il2Cpp.Type.enum.unsignedNativePointer:
                 case Il2Cpp.Type.enum.pointer:
