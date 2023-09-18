@@ -5,7 +5,7 @@ namespace Il2Cpp {
             return Il2Cpp.api.stringGetChars(this).readUtf16String(this.length);
         }
 
-        /** Sets the content of this string. */
+        /** @unsafe Sets the content of this string - it may write out of bounds! */
         set content(value: string | null) {
             // prettier-ignore
             const offset = Il2Cpp.string("vfsfitvnm").handle.offsetOf(_ => _.readInt() == 9) 
