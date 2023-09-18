@@ -21,7 +21,7 @@ namespace Il2Cpp {
     // prettier-ignore
     getter(Il2Cpp, "unityVersion", () => {
         try {
-            const unityVersion = unityEngineCall("get_unityVersion");
+            const unityVersion = (globalThis as any).IL2CPP_UNITY_VERSION ?? unityEngineCall("get_unityVersion");
 
             if (unityVersion != null) {
                 return unityVersion;
