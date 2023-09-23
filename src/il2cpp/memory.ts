@@ -140,7 +140,9 @@ namespace Il2Cpp {
     }
 
     /** @internal */
-    export function toFridaValue(value: Il2Cpp.Parameter.Type): NativeFunctionArgumentValue {
+    export function toFridaValue(value: Il2Cpp.Method.ReturnType): NativeFunctionReturnValue;
+    export function toFridaValue(value: Il2Cpp.Parameter.Type): NativeFunctionArgumentValue;
+    export function toFridaValue(value: Il2Cpp.Parameter.Type | Il2Cpp.Method.ReturnType): NativeFunctionArgumentValue | NativeFunctionReturnValue {
         if (typeof value == "boolean") {
             return +value;
         } else if (value instanceof Il2Cpp.ValueType) {

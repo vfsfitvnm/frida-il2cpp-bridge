@@ -331,8 +331,8 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
             // prettier-ignore
             return new NativeCallback((...args: any[]): any => {
                 const thisObject = this.isStatic ? this.class : new Il2Cpp.Object(args[0]);
-                const parameters = this.parameters.map((e, i) => fromFridaValue(args[i + startIndex], e.type));
-                const result = block.call(thisObject, ...parameters) as any;
+                const parameters = this.parameters.map((_, i) => fromFridaValue(args[i + startIndex], _.type));
+                const result = block.call(thisObject, ...parameters);
                 return toFridaValue(result);
             }, this.returnType.fridaAlias, this.fridaSignature);
         }
