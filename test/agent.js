@@ -249,6 +249,21 @@ Il2Cpp.perform(() => {
         });
     });
 
+    test("Structs fields are read correctly", () => {
+        assert(ptr(0xdeadbeef), () => {
+            const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc();
+            runtimeTypeHandle.method(".ctor").invoke(ptr(0xdeadbeef));
+            return runtimeTypeHandle.unbox().field("value").value;
+        });
+    });
+
+    test("Enums fields are read correctly", () => {
+        assert(6, () => {
+            const saturday = Il2Cpp.corlib.class("System.DayOfWeek").field("Saturday").value;
+            return saturday.field("value__").value;
+        });
+    });
+
     test("Boxed structs fields are read correctly", () => {
         assert(ptr(0xdeadbeef), () => {
             const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc();
@@ -258,10 +273,24 @@ Il2Cpp.perform(() => {
     });
 
     test("Boxed structs methods are invoked correctly", () => {
-        assert(-559038737, () => {
+        assert(ptr(0xdeadbeef), () => {
             const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc();
             runtimeTypeHandle.method(".ctor").invoke(ptr(0xdeadbeef));
-            return runtimeTypeHandle.method("GetHashCode").invoke();
+            return runtimeTypeHandle.handle.add(runtimeTypeHandle.field("value").offset).readPointer();
+        });
+        assert(ptr(0xdeadbeef), () => {
+            const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc();
+            runtimeTypeHandle.method(".ctor").invoke(ptr(0xdeadbeef));
+            return runtimeTypeHandle.method("get_Value").invoke();
+        });
+        assert("System.RuntimeTypeHandle", () => Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().toString());
+    });
+
+    test("Boxing/unboxing structs works correctly", () => {
+        assert(ptr(0xdeadbeef), () => {
+            const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc();
+            runtimeTypeHandle.method(".ctor").invoke(ptr(0xdeadbeef));
+            return runtimeTypeHandle.unbox().box().unbox().box().field("value").value;
         });
     });
 
@@ -291,7 +320,11 @@ function test(name, block) {
 }
 
 function eq(a, b) {
-    return a instanceof NativePointer || a instanceof NativeStruct ? a.equals(b) : a == b;
+    return a instanceof NativePointer || a instanceof NativeStruct
+        ? a.equals(b)
+        : a instanceof Array || b instanceof Array
+        ? JSON.stringify(a) == JSON.stringify(b)
+        : a == b;
 }
 
 function assert(expected, getActual) {

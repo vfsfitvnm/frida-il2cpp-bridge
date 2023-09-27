@@ -119,30 +119,19 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
                 raise(`cannot access static field ${this.class.type.name}::${this.name} from an object, use a class instead`);
             }
 
-            const valueHandle = (): NativePointer => {
-                const handle = instance.handle.add(this.offset);
-                return instance instanceof Il2Cpp.ValueType
-                    ? handle.sub(Il2Cpp.Object.headerSize)
-                    : instance.class.isValueType && !instance.class.isEnum
-                    ? // Boxed structs fields may require `Il2Cpp.Object.headerSize`
-                      // to be subtracted from their value handle, as they were
-                      // unboxed (?)
-                      // Observed in Unity 5.3.5f1 and >= 2021.2.0f1
-                      handle.sub(boxedValueTypesHandleOffset ?? (boxedValueTypesHandleOffset = getBoxedValueTypesHandleOffset()))
-                    : handle;
-            };
+            const valueHandle = instance.handle.add(this.offset - (instance instanceof Il2Cpp.ValueType ? Il2Cpp.Object.headerSize : 0));
 
             return new Proxy(this, {
                 get(target: Il2Cpp.Field<T>, property: keyof Il2Cpp.Field): any {
                     if (property == "value") {
-                        return read(valueHandle(), target.type);
+                        return read(valueHandle, target.type);
                     }
                     return Reflect.get(target, property);
                 },
 
                 set(target: Il2Cpp.Field<T>, property: keyof Il2Cpp.Field, value: any): boolean {
                     if (property == "value") {
-                        write(valueHandle(), value, target.type);
+                        write(valueHandle, value, target.type);
                         return true;
                     }
 
@@ -176,17 +165,5 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
             HasDefault = 0x8000,
             HasFieldRVA = 0x0100
         }
-    }
-
-    let boxedValueTypesHandleOffset: number | undefined;
-    function getBoxedValueTypesHandleOffset(): number {
-        const RuntimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle");
-        const runtimeTypeHandle = RuntimeTypeHandle.alloc();
-        runtimeTypeHandle.method(".ctor").invoke(RuntimeTypeHandle.type.handle);
-
-        const offset =
-            runtimeTypeHandle.handle.add(runtimeTypeHandle.field("value").offset).offsetOf(_ => _.readPointer().equals(RuntimeTypeHandle.type.handle), -512) ??
-            raise("couldn't determine the offset to read field values of boxed value types");
-        return offset;
     }
 }
