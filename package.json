@@ -34,8 +34,8 @@
     "trailingComma": "none"
   },
   "devDependencies": {
-    "@types/frida-gum": "^18.3.1",
-    "ts-patch": "^3.0.0-beta3",
+    "@types/frida-gum": "^18.4.3",
+    "ts-patch": "^3.0.2",
     "ts-transformer-inline-file": "^0.2.0"
   },
   "overrides": {
