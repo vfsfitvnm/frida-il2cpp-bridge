@@ -249,6 +249,29 @@ Il2Cpp.perform(() => {
         });
     });
 
+    test("Boxed structs fields are read correctly", () => {
+        assert(ptr(0xdeadbeef), () => {
+            const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc();
+            runtimeTypeHandle.method(".ctor").invoke(ptr(0xdeadbeef));
+            return runtimeTypeHandle.field("value").value;
+        });
+    });
+
+    test("Boxed structs methods are invoked correctly", () => {
+        assert(-559038737, () => {
+            const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc();
+            runtimeTypeHandle.method(".ctor").invoke(ptr(0xdeadbeef));
+            return runtimeTypeHandle.method("GetHashCode").invoke();
+        });
+    });
+
+    test("Boxed enums fields are read correctly", () => {
+        assert(1, () => {
+            const MemberTypes = Il2Cpp.corlib.class("System.Reflection.MemberTypes");
+            return MemberTypes.field("Constructor").value.box().field("value__").value;
+        });
+    });
+
     send(summary);
 });
 

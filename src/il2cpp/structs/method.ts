@@ -306,12 +306,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                 get(target: Il2Cpp.Method<T>, property: keyof Il2Cpp.Method<T>): any {
                     switch (property) {
                         case "invoke":
-                            let instanceHandle = instance.handle;
-                            if (!Il2Cpp.unityVersionIsBelow202120 && instance.class.isValueType && !instance.class.isEnum) {
-                                instanceHandle = instanceHandle.add(Il2Cpp.Object.headerSize);
-                            }
-
-                            return target.invokeRaw.bind(target, instanceHandle);
+                            return target.invokeRaw.bind(target, instance.handle);
                         case "inflate":
                         case "overload":
                         case "tryOverload":
