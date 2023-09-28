@@ -152,28 +152,10 @@ namespace Il2Cpp {
         if (typeof value == "boolean") {
             return +value;
         } else if (value instanceof Il2Cpp.ValueType) {
-            return valueTypeToArray(value);
+            const _ = value.type.class.fields.filter(_ => !_.isStatic).map(_ => toFridaValue(_.withHolder(value).value));
+            return _.length == 0 ? [0] : _;
         } else {
             return value;
         }
-    }
-
-    /** @internal */
-    function valueTypeToArray(value: Il2Cpp.ValueType): NativeFunctionArgumentValue[] {
-        const instanceFields = value.type.class.fields.filter(_ => !_.isStatic);
-
-        return instanceFields.length == 0
-            ? [value.handle.readU8()]
-            : instanceFields
-                  .map(_ => _.withHolder(value).value)
-                  .map(value =>
-                      value instanceof Il2Cpp.ValueType
-                          ? valueTypeToArray(value)
-                          : value instanceof NativeStruct
-                          ? value.handle
-                          : typeof value == "boolean"
-                          ? +value
-                          : value
-                  );
     }
 }
