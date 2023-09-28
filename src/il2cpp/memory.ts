@@ -109,7 +109,15 @@ namespace Il2Cpp {
     /** @internal */
     export function fromFridaValue(value: NativeFunctionReturnValue, type: Il2Cpp.Type): Il2Cpp.Parameter.Type | Il2Cpp.Method.ReturnType {
         if (globalThis.Array.isArray(value)) {
-            return arrayToValueType(type, value);
+            const handle = Memory.alloc(type.class.valueTypeSize);
+            const fields = type.class.fields.filter(_ => !_.isStatic);
+
+            for (let i = 0; i < fields.length; i++) {
+                const convertedValue = fromFridaValue(value[i], fields[i].type);
+                write(handle.add(fields[i].offset).sub(Il2Cpp.Object.headerSize), convertedValue, fields[i].type);
+            }
+
+            return new Il2Cpp.ValueType(handle, type);
         } else if (value instanceof NativePointer) {
             if (type.isByReference) {
                 return new Il2Cpp.Reference(value, type);
@@ -167,99 +175,5 @@ namespace Il2Cpp {
                           ? +value
                           : value
                   );
-    }
-
-    /** @internal */
-    function arrayToValueType(type: Il2Cpp.Type, nativeValues: any[]): Il2Cpp.ValueType {
-        function iter(type: Il2Cpp.Type, startOffset: number = 0): [number, number][] {
-            const arr: [number, number][] = [];
-
-            for (const field of type.class.fields) {
-                if (!field.isStatic) {
-                    const offset = startOffset + field.offset - Il2Cpp.Object.headerSize;
-                    if (
-                        field.type.typeEnum == Il2Cpp.Type.enum.valueType ||
-                        (field.type.typeEnum == Il2Cpp.Type.enum.genericInstance && field.type.class.isValueType)
-                    ) {
-                        arr.push(...iter(field.type, offset));
-                    } else {
-                        arr.push([field.type.typeEnum, offset]);
-                    }
-                }
-            }
-
-            if (arr.length == 0) {
-                arr.push([Il2Cpp.Type.enum.unsignedByte, 0]);
-            }
-
-            return arr;
-        }
-
-        const valueType = Memory.alloc(type.class.valueTypeSize);
-
-        nativeValues = nativeValues.flat(Infinity);
-        const typesAndOffsets = iter(type);
-
-        for (let i = 0; i < nativeValues.length; i++) {
-            const value = nativeValues[i];
-            const [typeEnum, offset] = typesAndOffsets[i];
-            const pointer = valueType.add(offset);
-
-            switch (typeEnum) {
-                case Il2Cpp.Type.enum.boolean:
-                    pointer.writeS8(value);
-                    break;
-                case Il2Cpp.Type.enum.byte:
-                    pointer.writeS8(value);
-                    break;
-                case Il2Cpp.Type.enum.unsignedByte:
-                    pointer.writeU8(value);
-                    break;
-                case Il2Cpp.Type.enum.short:
-                    pointer.writeS16(value);
-                    break;
-                case Il2Cpp.Type.enum.unsignedShort:
-                    pointer.writeU16(value);
-                    break;
-                case Il2Cpp.Type.enum.int:
-                    pointer.writeS32(value);
-                    break;
-                case Il2Cpp.Type.enum.unsignedInt:
-                    pointer.writeU32(value);
-                    break;
-                case Il2Cpp.Type.enum.char:
-                    pointer.writeU16(value);
-                    break;
-                case Il2Cpp.Type.enum.long:
-                    pointer.writeS64(value);
-                    break;
-                case Il2Cpp.Type.enum.unsignedLong:
-                    pointer.writeU64(value);
-                    break;
-                case Il2Cpp.Type.enum.float:
-                    pointer.writeFloat(value);
-                    break;
-                case Il2Cpp.Type.enum.double:
-                    pointer.writeDouble(value);
-                    break;
-                case Il2Cpp.Type.enum.nativePointer:
-                case Il2Cpp.Type.enum.unsignedNativePointer:
-                case Il2Cpp.Type.enum.pointer:
-                case Il2Cpp.Type.enum.array:
-                case Il2Cpp.Type.enum.multidimensionalArray:
-                case Il2Cpp.Type.enum.string:
-                case Il2Cpp.Type.enum.object:
-                case Il2Cpp.Type.enum.class:
-                case Il2Cpp.Type.enum.genericInstance:
-                    pointer.writePointer(value);
-                    break;
-                default:
-                    warn(`arrayToValueType: defaulting ${typeEnum} to pointer`);
-                    pointer.writePointer(value);
-                    break;
-            }
-        }
-
-        return new Il2Cpp.ValueType(valueType, type);
     }
 }
