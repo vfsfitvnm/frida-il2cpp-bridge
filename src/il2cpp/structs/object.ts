@@ -80,7 +80,7 @@ namespace Il2Cpp {
 
         /** */
         toString(): string {
-            return this.isNull() ? "null" : this.method<Il2Cpp.String>("ToString").invoke().content ?? "null";
+            return this.isNull() ? "null" : this.method<Il2Cpp.String>("ToString", 0).invoke().content ?? "null";
         }
 
         /** Unboxes the value type out of this object. */
