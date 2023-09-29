@@ -6,9 +6,11 @@ class Class : Interface
 
     int field;
 
+    static Enum enumfield;
+
     static Class()
     {
-
+        Class.enumfield = Enum.Second;
     }
 
     unsafe void Method(bool* pointer, ref bool reference, bool[] array)

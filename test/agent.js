@@ -301,6 +301,45 @@ Il2Cpp.perform(() => {
         });
     });
 
+    test("Il2Cpp.Field::value::get (static)", () => {
+        assert(46, () => Il2Cpp.corlib.class("System.Type").initialize().field("Delimiter").value);
+        assert("Second", () => Il2Cpp.domain.assembly("GameAssembly").image.class("Class").initialize().field("enumfield").value.toString());
+        assert("79228162514264337593543950335", () => Il2Cpp.corlib.class("System.Decimal").initialize().field("MaxValue").value.toString());
+        assert("True", () => Il2Cpp.corlib.class("System.Boolean").initialize().field("TrueString").value.content);
+    });
+
+    test("Il2Cpp.Field::value::set (static)", () => {
+        assert(48, () => {
+            const SystemType = Il2Cpp.corlib.class("System.Type").initialize();
+            SystemType.field("Delimiter").value = 48;
+            return SystemType.field("Delimiter").value;
+        });
+        assert(48, () => {
+            const SystemType = Il2Cpp.corlib.class("System.Type").initialize();
+            const value = SystemType.field("Delimiter").type.class.alloc();
+            value.field("m_value").value = 48;
+            SystemType.field("Delimiter").value = value;
+            return SystemType.field("Delimiter").value;
+        });
+        assert("Third", () => {
+            const Class = Il2Cpp.domain.assembly("GameAssembly").image.class("Class");
+            Class.field("enumfield").value = Class.field("enumfield").type.class.field("Third").value;
+            return Class.field("enumfield").value.toString();
+        });
+        assert("123456", () => {
+            const SystemDecimal = Il2Cpp.corlib.class("System.Decimal").initialize();
+            const value = SystemDecimal.alloc();
+            value.method(".ctor", 1).invoke(123456);
+            SystemDecimal.field("MaxValue").value = value;
+            return SystemDecimal.field("MaxValue").value.toString();
+        });
+        assert("VeryTrue", () => {
+            const SystemBoolean = Il2Cpp.corlib.class("System.Boolean").initialize();
+            SystemBoolean.field("TrueString").value = Il2Cpp.string("VeryTrue");
+            return SystemBoolean.field("TrueString").value.content;
+        });
+    });
+
     send(summary);
 });
 

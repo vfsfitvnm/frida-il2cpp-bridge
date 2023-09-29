@@ -96,8 +96,16 @@ namespace Il2Cpp {
                 raise(`cannot write the value of field ${this.name} as it's thread static or literal`);
             }
 
-            const handle = Memory.alloc(Process.pointerSize);
-            write(handle, value, this.type);
+            const handle =
+                // pointer-like values should be passed as-is, but boxed
+                // value types (primitives included) must be unboxed first
+                value instanceof Il2Cpp.Object && this.type.class.isValueType
+                    ? value.unbox()
+                    : value instanceof NativeStruct
+                    ? value.handle
+                    : value instanceof NativePointer
+                    ? value
+                    : write(Memory.alloc(this.type.class.valueTypeSize), value, this.type);
 
             Il2Cpp.api.fieldSetStaticValue(this.handle, handle);
         }
