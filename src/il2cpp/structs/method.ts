@@ -306,12 +306,10 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                 get(target: Il2Cpp.Method<T>, property: keyof Il2Cpp.Method<T>): any {
                     switch (property) {
                         case "invoke":
-                            let instanceHandle = instance.handle;
-                            if (!Il2Cpp.unityVersionIsBelow202120 && instance.class.isValueType && !instance.class.isEnum) {
-                                instanceHandle = instanceHandle.add(Il2Cpp.Object.headerSize);
-                            }
-
-                            return target.invokeRaw.bind(target, instanceHandle);
+                            // struct methods may assume they are receving
+                            // pointers to raw data instead of objects
+                            // observed in Unity 5.3.5f1 and >= 2021.2.0f1
+                            return target.invokeRaw.bind(target, target.class.isValueType ? instance.handle.add(maybeObjectHeaderSize()) : instance.handle);
                         case "inflate":
                         case "overload":
                         case "tryOverload":
@@ -331,12 +329,24 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
             // prettier-ignore
             return new NativeCallback((...args: any[]): any => {
                 const thisObject = this.isStatic ? this.class : new Il2Cpp.Object(args[0]);
-                const parameters = this.parameters.map((e, i) => fromFridaValue(args[i + startIndex], e.type));
-                const result = block.call(thisObject, ...parameters) as any;
+                const parameters = this.parameters.map((_, i) => fromFridaValue(args[i + startIndex], _.type));
+                const result = block.call(thisObject, ...parameters);
                 return toFridaValue(result);
             }, this.returnType.fridaAlias, this.fridaSignature);
         }
     }
+
+    let maybeObjectHeaderSize = (): number => {
+        const struct = Il2Cpp.corlib.class("System.RuntimeTypeHandle").initialize().alloc();
+        struct.method(".ctor").invokeRaw(struct, ptr(0xdeadbeef));
+
+        // here we check where the sentinel value is
+        // if it's not where it is supposed to be, it means struct methods
+        // assume they are receiving value types (that is a pointer to raw data)
+        // hence, we must "skip" the object header when invoking such methods
+        const offset = struct.field<NativePointer>("value").value.equals(ptr(0xdeadbeef)) ? 0 : Il2Cpp.Object.headerSize;
+        return (maybeObjectHeaderSize = () => offset)();
+    };
 
     export namespace Method {
         export type ReturnType = void | Il2Cpp.Field.Type;

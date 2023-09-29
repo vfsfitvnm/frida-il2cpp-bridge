@@ -143,6 +143,11 @@ namespace Il2Cpp {
             return !!Il2Cpp.api.classIsInterface(this);
         }
 
+        /** Determines whether the current class is a struct. */
+        get isStruct(): boolean {
+            return this.isValueType && !this.isEnum;
+        }
+
         /** Determines whether the current class is a value type. */
         @lazy
         get isValueType(): boolean {
@@ -312,7 +317,7 @@ namespace Il2Cpp {
 
             return `\
 // ${this.assemblyName}
-${this.isEnum ? `enum` : this.isValueType ? `struct` : this.isInterface ? `interface` : `class`} \
+${this.isEnum ? `enum` : this.isStruct ? `struct` : this.isInterface ? `interface` : `class`} \
 ${this.type.name}\
 ${inherited ? ` : ${inherited.map(_ => _?.type.name).join(`, `)}` : ``}
 {

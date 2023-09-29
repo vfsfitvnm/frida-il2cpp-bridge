@@ -496,7 +496,7 @@ namespace Il2Cpp {
     getter(Il2Cpp, "memorySnapshotApi", () => new CModule($inline_file("cmodules/memory-snapshot.c")), lazy);
 
     function r<R extends NativeFunctionReturnType, A extends NativeFunctionArgumentType[] | []>(exportName: string, retType: R, argTypes: A) {
-        const handle = Il2Cpp.module.findExportByName(exportName) ?? memorySnapshotApi[exportName];
+        const handle = (globalThis as any).IL2CPP_EXPORTS?.[exportName]?.() ?? Il2Cpp.module.findExportByName(exportName) ?? memorySnapshotApi[exportName];
 
         return new NativeFunction(handle ?? raise(`couldn't resolve export ${exportName}`), retType, argTypes);
     }

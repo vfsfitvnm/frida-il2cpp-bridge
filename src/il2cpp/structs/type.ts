@@ -100,11 +100,25 @@ namespace Il2Cpp {
         /** Determines whether this type is primitive. */
         @lazy
         get isPrimitive(): boolean {
-            return (
-                (this.typeEnum >= Il2Cpp.Type.enum.boolean && this.typeEnum <= Il2Cpp.Type.enum.double) ||
-                this.typeEnum == Il2Cpp.Type.enum.nativePointer ||
-                this.typeEnum == Il2Cpp.Type.enum.unsignedNativePointer
-            );
+            switch (this.typeEnum) {
+                case Il2Cpp.Type.enum.boolean:
+                case Il2Cpp.Type.enum.char:
+                case Il2Cpp.Type.enum.byte:
+                case Il2Cpp.Type.enum.unsignedByte:
+                case Il2Cpp.Type.enum.short:
+                case Il2Cpp.Type.enum.unsignedShort:
+                case Il2Cpp.Type.enum.int:
+                case Il2Cpp.Type.enum.unsignedInt:
+                case Il2Cpp.Type.enum.long:
+                case Il2Cpp.Type.enum.unsignedLong:
+                case Il2Cpp.Type.enum.float:
+                case Il2Cpp.Type.enum.double:
+                case Il2Cpp.Type.enum.nativePointer:
+                case Il2Cpp.Type.enum.unsignedNativePointer:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         /** Gets the name of this type. */

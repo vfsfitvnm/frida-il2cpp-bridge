@@ -1,44 +1,20 @@
 namespace Il2Cpp {
-    /** @internal Gets the Il2Cpp module name. */
-    export declare const moduleName: string;
-    getter(Il2Cpp, "moduleName", () => {
-        switch (Process.platform) {
-            case "linux":
-                try {
-                    const _ = Java.androidVersion;
-                    return "libil2cpp.so";
-                } catch (e) {
-                    return "GameAssembly.so";
-                }
-            case "windows":
-                return "GameAssembly.dll";
-            case "darwin":
-                try {
-                    return "UnityFramework";
-                } catch (e) {
-                    return "GameAssembly.dylib";
-                }
-        }
-
-        raise(`${Process.platform} is not supported yet`);
-    });
-
     /** Gets the Il2Cpp module as a Frida module. */
     export declare const module: Module;
-    // prettier-ignore
     getter(Il2Cpp, "module", () => {
-        return Process.getModuleByName(moduleName);
-    }, lazy);
+        const [moduleName, fallback] = getExpectedModuleNames();
+        return Process.findModuleByName(moduleName) ?? Process.getModuleByName(fallback);
+    });
 
     /** @internal Waits for Unity and Il2Cpp native libraries to be loaded and initialized. */
     export async function initialize(blocking = false): Promise<boolean> {
-        if (Process.platform == "darwin") {
-            Reflect.defineProperty(Il2Cpp, "moduleName", {
-                value: DebugSymbol.fromName("il2cpp_init").moduleName ?? (await forModule("UnityFramework", "GameAssembly.dylib"))
-            });
-        } else {
-            await forModule(Il2Cpp.moduleName);
-        }
+        Reflect.defineProperty(Il2Cpp, "module", {
+            // prettier-ignore
+            value: Process.platform == "darwin"
+                ? Process.findModuleByAddress(DebugSymbol.fromName("il2cpp_init").address) 
+                    ?? await forModule(...getExpectedModuleNames())
+                : await forModule(...getExpectedModuleNames())
+        });
 
         if (Il2Cpp.api.getCorlib().isNull()) {
             return await new Promise<boolean>(resolve => {
@@ -52,5 +28,22 @@ namespace Il2Cpp {
         }
 
         return false;
+    }
+
+    function getExpectedModuleNames(): string[] {
+        if ((globalThis as any).IL2CPP_MODULE_NAME) {
+            return [(globalThis as any).IL2CPP_MODULE_NAME];
+        }
+
+        switch (Process.platform) {
+            case "linux":
+                return [Android.apiLevel ? "libil2cpp.so" : "GameAssembly.so"];
+            case "windows":
+                return ["GameAssembly.dll"];
+            case "darwin":
+                return ["UnityFramework", "GameAssembly.dylib"];
+        }
+
+        raise(`${Process.platform} is not supported yet`);
     }
 }
