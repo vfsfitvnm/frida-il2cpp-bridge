@@ -286,6 +286,15 @@ Il2Cpp.perform(() => {
         assert("System.RuntimeTypeHandle", () => Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().toString());
     });
 
+    test("Structs methods are invoked correctly", () => {
+        assert(ptr(0xdeadbeef), () => {
+            const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().unbox();
+            runtimeTypeHandle.method(".ctor").invoke(ptr(0xdeadbeef));
+            return runtimeTypeHandle.method("get_Value").invoke();
+        });
+        assert("System.RuntimeTypeHandle", () => Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().toString());
+    });
+
     test("Boxing/unboxing structs works correctly", () => {
         assert(ptr(0xdeadbeef), () => {
             const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc();

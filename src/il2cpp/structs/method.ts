@@ -297,7 +297,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
         }
 
         /** @internal */
-        withHolder(instance: Il2Cpp.Object): Il2Cpp.Method<T> {
+        withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Method<T> {
             if (this.isStatic) {
                 raise(`cannot access static method ${this.class.type.name}::${this.name} from an object, use a class instead`);
             }
@@ -306,10 +306,27 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                 get(target: Il2Cpp.Method<T>, property: keyof Il2Cpp.Method<T>): any {
                     switch (property) {
                         case "invoke":
-                            // struct methods may assume they are receving
-                            // pointers to raw data instead of objects
+                            // value types methods may assume their `this`
+                            // parameter is a pointer to raw data (that is how
+                            // value types are layed out in memory) instead of
+                            // a pointer to an object (that is object header +
+                            // raw data)
+                            // in any case, they also don't use whatever there
+                            // is in the object header, so we can safely "skip"
+                            // the object header by adding the object header
+                            // size to the object (a boxed value type) handle
+                            //
                             // observed in Unity 5.3.5f1 and >= 2021.2.0f1
-                            return target.invokeRaw.bind(target, target.class.isValueType ? instance.handle.add(maybeObjectHeaderSize()) : instance.handle);
+                            const handle =
+                                instance instanceof Il2Cpp.ValueType
+                                    ? target.class.isValueType
+                                        ? instance.handle.add(maybeObjectHeaderSize() - Il2Cpp.Object.headerSize)
+                                        : raise(`cannot invoke method ${target.class.type.name}::${target.name} against a value type, you must box it first`)
+                                    : target.class.isValueType
+                                    ? instance.handle.add(maybeObjectHeaderSize())
+                                    : instance.handle;
+
+                            return target.invokeRaw.bind(target, handle);
                         case "inflate":
                         case "overload":
                         case "tryOverload":
