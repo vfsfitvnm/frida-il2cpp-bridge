@@ -107,7 +107,12 @@ namespace Il2Cpp {
     }
 
     /** @internal */
-    export function fromFridaValue(value: NativeFunctionReturnValue, type: Il2Cpp.Type): Il2Cpp.Parameter.Type | Il2Cpp.Method.ReturnType {
+    export function fromFridaValue(value: NativeCallbackArgumentValue, type: Il2Cpp.Type): Il2Cpp.Parameter.Type;
+    export function fromFridaValue(value: NativeFunctionReturnValue, type: Il2Cpp.Type): Il2Cpp.Method.ReturnType;
+    export function fromFridaValue(
+        value: NativeCallbackArgumentValue | NativeFunctionReturnValue,
+        type: Il2Cpp.Type
+    ): Il2Cpp.Parameter.Type | Il2Cpp.Method.ReturnType {
         if (globalThis.Array.isArray(value)) {
             const handle = Memory.alloc(type.class.valueTypeSize);
             const fields = type.class.fields.filter(_ => !_.isStatic);

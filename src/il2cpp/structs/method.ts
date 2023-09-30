@@ -173,7 +173,7 @@ namespace Il2Cpp {
         }
 
         /** Replaces the body of this method. */
-        set implementation(block: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => T) {
+        set implementation(block: (this: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType, ...parameters: Il2Cpp.Parameter.Type[]) => T) {
             try {
                 Interceptor.replace(this.virtualAddress, this.wrap(block));
             } catch (e: any) {
@@ -341,15 +341,23 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
         }
 
         /** @internal */
-        wrap(block: (this: Il2Cpp.Class | Il2Cpp.Object, ...parameters: any[]) => T): NativeCallback<any, any> {
+        wrap(block: (this: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType, ...parameters: Il2Cpp.Parameter.Type[]) => T): NativeCallback<any, any> {
             const startIndex = +!this.isStatic | +Il2Cpp.unityVersionIsBelow201830;
-            // prettier-ignore
-            return new NativeCallback((...args: any[]): any => {
-                const thisObject = this.isStatic ? this.class : new Il2Cpp.Object(args[0]);
-                const parameters = this.parameters.map((_, i) => fromFridaValue(args[i + startIndex], _.type));
-                const result = block.call(thisObject, ...parameters);
-                return toFridaValue(result);
-            }, this.returnType.fridaAlias, this.fridaSignature);
+            return new NativeCallback(
+                (...args: NativeCallbackArgumentValue[]): NativeCallbackReturnValue => {
+                    const thisObject = this.isStatic
+                        ? this.class
+                        : this.class.isValueType
+                        ? new Il2Cpp.ValueType((args[0] as NativePointer).add(Il2Cpp.Object.headerSize - maybeObjectHeaderSize()), this.class.type)
+                        : new Il2Cpp.Object(args[0] as NativePointer);
+
+                    const parameters = this.parameters.map((_, i) => fromFridaValue(args[i + startIndex], _.type));
+                    const result = block.call(thisObject, ...parameters);
+                    return toFridaValue(result);
+                },
+                this.returnType.fridaAlias,
+                this.fridaSignature
+            );
         }
     }
 
