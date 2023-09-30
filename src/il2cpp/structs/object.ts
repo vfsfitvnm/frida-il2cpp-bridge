@@ -12,20 +12,15 @@ namespace Il2Cpp {
             return new Il2Cpp.Class(Il2Cpp.api.objectGetClass(this));
         }
 
+        /** Returns a monitor for this object. */
+        get monitor(): Il2Cpp.Object.Monitor {
+            return new Il2Cpp.Object.Monitor(this);
+        }
+
         /** Gets the size of the current object. */
         @lazy
         get size(): number {
             return Il2Cpp.api.objectGetSize(this);
-        }
-
-        /** Acquires an exclusive lock on the current object. */
-        enter(): void {
-            return Il2Cpp.api.monitorEnter(this);
-        }
-
-        /** Release an exclusive lock on the current object. */
-        exit(): void {
-            return Il2Cpp.api.monitorExit(this);
         }
 
         /** Gets the field with the given name. */
@@ -38,16 +33,6 @@ namespace Il2Cpp {
             return this.class.method<T>(name, parameterCount).withHolder(this);
         }
 
-        /** Notifies a thread in the waiting queue of a change in the locked object's state. */
-        pulse(): void {
-            return Il2Cpp.api.monitorPulse(this);
-        }
-
-        /** Notifies all waiting threads of a change in the object's state. */
-        pulseAll(): void {
-            return Il2Cpp.api.monitorPulseAll(this);
-        }
-
         /** Creates a reference to this object. */
         ref(pin: boolean): Il2Cpp.GCHandle {
             return new Il2Cpp.GCHandle(Il2Cpp.api.gcHandleNew(this, +pin));
@@ -56,11 +41,6 @@ namespace Il2Cpp {
         /** Gets the correct virtual method from the given virtual method. */
         virtualMethod<T extends Il2Cpp.Method.ReturnType>(method: Il2Cpp.Method): Il2Cpp.Method<T> {
             return new Il2Cpp.Method<T>(Il2Cpp.api.objectGetVirtualMethod(this, method)).withHolder(this);
-        }
-
-        /** Attempts to acquire an exclusive lock on the current object. */
-        tryEnter(timeout: number): boolean {
-            return !!Il2Cpp.api.monitorTryEnter(this, timeout);
         }
 
         /** Gets the field with the given name. */
@@ -73,11 +53,6 @@ namespace Il2Cpp {
             return this.class.tryMethod<T>(name, parameterCount)?.withHolder(this);
         }
 
-        /** Releases the lock on an object and attempts to block the current thread until it reacquires the lock. */
-        tryWait(timeout: number): boolean {
-            return !!Il2Cpp.api.monitorTryWait(this, timeout);
-        }
-
         /** */
         toString(): string {
             return this.isNull() ? "null" : this.method<Il2Cpp.String>("ToString", 0).invoke().content ?? "null";
@@ -88,14 +63,51 @@ namespace Il2Cpp {
             return new Il2Cpp.ValueType(Il2Cpp.api.objectUnbox(this), this.class.type);
         }
 
-        /** Releases the lock on an object and blocks the current thread until it reacquires the lock. */
-        wait(): void {
-            return Il2Cpp.api.monitorWait(this);
-        }
-
         /** Creates a weak reference to this object. */
         weakRef(trackResurrection: boolean): Il2Cpp.GCHandle {
             return new Il2Cpp.GCHandle(Il2Cpp.api.gcHandleNewWeakRef(this, +trackResurrection));
+        }
+    }
+
+    export namespace Object {
+        export class Monitor {
+            /** @internal */
+            constructor(/** @internal */ readonly handle: NativePointerValue) {}
+
+            /** Acquires an exclusive lock on the current object. */
+            enter(): void {
+                return Il2Cpp.api.monitorEnter(this.handle);
+            }
+
+            /** Release an exclusive lock on the current object. */
+            exit(): void {
+                return Il2Cpp.api.monitorExit(this.handle);
+            }
+
+            /** Notifies a thread in the waiting queue of a change in the locked object's state. */
+            pulse(): void {
+                return Il2Cpp.api.monitorPulse(this.handle);
+            }
+
+            /** Notifies all waiting threads of a change in the object's state. */
+            pulseAll(): void {
+                return Il2Cpp.api.monitorPulseAll(this.handle);
+            }
+
+            /** Attempts to acquire an exclusive lock on the current object. */
+            tryEnter(timeout: number): boolean {
+                return !!Il2Cpp.api.monitorTryEnter(this.handle, timeout);
+            }
+
+            /** Releases the lock on an object and attempts to block the current thread until it reacquires the lock. */
+            tryWait(timeout: number): boolean {
+                return !!Il2Cpp.api.monitorTryWait(this.handle, timeout);
+            }
+
+            /** Releases the lock on an object and blocks the current thread until it reacquires the lock. */
+            wait(): void {
+                return Il2Cpp.api.monitorWait(this.handle);
+            }
         }
     }
 }
