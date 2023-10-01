@@ -349,6 +349,18 @@ Il2Cpp.perform(() => {
         });
     });
 
+    test("Invoke a method that returns an enum value", () => {
+        assert("Unix", () => Il2Cpp.corlib.class("System.Environment").method("get_Platform").invoke().toString());
+    });
+
+    test("Invoke a method that takes an enum value", () => {
+        assert("Sunday", () => {
+            const DateTimeFormatInfo = Il2Cpp.corlib.class("System.Globalization.DateTimeFormatInfo").initialize();
+            const DayOfWeek = Il2Cpp.corlib.class("System.DayOfWeek");
+            return DateTimeFormatInfo.new().method("GetDayName").invoke(DayOfWeek.field("Sunday").value).content;
+        });
+    });
+
     send(summary);
 });
 

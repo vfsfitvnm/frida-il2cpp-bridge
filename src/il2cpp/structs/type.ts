@@ -42,6 +42,11 @@ namespace Il2Cpp {
         /** */
         @lazy
         get fridaAlias(): NativeCallbackArgumentType {
+            function getValueTypeFields(type: Il2Cpp.Type): NativeCallbackArgumentType {
+                const instanceFields = type.class.fields.filter(_ => !_.isStatic);
+                return instanceFields.length == 0 ? ["char"] : instanceFields.map(_ => _.type.fridaAlias);
+            }
+
             if (this.isByReference) {
                 return "pointer";
             }
@@ -73,8 +78,6 @@ namespace Il2Cpp {
                     return "float";
                 case Il2Cpp.Type.enum.double:
                     return "double";
-                case Il2Cpp.Type.enum.valueType:
-                    return getValueTypeFields(this);
                 case Il2Cpp.Type.enum.nativePointer:
                 case Il2Cpp.Type.enum.unsignedNativePointer:
                 case Il2Cpp.Type.enum.pointer:
@@ -82,10 +85,12 @@ namespace Il2Cpp {
                 case Il2Cpp.Type.enum.array:
                 case Il2Cpp.Type.enum.multidimensionalArray:
                     return "pointer";
+                case Il2Cpp.Type.enum.valueType:
+                    return this.class.isEnum ? this.class.baseType!.fridaAlias : getValueTypeFields(this);
                 case Il2Cpp.Type.enum.class:
                 case Il2Cpp.Type.enum.object:
                 case Il2Cpp.Type.enum.genericInstance:
-                    return this.class.isValueType ? getValueTypeFields(this) : "pointer";
+                    return this.class.isStruct ? getValueTypeFields(this) : this.class.isEnum ? this.class.baseType!.fridaAlias : "pointer";
                 default:
                     return "pointer";
             }
@@ -149,10 +154,5 @@ namespace Il2Cpp {
         toString(): string {
             return this.name;
         }
-    }
-
-    function getValueTypeFields(type: Il2Cpp.Type): NativeCallbackArgumentType {
-        const instanceFields = type.class.fields.filter(_ => !_.isStatic);
-        return instanceFields.length == 0 ? ["char"] : instanceFields.map(_ => _.type.fridaAlias);
     }
 }

@@ -58,9 +58,11 @@ namespace Il2Cpp {
             return this.isNull() ? "null" : this.method<Il2Cpp.String>("ToString", 0).invoke().content ?? "null";
         }
 
-        /** Unboxes the value type out of this object. */
+        /** Unboxes the value type (either a struct or an enum) out of this object. */
         unbox(): Il2Cpp.ValueType {
-            return new Il2Cpp.ValueType(Il2Cpp.api.objectUnbox(this), this.class.type);
+            return this.class.isValueType
+                ? new Il2Cpp.ValueType(Il2Cpp.api.objectUnbox(this), this.class.type)
+                : raise(`couldn't unbox instances of ${this.class.type.name} as they are not value types`);
         }
 
         /** Creates a weak reference to this object. */

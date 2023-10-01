@@ -88,19 +88,16 @@ namespace Il2Cpp {
             case Il2Cpp.Type.enum.nativePointer:
             case Il2Cpp.Type.enum.unsignedNativePointer:
             case Il2Cpp.Type.enum.pointer:
-            case Il2Cpp.Type.enum.valueType:
             case Il2Cpp.Type.enum.string:
-            case Il2Cpp.Type.enum.object:
-            case Il2Cpp.Type.enum.class:
             case Il2Cpp.Type.enum.array:
             case Il2Cpp.Type.enum.multidimensionalArray:
-            case Il2Cpp.Type.enum.genericInstance:
-                if (value instanceof Il2Cpp.ValueType) {
-                    Memory.copy(pointer, value, type.class.valueTypeSize);
-                    return pointer;
-                }
-
                 return pointer.writePointer(value);
+            case Il2Cpp.Type.enum.valueType:
+                return Memory.copy(pointer, value, type.class.valueTypeSize), pointer;
+            case Il2Cpp.Type.enum.object:
+            case Il2Cpp.Type.enum.class:
+            case Il2Cpp.Type.enum.genericInstance:
+                return value instanceof Il2Cpp.ValueType ? (Memory.copy(pointer, value, type.class.valueTypeSize), pointer) : pointer.writePointer(value);
         }
 
         raise(`couldn't write value ${value} to ${pointer} using an unhandled or unknown type ${type.name} (${type.typeEnum}), please file an issue`);
@@ -145,6 +142,8 @@ namespace Il2Cpp {
             }
         } else if (type.typeEnum == Il2Cpp.Type.enum.boolean) {
             return !!(value as number);
+        } else if (type.typeEnum == Il2Cpp.Type.enum.valueType && type.class.isEnum) {
+            return fromFridaValue([value], type);
         } else {
             return value;
         }
@@ -157,8 +156,12 @@ namespace Il2Cpp {
         if (typeof value == "boolean") {
             return +value;
         } else if (value instanceof Il2Cpp.ValueType) {
-            const _ = value.type.class.fields.filter(_ => !_.isStatic).map(_ => toFridaValue(_.withHolder(value).value));
-            return _.length == 0 ? [0] : _;
+            if (value.type.class.isEnum) {
+                return value.field<number | Int64 | UInt64>("value__").value;
+            } else {
+                const _ = value.type.class.fields.filter(_ => !_.isStatic).map(_ => toFridaValue(_.withHolder(value).value));
+                return _.length == 0 ? [0] : _;
+            }
         } else {
             return value;
         }
