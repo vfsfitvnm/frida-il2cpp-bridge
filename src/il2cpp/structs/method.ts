@@ -147,7 +147,7 @@ namespace Il2Cpp {
             return new Il2Cpp.Type(Il2Cpp.api.methodGetReturnType(this));
         }
 
-        /** Gets the virtual address (VA) to this method. */
+        /** Gets the virtual address (VA) of this method. */
         get virtualAddress(): NativePointer {
             const FilterTypeName = Il2Cpp.corlib.class("System.Reflection.Module").initialize().field<Il2Cpp.Object>("FilterTypeName").value;
             const FilterTypeNameMethodPointer = FilterTypeName.field<NativePointer>("method_ptr").value;
