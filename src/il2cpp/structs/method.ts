@@ -162,11 +162,12 @@ namespace Il2Cpp {
                 return this.handle.add(offset).readPointer();
             }, lazy);
 
-            // In Unity 2017.4.40f1 (don't know about others), Il2Cpp.Class::initialize
-            // somehow triggers a nasty bug during early instrumentation, so that we aren't
-            // able to obtain the offset to get the virtual address of a method when the script
-            // is reloaded.
-            // A workaround consists in manually re-invoking the static constructor.
+            // In Unity 2017.4.40f1 (don't know about others),
+            // `Il2Cpp.Class::initialize` somehow triggers a nasty bug during
+            // early instrumentation, so that we aren't able to obtain the
+            // offset to get the virtual address of a method when the script
+            // is reloaded. A workaround consists in manually re-invoking the
+            // static constructor.
             Il2Cpp.corlib.class("System.Reflection.Module").method(".cctor").invoke();
 
             return this.virtualAddress;
@@ -306,17 +307,15 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                 get(target: Il2Cpp.Method<T>, property: keyof Il2Cpp.Method<T>): any {
                     switch (property) {
                         case "invoke":
-                            // value types methods may assume their `this`
-                            // parameter is a pointer to raw data (that is how
-                            // value types are layed out in memory) instead of
-                            // a pointer to an object (that is object header +
-                            // raw data)
-                            // in any case, they also don't use whatever there
+                            // In Unity 5.3.5f1 and >= 2021.2.0f1, value types
+                            // methods may assume their `this` parameter is a
+                            // pointer to raw data (that is how value types are
+                            // layed out in memory) instead of a pointer to an
+                            // object (that is object header + raw data).
+                            // In any case, they also don't use whatever there
                             // is in the object header, so we can safely "skip"
                             // the object header by adding the object header
-                            // size to the object (a boxed value type) handle
-                            //
-                            // observed in Unity 5.3.5f1 and >= 2021.2.0f1
+                            // size to the object (a boxed value type) handle.
                             const handle =
                                 instance instanceof Il2Cpp.ValueType
                                     ? target.class.isValueType
@@ -365,10 +364,10 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
         const struct = Il2Cpp.corlib.class("System.RuntimeTypeHandle").initialize().alloc();
         struct.method(".ctor").invokeRaw(struct, ptr(0xdeadbeef));
 
-        // here we check where the sentinel value is
+        // Here we check where the sentinel value is
         // if it's not where it is supposed to be, it means struct methods
         // assume they are receiving value types (that is a pointer to raw data)
-        // hence, we must "skip" the object header when invoking such methods
+        // hence, we must "skip" the object header when invoking such methods.
         const offset = struct.field<NativePointer>("value").value.equals(ptr(0xdeadbeef)) ? 0 : Il2Cpp.Object.headerSize;
         return (maybeObjectHeaderSize = () => offset)();
     };

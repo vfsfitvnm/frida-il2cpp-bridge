@@ -34,8 +34,8 @@ namespace Il2Cpp {
             const ToString = this.method<Il2Cpp.String>("ToString", 0);
             return this.isNull()
                 ? "null"
-                : // if ToString is defined within a value type class, we can
-                // avoid a boxing operaion
+                : // If ToString is defined within a value type class, we can
+                // avoid a boxing operation.
                 ToString.class.isValueType
                 ? ToString.invoke().content ?? "null"
                 : this.box().toString() ?? "null";
