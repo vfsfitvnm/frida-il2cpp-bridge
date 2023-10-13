@@ -1,4 +1,35 @@
 namespace Il2Cpp {
+    /**
+     * The **core** object where all the necessary IL2CPP native functions are
+     * held. \
+     * `frida-il2cpp-bridge` is built around this object by providing an
+     * easy-to-use abstraction layer: the user isn't expected to use it directly,
+     * but it can in case of advanced use cases.
+     *
+     * The APIs depends on the Unity version, hence some of them may be
+     * unavailable; moreover, they are searched by **name** (e.g.
+     * `il2cpp_class_from_name`) hence they might get stripped, hidden or
+     * renamed by a nasty obfuscator.
+     *
+     * However, it is possible to override or set the handle of any of the
+     * exports by using a global variable:
+     * ```ts
+     * declare global {
+     *     let IL2CPP_EXPORTS: Record<string, () => NativePointer>;
+     * }
+     *
+     * IL2CPP_EXPORTS = {
+     *     il2cpp_image_get_class: () => Il2Cpp.module.base.add(0x1204c),
+     *     il2cpp_class_get_parent: () => {
+     *         return Memory.scanSync(Il2Cpp.module.base, Il2Cpp.module.size, "2f 10 ee 10 34 a8")[0].address;
+     *     },
+     * };
+     *
+     * Il2Cpp.perform(() => {
+     *     // ...
+     * });
+     * ```
+     */
     export const api = {
         get alloc() {
             return r("il2cpp_alloc", "pointer", ["size_t"]);
