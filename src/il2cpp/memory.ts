@@ -1,10 +1,24 @@
 namespace Il2Cpp {
-    /** Allocates the given amount of bytes. */
+    /**
+     * Allocates the given amount of bytes - it's equivalent to C's `malloc`. \
+     * The allocated memory should be freed manually.
+     */
     export function alloc(size: number | UInt64 = Process.pointerSize): NativePointer {
         return Il2Cpp.api.alloc(size);
     }
 
-    /** Frees memory. */
+    /**
+     * Frees a previously allocated memory using {@link Il2Cpp.alloc} - it's
+     *  equivalent to C's `free`..
+     *
+     * ```ts
+     * const handle = Il2Cpp.alloc(64);
+     *
+     * // ...
+     *
+     * Il2Cpp.free(handle);
+     * ```
+     */
     export function free(pointer: NativePointerValue): void {
         return Il2Cpp.api.free(pointer);
     }
