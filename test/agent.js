@@ -361,6 +361,25 @@ Il2Cpp.perform(() => {
         });
     });
 
+    test("References to value types are created correctly", () => {
+        const Decimal = Il2Cpp.corlib.class("System.Decimal").initialize();
+
+        const x = Decimal.alloc().unbox();
+        const y = Decimal.alloc().unbox();
+
+        x.method(".ctor").overload("System.Int32").invoke(-1234);
+        y.method(".ctor").overload("System.Int32").invoke(777);
+
+        const xRef = Il2Cpp.reference(x);
+
+        assert(1234, () => xRef.handle.add(Decimal.field("lo").offset - Il2Cpp.Object.headerSize).readInt());
+
+        assert(-1, () => {
+            const Compare = Decimal.tryMethod("FCallCompare") ?? Decimal.tryMethod("decimalCompare");
+            return Compare ? Compare.invoke(xRef, Il2Cpp.reference(y)) : Decimal.method("Sign").invoke(xRef);
+        });
+    });
+
     send(summary);
 });
 
