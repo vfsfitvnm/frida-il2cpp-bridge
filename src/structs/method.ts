@@ -273,13 +273,21 @@ namespace Il2Cpp {
 
         /** Gets the overloaded method with the given parameter types. */
         tryOverload<U extends Il2Cpp.Method.ReturnType = T>(...parameterTypes: string[]): Il2Cpp.Method<U> | undefined {
-            return this.class.methods.find(method => {
-                return (
-                    method.name == this.name &&
-                    method.parameterCount == parameterTypes.length &&
-                    method.parameters.every((e, i) => e.type.name == parameterTypes[i])
-                );
-            }) as Il2Cpp.Method<U> | undefined;
+            let klass: Il2Cpp.Class | null = this.class;
+            while (klass) {
+                const method = klass.methods.find(method => {
+                    return (
+                      method.name == this.name &&
+                      method.parameterCount == parameterTypes.length &&
+                      method.parameters.every((e, i) => e.type.name == parameterTypes[i])
+                    );
+                }) as Il2Cpp.Method<U> | undefined;
+                if (method) {
+                    return method;
+                }
+                klass = klass.parent;
+            }
+            return undefined;
         }
 
         /** Gets the parameter with the given name. */
