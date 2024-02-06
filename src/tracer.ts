@@ -297,7 +297,11 @@ namespace Il2Cpp {
                     state.buffer.push(`\x1b[2m0x${paddedVirtualAddress}\x1b[0m ${`│ `.repeat(state.depth++)}┌─\x1b[35m${method.class.type.name}::\x1b[1m${method.name}\x1b[0m\x1b[0m(${parameters.map(e => `\x1b[32m${e.name}\x1b[0m = \x1b[31m${fromFridaValue(args[e.position + startIndex], e.type)}\x1b[0m`).join(", ")})`);
                 }
 
-                const returnValue = method.nativeFunction(...args);
+                let returnValue = NULL;
+                try {
+                    returnValue = method.nativeFunction(...args);
+                }
+                catch (e: any) {}
 
                 if ((this as InvocationContext).threadId == threadId) {
                     // prettier-ignore
