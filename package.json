@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@types/frida-gum": "^18.4.3",
-    "ts-patch": "^3.0.2",
+    "ts-patch": "^3.2.1",
     "ts-transformer-inline-file": "^0.2.0"
   },
   "overrides": {
