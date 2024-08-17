@@ -288,34 +288,35 @@ namespace Il2Cpp {
 
             const startIndex = +!method.isStatic | +Il2Cpp.unityVersionIsBelow201830;
 
-            const fromFridaValueNullable = (args: InvocationArguments, parameter: Il2Cpp.Parameter) => {
-                try {
-                    return `\x1b[31m${fromFridaValue(args[parameter.position + startIndex], parameter.type)}\x1b[0m`;
-                } catch (_) {
-                    return null;
+            const callback = function (this: CallbackContext | InvocationContext, ...args: any[]) {
+                if ((this as InvocationContext).threadId == threadId) {
+                    const thisParameter = method.isStatic ? undefined : new Il2Cpp.Parameter("this", -1, method.class.type);
+                    const parameters = thisParameter ? [thisParameter].concat(method.parameters) : method.parameters;
+
+                    // prettier-ignore
+                    state.buffer.push(`\x1b[2m0x${paddedVirtualAddress}\x1b[0m ${`│ `.repeat(state.depth++)}┌─\x1b[35m${method.class.type.name}::\x1b[1m${method.name}\x1b[0m\x1b[0m(${parameters.map(e => `\x1b[32m${e.name}\x1b[0m = \x1b[31m${fromFridaValue(args[e.position + startIndex], e.type)}\x1b[0m`).join(", ")})`);
                 }
+
+                let returnValue = method.returnType.isPrimitive ? 0 : NULL;
+                let isError = false;
+                try {
+                    returnValue = method.nativeFunction(...args);
+                } catch (_) {
+                    isError = true;
+                }
+
+                if ((this as InvocationContext).threadId == threadId) {
+                    // prettier-ignore
+                    state.buffer.push(`\x1b[2m0x${paddedVirtualAddress}\x1b[0m ${`│ `.repeat(--state.depth)}└─\x1b[33m${method.class.type.name}::\x1b[1m${method.name}\x1b[0m\x1b[0m${returnValue == undefined ? "" : ` = \x1b[36m${fromFridaValue(returnValue, method.returnType)}`}\x1b[0m${isError ? " \x1b[38;5;9m[native IL2CPP exception occurred]\x1b[0m" : ""}`);
+                    state.flush();
+                }
+
+                return returnValue;
             };
 
             method.revert();
-
-            Interceptor.attach(method.virtualAddress, {
-                onEnter(args) {
-                    if (this.threadId == threadId) {
-                        const thisParameter = method.isStatic ? undefined : new Il2Cpp.Parameter("this", -1, method.class.type);
-                        const parameters = thisParameter ? [thisParameter].concat(method.parameters) : method.parameters;
-
-                        // prettier-ignore
-                        state.buffer.push(`\x1b[2m0x${paddedVirtualAddress}\x1b[0m ${`│ `.repeat(state.depth++)}┌─\x1b[35m${method.class.type.name}::\x1b[1m${method.name}\x1b[0m\x1b[0m(${parameters.map(e => `\x1b[32m${e.name}\x1b[0m = ${fromFridaValueNullable(args, e) ?? "\x1b[38;5;9mnull (failed to parse parameter value)\x1b[0m"}`).join(", ")})`);
-                    }
-                },
-                onLeave(returnValue) {
-                    if (this.threadId == threadId) {
-                        // prettier-ignore
-                        state.buffer.push(`\x1b[2m0x${paddedVirtualAddress}\x1b[0m ${`│ `.repeat(--state.depth)}└─\x1b[33m${method.class.type.name}::\x1b[1m${method.name}\x1b[0m\x1b[0m${returnValue == undefined ? "" : ` = \x1b[36m${fromFridaValue(returnValue, method.returnType)}`}\x1b[0m${returnValue.isNull() && method.returnType.typeEnum != Il2Cpp.Type.enum.void ? " \x1b[38;5;9m[native IL2CPP exception occurred]\x1b[0m" : ""}`);
-                        state.flush();
-                    }
-                }
-            });
+            const nativeCallback = new NativeCallback(callback, method.returnType.fridaAlias, method.fridaSignature);
+            Interceptor.replace(method.virtualAddress, nativeCallback);
         };
 
         return new Il2Cpp.Tracer(parameters ? applierWithParameters() : applier());
