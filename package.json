@@ -1,6 +1,6 @@
 {
   "name": "frida-il2cpp-bridge",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "A Frida module to dump, trace or hijack any Il2Cpp application at runtime, without needing the global-metadata.dat file.",
   "keywords": [
     "frida",
