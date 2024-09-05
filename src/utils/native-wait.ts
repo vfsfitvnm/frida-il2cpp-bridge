@@ -86,7 +86,9 @@ function forModule(...moduleNames: string[]): Promise<Module> {
                 onLeave(_: InvocationReturnValue) {
                     for (const moduleName of moduleNames) {
                         if (this.modulePath.endsWith(moduleName)) {
-                            const module = Process.findModuleByName(this.modulePath);
+                            // Adding a fallback in case Frida cannot find the module by its full path
+                            // https://github.com/vfsfitvnm/frida-il2cpp-bridge/issues/547
+                            const module = Process.findModuleByName(this.modulePath) ?? Process.findModuleByName(moduleName);
 
                             if (module != null) {
                                 setImmediate(() => {
