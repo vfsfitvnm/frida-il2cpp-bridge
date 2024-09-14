@@ -529,7 +529,13 @@ namespace Il2Cpp {
     function r<R extends NativeFunctionReturnType, A extends NativeFunctionArgumentType[] | []>(exportName: string, retType: R, argTypes: A) {
         const handle = (globalThis as any).IL2CPP_EXPORTS?.[exportName]?.() ?? Il2Cpp.module.findExportByName(exportName) ?? memorySnapshotApi[exportName];
 
-        return new NativeFunction(handle ?? raise(`couldn't resolve export ${exportName}`), retType, argTypes);
+        const target = new NativeFunction(handle ?? raise(`couldn't resolve export ${exportName}`), retType, argTypes);
+
+        if (target.isNull()) {
+            raise(`export ${exportName} points to NULL IL2CPP library has likely been stripped, obfuscated, or customized`)
+        }
+
+        return target;
     }
 
     declare const $inline_file: typeof import("ts-transformer-inline-file").$INLINE_FILE;
