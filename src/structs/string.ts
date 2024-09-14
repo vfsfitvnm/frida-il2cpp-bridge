@@ -2,7 +2,7 @@ namespace Il2Cpp {
     export class String extends NativeStruct {
         /** Gets the content of this string. */
         get content(): string | null {
-            return Il2Cpp.api.stringGetChars(this).readUtf16String(this.length);
+            return Il2Cpp.exports.stringGetChars(this).readUtf16String(this.length);
         }
 
         /** @unsafe Sets the content of this string - it may write out of bounds! */
@@ -13,7 +13,7 @@ namespace Il2Cpp {
 
             globalThis.Object.defineProperty(Il2Cpp.String.prototype, "content", {
                 set(this: Il2Cpp.String, value: string | null) {
-                    Il2Cpp.api.stringGetChars(this).writeUtf16String(value ?? "");
+                    Il2Cpp.exports.stringGetChars(this).writeUtf16String(value ?? "");
                     this.handle.add(offset).writeS32(value?.length ?? 0);
                 }
             });
@@ -23,7 +23,7 @@ namespace Il2Cpp {
 
         /** Gets the length of this string. */
         get length(): number {
-            return Il2Cpp.api.stringGetLength(this);
+            return Il2Cpp.exports.stringGetLength(this);
         }
 
         /** Gets the encompassing object of the current string. */
@@ -39,6 +39,6 @@ namespace Il2Cpp {
 
     /** Creates a new string with the specified content. */
     export function string(content: string | null): Il2Cpp.String {
-        return new Il2Cpp.String(Il2Cpp.api.stringNew(Memory.allocUtf8String(content ?? "")));
+        return new Il2Cpp.String(Il2Cpp.exports.stringNew(Memory.allocUtf8String(content ?? "")));
     }
 }

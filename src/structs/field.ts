@@ -3,13 +3,13 @@ namespace Il2Cpp {
         /** Gets the class in which this field is defined. */
         @lazy
         get class(): Il2Cpp.Class {
-            return new Il2Cpp.Class(Il2Cpp.api.fieldGetClass(this));
+            return new Il2Cpp.Class(Il2Cpp.exports.fieldGetClass(this));
         }
 
         /** Gets the flags of the current field. */
         @lazy
         get flags(): number {
-            return Il2Cpp.api.fieldGetFlags(this);
+            return Il2Cpp.exports.fieldGetFlags(this);
         }
 
         /** Determines whether this field value is known at compile time. */
@@ -59,19 +59,19 @@ namespace Il2Cpp {
         /** Gets the name of this field. */
         @lazy
         get name(): string {
-            return Il2Cpp.api.fieldGetName(this).readUtf8String()!;
+            return Il2Cpp.exports.fieldGetName(this).readUtf8String()!;
         }
 
         /** Gets the offset of this field, calculated as the difference with its owner virtual address. */
         @lazy
         get offset(): number {
-            return Il2Cpp.api.fieldGetOffset(this);
+            return Il2Cpp.exports.fieldGetOffset(this);
         }
 
         /** Gets the type of this field. */
         @lazy
         get type(): Il2Cpp.Type {
-            return new Il2Cpp.Type(Il2Cpp.api.fieldGetType(this));
+            return new Il2Cpp.Type(Il2Cpp.exports.fieldGetType(this));
         }
 
         /** Gets the value of this field. */
@@ -81,7 +81,7 @@ namespace Il2Cpp {
             }
 
             const handle = Memory.alloc(Process.pointerSize);
-            Il2Cpp.api.fieldGetStaticValue(this.handle, handle);
+            Il2Cpp.exports.fieldGetStaticValue(this.handle, handle);
 
             return read(handle, this.type) as T;
         }
@@ -107,7 +107,7 @@ namespace Il2Cpp {
                     ? value
                     : write(Memory.alloc(this.type.class.valueTypeSize), value, this.type);
 
-            Il2Cpp.api.fieldSetStaticValue(this.handle, handle);
+            Il2Cpp.exports.fieldSetStaticValue(this.handle, handle);
         }
 
         /** */

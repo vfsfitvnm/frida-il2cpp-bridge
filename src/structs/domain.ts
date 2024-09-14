@@ -4,7 +4,7 @@ namespace Il2Cpp {
         /** Gets the assemblies that have been loaded into the execution context of the application domain. */
         @lazy
         get assemblies(): Il2Cpp.Assembly[] {
-            let handles = readNativeList(_ => Il2Cpp.api.domainGetAssemblies(this, _));
+            let handles = readNativeList(_ => Il2Cpp.exports.domainGetAssemblies(this, _));
 
             if (handles.length == 0) {
                 const assemblyObjects = this.object.method<Il2Cpp.Array<Il2Cpp.Object>>("GetAssemblies").overload().invoke();
@@ -27,12 +27,12 @@ namespace Il2Cpp {
 
         /** Attached a new thread to the application domain. */
         attach(): Il2Cpp.Thread {
-            return new Il2Cpp.Thread(Il2Cpp.api.threadAttach(this));
+            return new Il2Cpp.Thread(Il2Cpp.exports.threadAttach(this));
         }
 
         /** Opens and loads the assembly with the given name. */
         tryAssembly(name: string): Il2Cpp.Assembly | null {
-            return new Il2Cpp.Assembly(Il2Cpp.api.domainGetAssemblyFromName(this, Memory.allocUtf8String(name))).asNullable();
+            return new Il2Cpp.Assembly(Il2Cpp.exports.domainGetAssemblyFromName(this, Memory.allocUtf8String(name))).asNullable();
         }
     }
 
@@ -40,6 +40,6 @@ namespace Il2Cpp {
     export declare const domain: Il2Cpp.Domain;
     // prettier-ignore
     getter(Il2Cpp, "domain", () => {
-        return new Il2Cpp.Domain(Il2Cpp.api.domainGet());
+        return new Il2Cpp.Domain(Il2Cpp.exports.domainGet());
     }, lazy);
 }

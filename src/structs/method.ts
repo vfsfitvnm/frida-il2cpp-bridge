@@ -3,20 +3,20 @@ namespace Il2Cpp {
         /** Gets the class in which this method is defined. */
         @lazy
         get class(): Il2Cpp.Class {
-            return new Il2Cpp.Class(Il2Cpp.api.methodGetClass(this));
+            return new Il2Cpp.Class(Il2Cpp.exports.methodGetClass(this));
         }
 
         /** Gets the flags of the current method. */
         @lazy
         get flags(): number {
-            return Il2Cpp.api.methodGetFlags(this, NULL);
+            return Il2Cpp.exports.methodGetFlags(this, NULL);
         }
 
         /** Gets the implementation flags of the current method. */
         @lazy
         get implementationFlags(): number {
             const implementationFlagsPointer = Memory.alloc(Process.pointerSize);
-            Il2Cpp.api.methodGetFlags(this, implementationFlagsPointer);
+            Il2Cpp.exports.methodGetFlags(this, implementationFlagsPointer);
 
             return implementationFlagsPointer.readU32();
         }
@@ -49,7 +49,7 @@ namespace Il2Cpp {
             }
 
             const types = this.object.method<Il2Cpp.Array<Il2Cpp.Object>>("GetGenericArguments").invoke();
-            return globalThis.Array.from(types).map(_ => new Il2Cpp.Class(Il2Cpp.api.classFromObject(_)));
+            return globalThis.Array.from(types).map(_ => new Il2Cpp.Class(Il2Cpp.exports.classFromObject(_)));
         }
 
         /** Determines whether this method is external. */
@@ -61,19 +61,19 @@ namespace Il2Cpp {
         /** Determines whether this method is generic. */
         @lazy
         get isGeneric(): boolean {
-            return !!Il2Cpp.api.methodIsGeneric(this);
+            return !!Il2Cpp.exports.methodIsGeneric(this);
         }
 
         /** Determines whether this method is inflated (generic with a concrete type parameter). */
         @lazy
         get isInflated(): boolean {
-            return !!Il2Cpp.api.methodIsInflated(this);
+            return !!Il2Cpp.exports.methodIsInflated(this);
         }
 
         /** Determines whether this method is static. */
         @lazy
         get isStatic(): boolean {
-            return !Il2Cpp.api.methodIsInstance(this);
+            return !Il2Cpp.exports.methodIsInstance(this);
         }
 
         /** Determines whether this method is synchronized. */
@@ -104,7 +104,7 @@ namespace Il2Cpp {
         /** Gets the name of this method. */
         @lazy
         get name(): string {
-            return Il2Cpp.api.methodGetName(this).readUtf8String()!;
+            return Il2Cpp.exports.methodGetName(this).readUtf8String()!;
         }
 
         /** @internal */
@@ -116,21 +116,21 @@ namespace Il2Cpp {
         /** Gets the encompassing object of the current method. */
         @lazy
         get object(): Il2Cpp.Object {
-            return new Il2Cpp.Object(Il2Cpp.api.methodGetObject(this, NULL));
+            return new Il2Cpp.Object(Il2Cpp.exports.methodGetObject(this, NULL));
         }
 
         /** Gets the amount of parameters of this method. */
         @lazy
         get parameterCount(): number {
-            return Il2Cpp.api.methodGetParameterCount(this);
+            return Il2Cpp.exports.methodGetParameterCount(this);
         }
 
         /** Gets the parameters of this method. */
         @lazy
         get parameters(): Il2Cpp.Parameter[] {
             return globalThis.Array.from(globalThis.Array(this.parameterCount), (_, i) => {
-                const parameterName = Il2Cpp.api.methodGetParameterName(this, i).readUtf8String()!;
-                const parameterType = Il2Cpp.api.methodGetParameterType(this, i);
+                const parameterName = Il2Cpp.exports.methodGetParameterName(this, i).readUtf8String()!;
+                const parameterType = Il2Cpp.exports.methodGetParameterType(this, i);
                 return new Il2Cpp.Parameter(parameterName, i, new Il2Cpp.Type(parameterType));
             });
         }
@@ -144,7 +144,7 @@ namespace Il2Cpp {
         /** Gets the return type of this method. */
         @lazy
         get returnType(): Il2Cpp.Type {
-            return new Il2Cpp.Type(Il2Cpp.api.methodGetReturnType(this));
+            return new Il2Cpp.Type(Il2Cpp.exports.methodGetReturnType(this));
         }
 
         /** Gets the virtual address (VA) of this method. */

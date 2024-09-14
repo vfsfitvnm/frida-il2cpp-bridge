@@ -4,7 +4,7 @@ namespace Il2Cpp {
      * The allocated memory should be freed manually.
      */
     export function alloc(size: number | UInt64 = Process.pointerSize): NativePointer {
-        return Il2Cpp.api.alloc(size);
+        return Il2Cpp.exports.alloc(size);
     }
 
     /**
@@ -20,7 +20,7 @@ namespace Il2Cpp {
      * ```
      */
     export function free(pointer: NativePointerValue): void {
-        return Il2Cpp.api.free(pointer);
+        return Il2Cpp.exports.free(pointer);
     }
 
     /** @internal */

@@ -11,10 +11,10 @@
 /// <reference path="./utils/recycle.ts">/>
 /// <reference path="./utils/unity-version.ts">/>
 
-/// <reference path="./api.ts">/>
 /// <reference path="./application.ts">/>
 /// <reference path="./dump.ts">/>
 /// <reference path="./exception-listener.ts">/>
+/// <reference path="./exports.ts">/>
 /// <reference path="./filters.ts">/>
 /// <reference path="./gc.ts">/>
 /// <reference path="./memory.ts">/>

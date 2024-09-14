@@ -20,49 +20,49 @@ namespace Il2Cpp {
         /** Gets the array class which encompass the current class. */
         @lazy
         get arrayClass(): Il2Cpp.Class {
-            return new Il2Cpp.Class(Il2Cpp.api.classGetArrayClass(this, 1));
+            return new Il2Cpp.Class(Il2Cpp.exports.classGetArrayClass(this, 1));
         }
 
         /** Gets the size of the object encompassed by the current array class. */
         @lazy
         get arrayElementSize(): number {
-            return Il2Cpp.api.classGetArrayElementSize(this);
+            return Il2Cpp.exports.classGetArrayElementSize(this);
         }
 
         /** Gets the name of the assembly in which the current class is defined. */
         @lazy
         get assemblyName(): string {
-            return Il2Cpp.api.classGetAssemblyName(this).readUtf8String()!.replace(".dll", "");
+            return Il2Cpp.exports.classGetAssemblyName(this).readUtf8String()!.replace(".dll", "");
         }
 
         /** Gets the class that declares the current nested class. */
         @lazy
         get declaringClass(): Il2Cpp.Class | null {
-            return new Il2Cpp.Class(Il2Cpp.api.classGetDeclaringType(this)).asNullable();
+            return new Il2Cpp.Class(Il2Cpp.exports.classGetDeclaringType(this)).asNullable();
         }
 
         /** Gets the encompassed type of this array, reference, pointer or enum type. */
         @lazy
         get baseType(): Il2Cpp.Type | null {
-            return new Il2Cpp.Type(Il2Cpp.api.classGetBaseType(this)).asNullable();
+            return new Il2Cpp.Type(Il2Cpp.exports.classGetBaseType(this)).asNullable();
         }
 
         /** Gets the class of the object encompassed or referred to by the current array, pointer or reference class. */
         @lazy
         get elementClass(): Il2Cpp.Class | null {
-            return new Il2Cpp.Class(Il2Cpp.api.classGetElementClass(this)).asNullable();
+            return new Il2Cpp.Class(Il2Cpp.exports.classGetElementClass(this)).asNullable();
         }
 
         /** Gets the fields of the current class. */
         @lazy
         get fields(): Il2Cpp.Field[] {
-            return readNativeIterator(_ => Il2Cpp.api.classGetFields(this, _)).map(_ => new Il2Cpp.Field(_));
+            return readNativeIterator(_ => Il2Cpp.exports.classGetFields(this, _)).map(_ => new Il2Cpp.Field(_));
         }
 
         /** Gets the flags of the current class. */
         @lazy
         get flags(): number {
-            return Il2Cpp.api.classGetFlags(this);
+            return Il2Cpp.exports.classGetFlags(this);
         }
 
         /** Gets the full name (namespace + name) of the current class. */
@@ -79,13 +79,13 @@ namespace Il2Cpp {
             }
 
             const types = this.type.object.method<Il2Cpp.Array<Il2Cpp.Object>>("GetGenericArguments").invoke();
-            return globalThis.Array.from(types).map(_ => new Il2Cpp.Class(Il2Cpp.api.classFromObject(_)));
+            return globalThis.Array.from(types).map(_ => new Il2Cpp.Class(Il2Cpp.exports.classFromObject(_)));
         }
 
         /** Determines whether the GC has tracking references to the current class instances. */
         @lazy
         get hasReferences(): boolean {
-            return !!Il2Cpp.api.classHasReferences(this);
+            return !!Il2Cpp.exports.classHasReferences(this);
         }
 
         /** Determines whether ther current class has a valid static constructor. */
@@ -98,49 +98,49 @@ namespace Il2Cpp {
         /** Gets the image in which the current class is defined. */
         @lazy
         get image(): Il2Cpp.Image {
-            return new Il2Cpp.Image(Il2Cpp.api.classGetImage(this));
+            return new Il2Cpp.Image(Il2Cpp.exports.classGetImage(this));
         }
 
         /** Gets the size of the instance of the current class. */
         @lazy
         get instanceSize(): number {
-            return Il2Cpp.api.classGetInstanceSize(this);
+            return Il2Cpp.exports.classGetInstanceSize(this);
         }
 
         /** Determines whether the current class is abstract. */
         @lazy
         get isAbstract(): boolean {
-            return !!Il2Cpp.api.classIsAbstract(this);
+            return !!Il2Cpp.exports.classIsAbstract(this);
         }
 
         /** Determines whether the current class is blittable. */
         @lazy
         get isBlittable(): boolean {
-            return !!Il2Cpp.api.classIsBlittable(this);
+            return !!Il2Cpp.exports.classIsBlittable(this);
         }
 
         /** Determines whether the current class is an enumeration. */
         @lazy
         get isEnum(): boolean {
-            return !!Il2Cpp.api.classIsEnum(this);
+            return !!Il2Cpp.exports.classIsEnum(this);
         }
 
         /** Determines whether the current class is a generic one. */
         @lazy
         get isGeneric(): boolean {
-            return !!Il2Cpp.api.classIsGeneric(this);
+            return !!Il2Cpp.exports.classIsGeneric(this);
         }
 
         /** Determines whether the current class is inflated. */
         @lazy
         get isInflated(): boolean {
-            return !!Il2Cpp.api.classIsInflated(this);
+            return !!Il2Cpp.exports.classIsInflated(this);
         }
 
         /** Determines whether the current class is an interface. */
         @lazy
         get isInterface(): boolean {
-            return !!Il2Cpp.api.classIsInterface(this);
+            return !!Il2Cpp.exports.classIsInterface(this);
         }
 
         /** Determines whether the current class is a struct. */
@@ -151,43 +151,43 @@ namespace Il2Cpp {
         /** Determines whether the current class is a value type. */
         @lazy
         get isValueType(): boolean {
-            return !!Il2Cpp.api.classIsValueType(this);
+            return !!Il2Cpp.exports.classIsValueType(this);
         }
 
         /** Gets the interfaces implemented or inherited by the current class. */
         @lazy
         get interfaces(): Il2Cpp.Class[] {
-            return readNativeIterator(_ => Il2Cpp.api.classGetInterfaces(this, _)).map(_ => new Il2Cpp.Class(_));
+            return readNativeIterator(_ => Il2Cpp.exports.classGetInterfaces(this, _)).map(_ => new Il2Cpp.Class(_));
         }
 
         /** Gets the methods implemented by the current class. */
         @lazy
         get methods(): Il2Cpp.Method[] {
-            return readNativeIterator(_ => Il2Cpp.api.classGetMethods(this, _)).map(_ => new Il2Cpp.Method(_));
+            return readNativeIterator(_ => Il2Cpp.exports.classGetMethods(this, _)).map(_ => new Il2Cpp.Method(_));
         }
 
         /** Gets the name of the current class. */
         @lazy
         get name(): string {
-            return Il2Cpp.api.classGetName(this).readUtf8String()!;
+            return Il2Cpp.exports.classGetName(this).readUtf8String()!;
         }
 
         /** Gets the namespace of the current class. */
         @lazy
         get namespace(): string {
-            return Il2Cpp.api.classGetNamespace(this).readUtf8String()!;
+            return Il2Cpp.exports.classGetNamespace(this).readUtf8String()!;
         }
 
         /** Gets the classes nested inside the current class. */
         @lazy
         get nestedClasses(): Il2Cpp.Class[] {
-            return readNativeIterator(_ => Il2Cpp.api.classGetNestedClasses(this, _)).map(_ => new Il2Cpp.Class(_));
+            return readNativeIterator(_ => Il2Cpp.exports.classGetNestedClasses(this, _)).map(_ => new Il2Cpp.Class(_));
         }
 
         /** Gets the class from which the current class directly inherits. */
         @lazy
         get parent(): Il2Cpp.Class | null {
-            return new Il2Cpp.Class(Il2Cpp.api.classGetParent(this)).asNullable();
+            return new Il2Cpp.Class(Il2Cpp.exports.classGetParent(this)).asNullable();
         }
 
         /** Gets the rank (number of dimensions) of the current array class. */
@@ -211,24 +211,24 @@ namespace Il2Cpp {
         /** Gets a pointer to the static fields of the current class. */
         @lazy
         get staticFieldsData(): NativePointer {
-            return Il2Cpp.api.classGetStaticFieldData(this);
+            return Il2Cpp.exports.classGetStaticFieldData(this);
         }
 
         /** Gets the size of the instance - as a value type - of the current class. */
         @lazy
         get valueTypeSize(): number {
-            return Il2Cpp.api.classGetValueTypeSize(this, NULL);
+            return Il2Cpp.exports.classGetValueTypeSize(this, NULL);
         }
 
         /** Gets the type of the current class. */
         @lazy
         get type(): Il2Cpp.Type {
-            return new Il2Cpp.Type(Il2Cpp.api.classGetType(this));
+            return new Il2Cpp.Type(Il2Cpp.exports.classGetType(this));
         }
 
         /** Allocates a new object of the current class. */
         alloc(): Il2Cpp.Object {
-            return new Il2Cpp.Object(Il2Cpp.api.objectNew(this));
+            return new Il2Cpp.Object(Il2Cpp.exports.objectNew(this));
         }
 
         /** Gets the field identified by the given name. */
@@ -250,23 +250,23 @@ namespace Il2Cpp {
             const typeArray = Il2Cpp.array(Il2Cpp.corlib.class("System.Type"), types);
 
             const inflatedType = this.type.object.method<Il2Cpp.Object>("MakeGenericType", 1).invoke(typeArray);
-            return new Il2Cpp.Class(Il2Cpp.api.classFromObject(inflatedType));
+            return new Il2Cpp.Class(Il2Cpp.exports.classFromObject(inflatedType));
         }
 
         /** Calls the static constructor of the current class. */
         initialize(): Il2Cpp.Class {
-            Il2Cpp.api.classInitialize(this);
+            Il2Cpp.exports.classInitialize(this);
             return this;
         }
 
         /** Determines whether an instance of `other` class can be assigned to a variable of the current type. */
         isAssignableFrom(other: Il2Cpp.Class): boolean {
-            return !!Il2Cpp.api.classIsAssignableFrom(this, other);
+            return !!Il2Cpp.exports.classIsAssignableFrom(this, other);
         }
 
         /** Determines whether the current class derives from `other` class. */
         isSubclassOf(other: Il2Cpp.Class, checkInterfaces: boolean): boolean {
-            return !!Il2Cpp.api.classIsSubclassOf(this, other, +checkInterfaces);
+            return !!Il2Cpp.exports.classIsSubclassOf(this, other, +checkInterfaces);
         }
 
         /** Gets the method identified by the given name and parameter count. */
@@ -285,7 +285,7 @@ namespace Il2Cpp {
 
             const exceptionArray = Memory.alloc(Process.pointerSize);
 
-            Il2Cpp.api.objectInitialize(object, exceptionArray);
+            Il2Cpp.exports.objectInitialize(object, exceptionArray);
 
             const exception = exceptionArray.readPointer();
 
@@ -298,12 +298,12 @@ namespace Il2Cpp {
 
         /** Gets the field with the given name. */
         tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> | null {
-            return new Il2Cpp.Field<T>(Il2Cpp.api.classGetFieldFromName(this, Memory.allocUtf8String(name))).asNullable();
+            return new Il2Cpp.Field<T>(Il2Cpp.exports.classGetFieldFromName(this, Memory.allocUtf8String(name))).asNullable();
         }
 
         /** Gets the method with the given name and parameter count. */
         tryMethod<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> | null {
-            return new Il2Cpp.Method<T>(Il2Cpp.api.classGetMethodFromName(this, Memory.allocUtf8String(name), parameterCount)).asNullable();
+            return new Il2Cpp.Method<T>(Il2Cpp.exports.classGetMethodFromName(this, Memory.allocUtf8String(name), parameterCount)).asNullable();
         }
 
         /** Gets the nested class with the given name. */
@@ -329,7 +329,7 @@ ${inherited ? ` : ${inherited.map(_ => _?.type.name).join(`, `)}` : ``}
         /** Executes a callback for every defined class. */
         static enumerate(block: (klass: Il2Cpp.Class) => void): void {
             const callback = new NativeCallback(_ => block(new Il2Cpp.Class(_)), "void", ["pointer", "pointer"]);
-            return Il2Cpp.api.classForEach(callback, NULL);
+            return Il2Cpp.exports.classForEach(callback, NULL);
         }
     }
 }

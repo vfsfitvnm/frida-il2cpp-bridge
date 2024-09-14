@@ -35,7 +35,7 @@ namespace Il2Cpp {
         /** Determines whether the current thread is the garbage collector finalizer one. */
         @lazy
         get isFinalizer(): boolean {
-            return !Il2Cpp.api.threadIsVm(this);
+            return !Il2Cpp.exports.threadIsVm(this);
         }
 
         /** Gets the managed id of the current thread. */
@@ -80,7 +80,7 @@ namespace Il2Cpp {
 
         /** Detaches the thread from the application domain. */
         detach(): void {
-            return Il2Cpp.api.threadDetach(this);
+            return Il2Cpp.exports.threadDetach(this);
         }
 
         /** Schedules a callback on the current thread. */
@@ -108,7 +108,7 @@ namespace Il2Cpp {
                 // The following solution, which basically redirects the invocation to a native function that
                 // survives the script reloading, is much simpler, honestly.
                 Script.bindWeak(globalThis, () => {
-                    delegate.field("method_ptr").value = delegate.field("invoke_impl").value = Il2Cpp.api.domainGet;
+                    delegate.field("method_ptr").value = delegate.field("invoke_impl").value = Il2Cpp.exports.domainGet;
                 });
 
                 Post.invoke(delegate, NULL);
@@ -132,13 +132,13 @@ namespace Il2Cpp {
     /** Gets the attached threads. */
     export declare const attachedThreads: Il2Cpp.Thread[];
     getter(Il2Cpp, "attachedThreads", () => {
-        return readNativeList(Il2Cpp.api.threadGetAttachedThreads).map(_ => new Il2Cpp.Thread(_));
+        return readNativeList(Il2Cpp.exports.threadGetAttachedThreads).map(_ => new Il2Cpp.Thread(_));
     });
 
     /** Gets the current attached thread, if any. */
     export declare const currentThread: Il2Cpp.Thread | null;
     getter(Il2Cpp, "currentThread", () => {
-        return new Il2Cpp.Thread(Il2Cpp.api.threadGetCurrent()).asNullable();
+        return new Il2Cpp.Thread(Il2Cpp.exports.threadGetCurrent()).asNullable();
     });
 
     /** Gets the current attached thread, if any. */

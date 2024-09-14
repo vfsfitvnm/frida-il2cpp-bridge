@@ -6,26 +6,26 @@ namespace Il2Cpp {
         }
 
         /** Creates a memory snapshot with the given handle. */
-        constructor(handle: NativePointer = Il2Cpp.api.memorySnapshotCapture()) {
+        constructor(handle: NativePointer = Il2Cpp.exports.memorySnapshotCapture()) {
             super(handle);
         }
 
         /** Gets any initialized class. */
         @lazy
         get classes(): Il2Cpp.Class[] {
-            return readNativeIterator(_ => Il2Cpp.api.memorySnapshotGetClasses(this, _)).map(_ => new Il2Cpp.Class(_));
+            return readNativeIterator(_ => Il2Cpp.exports.memorySnapshotGetClasses(this, _)).map(_ => new Il2Cpp.Class(_));
         }
 
         /** Gets the objects tracked by this memory snapshot. */
         @lazy
         get objects(): Il2Cpp.Object[] {
             // prettier-ignore
-            return readNativeList(_ => Il2Cpp.api.memorySnapshotGetObjects(this, _)).filter(_ => !_.isNull()).map(_ => new Il2Cpp.Object(_));
+            return readNativeList(_ => Il2Cpp.exports.memorySnapshotGetObjects(this, _)).filter(_ => !_.isNull()).map(_ => new Il2Cpp.Object(_));
         }
 
         /** Frees this memory snapshot. */
         free(): void {
-            Il2Cpp.api.memorySnapshotFree(this);
+            Il2Cpp.exports.memorySnapshotFree(this);
         }
     }
 

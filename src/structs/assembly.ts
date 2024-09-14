@@ -4,11 +4,11 @@ namespace Il2Cpp {
         /** Gets the image of this assembly. */
         get image(): Il2Cpp.Image {
             let get = function (this: Il2Cpp.Assembly) {
-                return new Il2Cpp.Image(Il2Cpp.api.assemblyGetImage(this));
+                return new Il2Cpp.Image(Il2Cpp.exports.assemblyGetImage(this));
             };
 
             try {
-                Il2Cpp.api.assemblyGetImage;
+                Il2Cpp.exports.assemblyGetImage;
             } catch (_) {
                 get = function (this: Il2Cpp.Assembly) {
                     // We need to get the System.Reflection.Module of the current assembly;

@@ -7,14 +7,14 @@ namespace Il2Cpp {
          * Gets the heap size in bytes.
          */
         get heapSize(): Int64 {
-            return Il2Cpp.api.gcGetHeapSize();
+            return Il2Cpp.exports.gcGetHeapSize();
         },
 
         /**
          * Determines whether the garbage collector is enabled.
          */
         get isEnabled(): boolean {
-            return !Il2Cpp.api.gcIsDisabled();
+            return !Il2Cpp.exports.gcIsDisabled();
         },
 
         /**
@@ -22,7 +22,7 @@ namespace Il2Cpp {
          * ([source](https://docs.unity3d.com/Manual/performance-incremental-garbage-collection.html)).
          */
         get isIncremental(): boolean {
-            return !!Il2Cpp.api.gcIsIncremental();
+            return !!Il2Cpp.exports.gcIsIncremental();
         },
 
         /**
@@ -30,21 +30,21 @@ namespace Il2Cpp {
          * collection step.
          */
         get maxTimeSlice(): Int64 {
-            return Il2Cpp.api.gcGetMaxTimeSlice();
+            return Il2Cpp.exports.gcGetMaxTimeSlice();
         },
 
         /**
          * Gets the used heap size in bytes.
          */
         get usedHeapSize(): Int64 {
-            return Il2Cpp.api.gcGetUsedSize();
+            return Il2Cpp.exports.gcGetUsedSize();
         },
 
         /**
          * Enables or disables the garbage collector.
          */
         set isEnabled(value: boolean) {
-            value ? Il2Cpp.api.gcEnable() : Il2Cpp.api.gcDisable();
+            value ? Il2Cpp.exports.gcEnable() : Il2Cpp.exports.gcDisable();
         },
 
         /**
@@ -52,7 +52,7 @@ namespace Il2Cpp {
          * a collection step.
          */
         set maxTimeSlice(nanoseconds: number | Int64) {
-            Il2Cpp.api.gcSetMaxTimeSlice(nanoseconds);
+            Il2Cpp.exports.gcSetMaxTimeSlice(nanoseconds);
         },
 
         /**
@@ -72,10 +72,10 @@ namespace Il2Cpp {
 
             if (Il2Cpp.unityVersionIsBelow202120) {
                 const onWorld = new NativeCallback(() => {}, "void", []);
-                const state = Il2Cpp.api.livenessCalculationBegin(klass, 0, chooseCallback, NULL, onWorld, onWorld);
+                const state = Il2Cpp.exports.livenessCalculationBegin(klass, 0, chooseCallback, NULL, onWorld, onWorld);
 
-                Il2Cpp.api.livenessCalculationFromStatics(state);
-                Il2Cpp.api.livenessCalculationEnd(state);
+                Il2Cpp.exports.livenessCalculationFromStatics(state);
+                Il2Cpp.exports.livenessCalculationEnd(state);
             } else {
                 const realloc = (handle: NativePointer, size: UInt64) => {
                     if (!handle.isNull() && size.compare(0) == 0) {
@@ -90,13 +90,13 @@ namespace Il2Cpp {
 
                 this.stopWorld();
 
-                const state = Il2Cpp.api.livenessAllocateStruct(klass, 0, chooseCallback, NULL, reallocCallback);
-                Il2Cpp.api.livenessCalculationFromStatics(state);
-                Il2Cpp.api.livenessFinalize(state);
+                const state = Il2Cpp.exports.livenessAllocateStruct(klass, 0, chooseCallback, NULL, reallocCallback);
+                Il2Cpp.exports.livenessCalculationFromStatics(state);
+                Il2Cpp.exports.livenessFinalize(state);
 
                 this.startWorld();
 
-                Il2Cpp.api.livenessFreeStruct(state);
+                Il2Cpp.exports.livenessFreeStruct(state);
             }
 
             return matches;
@@ -106,28 +106,28 @@ namespace Il2Cpp {
          * Forces a garbage collection of the specified generation.
          */
         collect(generation: 0 | 1 | 2): void {
-            Il2Cpp.api.gcCollect(generation < 0 ? 0 : generation > 2 ? 2 : generation);
+            Il2Cpp.exports.gcCollect(generation < 0 ? 0 : generation > 2 ? 2 : generation);
         },
 
         /**
          * Forces a garbage collection.
          */
         collectALittle(): void {
-            Il2Cpp.api.gcCollectALittle();
+            Il2Cpp.exports.gcCollectALittle();
         },
 
         /**
          *  Resumes all the previously stopped threads.
          */
         startWorld(): void {
-            return Il2Cpp.api.gcStartWorld();
+            return Il2Cpp.exports.gcStartWorld();
         },
 
         /**
          * Performs an incremental garbage collection.
          */
         startIncrementalCollection(): void {
-            return Il2Cpp.api.gcStartIncrementalCollection();
+            return Il2Cpp.exports.gcStartIncrementalCollection();
         },
 
         /**
@@ -135,7 +135,7 @@ namespace Il2Cpp {
          * than the caller.
          */
         stopWorld(): void {
-            return Il2Cpp.api.gcStopWorld();
+            return Il2Cpp.exports.gcStopWorld();
         }
     };
 }

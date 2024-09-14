@@ -5,12 +5,12 @@ namespace Il2Cpp {
 
         /** Gets the object associated to this handle. */
         get target(): Il2Cpp.Object | null {
-            return new Il2Cpp.Object(Il2Cpp.api.gcHandleGetTarget(this.handle)).asNullable();
+            return new Il2Cpp.Object(Il2Cpp.exports.gcHandleGetTarget(this.handle)).asNullable();
         }
 
         /** Frees this handle. */
         free(): void {
-            return Il2Cpp.api.gcHandleFree(this.handle);
+            return Il2Cpp.exports.gcHandleFree(this.handle);
         }
     }
 }

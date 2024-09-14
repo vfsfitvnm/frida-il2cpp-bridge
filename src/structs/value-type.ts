@@ -6,7 +6,7 @@ namespace Il2Cpp {
 
         /** Boxes the current value type in a object. */
         box(): Il2Cpp.Object {
-            return new Il2Cpp.Object(Il2Cpp.api.valueTypeBox(this.type.class, this));
+            return new Il2Cpp.Object(Il2Cpp.exports.valueTypeBox(this.type.class, this));
         }
 
         /** Gets the field with the given name. */

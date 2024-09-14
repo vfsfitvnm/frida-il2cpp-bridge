@@ -28,7 +28,7 @@ namespace Il2Cpp {
                 string: _("System.String"),
                 class: _("System.Array"),
                 array: _("System.Void", _ => _.arrayClass),
-                multidimensionalArray: _("System.Void", _ => new Il2Cpp.Class(Il2Cpp.api.classGetArrayClass(_, 2))),
+                multidimensionalArray: _("System.Void", _ => new Il2Cpp.Class(Il2Cpp.exports.classGetArrayClass(_, 2))),
                 genericInstance: _("System.Int32", _ => _.interfaces.find(_ => _.name.endsWith("`1"))!)
             };
         }
@@ -36,7 +36,7 @@ namespace Il2Cpp {
         /** Gets the class of this type. */
         @lazy
         get class(): Il2Cpp.Class {
-            return new Il2Cpp.Class(Il2Cpp.api.typeGetClass(this));
+            return new Il2Cpp.Class(Il2Cpp.exports.typeGetClass(this));
         }
 
         /** */
@@ -129,7 +129,7 @@ namespace Il2Cpp {
         /** Gets the name of this type. */
         @lazy
         get name(): string {
-            const handle = Il2Cpp.api.typeGetName(this);
+            const handle = Il2Cpp.exports.typeGetName(this);
 
             try {
                 return handle.readUtf8String()!;
@@ -141,13 +141,13 @@ namespace Il2Cpp {
         /** Gets the encompassing object of the current type. */
         @lazy
         get object(): Il2Cpp.Object {
-            return new Il2Cpp.Object(Il2Cpp.api.typeGetObject(this));
+            return new Il2Cpp.Object(Il2Cpp.exports.typeGetObject(this));
         }
 
         /** Gets the type enum of the current type. */
         @lazy
         get typeEnum(): number {
-            return Il2Cpp.api.typeGetTypeEnum(this);
+            return Il2Cpp.exports.typeGetTypeEnum(this);
         }
 
         /** */
