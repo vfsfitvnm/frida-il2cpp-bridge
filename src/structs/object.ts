@@ -55,7 +55,12 @@ namespace Il2Cpp {
 
         /** */
         toString(): string {
-            return this.isNull() ? "null" : this.method<Il2Cpp.String>("ToString", 0).invoke().content ?? "null";
+            try{
+                return this.isNull() ? "null" : this.method<Il2Cpp.String>("ToString", 0).invoke().content ?? "null";
+            }
+            finally{
+                return "Error: ToString failed"
+            }
         }
 
         /** Unboxes the value type (either a primitive, a struct or an enum) out of this object. */
