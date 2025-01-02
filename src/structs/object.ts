@@ -55,11 +55,10 @@ namespace Il2Cpp {
 
         /** */
         toString(): string {
-            try{
+            try {
                 return this.isNull() ? "null" : this.method<Il2Cpp.String>("ToString", 0).invoke().content ?? "null";
-            }
-            finally{
-                return "Error: ToString failed"
+            } catch (error) {
+                return "Error: ToString failed";
             }
         }
 
