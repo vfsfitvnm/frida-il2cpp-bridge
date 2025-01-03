@@ -41,22 +41,35 @@ namespace Il2Cpp {
      *   }
      * ```
      */
-    export function dump(fileName?: string, path?: string): void {
-        fileName = fileName ?? `${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}.cs`;
+    export function dump(path?: string): void {
+        const basePath = path ?? `${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
 
-        const destination = `${path ?? Il2Cpp.application.dataPath}/${fileName}`;
-        const file = new File(destination, "w");
+        const appContext = Java.use("android.app.ActivityThread").currentApplication().getApplicationContext()
 
         for (const assembly of Il2Cpp.domain.assemblies) {
-            inform(`dumping ${assembly.name}...`);
+            const assemblyParts = assembly.name.split(".");
+            const assemblyPath = assemblyParts.length >= 2 ? assemblyParts.slice(0, -1).join("/") : null;
+            const filename = assemblyParts[assemblyParts.length - 1] + '.cs';
+            const parentPath = assemblyPath ? `${basePath}/${assemblyPath}` : basePath;
+            // const fullPath = `${parentPath}/${filename}`;
+
+            // Create directory if necessary
+            const absoluteParentPath = appContext.getExternalFilesDir(parentPath).getAbsolutePath();
+            const fullPath = `${absoluteParentPath}/${filename}`;
+
+            // inform(`dumping ${assembly.name}... `)
+            inform(`dumping ${parentPath}/${filename}`);
+
+            const file = new File(fullPath, "w");
 
             for (const klass of assembly.image.classes) {
                 file.write(`${klass}\n\n`);
             }
+
+            file.flush();
+            file.close();            
         }
 
-        file.flush();
-        file.close();
-        ok(`dump saved to ${destination}`);
+        ok(`dump saved to ${basePath}`);
     }
 }
