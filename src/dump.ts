@@ -41,26 +41,68 @@ namespace Il2Cpp {
      *   }
      * ```
      */
-    export function dump(path?: string): void {
-        const basePath = path ?? `${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
+    function mkdir(p: string): boolean {
+        const mkdirPtr = Module.findExportByName('libc.so', "mkdir")!;
+        const mkdirFn = new NativeFunction(mkdirPtr, "int", ["pointer", "int32"]);
+        const res = mkdirFn(Memory.allocUtf8String(p), 0o777);
+        // 0 means success
+        return res === 0;
+    }
 
-        const appContext = Java.use("android.app.ActivityThread").currentApplication().getApplicationContext()
+    function mkdirp(p: string) {
+        const parts = p.split("/");
+        // All parent paths along the way
+        const paths = parts.map((_, i) => parts.slice(0, i + 1).join("/"));
+        // Create each ancestor path in turn, ignoring existing ones
+        const successes = paths.map((path) => mkdir(path));
+
+        // If all failed to create, let's hope it already existed (TODO: check `stat`)
+        if (successes.every((s) => !s)) return;
+
+        // If last one failed to create but some others didn't, something went wrong
+        if (!successes[successes.length - 1])
+        throw new Error(`Failed to create directory: ${p}`);
+    }
+
+    export function dump(fileName?: string, path?: string): void {
+        fileName = fileName ?? `${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}.cs`;
+        path = path ?? Il2Cpp.application.dataPath!;
+
+        // Create directory (recursively) if necessary
+        mkdirp(path);
+
+        const destination = `${path ?? Il2Cpp.application.dataPath}/${fileName}`;
+        const file = new File(destination, "w");
+
+        for (const assembly of Il2Cpp.domain.assemblies) {
+            inform(`dumping ${assembly.name}...`);
+
+            for (const klass of assembly.image.classes) {
+                file.write(`${klass}\n\n`);
+            }
+        }
+
+        file.flush();
+        file.close();
+        ok(`dump saved to ${destination}`);
+    }
+
+    export function dumpTree(path?: string): void {
+        const basePath = path ?? `${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
 
         for (const assembly of Il2Cpp.domain.assemblies) {
             const assemblyParts = assembly.name.split(".");
             const assemblyPath = assemblyParts.length >= 2 ? assemblyParts.slice(0, -1).join("/") : null;
             const filename = assemblyParts[assemblyParts.length - 1] + '.cs';
-            const parentPath = assemblyPath ? `${basePath}/${assemblyPath}` : basePath;
-            // const fullPath = `${parentPath}/${filename}`;
+            const path = assemblyPath ? `${basePath}/${assemblyPath}` : basePath;
 
-            // Create directory if necessary
-            const absoluteParentPath = appContext.getExternalFilesDir(parentPath).getAbsolutePath();
-            const fullPath = `${absoluteParentPath}/${filename}`;
+            // Create directory (recursively) if necessary
+            mkdirp(path);
 
-            // inform(`dumping ${assembly.name}... `)
-            inform(`dumping ${parentPath}/${filename}`);
+            const filepath = `${path}/${filename}`;    
+            const file = new File(filepath, "w");
 
-            const file = new File(fullPath, "w");
+            inform(`dumping ${path}/${filename}`);
 
             for (const klass of assembly.image.classes) {
                 file.write(`${klass}\n\n`);
