@@ -64,6 +64,14 @@ namespace Il2Cpp {
         throw new Error(`Failed to create directory: ${p}`);
     }
 
+    function access(p: string, mode: number = 4): boolean {
+        const accessPtr = Module.findExportByName('libc.so', "access")!;
+        const accessFn = new NativeFunction(accessPtr, "int", ["pointer", "int32"]);
+        const res = accessFn(Memory.allocUtf8String(p), mode);
+        // 0 means success –> file can be accessed for given read/write/execute mode
+        return res === 0;
+    }
+
     export function dump(fileName?: string, path?: string): void {
         fileName = fileName ?? `${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}.cs`;
         path = path ?? Il2Cpp.application.dataPath!;
@@ -87,8 +95,19 @@ namespace Il2Cpp {
         ok(`dump saved to ${destination}`);
     }
 
-    export function dumpTree(path?: string): void {
+    export function dumpTree(path?: string, deleteIfExists: boolean = false): void {
         const basePath = path ?? `${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
+        const basePathExists = access(basePath);
+
+        if (!deleteIfExists && basePathExists) {
+            warn(`directory ${basePath} already exists, skipping...`);
+            return;
+        }
+
+        if (deleteIfExists && basePathExists) {
+            warn(`directory ${basePath} already exists, but tree deletion not yet supported, skipping...`);
+            return;
+        }
 
         for (const assembly of Il2Cpp.domain.assemblies) {
             const assemblyParts = assembly.name.split(".");
