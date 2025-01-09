@@ -4,8 +4,6 @@ namespace Il2Cpp {
     type OnLeaveCallback<T extends Il2Cpp.Method.ReturnType> = (this: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType, retval: T) => T | void;
 
     export class Method<T extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType> extends NativeStruct {
-
-
         /** Gets the class in which this method is defined. */
         @lazy
         get class(): Il2Cpp.Class {
@@ -236,7 +234,6 @@ namespace Il2Cpp {
             return this.invokeRaw(NULL, ...parameters);
         }
 
-        /** @internal */
         invokeRaw(instance: NativePointerValue, ...parameters: Il2Cpp.Parameter.Type[]): T {
             const allocatedParameters = parameters.map(toFridaValue);
 
@@ -396,7 +393,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                     : new Il2Cpp.Object(args[0] as NativePointer);
                 // As opposed to `Interceptor.replace`, `Interceptor.attach` doesn't
                 // interpret pointers, so use `read` instead of `fromFridaValue`
-                const parameters = this.parameters.map((_, i) => read(args[i + startIndex], _.type));
+                const parameters = this.parameters.map((_, i) => read(args[i + startIndex], _.type, false));
                 block.call(thisObject, ...parameters);
             }
         }

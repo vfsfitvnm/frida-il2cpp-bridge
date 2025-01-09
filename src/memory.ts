@@ -23,8 +23,12 @@ namespace Il2Cpp {
         return Il2Cpp.exports.free(pointer);
     }
 
-    /** @internal */
-    export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Type {
+    /**
+     * @param dereference If a pointer, dereference before reading? Usually `true`, but `false` for parameters for example.
+     */
+    export function read(pointer: NativePointer, type: Il2Cpp.Type, derefPointer: boolean=true): Il2Cpp.Field.Type {
+        const dereferenced = derefPointer ? pointer.readPointer() : pointer;
+
         switch (type.typeEnum) {
             case Il2Cpp.Type.enum.boolean:
                 return !!pointer.readS8();
@@ -52,27 +56,27 @@ namespace Il2Cpp {
                 return pointer.readDouble();
             case Il2Cpp.Type.enum.nativePointer:
             case Il2Cpp.Type.enum.unsignedNativePointer:
-                return pointer.readPointer();
+                return dereferenced;
             case Il2Cpp.Type.enum.pointer:
-                return new Il2Cpp.Pointer(pointer.readPointer(), type.class.baseType!);
+                return new Il2Cpp.Pointer(dereferenced, type.class.baseType!);
             case Il2Cpp.Type.enum.valueType:
+                // Never needs dereferencing
                 return new Il2Cpp.ValueType(pointer, type);
             case Il2Cpp.Type.enum.object:
             case Il2Cpp.Type.enum.class:
-                return new Il2Cpp.Object(pointer.readPointer());
+                return new Il2Cpp.Object(dereferenced);
             case Il2Cpp.Type.enum.genericInstance:
-                return type.class.isValueType ? new Il2Cpp.ValueType(pointer, type) : new Il2Cpp.Object(pointer.readPointer());
+                return type.class.isValueType ? new Il2Cpp.ValueType(pointer, type) : new Il2Cpp.Object(dereferenced);
             case Il2Cpp.Type.enum.string:
-                return new Il2Cpp.String(pointer.readPointer());
+                return new Il2Cpp.String(dereferenced);
             case Il2Cpp.Type.enum.array:
             case Il2Cpp.Type.enum.multidimensionalArray:
-                return new Il2Cpp.Array(pointer.readPointer());
+                return new Il2Cpp.Array(dereferenced);
         }
 
         raise(`couldn't read the value from ${pointer} using an unhandled or unknown type ${type.name} (${type.typeEnum}), please file an issue`);
     }
 
-    /** @internal */
     export function write(pointer: NativePointer, value: any, type: Il2Cpp.Type): NativePointer {
         switch (type.typeEnum) {
             case Il2Cpp.Type.enum.boolean:
