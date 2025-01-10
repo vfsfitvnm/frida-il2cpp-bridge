@@ -517,6 +517,10 @@ namespace Il2Cpp {
 
         get typeGetTypeEnum() {
             return r("il2cpp_type_get_type", "int", ["pointer"]);
+        },
+
+        get typeEquals() {
+            return r("il2cpp_type_equals", "bool", ["pointer", "pointer"]);
         }
     };
 

@@ -154,5 +154,9 @@ namespace Il2Cpp {
         toString(): string {
             return this.name;
         }
+
+        isSame(other: Il2Cpp.Type): boolean {
+            return !!Il2Cpp.exports.typeEquals(this.handle, other.handle);
+        }
     }
 }

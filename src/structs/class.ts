@@ -306,6 +306,10 @@ namespace Il2Cpp {
             return new Il2Cpp.Method<T>(Il2Cpp.exports.classGetMethodFromName(this, Memory.allocUtf8String(name), parameterCount)).asNullable();
         }
 
+        tryMethodWithSignature<T extends Il2Cpp.Method.ReturnType>(name: string, ...paramTypes: Il2Cpp.Type[]): Il2Cpp.Method<T> | undefined {
+            return this.methods.find(m => m.name == name && m.parameters.every((p, i) => p.type.isSame(paramTypes[i]))) as Il2Cpp.Method<T> | undefined;
+        }
+
         /** Gets the nested class with the given name. */
         tryNested(name: string): Il2Cpp.Class | undefined {
             return this.nestedClasses.find(_ => _.name == name);
