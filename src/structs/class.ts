@@ -280,7 +280,7 @@ namespace Il2Cpp {
         }
 
         /** Allocates a new object of the current class and calls its default constructor. */
-        new(): Il2Cpp.Object {
+        defaultNew(): Il2Cpp.Object {
             const object = this.alloc();
 
             const exceptionArray = Memory.alloc(Process.pointerSize);
@@ -292,6 +292,28 @@ namespace Il2Cpp {
             if (!exception.isNull()) {
                 raise(new Il2Cpp.Object(exception).toString());
             }
+
+            return object;
+        }
+
+        /**
+         * Finds the best fit constructor given the parameter types.
+         * Doesn't cover constructors with default parameters – all parameters must be provided.
+         */
+        new(...parameters: Il2Cpp.Parameter.Type[]): Il2Cpp.Object {
+            if (parameters.length == 0)
+                return this.defaultNew();
+
+
+            const paramTypes = parameters.map(p => Il2Cpp.Type.fromValue(p));
+            const constructor = this.tryMethodWithSignature(".ctor", ...paramTypes);
+
+            if (!constructor) {
+                raise(`Couldn't find constructor with signature [${paramTypes}] in class ${this.type})`);
+            }
+
+            const object = this.alloc();
+            constructor.invokeRaw(object, ...parameters)
 
             return object;
         }
