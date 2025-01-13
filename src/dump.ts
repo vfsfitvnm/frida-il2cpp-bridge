@@ -41,45 +41,14 @@ namespace Il2Cpp {
      *   }
      * ```
      */
-    function mkdir(p: string): boolean {
-        const mkdirPtr = Module.findExportByName('libc.so', "mkdir")!;
-        const mkdirFn = new NativeFunction(mkdirPtr, "int", ["pointer", "int32"]);
-        const res = mkdirFn(Memory.allocUtf8String(p), 0o777);
-        // 0 means success
-        return res === 0;
-    }
-
-    function mkdirp(p: string) {
-        const parts = p.split("/");
-        // All parent paths along the way
-        const paths = parts.map((_, i) => parts.slice(0, i + 1).join("/"));
-        // Create each ancestor path in turn, ignoring existing ones
-        const successes = paths.map((path) => mkdir(path));
-
-        // If all failed to create, let's hope it already existed (TODO: check `stat`)
-        if (successes.every((s) => !s)) return;
-
-        // If last one failed to create but some others didn't, something went wrong
-        if (!successes[successes.length - 1])
-        throw new Error(`Failed to create directory: ${p}`);
-    }
-
-    function access(p: string, mode: number = 4): boolean {
-        const accessPtr = Module.findExportByName('libc.so', "access")!;
-        const accessFn = new NativeFunction(accessPtr, "int", ["pointer", "int32"]);
-        const res = accessFn(Memory.allocUtf8String(p), mode);
-        // 0 means success –> file can be accessed for given read/write/execute mode
-        return res === 0;
-    }
-
     export function dump(fileName?: string, path?: string): void {
         fileName = fileName ?? `${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}.cs`;
         path = path ?? Il2Cpp.application.dataPath!;
 
         // Create directory (recursively) if necessary
-        mkdirp(path);
+        createDirectoryRecursively(path);
 
-        const destination = `${path ?? Il2Cpp.application.dataPath}/${fileName}`;
+        const destination = `${path}/${fileName}`;
         const file = new File(destination, "w");
 
         for (const assembly of Il2Cpp.domain.assemblies) {
@@ -96,8 +65,8 @@ namespace Il2Cpp {
     }
 
     export function dumpTree(path?: string, deleteIfExists: boolean = false): void {
-        const basePath = path ?? `${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
-        const basePathExists = access(basePath);
+        const basePath = path ?? `${Il2Cpp.application.dataPath!}/${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
+        const basePathExists = directoryExists(basePath);
 
         if (!deleteIfExists && basePathExists) {
             warn(`directory ${basePath} already exists, skipping...`);
@@ -116,10 +85,10 @@ namespace Il2Cpp {
             const path = assemblyPath ? `${basePath}/${assemblyPath}` : basePath;
 
             // Create directory (recursively) if necessary
-            mkdirp(path);
+            createDirectoryRecursively(path);
 
-            const filepath = `${path}/${filename}`;    
-            const file = new File(filepath, "w");
+            const destination = `${path}/${filename}`;    
+            const file = new File(destination, "w");
 
             inform(`dumping ${path}/${filename}`);
 
@@ -132,5 +101,26 @@ namespace Il2Cpp {
         }
 
         ok(`dump saved to ${basePath}`);
+    }
+
+    function createDirectoryRecursively(p: string) {
+        const Directory = Il2Cpp.corlib.class('System.IO.Directory');
+        const CreateDirectory = Directory.method('CreateDirectory');
+        CreateDirectory.invoke(Il2Cpp.string(p));
+    }
+
+    function directoryExists(p: string): boolean {
+        const Directory = Il2Cpp.corlib.class('System.IO.Directory');
+        const Exists = Directory.method<boolean>('Exists');
+        return Exists.invoke(Il2Cpp.string(p));
+    }
+
+    /**
+     * Not always available
+     */
+    function removeDirectoryTree(p: string) {
+        const Directory = Il2Cpp.corlib.class('System.IO.Directory');
+        const Delete = Directory.method('Delete', 2);
+        Delete.invoke(Il2Cpp.string(p), true);
     }
 }
