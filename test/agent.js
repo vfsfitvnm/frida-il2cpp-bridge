@@ -295,6 +295,34 @@ Il2Cpp.perform(() => {
         assert("System.RuntimeTypeHandle", () => Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().toString());
     });
 
+    test("Struct methods can be found using their signature", () => {
+        assert(ptr(0xdeadbeef), () => {
+            const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().unbox();
+            runtimeTypeHandle.methodWithSignature(".ctor", Il2Cpp.corlib.class("System.IntPtr").type).invoke(ptr(0xdeadbeef));
+            return runtimeTypeHandle.method("get_Value").invoke();
+        });
+        assert("System.RuntimeTypeHandle", () => Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().toString());
+    });
+
+    test("Struct constructors with parameters can be invoked via `new`", () => {
+        assert(ptr(0xdeadbeef), () => {
+            const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").new(ptr(0xdeadbeef));
+            return runtimeTypeHandle.method("get_Value").invoke();
+        });
+        assert("System.RuntimeTypeHandle", () => Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().toString());
+    });
+
+    test("Overloaded struct methods can be found by signature", () => {
+        assert(true, () => {
+            const runtimeType = Il2Cpp.string("").object.method("GetType").invoke();
+            const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().unbox();
+            runtimeTypeHandle.methodWithSignature(".ctor", Il2Cpp.Type.fromValue(runtimeType)).invoke(runtimeType);
+            const reconstructedRuntimeType = Il2Cpp.corlib.class("System.RuntimeType").method("GetTypeFromHandle").invoke(runtimeTypeHandle);
+            return runtimeType.method('Equals').invoke(reconstructedRuntimeType);
+        });
+        assert("System.RuntimeTypeHandle", () => Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().toString());
+    });
+
     test("Boxing/unboxing structs works correctly", () => {
         assert(ptr(0xdeadbeef), () => {
             const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc();

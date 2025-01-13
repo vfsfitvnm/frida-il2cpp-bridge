@@ -33,6 +33,10 @@ namespace Il2Cpp {
             return this.class.method<T>(name, parameterCount).withHolder(this);
         }
 
+        methodWithSignature<T extends Il2Cpp.Method.ReturnType>(name: string, ...paramTypes: Il2Cpp.Type[]): Il2Cpp.HeldMethod<T> {
+            return this.class.methodWithSignature<T>(name, ...paramTypes).withHolder(this);
+        }
+
         /** Creates a reference to this object. */
         ref(pin: boolean): Il2Cpp.GCHandle {
             return new Il2Cpp.GCHandle(Il2Cpp.exports.gcHandleNew(this, +pin));
@@ -51,6 +55,10 @@ namespace Il2Cpp {
         /** Gets the field with the given name. */
         tryMethod<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.HeldMethod<T> | undefined {
             return this.class.tryMethod<T>(name, parameterCount)?.withHolder(this);
+        }
+
+        tryMethodWithSignature<T extends Il2Cpp.Method.ReturnType>(name: string, ...paramTypes: Il2Cpp.Type[]): Il2Cpp.HeldMethod<T> | undefined {
+            return this.class.tryMethodWithSignature<T>(name, ...paramTypes)?.withHolder(this);
         }
 
         /** */

@@ -162,25 +162,16 @@ namespace Il2Cpp {
         static fromValue(value: Il2Cpp.Parameter.Type): Il2Cpp.Type {
             const _ = (kls: string) => Il2Cpp.corlib.class(kls).type;
 
-            if (typeof value === "boolean")
-                return _("System.Boolean");
-            if (typeof value === "number") 
-                if (Number.isInteger(value)) 
-                    return _("System.Int32");
-                else 
-                    return _("System.Double");
-            if (value instanceof Int64) 
-                return _("System.Int64");
-            if (value instanceof UInt64)
-                return _("System.UInt64");
-            if (value instanceof NativePointer)
-                return _("System.IntPtr");
-            if (value instanceof Il2Cpp.Object)
-                return value.class.type;
-            if (value instanceof Il2Cpp.String)
-                return _("System.String");
-            if (value instanceof Il2Cpp.Array)
-                return value.object.class.type;
+            if (typeof value === "boolean") return _("System.Boolean");
+            if (typeof value === "number")
+                if (Number.isInteger(value)) return _("System.Int32");
+                else return _("System.Double");
+            if (value instanceof Int64) return _("System.Int64");
+            if (value instanceof UInt64) return _("System.UInt64");
+            if (value instanceof NativePointer) return _("System.IntPtr");
+            if (value instanceof Il2Cpp.Object) return value.class.type;
+            if (value instanceof Il2Cpp.String) return _("System.String");
+            if (value instanceof Il2Cpp.Array) return value.object.class.type;
 
             return value.type;
         }
