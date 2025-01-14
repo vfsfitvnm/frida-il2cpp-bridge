@@ -66,7 +66,7 @@ namespace Il2Cpp {
 
     export function dumpTree(path?: string, deleteIfExists: boolean = false): void {
         const basePath = path ?? `${Il2Cpp.application.dataPath!}/${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
-        const basePathExists = directoryExists(basePath);
+        const basePathExists = Il2Cpp.corlib.class("System.IO.Directory").method<boolean>("Exists").invoke(Il2Cpp.string(basePath));
 
         if (!deleteIfExists && basePathExists) {
             warn(`directory ${basePath} already exists, skipping...`);
@@ -79,18 +79,15 @@ namespace Il2Cpp {
         }
 
         for (const assembly of Il2Cpp.domain.assemblies) {
-            const assemblyParts = assembly.name.split(".");
-            const assemblyPath = assemblyParts.length >= 2 ? assemblyParts.slice(0, -1).join("/") : null;
-            const filename = assemblyParts[assemblyParts.length - 1] + '.cs';
-            const path = assemblyPath ? `${basePath}/${assemblyPath}` : basePath;
+            const assemblyPath = assembly.name.replace(".", "/") + ".cs";
+            const destination = `${basePath}/${assemblyPath}`;
+            
+            inform(`dumping ${assemblyPath}`);
 
             // Create directory (recursively) if necessary
-            createDirectoryRecursively(path);
+            createDirectoryRecursively(destination.substring(0, destination.lastIndexOf("/")));
 
-            const destination = `${path}/${filename}`;    
             const file = new File(destination, "w");
-
-            inform(`dumping ${path}/${filename}`);
 
             for (const klass of assembly.image.classes) {
                 file.write(`${klass}\n\n`);
@@ -104,23 +101,6 @@ namespace Il2Cpp {
     }
 
     function createDirectoryRecursively(p: string) {
-        const Directory = Il2Cpp.corlib.class('System.IO.Directory');
-        const CreateDirectory = Directory.method('CreateDirectory');
-        CreateDirectory.invoke(Il2Cpp.string(p));
-    }
-
-    function directoryExists(p: string): boolean {
-        const Directory = Il2Cpp.corlib.class('System.IO.Directory');
-        const Exists = Directory.method<boolean>('Exists');
-        return Exists.invoke(Il2Cpp.string(p));
-    }
-
-    /**
-     * Not always available
-     */
-    function removeDirectoryTree(p: string) {
-        const Directory = Il2Cpp.corlib.class('System.IO.Directory');
-        const Delete = Directory.method('Delete', 2);
-        Delete.invoke(Il2Cpp.string(p), true);
+        return Il2Cpp.corlib.class("System.IO.Directory").method("CreateDirectory").invoke(Il2Cpp.string(p));
     }
 }
