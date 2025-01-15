@@ -1,18 +1,16 @@
 {
-  "compilerOptions": {
-    "target": "es2022",
-    "lib": [ "es2020" ],
-    "moduleResolution": "node",
-    "outDir": "dist",
-    "outFile": "dist/index.js",
-    "sourceRoot": ".",
-    "declaration": true,
-    "experimentalDecorators": true,
-    "sourceMap": true,
-    "strict": true,
-    "stripInternal": true,
-    "plugins": [ 
-      { "transform": "ts-transformer-inline-file/transformer" }
-    ],
-  }
+    "compilerOptions": {
+        "target": "es2022",
+        "lib": ["es2021"],
+        "moduleResolution": "node",
+        "outDir": "dist",
+        "outFile": "dist/index.js",
+        "sourceRoot": ".",
+        "declaration": true,
+        "experimentalDecorators": true,
+        "sourceMap": true,
+        "strict": true,
+        "stripInternal": true,
+        "plugins": [{ "transform": "ts-transformer-inline-file/transformer" }]
+    }
 }

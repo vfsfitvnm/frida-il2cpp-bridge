@@ -74,7 +74,7 @@ namespace Il2Cpp {
         }
 
         for (const assembly of Il2Cpp.domain.assemblies) {
-            const assemblyPath = assembly.name.replace(".", "/") + ".cs";
+            const assemblyPath = assembly.name.replaceAll(".", "/") + ".cs";
             const destination = `${basePath}/${assemblyPath}`;
             
             inform(`dumping ${assemblyPath}`);
