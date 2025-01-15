@@ -64,17 +64,12 @@ namespace Il2Cpp {
         ok(`dump saved to ${destination}`);
     }
 
-    export function dumpTree(path?: string, deleteIfExists: boolean = false): void {
+    export function dumpTree(path?: string): void {
         const basePath = path ?? `${Il2Cpp.application.dataPath!}/${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
         const basePathExists = Il2Cpp.corlib.class("System.IO.Directory").method<boolean>("Exists").invoke(Il2Cpp.string(basePath));
 
-        if (!deleteIfExists && basePathExists) {
+        if (basePathExists) {
             warn(`directory ${basePath} already exists, skipping...`);
-            return;
-        }
-
-        if (deleteIfExists && basePathExists) {
-            warn(`directory ${basePath} already exists, but tree deletion not yet supported, skipping...`);
             return;
         }
 
