@@ -74,12 +74,10 @@ namespace Il2Cpp {
         }
 
         for (const assembly of Il2Cpp.domain.assemblies) {
-            const assemblyPath = assembly.name.replaceAll(".", "/") + ".cs";
-            const destination = `${basePath}/${assemblyPath}`;
-            
-            inform(`dumping ${assemblyPath}`);
+            inform(`dumping ${assembly.name}...`);
 
-            // Create directory (recursively) if necessary
+            const destination = `${basePath}/${assembly.name.replaceAll(".", "/")}.cs`;
+
             createDirectoryRecursively(destination.substring(0, destination.lastIndexOf("/")));
 
             const file = new File(destination, "w");
