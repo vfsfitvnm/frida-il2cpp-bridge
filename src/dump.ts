@@ -93,6 +93,10 @@ namespace Il2Cpp {
         ok(`dump saved to ${basePath}`);
     }
 
+    function directoryExists(path: string) {
+        Il2Cpp.corlib.class("System.IO.Directory").method<boolean>("Exists").invoke(Il2Cpp.string(path));
+    }
+
     function createDirectoryRecursively(path: string) {
         return Il2Cpp.corlib.class("System.IO.Directory").method("CreateDirectory").invoke(Il2Cpp.string(path));
     }
