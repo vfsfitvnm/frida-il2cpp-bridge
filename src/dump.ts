@@ -100,7 +100,7 @@ namespace Il2Cpp {
         ok(`dump saved to ${basePath}`);
     }
 
-    function createDirectoryRecursively(p: string) {
-        return Il2Cpp.corlib.class("System.IO.Directory").method("CreateDirectory").invoke(Il2Cpp.string(p));
+    function createDirectoryRecursively(path: string) {
+        return Il2Cpp.corlib.class("System.IO.Directory").method("CreateDirectory").invoke(Il2Cpp.string(path));
     }
 }
