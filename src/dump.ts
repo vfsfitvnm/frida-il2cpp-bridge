@@ -63,6 +63,19 @@ namespace Il2Cpp {
         ok(`dump saved to ${destination}`);
     }
 
+    /**
+     * Just like {@link Il2Cpp.dump}, but a `.cs` file per assembly is
+     * generated instead of having a single big `.cs` file. For instance, all
+     * classes within `System.Core` and `System.Runtime.CompilerServices.Unsafe`
+     * are dumped into `System/Core.cs` and
+     * `System/Runtime/CompilerServices/Unsafe.cs`, respectively.
+     * 
+     * ```ts
+     * Il2Cpp.perform(() => {
+     *     Il2Cpp.dumpTree();
+     * });
+     * ```
+     */
     export function dumpTree(path?: string, ignoreAlreadyExistingDirectory: boolean = false): void {
         path = path ?? `${Il2Cpp.application.dataPath!}/${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
 
