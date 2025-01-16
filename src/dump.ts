@@ -108,6 +108,6 @@ namespace Il2Cpp {
     }
 
     function createDirectoryRecursively(path: string) {
-        return Il2Cpp.corlib.class("System.IO.Directory").method("CreateDirectory").invoke(Il2Cpp.string(path));
+        Il2Cpp.corlib.class("System.IO.Directory").method("CreateDirectory").invoke(Il2Cpp.string(path));
     }
 }
