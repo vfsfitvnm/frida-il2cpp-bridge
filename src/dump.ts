@@ -64,16 +64,16 @@ namespace Il2Cpp {
     }
 
     export function dumpTree(path?: string, ignoreAlreadyExistingDirectory: boolean = false): void {
-        const basePath = path ?? `${Il2Cpp.application.dataPath!}/${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
+        path = path ?? `${Il2Cpp.application.dataPath!}/${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
 
-        if (!ignoreAlreadyExistingDirectory && directoryExists(basePath)) {
-            raise(`directory ${basePath} already exists - pass ignoreAlreadyExistingDirectory = true to skip this check`);
+        if (!ignoreAlreadyExistingDirectory && directoryExists(path)) {
+            raise(`directory ${path} already exists - pass ignoreAlreadyExistingDirectory = true to skip this check`);
         }
 
         for (const assembly of Il2Cpp.domain.assemblies) {
             inform(`dumping ${assembly.name}...`);
 
-            const destination = `${basePath}/${assembly.name.replaceAll(".", "/")}.cs`;
+            const destination = `${path}/${assembly.name.replaceAll(".", "/")}.cs`;
 
             createDirectoryRecursively(destination.substring(0, destination.lastIndexOf("/")));
 
@@ -87,7 +87,7 @@ namespace Il2Cpp {
             file.close();            
         }
 
-        ok(`dump saved to ${basePath}`);
+        ok(`dump saved to ${path}`);
     }
 
     function directoryExists(path: string): boolean {
