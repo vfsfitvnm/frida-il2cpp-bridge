@@ -45,7 +45,6 @@ namespace Il2Cpp {
         fileName = fileName ?? `${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}.cs`;
         path = path ?? Il2Cpp.application.dataPath!;
 
-        // Create directory (recursively) if necessary
         createDirectoryRecursively(path);
 
         const destination = `${path}/${fileName}`;
