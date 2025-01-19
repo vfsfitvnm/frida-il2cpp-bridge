@@ -1,6 +1,7 @@
+UNITY_CHANGESET := 6e14067f8a9a
+
 include ../common.mk
 
-UNITY_CHANGESET := 6e14067f8a9a
 UNITY_LINKER := $(MONO) $(IL2CPP_DIR)/build/UnityLinker.exe
 IL2CPP := $(MONO) $(IL2CPP_DIR)/build/il2cpp.exe
 
