@@ -25,6 +25,42 @@ It should work for any Unity version in the range **5.3.0** - **2022.1.x**.
 **Android**, **Linux**, **Windows**, **iOS**, **macOS** are supported.
 However, only Android and Linux are "tested": expect breakage if you are using another platform.
 
+## Testing
+
+Over the time, it was realized that some testing was necessary, as supporting many Unity version makes introducing regressions or faulty features easy. Though it's far from being complete and bullet-proof, there's a minimal testing setup contributors can get advantage of to test their changes. \
+In order to test `frida-il2cpp-bridge`, a IL2CPP application is needed (of course). Here are some very useful resources:
+- [IL2CPP toolchain](https://katyscode.wordpress.com/2020/06/24/il2cpp-part-1/)
+- [Scripting](https://github.com/djkaty/Il2CppInspector/blob/116c6355e7ee3656eab85ca753f913d428abc7a3/Il2CppTests/il2cpp.ps1)
+
+
+### Commands
+
+Unity editors (so IL2CPP toolchains) will be downloaded and extracted automatically.
+
+**Prerequisites**
+
+1. Only Linux is currently supported;
+2. Make sure to have `clang` and `make` installed.
+
+#### Build IL2CPP assemblies
+```sh
+make assemblies
+```
+An assembly (`GameAssembly.so`) will be built for each of [tested Unity versions](https://github.com/vfsfitvnm/frida-il2cpp-bridge/tree/master/unity).
+
+#### Build IL2CPP assembly for a specific Unity version only
+```sh
+make unity/2019.3.0f1/
+```
+
+#### Run tests
+```sh
+make test
+```
+Tests run against only the installed Unity versions.
+
+
+
 ## Acknowledgements
 
 Thanks to [meme](https://github.com/meme) and [knobse](https://github.com/knobse) for helping and getting me into this,
