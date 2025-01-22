@@ -1,6 +1,7 @@
+UNITY_CHANGESET := ffacea4b84e7
+
 include ../common.mk
 
-UNITY_CHANGESET := ffacea4b84e7
 UNITY_LINKER := $(MONO) $(IL2CPP_DIR)/build/deploy/net471/UnityLinker.exe
 IL2CPP := $(MONO) $(IL2CPP_DIR)/build/deploy/net471/il2cpp.exe
 

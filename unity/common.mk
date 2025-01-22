@@ -54,7 +54,7 @@ $(DLL_TARGET): $(CS_SRC) $(EDITOR_DIR) $(BUILD_DIR)
 $(BUILD_DIR):
 	@ mkdir -p "$@"
 
-ifdef $(UNITY_CHANGESET)
+ifdef UNITY_CHANGESET
 $(EDITOR_DIR):
 	@ $(ECHO) downloading editor...
 	@ $(CURL) https://netstorage.unity3d.com/unity/$(UNITY_CHANGESET)/LinuxEditorInstaller/Unity.tar.xz -O
