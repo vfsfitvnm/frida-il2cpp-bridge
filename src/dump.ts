@@ -43,8 +43,11 @@ namespace Il2Cpp {
      */
     export function dump(fileName?: string, path?: string): void {
         fileName = fileName ?? `${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}.cs`;
+        path = path ?? Il2Cpp.application.dataPath!;
 
-        const destination = `${path ?? Il2Cpp.application.dataPath}/${fileName}`;
+        createDirectoryRecursively(path);
+
+        const destination = `${path}/${fileName}`;
         const file = new File(destination, "w");
 
         for (const assembly of Il2Cpp.domain.assemblies) {
@@ -58,5 +61,53 @@ namespace Il2Cpp {
         file.flush();
         file.close();
         ok(`dump saved to ${destination}`);
+    }
+
+    /**
+     * Just like {@link Il2Cpp.dump}, but a `.cs` file per assembly is
+     * generated instead of having a single big `.cs` file. For instance, all
+     * classes within `System.Core` and `System.Runtime.CompilerServices.Unsafe`
+     * are dumped into `System/Core.cs` and
+     * `System/Runtime/CompilerServices/Unsafe.cs`, respectively.
+     * 
+     * ```ts
+     * Il2Cpp.perform(() => {
+     *     Il2Cpp.dumpTree();
+     * });
+     * ```
+     */
+    export function dumpTree(path?: string, ignoreAlreadyExistingDirectory: boolean = false): void {
+        path = path ?? `${Il2Cpp.application.dataPath!}/${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
+
+        if (!ignoreAlreadyExistingDirectory && directoryExists(path)) {
+            raise(`directory ${path} already exists - pass ignoreAlreadyExistingDirectory = true to skip this check`);
+        }
+
+        for (const assembly of Il2Cpp.domain.assemblies) {
+            inform(`dumping ${assembly.name}...`);
+
+            const destination = `${path}/${assembly.name.replaceAll(".", "/")}.cs`;
+
+            createDirectoryRecursively(destination.substring(0, destination.lastIndexOf("/")));
+
+            const file = new File(destination, "w");
+
+            for (const klass of assembly.image.classes) {
+                file.write(`${klass}\n\n`);
+            }
+
+            file.flush();
+            file.close();            
+        }
+
+        ok(`dump saved to ${path}`);
+    }
+
+    function directoryExists(path: string): boolean {
+        return Il2Cpp.corlib.class("System.IO.Directory").method<boolean>("Exists").invoke(Il2Cpp.string(path));
+    }
+
+    function createDirectoryRecursively(path: string) {
+        Il2Cpp.corlib.class("System.IO.Directory").method("CreateDirectory").invoke(Il2Cpp.string(path));
     }
 }
