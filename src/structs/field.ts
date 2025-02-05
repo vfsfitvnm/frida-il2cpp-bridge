@@ -122,30 +122,37 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
         }
 
         /** @internal */
-        withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Field<T> {
+        withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.HeldField<T> {
             if (this.isStatic) {
                 raise(`cannot access static field ${this.class.type.name}::${this.name} from an object, use a class instead`);
             }
 
-            const valueHandle = instance.handle.add(this.offset - (instance instanceof Il2Cpp.ValueType ? Il2Cpp.Object.headerSize : 0));
+            return HeldField.from<T>(this, instance);
+        }
+    }
 
-            return new Proxy(this, {
-                get(target: Il2Cpp.Field<T>, property: keyof Il2Cpp.Field): any {
-                    if (property == "value") {
-                        return read(valueHandle, target.type);
-                    }
-                    return Reflect.get(target, property);
-                },
+    export class HeldField<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Field<T> {
+        /** @internal */
+        constructor(handle: NativePointerValue, public instance: Il2Cpp.Object | Il2Cpp.ValueType) {
+            super(handle);
+        }
 
-                set(target: Il2Cpp.Field<T>, property: keyof Il2Cpp.Field, value: any): boolean {
-                    if (property == "value") {
-                        write(valueHandle, value, target.type);
-                        return true;
-                    }
+        static from<T extends Il2Cpp.Field.Type>(field: Il2Cpp.Field<T>, instance: Il2Cpp.Object | Il2Cpp.ValueType): HeldField<T> {
+            return new HeldField(field.handle, instance);
+        }
 
-                    return Reflect.set(target, property, value);
-                }
-            });
+        get valueHandle(): NativePointer {
+            return this.instance.handle.add(this.offset - (this.instance instanceof Il2Cpp.ValueType ? Il2Cpp.Object.headerSize : 0));
+        }
+
+        /** Gets the value of this field. */
+        get value(): T {
+            return read(this.valueHandle, this.type) as T;
+        }
+
+        /** Sets the value of this field. Thread static or literal values cannot be altered yet. */
+        set value(value: T) {
+            write(this.valueHandle, value, this.type);
         }
     }
 
