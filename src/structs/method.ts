@@ -385,6 +385,10 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
         tryOverload<U extends Il2Cpp.Method.ReturnType = T>(...parameterTypes: string[]): Il2Cpp.HeldMethod<U> | undefined {
             return super.tryOverload<U>(...parameterTypes)?.withHolder(this.instance);
         }
+
+        detach(): Il2Cpp.Method<T> {
+            return new Il2Cpp.Method(this.handle);
+        }
     }
 
     let maybeObjectHeaderSize = (): number => {

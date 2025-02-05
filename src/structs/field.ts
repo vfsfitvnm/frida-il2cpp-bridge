@@ -154,6 +154,10 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
         set value(value: T) {
             write(this.valueHandle, value, this.type);
         }
+
+        detach(): Il2Cpp.Field<T> {
+            return new Field(this.handle);
+        }
     }
 
     export namespace Field {
