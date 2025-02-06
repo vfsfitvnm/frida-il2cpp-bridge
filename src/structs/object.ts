@@ -24,12 +24,12 @@ namespace Il2Cpp {
         }
 
         /** Gets the field with the given name. */
-        field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> {
+        field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.HeldField<T> {
             return this.class.field<T>(name).withHolder(this);
         }
 
         /** Gets the method with the given name. */
-        method<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> {
+        method<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.HeldMethod<T> {
             return this.class.method<T>(name, parameterCount).withHolder(this);
         }
 
@@ -39,17 +39,17 @@ namespace Il2Cpp {
         }
 
         /** Gets the correct virtual method from the given virtual method. */
-        virtualMethod<T extends Il2Cpp.Method.ReturnType>(method: Il2Cpp.Method): Il2Cpp.Method<T> {
+        virtualMethod<T extends Il2Cpp.Method.ReturnType>(method: Il2Cpp.Method): Il2Cpp.HeldMethod<T> {
             return new Il2Cpp.Method<T>(Il2Cpp.exports.objectGetVirtualMethod(this, method)).withHolder(this);
         }
 
         /** Gets the field with the given name. */
-        tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> | undefined {
+        tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.HeldField<T> | undefined {
             return this.class.tryField<T>(name)?.withHolder(this);
         }
 
         /** Gets the field with the given name. */
-        tryMethod<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> | undefined {
+        tryMethod<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.HeldMethod<T> | undefined {
             return this.class.tryMethod<T>(name, parameterCount)?.withHolder(this);
         }
 
