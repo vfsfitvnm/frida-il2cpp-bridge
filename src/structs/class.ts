@@ -1,13 +1,4 @@
 namespace Il2Cpp {
-    interface ParameterValue {
-        type: Il2Cpp.Type;
-        value: Il2Cpp.Parameter.Type;
-    }
-
-    function isParameterValue(v: ParameterValue | Il2Cpp.Parameter.Type): v is ParameterValue {
-        return (v as ParameterValue).type !== undefined;
-    }
-
     @recycle
     export class Class extends NativeStruct {
         /** Gets the actual size of the instance of the current class. */
@@ -313,17 +304,11 @@ namespace Il2Cpp {
          * Finds the best fit constructor given the parameter types.
          * Doesn't cover constructors with default parameters – all parameters must be provided.
          */
-        new(...parameters: (ParameterValue | Il2Cpp.Parameter.Type)[]): Il2Cpp.Object {
+        new(...parameters: (Il2Cpp.Parameter.TypeValue | Il2Cpp.Parameter.Type)[]): Il2Cpp.Object {
             if (parameters.length == 0) return this.defaultNew();
 
-            const paramTypes = parameters.map(p => (isParameterValue(p) ? p.type : Il2Cpp.Type.fromValue(p)));
-            const paramValues = parameters.map(p => (isParameterValue(p) ? p.value : p));
-
-            const constructor =
-                this.tryMethodWithSignature(".ctor", ...paramTypes) ?? raise(`Couldn't find constructor with signature ${paramTypes}) in class ${this.type})`);
-
             const object = this.alloc();
-            constructor.withHolder(object).invoke(...paramValues);
+            object.m[".ctor"](...parameters);
 
             return object;
         }
