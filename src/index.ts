@@ -32,6 +32,7 @@
 /// <reference path="./structs/image.ts">/>
 /// <reference path="./structs/memory-snapshot.ts">/>
 /// <reference path="./structs/method.ts">/>
+/// <reference path="./structs/object-like.ts">/>
 /// <reference path="./structs/object.ts">/>
 /// <reference path="./structs/parameter.ts">/>
 /// <reference path="./structs/pointer.ts">/>

@@ -122,7 +122,7 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
         }
 
         /** @internal */
-        withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.HeldField<T> {
+        withHolder(instance: Il2Cpp.ObjectLike): Il2Cpp.HeldField<T> {
             if (this.isStatic) {
                 raise(`cannot access static field ${this.class.type.name}::${this.name} from an object, use a class instead`);
             }
@@ -133,11 +133,11 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
 
     export class HeldField<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Field<T> {
         /** @internal */
-        constructor(handle: NativePointerValue, public instance: Il2Cpp.Object | Il2Cpp.ValueType) {
+        constructor(handle: NativePointerValue, public instance: Il2Cpp.ObjectLike) {
             super(handle);
         }
 
-        static from<T extends Il2Cpp.Field.Type>(field: Il2Cpp.Field<T>, instance: Il2Cpp.Object | Il2Cpp.ValueType): HeldField<T> {
+        static from<T extends Il2Cpp.Field.Type>(field: Il2Cpp.Field<T>, instance: Il2Cpp.ObjectLike): HeldField<T> {
             return new HeldField(field.handle, instance);
         }
 

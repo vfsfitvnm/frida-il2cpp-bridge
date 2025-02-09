@@ -1,5 +1,5 @@
 namespace Il2Cpp {
-    export class Object extends NativeStruct {
+    export class Object extends Il2Cpp.ObjectLike {
         /** Gets the Il2CppObject struct size, possibly equal to `Process.pointerSize * 2`. */
         @lazy
         static get headerSize(): number {
@@ -10,6 +10,12 @@ namespace Il2Cpp {
         @lazy
         get class(): Il2Cpp.Class {
             return new Il2Cpp.Class(Il2Cpp.exports.objectGetClass(this));
+        }
+
+        /** Gets the type of this object. */
+        @lazy
+        get type(): Il2Cpp.Type {
+            return this.class.type;
         }
 
         @lazy
@@ -28,20 +34,6 @@ namespace Il2Cpp {
             return Il2Cpp.exports.objectGetSize(this);
         }
 
-        /** Gets the field with the given name. */
-        field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.HeldField<T> {
-            return this.class.field<T>(name).withHolder(this);
-        }
-
-        /** Gets the method with the given name. */
-        method<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.HeldMethod<T> {
-            return this.class.method<T>(name, parameterCount).withHolder(this);
-        }
-
-        methodWithSignature<T extends Il2Cpp.Method.ReturnType>(name: string, ...paramTypes: Il2Cpp.Type[]): Il2Cpp.HeldMethod<T> {
-            return this.class.methodWithSignature<T>(name, ...paramTypes).withHolder(this);
-        }
-
         /** Creates a reference to this object. */
         ref(pin: boolean): Il2Cpp.GCHandle {
             return new Il2Cpp.GCHandle(Il2Cpp.exports.gcHandleNew(this, +pin));
@@ -50,20 +42,6 @@ namespace Il2Cpp {
         /** Gets the correct virtual method from the given virtual method. */
         virtualMethod<T extends Il2Cpp.Method.ReturnType>(method: Il2Cpp.Method): Il2Cpp.HeldMethod<T> {
             return new Il2Cpp.Method<T>(Il2Cpp.exports.objectGetVirtualMethod(this, method)).withHolder(this);
-        }
-
-        /** Gets the field with the given name. */
-        tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.HeldField<T> | undefined {
-            return this.class.tryField<T>(name)?.withHolder(this);
-        }
-
-        /** Gets the field with the given name. */
-        tryMethod<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.HeldMethod<T> | undefined {
-            return this.class.tryMethod<T>(name, parameterCount)?.withHolder(this);
-        }
-
-        tryMethodWithSignature<T extends Il2Cpp.Method.ReturnType>(name: string, ...paramTypes: Il2Cpp.Type[]): Il2Cpp.HeldMethod<T> | undefined {
-            return this.class.tryMethodWithSignature<T>(name, ...paramTypes)?.withHolder(this);
         }
 
         /** */

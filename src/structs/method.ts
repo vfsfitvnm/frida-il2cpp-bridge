@@ -306,7 +306,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
         }
 
         /** @internal */
-        withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.HeldMethod<T> {
+        withHolder(instance: Il2Cpp.ObjectLike): Il2Cpp.HeldMethod<T> {
             if (this.isStatic) {
                 raise(`cannot access static method ${this.class.type.name}::${this.name} from an object, use a class instead`);
             }
@@ -337,14 +337,11 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
 
     export class HeldMethod<T extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType> extends Method<T> {
         /** @internal */
-        constructor(handle: NativePointerValue, public instance: Il2Cpp.Object | Il2Cpp.ValueType) {
+        constructor(handle: NativePointerValue, public instance: Il2Cpp.ObjectLike) {
             super(handle);
         }
 
-        static from<T extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType>(
-            method: Il2Cpp.Method<T>,
-            instance: Il2Cpp.Object | Il2Cpp.ValueType
-        ): HeldMethod<T> {
+        static from<T extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType>(method: Il2Cpp.Method<T>, instance: Il2Cpp.ObjectLike): HeldMethod<T> {
             return new HeldMethod(method.handle, instance);
         }
 
