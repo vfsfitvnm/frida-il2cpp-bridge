@@ -389,6 +389,13 @@ Il2Cpp.perform(() => {
         });
     });
 
+    test("Methods can be found and invoked by parameter type", () => {
+        assert("System.String", () => {
+            const runtimeType = Il2Cpp.string("").object.m.GetType();
+            return runtimeType.m.getFullName(true, false).content;
+        });
+    });
+
     test("References to value types are created correctly", () => {
         const Decimal = Il2Cpp.corlib.class("System.Decimal").initialize();
 
