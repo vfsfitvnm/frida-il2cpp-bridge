@@ -18,11 +18,6 @@ namespace Il2Cpp {
             return this.class.type;
         }
 
-        @lazy
-        get m(): DynamicMethods {
-            return new ObjectMethods(this) as unknown as DynamicMethods;
-        }
-
         /** Returns a monitor for this object. */
         get monitor(): Il2Cpp.Object.Monitor {
             return new Il2Cpp.Object.Monitor(this);
@@ -59,31 +54,6 @@ namespace Il2Cpp {
         /** Creates a weak reference to this object. */
         weakRef(trackResurrection: boolean): Il2Cpp.GCHandle {
             return new Il2Cpp.GCHandle(Il2Cpp.exports.gcHandleNewWeakRef(this, +trackResurrection));
-        }
-    }
-
-    type DynamicMethods = {
-        [K in Exclude<string, ["constructor" | "#invokeMethod"]>]: (...parameters: (Il2Cpp.Parameter.TypeValue | Il2Cpp.Parameter.Type)[]) => any;
-    };
-
-    class ObjectMethods {
-        constructor(public readonly object: Il2Cpp.Object) {
-            this.object.class.methods
-                .filter(m => !m.isStatic)
-                .forEach(m => {
-                    globalThis.Object.defineProperty(this, m.name, {
-                        value: this.#invokeMethod.bind(this, m.name),
-                        enumerable: true,
-                        configurable: true
-                    });
-                });
-        }
-
-        #invokeMethod<T extends Il2Cpp.Method.ReturnType>(name: string, ...parameters: (Il2Cpp.Parameter.TypeValue | Il2Cpp.Parameter.Type)[]): T {
-            const paramTypes = parameters.map(p => (Il2Cpp.Parameter.isTypeValue(p) ? p.type : Il2Cpp.Type.fromValue(p)));
-            const paramValues = parameters.map(p => (Il2Cpp.Parameter.isTypeValue(p) ? p.value : p));
-
-            return this.object.methodWithSignature<T>(name, ...paramTypes).invoke(...paramValues);
         }
     }
 
