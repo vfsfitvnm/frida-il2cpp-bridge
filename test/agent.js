@@ -389,6 +389,14 @@ Il2Cpp.perform(() => {
         });
     });
 
+    test("Can look up a method with abstract types in signature" , () => {
+        assert("System.Type", () => {
+            const runtimeType = Il2Cpp.string("").object.method("GetType").invoke();
+            const method = Il2Cpp.corlib.class("System.RuntimeType").tryMethodWithSignature("MakePointerType", Il2Cpp.Type.fromValue(runtimeType));
+            return method.parameters[0].type.name;
+        });
+    });
+
     test("References to value types are created correctly", () => {
         const Decimal = Il2Cpp.corlib.class("System.Decimal").initialize();
 

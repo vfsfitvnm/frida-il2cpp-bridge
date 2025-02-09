@@ -340,7 +340,7 @@ namespace Il2Cpp {
 
         tryMethodWithSignature<T extends Il2Cpp.Method.ReturnType>(name: string, ...paramTypes: Il2Cpp.Type[]): Il2Cpp.Method<T> | undefined {
             return this.methods.find(
-                m => m.name == name && m.parameters.length == paramTypes.length && m.parameters.every((p, i) => p.type.isSame(paramTypes[i]))
+                m => m.name == name && m.parameters.length == paramTypes.length && m.parameters.every((p, i) => Il2Cpp.is(p.type.class)(paramTypes[i]))
             ) as Il2Cpp.Method<T> | undefined;
         }
 
