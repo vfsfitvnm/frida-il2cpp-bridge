@@ -22,6 +22,8 @@
 /// <reference path="./perform.ts">/>
 /// <reference path="./tracer.ts">/>
 
+/// <reference path="./structs/common/object-like.ts">/>
+/// <reference path="./structs/common/dynamic-methods.ts">/>
 /// <reference path="./structs/array.ts">/>
 /// <reference path="./structs/assembly.ts">/>
 /// <reference path="./structs/class.ts">/>
@@ -32,7 +34,6 @@
 /// <reference path="./structs/image.ts">/>
 /// <reference path="./structs/memory-snapshot.ts">/>
 /// <reference path="./structs/method.ts">/>
-/// <reference path="./structs/object-like.ts">/>
 /// <reference path="./structs/object.ts">/>
 /// <reference path="./structs/parameter.ts">/>
 /// <reference path="./structs/pointer.ts">/>

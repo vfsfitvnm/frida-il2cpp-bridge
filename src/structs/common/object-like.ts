@@ -32,33 +32,8 @@ namespace Il2Cpp {
         }
 
         @lazy
-        get m(): DynamicMethods {
-            return new ObjectMethods(this) as unknown as DynamicMethods;
-        }
-    }
-
-    type DynamicMethods = {
-        [K in Exclude<string, ["constructor" | "#invokeMethod"]>]: (...parameters: (Il2Cpp.Parameter.TypeValue | Il2Cpp.Parameter.Type)[]) => any;
-    };
-
-    class ObjectMethods {
-        constructor(public readonly object: Il2Cpp.ObjectLike) {
-            this.object.class.methods
-                .filter(m => !m.isStatic)
-                .forEach(m => {
-                    globalThis.Object.defineProperty(this, m.name, {
-                        value: this.#invokeMethod.bind(this, m.name),
-                        enumerable: true,
-                        configurable: true
-                    });
-                });
-        }
-
-        #invokeMethod<T extends Il2Cpp.Method.ReturnType>(name: string, ...parameters: (Il2Cpp.Parameter.TypeValue | Il2Cpp.Parameter.Type)[]): T {
-            const paramTypes = parameters.map(p => (Il2Cpp.Parameter.isTypeValue(p) ? p.type : Il2Cpp.Type.fromValue(p)));
-            const paramValues = parameters.map(p => (Il2Cpp.Parameter.isTypeValue(p) ? p.value : p));
-
-            return this.object.methodWithSignature<T>(name, ...paramTypes).invoke(...paramValues);
+        get m(): Il2Cpp.DynamicMethods {
+            return Il2Cpp.DynamicMethodsLookup.from(this, false);
         }
     }
 }

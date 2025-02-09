@@ -275,7 +275,10 @@ namespace Il2Cpp {
         }
 
         methodWithSignature<T extends Il2Cpp.Method.ReturnType>(name: string, ...paramTypes: Il2Cpp.Type[]): Il2Cpp.Method<T> {
-            return this.tryMethodWithSignature<T>(name, ...paramTypes) ?? raise(`couldn't find method ${name} in class ${this.type.name}`);
+            return (
+                this.tryMethodWithSignature<T>(name, ...paramTypes) ??
+                raise(`couldn't find method ${name} in class ${this.type.name} for parameter types [${paramTypes.map(_ => _.name).join(", ")}]`)
+            );
         }
 
         /** Gets the nested class with the given name. */
@@ -332,6 +335,11 @@ namespace Il2Cpp {
         /** Gets the nested class with the given name. */
         tryNested(name: string): Il2Cpp.Class | undefined {
             return this.nestedClasses.find(_ => _.name == name);
+        }
+
+        @lazy
+        get m(): Il2Cpp.DynamicMethods {
+            return Il2Cpp.DynamicMethodsLookup.from(this, true);
         }
 
         /** */
