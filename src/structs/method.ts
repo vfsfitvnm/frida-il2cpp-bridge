@@ -335,7 +335,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
         }
     }
 
-    export class HeldMethod<T extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType> extends Method<T> {
+    export class HeldMethod<T extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType> extends Il2Cpp.Method<T> {
         /** @internal */
         constructor(handle: NativePointerValue, public instance: Il2Cpp.Object | Il2Cpp.ValueType) {
             super(handle);

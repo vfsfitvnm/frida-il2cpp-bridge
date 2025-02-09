@@ -131,7 +131,7 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
         }
     }
 
-    export class HeldField<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Field<T> {
+    export class HeldField<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Il2Cpp.Field<T> {
         /** @internal */
         constructor(handle: NativePointerValue, public instance: Il2Cpp.Object | Il2Cpp.ValueType) {
             super(handle);
