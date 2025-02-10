@@ -308,7 +308,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
         /** Derive a BoundMethod so this method can be invoked for `instance`. */
         bind(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.BoundMethod<T> {
             if (this.isStatic) {
-                raise(`cannot access static method ${this.class.type.name}::${this.name} from an object, use a class instead`);
+                raise(`cannot bind static method ${this.class.type.name}::${this.name} to an object`);
             }
 
             return new BoundMethod<T>(this.handle, instance);
@@ -339,13 +339,6 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
         /** @internal */
         constructor(handle: NativePointerValue, public instance: Il2Cpp.Object | Il2Cpp.ValueType) {
             super(handle);
-        }
-
-        static from<T extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType>(
-            method: Il2Cpp.Method<T>,
-            instance: Il2Cpp.Object | Il2Cpp.ValueType
-        ): BoundMethod<T> {
-            return new BoundMethod(method.handle, instance);
         }
 
         /** Invokes this method. */

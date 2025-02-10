@@ -124,7 +124,7 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
         /** Derive a BoundField for access to this field's value for `instance`. */
         bind(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.BoundField<T> {
             if (this.isStatic) {
-                raise(`cannot access static field ${this.class.type.name}::${this.name} from an object, use a class instead`);
+                raise(`cannot bind static field ${this.class.type.name}::${this.name} to an object`);
             }
 
             return new BoundField<T>(this.handle, instance);
