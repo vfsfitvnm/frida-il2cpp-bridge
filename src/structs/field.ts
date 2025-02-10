@@ -127,7 +127,15 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
                 raise(`cannot bind static field ${this.class.type.name}::${this.name} to an object`);
             }
 
-            return new BoundField<T>(this.handle, instance);
+            const bound = new Il2Cpp.BoundField<T>(this.handle, instance);
+
+            // Copy over previously cached @lazy properties
+            globalThis.Object.assign(
+                bound,
+                globalThis.Object.create(Il2Cpp.BoundMethod.prototype, globalThis.Object.getOwnPropertyDescriptors(this)) as Il2Cpp.BoundMethod<T>
+            );
+
+            return bound;
         }
     }
 

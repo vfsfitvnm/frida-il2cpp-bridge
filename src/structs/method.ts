@@ -311,7 +311,15 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                 raise(`cannot bind static method ${this.class.type.name}::${this.name} to an object`);
             }
 
-            return new BoundMethod<T>(this.handle, instance);
+            const bound = new Il2Cpp.BoundMethod<T>(this.handle, instance);
+
+            // Copy over previously cached @lazy properties
+            globalThis.Object.assign(
+                bound,
+                globalThis.Object.create(Il2Cpp.BoundMethod.prototype, globalThis.Object.getOwnPropertyDescriptors(this)) as Il2Cpp.BoundMethod<T>
+            );
+
+            return bound;
         }
 
         /** @internal */
