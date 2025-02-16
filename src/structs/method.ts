@@ -313,11 +313,22 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
 
             const bound = new Il2Cpp.BoundMethod<T>(this.handle, instance);
 
-            // Copy over previously cached @lazy properties
-            globalThis.Object.assign(
-                bound,
-                globalThis.Object.create(Il2Cpp.BoundMethod.prototype, globalThis.Object.getOwnPropertyDescriptors(this)) as Il2Cpp.BoundMethod<T>
-            );
+            // Ensure this method and its bound version have a shared @lazy cache
+            if (!(this as unknown & { _propertyCache?: Record<PropertyKey, any> })._propertyCache) {
+                globalThis.Object.defineProperty(this, "_propertyCache", {
+                    value: {},
+                    configurable: false,
+                    enumerable: false,
+                    writable: true
+                });
+            }
+
+            globalThis.Object.defineProperty(bound, "_propertyCache", {
+                value: (this as unknown & { _propertyCache?: Record<PropertyKey, any> })._propertyCache,
+                configurable: false,
+                enumerable: false,
+                writable: true
+            });
 
             return bound;
         }
