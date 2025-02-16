@@ -154,7 +154,7 @@ namespace Il2Cpp {
             const FilterTypeNameMethod = FilterTypeName.field<NativePointer>("method").value;
 
             // prettier-ignore
-            const offset = FilterTypeNameMethod.offsetOf(_ => _.readPointer().equals(FilterTypeNameMethodPointer)) 
+            const offset = FilterTypeNameMethod.offsetOf(_ => _.readPointer().equals(FilterTypeNameMethodPointer))
                 ?? raise("couldn't find the virtual address offset in the native method struct");
 
             // prettier-ignore
@@ -277,9 +277,9 @@ namespace Il2Cpp {
             while (klass) {
                 const method = klass.methods.find(method => {
                     return (
-                      method.name == this.name &&
-                      method.parameterCount == parameterTypes.length &&
-                      method.parameters.every((e, i) => e.type.name == parameterTypes[i])
+                        method.name == this.name &&
+                        method.parameterCount == parameterTypes.length &&
+                        method.parameters.every((e, i) => e.type.name == parameterTypes[i])
                     );
                 }) as Il2Cpp.Method<U> | undefined;
                 if (method) {
@@ -305,46 +305,32 @@ ${this.name}\
 ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toString(16).padStart(8, `0`)}`}`;
         }
 
-        /** @internal */
-        withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Method<T> {
+        /** Derive a BoundMethod so this method can be invoked for `instance`. */
+        bind(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.BoundMethod<T> {
             if (this.isStatic) {
-                raise(`cannot access static method ${this.class.type.name}::${this.name} from an object, use a class instead`);
+                raise(`cannot bind static method ${this.class.type.name}::${this.name} to an object`);
             }
 
-            return new Proxy(this, {
-                get(target: Il2Cpp.Method<T>, property: keyof Il2Cpp.Method<T>): any {
-                    switch (property) {
-                        case "invoke":
-                            // In Unity 5.3.5f1 and >= 2021.2.0f1, value types
-                            // methods may assume their `this` parameter is a
-                            // pointer to raw data (that is how value types are
-                            // layed out in memory) instead of a pointer to an
-                            // object (that is object header + raw data).
-                            // In any case, they also don't use whatever there
-                            // is in the object header, so we can safely "skip"
-                            // the object header by adding the object header
-                            // size to the object (a boxed value type) handle.
-                            const handle =
-                                instance instanceof Il2Cpp.ValueType
-                                    ? target.class.isValueType
-                                        ? instance.handle.add(maybeObjectHeaderSize() - Il2Cpp.Object.headerSize)
-                                        : raise(`cannot invoke method ${target.class.type.name}::${target.name} against a value type, you must box it first`)
-                                    : target.class.isValueType
-                                    ? instance.handle.add(maybeObjectHeaderSize())
-                                    : instance.handle;
+            const bound = new Il2Cpp.BoundMethod<T>(this.handle, instance);
 
-                            return target.invokeRaw.bind(target, handle);
-                        case "inflate":
-                        case "overload":
-                        case "tryOverload":
-                            return function (...args: any[]) {
-                                return target[property](...args)?.withHolder(instance);
-                            };
-                    }
+            // Ensure this method and its bound version have a shared @lazy cache
+            if (!(this as unknown & { _propertyCache?: Record<PropertyKey, any> })._propertyCache) {
+                globalThis.Object.defineProperty(this, "_propertyCache", {
+                    value: {},
+                    configurable: false,
+                    enumerable: false,
+                    writable: true
+                });
+            }
 
-                    return Reflect.get(target, property);
-                }
+            globalThis.Object.defineProperty(bound, "_propertyCache", {
+                value: (this as unknown & { _propertyCache?: Record<PropertyKey, any> })._propertyCache,
+                configurable: false,
+                enumerable: false,
+                writable: true
             });
+
+            return bound;
         }
 
         /** @internal */
@@ -365,6 +351,51 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                 this.returnType.fridaAlias,
                 this.fridaSignature
             );
+        }
+    }
+
+    export class BoundMethod<T extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType> extends Il2Cpp.Method<T> {
+        /** @internal */
+        constructor(handle: NativePointerValue, public instance: Il2Cpp.Object | Il2Cpp.ValueType) {
+            super(handle);
+        }
+
+        /** Invokes this method. */
+        invoke(...parameters: Il2Cpp.Parameter.Type[]): T {
+            // In Unity 5.3.5f1 and >= 2021.2.0f1, value types
+            // methods may assume their `this` parameter is a
+            // pointer to raw data (that is how value types are
+            // layed out in memory) instead of a pointer to an
+            // object (that is object header + raw data).
+            // In any case, they also don't use whatever there
+            // is in the object header, so we can safely "skip"
+            // the object header by adding the object header
+            // size to the object (a boxed value type) handle.
+            const handle =
+                this.instance instanceof Il2Cpp.ValueType
+                    ? this.class.isValueType
+                        ? this.instance.handle.add(maybeObjectHeaderSize() - Il2Cpp.Object.headerSize)
+                        : raise(`cannot invoke method ${this.class.type.name}::${this.name} against a value type, you must box it first`)
+                    : this.class.isValueType
+                    ? this.instance.handle.add(maybeObjectHeaderSize())
+                    : this.instance.handle;
+
+            return this.invokeRaw(handle, ...parameters);
+        }
+
+        /** Creates a generic instance of the current generic method. */
+        inflate<R extends Il2Cpp.Method.ReturnType = T>(...classes: Il2Cpp.Class[]): Il2Cpp.BoundMethod<R> {
+            return super.inflate<R>(...classes).bind(this.instance);
+        }
+
+        /** Gets the overloaded method with the given parameter types. */
+        overload(...parameterTypes: string[]): Il2Cpp.BoundMethod<T> {
+            return super.overload(...parameterTypes).bind(this.instance);
+        }
+
+        /** Gets the overloaded method with the given parameter types. */
+        tryOverload<U extends Il2Cpp.Method.ReturnType = T>(...parameterTypes: string[]): Il2Cpp.BoundMethod<U> | undefined {
+            return super.tryOverload<U>(...parameterTypes)?.bind(this.instance);
         }
     }
 

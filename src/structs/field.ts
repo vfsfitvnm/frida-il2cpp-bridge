@@ -121,31 +121,53 @@ ${this.isLiteral ? ` = ${this.type.class.isEnum ? read((this.value as Il2Cpp.Val
 ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)}`}`;
         }
 
-        /** @internal */
-        withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Field<T> {
+        /** Derive a BoundField for access to this field's value for `instance`. */
+        bind(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.BoundField<T> {
             if (this.isStatic) {
-                raise(`cannot access static field ${this.class.type.name}::${this.name} from an object, use a class instead`);
+                raise(`cannot bind static field ${this.class.type.name}::${this.name} to an object`);
             }
 
-            const valueHandle = instance.handle.add(this.offset - (instance instanceof Il2Cpp.ValueType ? Il2Cpp.Object.headerSize : 0));
+            const bound = new Il2Cpp.BoundField<T>(this.handle, instance);
 
-            return new Proxy(this, {
-                get(target: Il2Cpp.Field<T>, property: keyof Il2Cpp.Field): any {
-                    if (property == "value") {
-                        return read(valueHandle, target.type);
-                    }
-                    return Reflect.get(target, property);
-                },
+            // Ensure this field and its bound version have a shared @lazy cache
+            if (!(this as unknown & { _propertyCache?: Record<PropertyKey, any> })._propertyCache) {
+                globalThis.Object.defineProperty(this, "_propertyCache", {
+                    value: {},
+                    configurable: false,
+                    enumerable: false,
+                    writable: true
+                });
+            }
 
-                set(target: Il2Cpp.Field<T>, property: keyof Il2Cpp.Field, value: any): boolean {
-                    if (property == "value") {
-                        write(valueHandle, value, target.type);
-                        return true;
-                    }
-
-                    return Reflect.set(target, property, value);
-                }
+            globalThis.Object.defineProperty(bound, "_propertyCache", {
+                value: (this as unknown & { _propertyCache?: Record<PropertyKey, any> })._propertyCache,
+                configurable: false,
+                enumerable: false,
+                writable: true
             });
+
+            return bound;
+        }
+    }
+
+    export class BoundField<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Il2Cpp.Field<T> {
+        /** @internal */
+        constructor(handle: NativePointerValue, public instance: Il2Cpp.Object | Il2Cpp.ValueType) {
+            super(handle);
+        }
+
+        get valueHandle(): NativePointer {
+            return this.instance.handle.add(this.offset - (this.instance instanceof Il2Cpp.ValueType ? Il2Cpp.Object.headerSize : 0));
+        }
+
+        /** Gets the value of this field. */
+        get value(): T {
+            return read(this.valueHandle, this.type) as T;
+        }
+
+        /** Sets the value of this field. Thread static or literal values cannot be altered yet. */
+        set value(value: T) {
+            write(this.valueHandle, value, this.type);
         }
     }
 
