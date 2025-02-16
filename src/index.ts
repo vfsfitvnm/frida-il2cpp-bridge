@@ -22,6 +22,8 @@
 /// <reference path="./perform.ts">/>
 /// <reference path="./tracer.ts">/>
 
+/// <reference path="./structs/common/object-like.ts">/>
+/// <reference path="./structs/common/dynamic-methods.ts">/>
 /// <reference path="./structs/array.ts">/>
 /// <reference path="./structs/assembly.ts">/>
 /// <reference path="./structs/class.ts">/>

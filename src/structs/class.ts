@@ -274,13 +274,20 @@ namespace Il2Cpp {
             return this.tryMethod<T>(name, parameterCount) ?? raise(`couldn't find method ${name} in class ${this.type.name}`);
         }
 
+        methodWithSignature<T extends Il2Cpp.Method.ReturnType>(name: string, ...paramTypes: Il2Cpp.Type[]): Il2Cpp.Method<T> {
+            return (
+                this.tryMethodWithSignature<T>(name, ...paramTypes) ??
+                raise(`couldn't find method ${name} in class ${this.type.name} for parameter types [${paramTypes.map(_ => _.name).join(", ")}]`)
+            );
+        }
+
         /** Gets the nested class with the given name. */
         nested(name: string): Il2Cpp.Class {
             return this.tryNested(name) ?? raise(`couldn't find nested class ${name} in class ${this.type.name}`);
         }
 
         /** Allocates a new object of the current class and calls its default constructor. */
-        new(): Il2Cpp.Object {
+        defaultNew(): Il2Cpp.Object {
             const object = this.alloc();
 
             const exceptionArray = Memory.alloc(Process.pointerSize);
@@ -296,6 +303,19 @@ namespace Il2Cpp {
             return object;
         }
 
+        /**
+         * Finds the best fit constructor given the parameter types.
+         * Doesn't cover constructors with default parameters – all parameters must be provided.
+         */
+        new(...parameters: (Il2Cpp.Parameter.TypeValue | Il2Cpp.Parameter.Type)[]): Il2Cpp.Object {
+            if (parameters.length == 0) return this.defaultNew();
+
+            const object = this.alloc();
+            object.m[".ctor"](...parameters);
+
+            return object;
+        }
+
         /** Gets the field with the given name. */
         tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> | null {
             return new Il2Cpp.Field<T>(Il2Cpp.exports.classGetFieldFromName(this, Memory.allocUtf8String(name))).asNullable();
@@ -306,9 +326,20 @@ namespace Il2Cpp {
             return new Il2Cpp.Method<T>(Il2Cpp.exports.classGetMethodFromName(this, Memory.allocUtf8String(name), parameterCount)).asNullable();
         }
 
+        tryMethodWithSignature<T extends Il2Cpp.Method.ReturnType>(name: string, ...paramTypes: Il2Cpp.Type[]): Il2Cpp.Method<T> | undefined {
+            return this.methods.find(
+                m => m.name == name && m.parameters.length == paramTypes.length && m.parameters.every((p, i) => p.type.isSame(paramTypes[i]))
+            ) as Il2Cpp.Method<T> | undefined;
+        }
+
         /** Gets the nested class with the given name. */
         tryNested(name: string): Il2Cpp.Class | undefined {
             return this.nestedClasses.find(_ => _.name == name);
+        }
+
+        @lazy
+        get m(): Il2Cpp.DynamicMethods {
+            return Il2Cpp.DynamicMethodsLookup.from(this, true);
         }
 
         /** */

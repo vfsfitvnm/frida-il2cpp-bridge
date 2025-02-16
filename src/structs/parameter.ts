@@ -23,5 +23,14 @@ namespace Il2Cpp {
 
     export namespace Parameter {
         export type Type = Il2Cpp.Field.Type | Il2Cpp.Reference;
+
+        export type TypeValue = {
+            type: Il2Cpp.Type;
+            value: Type;
+        };
+
+        export function isTypeValue(v: TypeValue | Type): v is TypeValue {
+            return (v as TypeValue).type !== undefined;
+        }
     }
 }
