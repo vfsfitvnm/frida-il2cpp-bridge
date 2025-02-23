@@ -24,8 +24,8 @@ namespace Il2Cpp {
         }
 
         /** Gets the field with the given name. */
-        field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> {
-            return this.class.field<T>(name).withHolder(this);
+        field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.BoundField<T> {
+            return this.class.field<T>(name).bind(this);
         }
 
         /** Gets the method with the given name. */
@@ -44,8 +44,8 @@ namespace Il2Cpp {
         }
 
         /** Gets the field with the given name. */
-        tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> | undefined {
-            return this.class.tryField<T>(name)?.withHolder(this);
+        tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.BoundField<T> | undefined {
+            return this.class.tryField<T>(name)?.bind(this);
         }
 
         /** Gets the field with the given name. */

@@ -181,7 +181,7 @@ namespace Il2Cpp {
             if (value.type.class.isEnum) {
                 return value.field<number | Int64 | UInt64>("value__").value;
             } else {
-                const _ = value.type.class.fields.filter(_ => !_.isStatic).map(_ => toFridaValue(_.withHolder(value).value));
+                const _ = value.type.class.fields.filter(_ => !_.isStatic).map(_ => toFridaValue(_.bind(value).value));
                 return _.length == 0 ? [0] : _;
             }
         } else {
