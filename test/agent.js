@@ -76,8 +76,8 @@ Il2Cpp.perform(() => {
     });
 
     test("Il2Cpp.Image::classCount", () => {
-        assertEquals(16, () => Il2Cpp.domain.assembly("GameAssembly").image.classes.length);
-        assertEquals(16, () => Il2Cpp.domain.assembly("GameAssembly").image.classCount);
+        assertEquals(23, () => Il2Cpp.domain.assembly("GameAssembly").image.classes.length);
+        assertEquals(23, () => Il2Cpp.domain.assembly("GameAssembly").image.classCount);
     });
 
     test("Il2Cpp.Class::image", () => {
@@ -423,6 +423,39 @@ Il2Cpp.perform(() => {
         assertEquals(1, () => Test.method("B").inflate(Test).invoke(NULL));
 
         assertEquals(3, () => Test.method("A").inflate(Test, Test, Test).invoke());
+    });
+
+    test("Overloading selection picks the correct method", () => {
+        const GameAssembly = Il2Cpp.domain.assembly("GameAssembly").image;
+        const Method = GameAssembly.class("OverloadTest").new().method("Method");
+
+        assert(0, () => Method.overload("ParentClass").invoke(GameAssembly.class("ParentClass").new()));
+        assert(1, () => Method.overload("ChildClass").invoke(GameAssembly.class("ChildClass").new()));
+        assert(null, () => Method.tryOverload("ChildChildClass"));
+        assert(null, () => Method.tryOverload("AnotherChildClass"));
+        assert(2, () => Method.overload("AnotherChildChildClass").invoke(GameAssembly.class("AnotherChildChildClass").new()));
+    });
+
+    test("Overloading selection looks in parent class", () => {
+        const GameAssembly = Il2Cpp.domain.assembly("GameAssembly").image;
+        const AnotherMethod = GameAssembly.class("OverloadTest2").new().method("AnotherMethod");
+
+        assert(2, () => AnotherMethod.overload().invoke());
+        assert(-1, () => AnotherMethod.overload("System.Int32").invoke(-1));
+    });
+
+    test("Overloading selection by type picks the most precise method possible", () => {
+        const GameAssembly = Il2Cpp.domain.assembly("GameAssembly").image;
+        const Method = GameAssembly.class("OverloadTest").new().method("Method");
+        const Method2 = GameAssembly.class("OverloadTest2").new().method("Method");
+
+        assert(0, () => Method.overload(GameAssembly.class("ParentClass")).invoke(GameAssembly.class("ParentClass").new()));
+        assert(1, () => Method.overload(GameAssembly.class("ChildClass")).invoke(GameAssembly.class("ChildClass").new()));
+        assert(1, () => Method.overload(GameAssembly.class("ChildChildClass")).invoke(GameAssembly.class("ChildChildClass").new()));
+        assert(0, () => Method.overload(GameAssembly.class("AnotherChildClass")).invoke(GameAssembly.class("AnotherChildClass").new()));
+        assert(2, () => Method.overload(GameAssembly.class("AnotherChildChildClass")).invoke(GameAssembly.class("AnotherChildChildClass").new()));
+        assert(3, () => Method2.overload(GameAssembly.class("AnotherChildClass")).invoke(GameAssembly.class("AnotherChildClass").new()));
+        assert(2, () => Method2.overload(GameAssembly.class("AnotherChildChildClass")).invoke(GameAssembly.class("AnotherChildChildClass").new()));
     });
 
     send(summary);
