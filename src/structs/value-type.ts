@@ -15,8 +15,8 @@ namespace Il2Cpp {
         }
 
         /** Gets the method with the given name. */
-        method<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> {
-            return this.type.class.method<T>(name, parameterCount).withHolder(this);
+        method<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.BoundMethod<T> {
+            return this.type.class.method<T>(name, parameterCount).bind(this);
         }
 
         /** Gets the field with the given name. */
@@ -25,8 +25,8 @@ namespace Il2Cpp {
         }
 
         /** Gets the field with the given name. */
-        tryMethod<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> | undefined {
-            return this.type.class.tryMethod<T>(name, parameterCount)?.withHolder(this);
+        tryMethod<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.BoundMethod<T> | undefined {
+            return this.type.class.tryMethod<T>(name, parameterCount)?.bind(this);
         }
 
         /** */
