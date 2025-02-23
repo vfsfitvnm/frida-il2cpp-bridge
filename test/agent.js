@@ -380,6 +380,39 @@ Il2Cpp.perform(() => {
         });
     });
 
+    test("Overloading selection picks the correct method", () => {
+        const GameAssembly = Il2Cpp.domain.assembly("GameAssembly").image;
+        const Method = GameAssembly.class("OverloadTest").new().method("Method");
+
+        assert(0, () => Method.overload("ParentClass").invoke());
+        assert(1, () => Method.overload("ChildClass").invoke());
+        assert(1, () => Method.overload("ChildChildClass").invoke());
+        assert(0, () => Method.overload("AnotherChildClass").invoke());
+        assert(2, () => Method.overload("AnotherChildChildClass").invoke());
+    });
+
+    test("Overloading selection looks in parent class", () => {
+        const GameAssembly = Il2Cpp.domain.assembly("GameAssembly").image;
+        const AnotherMethod = GameAssembly.class("OverloadTest2").new().method("AnotherMethod");
+
+        assert(2, () => AnotherMethod.overload().invoke());
+        assert(-1, () => AnotherMethod.overload("System.Int32").invoke(-1));
+    });
+
+    test("Overloading selection by type picks the most precise method possible", () => {
+        const GameAssembly = Il2Cpp.domain.assembly("GameAssembly").image;
+        const Method = GameAssembly.class("OverloadTest").new().method("Method");
+        const Method2 = GameAssembly.class("OverloadTest2").new().method("Method");
+
+        assert(0, () => Method.overload(GameAssembly.class("ParentClass").type).invoke());
+        assert(1, () => Method.overload(GameAssembly.class("ChildClass").type).invoke());
+        assert(1, () => Method.overload(GameAssembly.class("ChildChildClass").type).invoke());
+        assert(0, () => Method.overload(GameAssembly.class("AnotherChildClass").type).invoke());
+        assert(2, () => Method.overload(GameAssembly.class("AnotherChildChildClass").type).invoke());
+        assert(3, () => Method2.overload(GameAssembly.class("AnotherChildClass").type).invoke());
+        assert(2, () => Method2.overload(GameAssembly.class("AnotherChildChildClass").type).invoke());
+    });
+
     send(summary);
 });
 
