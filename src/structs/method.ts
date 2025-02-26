@@ -257,12 +257,12 @@ namespace Il2Cpp {
         }
 
         /** Gets the overloaded method with the given parameter types. */
-        overload(...parameterTypes: string[]): Il2Cpp.Method<T> {
-            const result = this.tryOverload<T>(...parameterTypes);
+        overload(...typeNamesOrClasses: (string | Il2Cpp.Class)[]): Il2Cpp.Method<T> {
+            const result = this.tryOverload<T>(...typeNamesOrClasses);
 
             if (result != undefined) return result;
 
-            raise(`couldn't find overloaded method ${this.name}(${parameterTypes})`);
+            raise(`couldn't find overloaded method ${this.name}(${typeNamesOrClasses.map(_ => (_ instanceof Il2Cpp.Class ? _.type.name : _))})`);
         }
 
         /** Gets the parameter with the given name. */
@@ -277,22 +277,50 @@ namespace Il2Cpp {
         }
 
         /** Gets the overloaded method with the given parameter types. */
-        tryOverload<U extends Il2Cpp.Method.ReturnType = T>(...parameterTypes: string[]): Il2Cpp.Method<U> | undefined {
+        tryOverload<U extends Il2Cpp.Method.ReturnType = T>(...typeNamesOrClasses: (string | Il2Cpp.Class)[]): Il2Cpp.Method<U> | undefined {
+            const minScore = typeNamesOrClasses.length * 1;
+            const maxScore = typeNamesOrClasses.length * 2;
+
+            let candidate: [number, Il2Cpp.Method] | undefined = undefined;
+
             let klass: Il2Cpp.Class | null = this.class;
             while (klass) {
-                const method = klass.methods.find(method => {
-                    return (
-                        method.name == this.name &&
-                        method.parameterCount == parameterTypes.length &&
-                        method.parameters.every((e, i) => e.type.name == parameterTypes[i])
-                    );
-                }) as Il2Cpp.Method<U> | undefined;
-                if (method) {
-                    return method;
+                loop: for (const method of klass.methods) {
+                    if (method.name != this.name || method.parameterCount != typeNamesOrClasses.length) continue;
+
+                    let score = 0;
+                    let i = 0;
+                    for (const parameter of method.parameters) {
+                        const desiredTypeNameOrClass = typeNamesOrClasses[i];
+                        if (desiredTypeNameOrClass instanceof Il2Cpp.Class) {
+                            if (parameter.type.is(desiredTypeNameOrClass.type)) {
+                                score += 2;
+                            } else if (parameter.type.class.isAssignableFrom(desiredTypeNameOrClass)) {
+                                score += 1;
+                            } else {
+                                continue loop;
+                            }
+                        } else if (parameter.type.name == desiredTypeNameOrClass) {
+                            score += 2;
+                        } else {
+                            continue loop;
+                        }
+                        i++;
+                    }
+
+                    if (score < minScore) {
+                        continue;
+                    } else if (score == maxScore) {
+                        return method as Il2Cpp.Method<U>;
+                    } else if (candidate == undefined || score > candidate[0]) {
+                        candidate = [score, method];
+                    }
                 }
+
                 klass = klass.parent;
             }
-            return undefined;
+
+            return candidate?.[1] as Il2Cpp.Method<U> | undefined;
         }
 
         /** Gets the parameter with the given name. */
