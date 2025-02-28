@@ -1,21 +1,6 @@
 /** @internal */
-interface ResolvedExport {
-    handle: NativePointer;
-    readString: (handle: NativePointer) => string | null;
-}
-
-/** @internal */
 function forModule(...moduleNames: string[]): Promise<Module> {
-    function find(
-        moduleName: string | null,
-        name: string,
-        readString: (handle: NativePointer) => string | null = _ => _.readUtf8String()
-    ): ResolvedExport | undefined {
-        const handle = Module.findExportByName(moduleName, name) ?? NULL;
-        if (!handle.isNull()) {
-            return { handle, readString };
-        }
-    }
+    type Encoding = { [K in keyof NativePointer]: K extends `read${infer T}String` ? T : never }[keyof NativePointer];
 
     return new Promise<Module>(resolve => {
         for (const moduleName of moduleNames) {
@@ -26,12 +11,26 @@ function forModule(...moduleNames: string[]): Promise<Module> {
             }
         }
 
-        let targets: (ResolvedExport | undefined)[] = [];
+        let targets: [NativePointer | null | undefined, Encoding][] = [];
 
         switch (Process.platform) {
             case "linux":
                 if (Android.apiLevel == null) {
-                    targets = [find(null, "dlopen")];
+                    targets = [[Module.findExportByName(null, "dlopen"), "Utf8"]];
+                    break;
+                }
+
+                const linker = Process.findModuleByName("linker64") ?? Process.findModuleByName("linker");
+
+                if (linker == null) {
+                    if (Android.apiLevel >= 31) {
+                        targets = [[Module.findExportByName(null, "__loader_dlopen"), "Utf8"]];
+                    } else {
+                        targets = [
+                            [Module.findExportByName("libdl.so", "dlopen"), "Utf8"],
+                            [Module?.findExportByName("libdl.so", "android_dlopen_ext"), "Utf8"]
+                        ];
+                    }
                     break;
                 }
 
@@ -39,25 +38,25 @@ function forModule(...moduleNames: string[]): Promise<Module> {
                 // A6, A7: __dl_open
                 // A8, A8.1: __dl__Z8__dlopenPKciPKv
                 // A9, A10, A12, A13: __dl___loader_dlopen
-                targets = (Process.findModuleByName("linker64") ?? Process.getModuleByName("linker"))
+                targets = linker
                     .enumerateSymbols()
                     .filter(_ => ["__dl___loader_dlopen", "__dl__Z8__dlopenPKciPKv", "__dl_open"].includes(_.name))
-                    .map(_ => ({ handle: _.address, readString: _ => _.readCString() }));
+                    .map(_ => [_.address, "C"]);
                 break;
             case "darwin":
-                targets = [find("libdyld.dylib", "dlopen")];
+                targets = [[Module.findExportByName("libdyld.dylib", "dlopen"), "Utf8"]];
                 break;
             case "windows":
                 targets = [
-                    find("kernel32.dll", "LoadLibraryW", _ => _.readUtf16String()),
-                    find("kernel32.dll", "LoadLibraryExW", _ => _.readUtf16String()),
-                    find("kernel32.dll", "LoadLibraryA", _ => _.readAnsiString()),
-                    find("kernel32.dll", "LoadLibraryExA", _ => _.readAnsiString())
+                    [Module.findExportByName("kernel32.dll", "LoadLibraryW"), "Utf16"],
+                    [Module.findExportByName("kernel32.dll", "LoadLibraryExW"), "Utf16"],
+                    [Module.findExportByName("kernel32.dll", "LoadLibraryA"), "Ansi"],
+                    [Module.findExportByName("kernel32.dll", "LoadLibraryExA"), "Ansi"]
                 ];
                 break;
         }
 
-        targets = targets.filter(_ => _);
+        targets = targets.filter(_ => _[0]);
 
         if (targets.length == 0) {
             raise(`there are no targets to hook the loading of \x1b[3m${moduleNames}\x1b[0m, please file a bug`);
@@ -78,10 +77,10 @@ function forModule(...moduleNames: string[]): Promise<Module> {
             warn(`10 seconds have passed and \x1b[3m${moduleNames}\x1b[0m has not been loaded yet, is the app running?`);
         }, 10000);
 
-        const interceptors = targets.map(_ =>
-            Interceptor.attach(_!.handle, {
+        const interceptors = targets.map(([handle, encoding]) =>
+            Interceptor.attach(handle!, {
                 onEnter(args: InvocationArguments) {
-                    this.modulePath = _!.readString(args[0]) ?? "";
+                    this.modulePath = args[0][`read${encoding}String`]() ?? "";
                 },
                 onLeave(_: InvocationReturnValue) {
                     for (const moduleName of moduleNames) {
