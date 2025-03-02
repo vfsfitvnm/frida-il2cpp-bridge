@@ -33,57 +33,100 @@ class Class : Interface
     }
 }
 
-class ParentClass {
+public class Root {
 }
 
-class ChildClass : ParentClass {
+public class Child1 : Root {
 }
 
-class ChildChildClass : ChildClass {
+public class Child11 : Child1 {
 }
 
-class AnotherChildClass : ParentClass {
+public class Child2 : Root {
 }
 
-class AnotherChildChildClass : ParentClass {
+public class Child3 : Root {
 }
 
-class OverloadTest {
-    int Method(ParentClass instance) {
-        return 0;
+public class Child31 : Child3 {
+}
+
+public class Child311 : Child31 {
+}
+
+public class Child4<T> : Root {
+}
+
+public class Child41<T, U> : Child4<T> {
+}
+
+public class OverloadTest {
+    public int a;
+
+    public OverloadTest(int b)
+    {
+        this.a = b;
     }
 
-    int Method(ChildClass instance) {
-        return 1;
-    }
-
-    int Method(AnotherChildChildClass instance) {
+    public int Method(Child3 instance) {
         return 2;
     }
 
-    int Method2(ParentClass a, ChildClass b) {
+    public int Method(Root instance) {
         return 0;
     }
 
-    int Method2(ChildClass a, ParentClass b) {
+    public int Method(Child1 instance) {
         return 1;
     }
 
-    int AnotherMethod() {
+    public int Method(Child4<Root> instance) {
+        return 4;
+    }
+
+    public int Method<T>(Child4<Child4<T>> instance) {
+        return 5;
+    }
+
+    public int Method(Child41<Child1, Child2> instance) {
+        return 6;
+    }
+
+    public int Method2(Root a, Child1 b) {
         return 0;
     }
 
-    int AnotherMethod(int value) {
+    public int Method2(Child1 a, Root b) {
+        return 1;
+    }
+
+    public int AnotherMethod() {
+        return 0;
+    }
+
+   public int AnotherMethod(int value) {
         return value;
+    }
+
+    public static int D(Child1 a) {
+        return 0;
+    }
+
+    public int D(Root a) {
+        return this.a;
     }
 }
 
-class OverloadTest2 : OverloadTest {
-    int Method(AnotherChildClass instance) {
+public class OverloadTest2 : OverloadTest {
+    public OverloadTest2(int b) : base(b)
+    {
+    }
+
+    public int Method(Child2 instance) {
         return 3;
     }
 
-    int AnotherMethod() {
+    public new int AnotherMethod() {
         return 2;
     }
 }
