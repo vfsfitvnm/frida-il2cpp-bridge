@@ -77,7 +77,7 @@ namespace Il2Cpp {
      * ```
      */
     export function dumpTree(path?: string, ignoreAlreadyExistingDirectory: boolean = false): void {
-        if (!path?.startsWith("/")) path = `${Il2Cpp.application.dataPath!}/${path}`;
+        if (path && !path?.startsWith("/")) path = `${Il2Cpp.application.dataPath!}/${path}`;
         path = path ?? `${Il2Cpp.application.dataPath!}/${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
 
         if (!ignoreAlreadyExistingDirectory && directoryExists(path)) {
