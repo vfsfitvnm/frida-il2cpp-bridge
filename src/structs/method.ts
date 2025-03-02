@@ -314,6 +314,35 @@ namespace Il2Cpp {
                         return method as Il2Cpp.Method<U>;
                     } else if (candidate == undefined || score > candidate[0]) {
                         candidate = [score, method];
+                    } else if (score == candidate[0]) {
+                        // ```cs
+                        // class Parent {}
+                        // class Child0 extends Parent {}
+                        // class Child1 extends Parent {}
+                        // class Child10 extends Child1 {}
+                        //
+                        // class Methods {
+                        //   void Foo(obj: Parent) {}
+                        //   void Foo(obj: Child1) {}
+                        //}
+                        // ```
+                        // in this scenario, Foo(Parent) and Foo(Child1) have
+                        // the same score when looking for Foo(Child10) -
+                        // we must compare the two candidates to determine the
+                        // one that is "closer" to Foo(Child10)
+                        let i = 0;
+                        for (const parameter of candidate[1].parameters) {
+                            // in this case, Foo(Parent) is the candidate
+                            // overload: let's compare the parameter types - if
+                            // any of the candidate ones is a parent, then the
+                            // candidate method is not the closest overload
+                            // TODO: what happens with multiple parameters?
+                            if (parameter.type.class.isAssignableFrom(method.parameters[i].type.class)) {
+                                candidate = [score, method];
+                                continue loop;
+                            }
+                            i++;
+                        }
                     }
                 }
 
