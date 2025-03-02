@@ -18,6 +18,6 @@
     "trailingComma": "none"
   },
   "dependencies": {
-    "frida": "^16.1.3"
+    "frida": "^16.6.6"
   }
 }
