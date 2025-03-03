@@ -1,10 +1,15 @@
 /** @internal */
 function raise(message: any): never {
-    const error = new Error(`\x1b[0m${message}`);
-    error.name = `\x1b[0m\x1b[38;5;9mil2cpp\x1b[0m`;
+    const error = new Error(message);
+    // in the stack message, it is only used by V8 - qjs ignores it
+    error.name = "Il2CppError";
     error.stack = error.stack
-        ?.replace(/^Error/, error.name)
+        // reset style and replace "(Il2Cpp)?Error" with custom tag
+        ?.replace(/^(Il2Cpp)?Error/, "\x1b[0m\x1b[38;5;9mil2cpp\x1b[0m")
+        // replace the (unhelpful) first line of the stack ("at raise ...") and
+        // add style to the stack lines
         ?.replace(/\n    at (.+) \((.+):(.+)\)/, "\x1b[3m\x1b[2m")
+        // reset style
         ?.concat("\x1B[0m");
 
     throw error;

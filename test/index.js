@@ -8,7 +8,7 @@ const src = (await fs.readFile(path.join(root, "dist", "index.js"), "utf-8")) + 
 
 const unityVersions = await fs.readdir(path.join(root, "build"));
 
-const summary = { passed: 0, failed: 0 };
+const summary = { passed: 0, failed: 0, failedPayloads: [] };
 
 for (const unityVersion of unityVersions) {
     const buildPath = path.join(root, "build", unityVersion);
@@ -26,6 +26,9 @@ for (const unityVersion of unityVersions) {
             switch (message.type) {
                 case frida.MessageType.Send: {
                     if (message.payload?.type == "summary") {
+                        for (const failure of message.payload.failures) {
+                            console.log(failure);
+                        }
                         console.log();
                         summary.passed += message.payload.passed;
                         summary.failed += message.payload.failed;

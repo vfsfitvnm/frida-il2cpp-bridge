@@ -2,228 +2,228 @@ Il2Cpp.perform(() => {
     send(`\x1b[94m\x1b[1m►\x1b[22m\x1b[0m ${$EXPECTED_UNITY_VERSION}`);
 
     test("Il2Cpp::unityVersion", () => {
-        assert($EXPECTED_UNITY_VERSION, () => Il2Cpp.unityVersion);
+        assertEquals($EXPECTED_UNITY_VERSION, () => Il2Cpp.unityVersion);
     });
 
     test("Il2Cpp::currentThread", () => {
-        disavow(null, () => Il2Cpp.currentThread);
+        assertNotNull(() => Il2Cpp.currentThread);
     });
 
     test("Il2Cpp.Thread::id", () => {
-        assert(Process.getCurrentThreadId(), () => Il2Cpp.currentThread?.id);
+        assertEquals(Process.getCurrentThreadId(), () => Il2Cpp.currentThread?.id);
     });
 
     test("Il2Cpp.Domain::handle", () => {
-        disavow(NULL, () => Il2Cpp.domain.handle);
+        assertNotEquals(NULL, () => Il2Cpp.domain.handle);
     });
 
     test("Il2Cpp.Domain::assemblies", () => {
-        assert(true, () => Il2Cpp.domain.assemblies.length > 0);
+        assertTrue(() => Il2Cpp.domain.assemblies.length > 0);
     });
 
     test("Il2Cpp.Domain::object", () => {
-        assert(Il2Cpp.corlib.class("System.AppDomain"), () => Il2Cpp.domain.object.class);
+        assertEquals(Il2Cpp.corlib.class("System.AppDomain"), () => Il2Cpp.domain.object.class);
     });
 
     test("Il2Cpp.Domain::tryAssembly", () => {
-        disavow(null, () => Il2Cpp.domain.tryAssembly("mscorlib"));
-        assert(null, () => Il2Cpp.domain.tryAssembly("howboring"));
-        disavow(null, () => Il2Cpp.domain.tryAssembly("GameAssembly"));
+        assertNotNull(() => Il2Cpp.domain.tryAssembly("mscorlib"));
+        assertNull(() => Il2Cpp.domain.tryAssembly("howboring"));
+        assertNotNull(() => Il2Cpp.domain.tryAssembly("GameAssembly"));
     });
 
     test("Il2Cpp.Domain::assembly", () => {
-        throws("couldn't find assembly howboring", () => Il2Cpp.domain.assembly("howboring"));
+        assertThrows("couldn't find assembly howboring", () => Il2Cpp.domain.assembly("howboring"));
     });
 
     test("Il2Cpp.Assembly::name", () => {
-        assert("mscorlib", () => Il2Cpp.domain.assembly("mscorlib").name);
+        assertEquals("mscorlib", () => Il2Cpp.domain.assembly("mscorlib").name);
     });
 
     test("Il2Cpp.Assembly::image", () => {
-        assert(Il2Cpp.corlib, () => Il2Cpp.domain.assembly("mscorlib").image);
+        assertEquals(Il2Cpp.corlib, () => Il2Cpp.domain.assembly("mscorlib").image);
     });
 
     test("Il2Cpp.Assembly::object", () => {
-        assert(true, () => Il2Cpp.domain.assembly("mscorlib").object.class.isSubclassOf(Il2Cpp.corlib.class("System.Reflection.Assembly")));
+        assertTrue(() => Il2Cpp.domain.assembly("mscorlib").object.class.isSubclassOf(Il2Cpp.corlib.class("System.Reflection.Assembly")));
     });
 
     test("Il2Cpp::corlib", () => {
-        assert(Il2Cpp.domain.assembly("mscorlib").image, () => Il2Cpp.corlib);
+        assertEquals(Il2Cpp.domain.assembly("mscorlib").image, () => Il2Cpp.corlib);
     });
 
     test("Il2Cpp.Image::name", () => {
-        assert("mscorlib.dll", () => Il2Cpp.corlib.name);
+        assertEquals("mscorlib.dll", () => Il2Cpp.corlib.name);
     });
 
     test("Il2Cpp.Image::assembly", () => {
-        assert(Il2Cpp.domain.assembly("mscorlib"), () => Il2Cpp.corlib.assembly);
+        assertEquals(Il2Cpp.domain.assembly("mscorlib"), () => Il2Cpp.corlib.assembly);
     });
 
     test("Il2Cpp.Image::tryClass", () => {
-        assert(null, () => Il2Cpp.corlib.tryClass("System.Boring"));
-        disavow(NULL, () => Il2Cpp.corlib.tryClass("System.String")?.handle ?? NULL);
-        disavow(NULL, () => Il2Cpp.corlib.tryClass("<Module>")?.handle ?? NULL);
-        disavow(NULL, () => Il2Cpp.corlib.tryClass("System.Collections.Generic.List`1")?.handle ?? NULL);
+        assertNull(() => Il2Cpp.corlib.tryClass("System.Boring"));
+        assertNotEquals(NULL, () => Il2Cpp.corlib.tryClass("System.String")?.handle ?? NULL);
+        assertNotEquals(NULL, () => Il2Cpp.corlib.tryClass("<Module>")?.handle ?? NULL);
+        assertNotEquals(NULL, () => Il2Cpp.corlib.tryClass("System.Collections.Generic.List`1")?.handle ?? NULL);
     });
 
     test("Il2Cpp.Image::class", () => {
-        throws("couldn't find class System.Boring in assembly mscorlib.dll", () => Il2Cpp.corlib.class("System.Boring"));
+        assertThrows("couldn't find class System.Boring in assembly mscorlib.dll", () => Il2Cpp.corlib.class("System.Boring"));
     });
 
     test("Il2Cpp.Image::classes", () => {
-        assert(true, () => Il2Cpp.corlib.classes.length > 0);
-        assert(true, () => Il2Cpp.domain.assembly("GameAssembly").image.classes.length > 0);
+        assertTrue(() => Il2Cpp.corlib.classes.length > 0);
+        assertTrue(() => Il2Cpp.domain.assembly("GameAssembly").image.classes.length > 0);
     });
 
     test("Il2Cpp.Image::classCount", () => {
-        assert(13, () => Il2Cpp.domain.assembly("GameAssembly").image.classes.length);
-        assert(13, () => Il2Cpp.domain.assembly("GameAssembly").image.classCount);
+        assertEquals(13, () => Il2Cpp.domain.assembly("GameAssembly").image.classes.length);
+        assertEquals(13, () => Il2Cpp.domain.assembly("GameAssembly").image.classCount);
     });
 
     test("Il2Cpp.Class::image", () => {
-        assert(Il2Cpp.corlib, () => Il2Cpp.corlib.class("System.String").image);
+        assertEquals(Il2Cpp.corlib, () => Il2Cpp.corlib.class("System.String").image);
     });
 
     test("Il2Cpp.Class::assemblyName", () => {
-        assert("mscorlib", () => Il2Cpp.corlib.class("System.String").assemblyName);
+        assertEquals("mscorlib", () => Il2Cpp.corlib.class("System.String").assemblyName);
     });
 
     test("Il2Cpp.Class::actualInstanceSize", () => {
-        assert(1, () => Il2Cpp.corlib.class("<Module>").actualInstanceSize);
-        assert(Il2Cpp.Object.headerSize, () => Il2Cpp.corlib.class("System.Void").actualInstanceSize);
-        assert(Il2Cpp.Object.headerSize + 4, () => Il2Cpp.corlib.class("System.Int32").actualInstanceSize);
+        assertEquals(1, () => Il2Cpp.corlib.class("<Module>").actualInstanceSize);
+        assertEquals(Il2Cpp.Object.headerSize, () => Il2Cpp.corlib.class("System.Void").actualInstanceSize);
+        assertEquals(Il2Cpp.Object.headerSize + 4, () => Il2Cpp.corlib.class("System.Int32").actualInstanceSize);
     });
 
     test("Il2Cpp.Class::arrayElementSize", () => {
-        assert(0, () => Il2Cpp.corlib.class("System.Void").arrayElementSize);
-        assert(1, () => Il2Cpp.corlib.class("System.Byte").arrayElementSize);
-        assert(4, () => Il2Cpp.corlib.class("System.Int32").arrayElementSize);
-        assert(8, () => Il2Cpp.corlib.class("System.String").arrayElementSize);
+        assertEquals(0, () => Il2Cpp.corlib.class("System.Void").arrayElementSize);
+        assertEquals(1, () => Il2Cpp.corlib.class("System.Byte").arrayElementSize);
+        assertEquals(4, () => Il2Cpp.corlib.class("System.Int32").arrayElementSize);
+        assertEquals(8, () => Il2Cpp.corlib.class("System.String").arrayElementSize);
     });
 
     test("Il2Cpp.Class::name", () => {
-        assert("String", () => Il2Cpp.corlib.class("System.String").name);
-        assert("List`1", () => Il2Cpp.corlib.class("System.Collections.Generic.List`1").name);
+        assertEquals("String", () => Il2Cpp.corlib.class("System.String").name);
+        assertEquals("List`1", () => Il2Cpp.corlib.class("System.Collections.Generic.List`1").name);
     });
 
     test("Il2Cpp.Class::namespace", () => {
-        assert("System", () => Il2Cpp.corlib.class("System.String").namespace);
-        assert("System.Collections.Generic", () => Il2Cpp.corlib.class("System.Collections.Generic.List`1").namespace);
-        assert("", () => Il2Cpp.corlib.class("<Module>").namespace);
+        assertEquals("System", () => Il2Cpp.corlib.class("System.String").namespace);
+        assertEquals("System.Collections.Generic", () => Il2Cpp.corlib.class("System.Collections.Generic.List`1").namespace);
+        assertEquals("", () => Il2Cpp.corlib.class("<Module>").namespace);
     });
 
     test("Il2Cpp.Class::fullname", () => {
-        assert("System.String", () => Il2Cpp.corlib.class("System.String").fullName);
-        assert("System.Collections.Generic.List`1", () => Il2Cpp.corlib.class("System.Collections.Generic.List`1").fullName);
-        assert("<Module>", () => Il2Cpp.corlib.class("<Module>").fullName);
+        assertEquals("System.String", () => Il2Cpp.corlib.class("System.String").fullName);
+        assertEquals("System.Collections.Generic.List`1", () => Il2Cpp.corlib.class("System.Collections.Generic.List`1").fullName);
+        assertEquals("<Module>", () => Il2Cpp.corlib.class("<Module>").fullName);
     });
 
     test("Il2Cpp.Class::type", () => {
-        disavow(NULL, () => Il2Cpp.corlib.class("System.String").type);
+        assertNotEquals(NULL, () => Il2Cpp.corlib.class("System.String").type);
     });
 
     test("Il2Cpp.Class::isAbstract", () => {
-        assert(false, () => Il2Cpp.corlib.class("System.String").isAbstract);
-        assert(true, () => Il2Cpp.corlib.class("System.IComparable").isAbstract);
-        assert(true, () => Il2Cpp.domain.assembly("GameAssembly").image.class("AbstractGenericClass`2").isAbstract);
-        assert(false, () => Il2Cpp.domain.assembly("GameAssembly").image.class("PartiallyInflatedClass`1").isAbstract);
+        assertFalse(() => Il2Cpp.corlib.class("System.String").isAbstract);
+        assertTrue(() => Il2Cpp.corlib.class("System.IComparable").isAbstract);
+        assertTrue(() => Il2Cpp.domain.assembly("GameAssembly").image.class("AbstractGenericClass`2").isAbstract);
+        assertFalse(() => Il2Cpp.domain.assembly("GameAssembly").image.class("PartiallyInflatedClass`1").isAbstract);
     });
 
     test("Il2Cpp.Class::isEnum", () => {
-        assert(false, () => Il2Cpp.corlib.class("System.String").isEnum);
-        assert(false, () => Il2Cpp.corlib.class("System.Boolean").isEnum);
-        assert(true, () => Il2Cpp.corlib.class("System.DayOfWeek").isEnum);
+        assertFalse(() => Il2Cpp.corlib.class("System.String").isEnum);
+        assertFalse(() => Il2Cpp.corlib.class("System.Boolean").isEnum);
+        assertTrue(() => Il2Cpp.corlib.class("System.DayOfWeek").isEnum);
     });
 
     test("Il2Cpp.Class::isValueType", () => {
-        assert(false, () => Il2Cpp.corlib.class("System.String").isValueType);
-        assert(true, () => Il2Cpp.corlib.class("System.Boolean").isValueType);
-        assert(true, () => Il2Cpp.corlib.class("System.DayOfWeek").isValueType);
+        assertFalse(() => Il2Cpp.corlib.class("System.String").isValueType);
+        assertTrue(() => Il2Cpp.corlib.class("System.Boolean").isValueType);
+        assertTrue(() => Il2Cpp.corlib.class("System.DayOfWeek").isValueType);
     });
 
     test("Il2Cpp.Class::isGeneric", () => {
-        assert(false, () => Il2Cpp.corlib.class("System.String").isGeneric);
-        assert(true, () => Il2Cpp.corlib.class("System.Collections.Generic.List`1").isGeneric);
+        assertFalse(() => Il2Cpp.corlib.class("System.String").isGeneric);
+        assertTrue(() => Il2Cpp.corlib.class("System.Collections.Generic.List`1").isGeneric);
     });
 
     test("Il2Cpp.Class::inflate", () => {
-        throws("cannot inflate class System.String as it has no generic parameters", () => Il2Cpp.corlib.class("System.String").inflate());
-        throws("cannot inflate class System.Collections.Generic.List<T> as it needs 1 generic parameter(s), not 0", () => {
+        assertThrows("cannot inflate class System.String as it has no generic parameters", () => Il2Cpp.corlib.class("System.String").inflate());
+        assertThrows("cannot inflate class System.Collections.Generic.List<T> as it needs 1 generic parameter(s), not 0", () => {
             return Il2Cpp.corlib.class("System.Collections.Generic.List`1").inflate();
         });
-        disavow(NULL, () => {
+        assertNotEquals(NULL, () => {
             return Il2Cpp.corlib.class("System.Action`1").inflate(Il2Cpp.corlib.class("System.String"));
         });
     });
 
     test("Il2Cpp.Class::isInflated", () => {
-        assert(false, () => Il2Cpp.corlib.class("System.String").isInflated);
-        assert(false, () => Il2Cpp.corlib.class("System.Action`1").isInflated);
-        assert(true, () => Il2Cpp.corlib.class("System.Action`1").inflate(Il2Cpp.corlib.class("System.String")).isInflated);
+        assertFalse(() => Il2Cpp.corlib.class("System.String").isInflated);
+        assertFalse(() => Il2Cpp.corlib.class("System.Action`1").isInflated);
+        assertTrue(() => Il2Cpp.corlib.class("System.Action`1").inflate(Il2Cpp.corlib.class("System.String")).isInflated);
     });
 
     test("Il2Cpp.Class::isInterface", () => {
-        assert(false, () => Il2Cpp.corlib.class("System.String").isInterface);
-        assert(true, () => Il2Cpp.corlib.class("System.IComparable").isInterface);
-        assert(false, () => Il2Cpp.domain.assembly("GameAssembly").image.class("AbstractGenericClass`2").isInterface);
-        assert(false, () => Il2Cpp.domain.assembly("GameAssembly").image.class("PartiallyInflatedClass`1").isInterface);
+        assertFalse(() => Il2Cpp.corlib.class("System.String").isInterface);
+        assertTrue(() => Il2Cpp.corlib.class("System.IComparable").isInterface);
+        assertFalse(() => Il2Cpp.domain.assembly("GameAssembly").image.class("AbstractGenericClass`2").isInterface);
+        assertFalse(() => Il2Cpp.domain.assembly("GameAssembly").image.class("PartiallyInflatedClass`1").isInterface);
     });
 
     test("Il2Cpp.Class::declaringClass", () => {
-        assert(null, () => Il2Cpp.corlib.class("System.Array").declaringClass);
-        assert(Il2Cpp.corlib.class("System.Threading.Timer"), () => {
+        assertNull(() => Il2Cpp.corlib.class("System.Array").declaringClass);
+        assertEquals(Il2Cpp.corlib.class("System.Threading.Timer"), () => {
             return Il2Cpp.corlib.class("System.Threading.Timer").nested("Scheduler").declaringClass;
         });
     });
 
     test("Il2Cpp.Class::arrayClass", () => {
-        assert("String[]", () => Il2Cpp.corlib.class("System.String").arrayClass.name);
-        assert("String[][]", () => Il2Cpp.corlib.class("System.String").arrayClass.arrayClass.name);
+        assertEquals("String[]", () => Il2Cpp.corlib.class("System.String").arrayClass.name);
+        assertEquals("String[][]", () => Il2Cpp.corlib.class("System.String").arrayClass.arrayClass.name);
     });
 
     test("Il2Cpp.Class::elementClass", () => {
         const Method = () => Il2Cpp.domain.assembly("GameAssembly").image.class("Class").method("Method");
 
-        assert(Il2Cpp.corlib.class("System.Boolean"), () => Il2Cpp.corlib.class("System.Boolean").arrayClass.elementClass);
-        assert(Il2Cpp.corlib.class("System.Boolean"), () => Method().parameter("pointer").type.class.elementClass);
-        assert(Il2Cpp.corlib.class("System.Boolean"), () => Method().parameter("reference").type.class.elementClass);
-        assert(Il2Cpp.corlib.class("System.Boolean"), () => Method().parameter("array").type.class.elementClass);
+        assertEquals(Il2Cpp.corlib.class("System.Boolean"), () => Il2Cpp.corlib.class("System.Boolean").arrayClass.elementClass);
+        assertEquals(Il2Cpp.corlib.class("System.Boolean"), () => Method().parameter("pointer").type.class.elementClass);
+        assertEquals(Il2Cpp.corlib.class("System.Boolean"), () => Method().parameter("reference").type.class.elementClass);
+        assertEquals(Il2Cpp.corlib.class("System.Boolean"), () => Method().parameter("array").type.class.elementClass);
     });
 
     test("Il2Cpp.Class::baseType", () => {
         const Method = () => Il2Cpp.domain.assembly("GameAssembly").image.class("Class").method("Method");
 
-        assert(null, () => Il2Cpp.corlib.class("System.Boolean").baseType);
-        assert(Il2Cpp.corlib.class("System.Boolean").type, () => Il2Cpp.corlib.class("System.Boolean").arrayClass.baseType);
-        assert(Il2Cpp.corlib.class("System.Boolean").arrayClass.type, () => Il2Cpp.corlib.class("System.Boolean").arrayClass.arrayClass.baseType);
-        assert(Il2Cpp.corlib.class("System.Int32").type, () => Il2Cpp.corlib.class("System.DayOfWeek").baseType);
-        assert(null, () => Method().parameter("reference").type.class.baseType);
-        assert(Il2Cpp.corlib.class("System.Boolean").type, () => Method().parameter("pointer").type.class.baseType);
-        assert(Il2Cpp.corlib.class("System.Boolean").type, () => Method().parameter("array").type.class.baseType);
+        assertNull(() => Il2Cpp.corlib.class("System.Boolean").baseType);
+        assertEquals(Il2Cpp.corlib.class("System.Boolean").type, () => Il2Cpp.corlib.class("System.Boolean").arrayClass.baseType);
+        assertEquals(Il2Cpp.corlib.class("System.Boolean").arrayClass.type, () => Il2Cpp.corlib.class("System.Boolean").arrayClass.arrayClass.baseType);
+        assertEquals(Il2Cpp.corlib.class("System.Int32").type, () => Il2Cpp.corlib.class("System.DayOfWeek").baseType);
+        assertNull(() => Method().parameter("reference").type.class.baseType);
+        assertEquals(Il2Cpp.corlib.class("System.Boolean").type, () => Method().parameter("pointer").type.class.baseType);
+        assertEquals(Il2Cpp.corlib.class("System.Boolean").type, () => Method().parameter("array").type.class.baseType);
     });
 
     test("Il2Cpp.String::content", () => {
-        assert("vfsfitvnm", () => Il2Cpp.string("vfsfitvnm").content);
+        assertEquals("vfsfitvnm", () => Il2Cpp.string("vfsfitvnm").content);
     });
 
     test("Il2Cpp.String::length", () => {
-        assert(9, () => Il2Cpp.string("vfsfitvnm").length);
+        assertEquals(9, () => Il2Cpp.string("vfsfitvnm").length);
     });
 
     test("Il2Cpp.String::content", () => {
         const string = Il2Cpp.string("vfsfitvnm");
         string.content = "frida-il2cpp-bridge";
 
-        assert("frida-il2cpp-bridge", () => string.content);
-        assert(19, () => string.length);
+        assertEquals("frida-il2cpp-bridge", () => string.content);
+        assertEquals(19, () => string.length);
     });
 
     test("Il2Cpp.String::object", () => {
-        assert(Il2Cpp.corlib.class("System.String"), () => Il2Cpp.string("vfsfitvnm").object.class);
+        assertEquals(Il2Cpp.corlib.class("System.String"), () => Il2Cpp.string("vfsfitvnm").object.class);
     });
 
     test("Il2Cpp.Array::get", () => {
-        assert(-2442, () => {
+        assertEquals(-2442, () => {
             const SystemInt32 = Il2Cpp.corlib.class("System.Int32");
             const array = Il2Cpp.array(SystemInt32, [0, -1, 12, 3900, -2442, 99]);
             return array.get(4);
@@ -231,7 +231,7 @@ Il2Cpp.perform(() => {
     });
 
     test("Il2Cpp.Array::set", () => {
-        assert(2147483647, () => {
+        assertEquals(2147483647, () => {
             const SystemInt32 = Il2Cpp.corlib.class("System.Int32");
             const array = Il2Cpp.array(SystemInt32, [0, -1, 12, 3900, -2442, 99]);
             array.set(4, 2147483647);
@@ -244,13 +244,13 @@ Il2Cpp.perform(() => {
             _.image.classes
                 .filter(_ => _.isEnum)
                 .forEach(_ => {
-                    assert(_.field("value__").type.name, () => _.baseType.name);
+                    assertEquals(_.field("value__").type.name, () => _.baseType.name);
                 });
         });
     });
 
     test("Structs fields are read correctly", () => {
-        assert(ptr(0xdeadbeef), () => {
+        assertEquals(ptr(0xdeadbeef), () => {
             const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc();
             runtimeTypeHandle.method(".ctor").invoke(ptr(0xdeadbeef));
             return runtimeTypeHandle.unbox().field("value").value;
@@ -258,14 +258,14 @@ Il2Cpp.perform(() => {
     });
 
     test("Enums fields are read correctly", () => {
-        assert(6, () => {
+        assertEquals(6, () => {
             const saturday = Il2Cpp.corlib.class("System.DayOfWeek").field("Saturday").value;
             return saturday.field("value__").value;
         });
     });
 
     test("Boxed structs fields are read correctly", () => {
-        assert(ptr(0xdeadbeef), () => {
+        assertEquals(ptr(0xdeadbeef), () => {
             const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc();
             runtimeTypeHandle.method(".ctor").invoke(ptr(0xdeadbeef));
             return runtimeTypeHandle.field("value").value;
@@ -273,30 +273,30 @@ Il2Cpp.perform(() => {
     });
 
     test("Boxed structs methods are invoked correctly", () => {
-        assert(ptr(0xdeadbeef), () => {
+        assertEquals(ptr(0xdeadbeef), () => {
             const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc();
             runtimeTypeHandle.method(".ctor").invoke(ptr(0xdeadbeef));
             return runtimeTypeHandle.handle.add(runtimeTypeHandle.field("value").offset).readPointer();
         });
-        assert(ptr(0xdeadbeef), () => {
+        assertEquals(ptr(0xdeadbeef), () => {
             const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc();
             runtimeTypeHandle.method(".ctor").invoke(ptr(0xdeadbeef));
             return runtimeTypeHandle.method("get_Value").invoke();
         });
-        assert("System.RuntimeTypeHandle", () => Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().toString());
+        assertEquals("System.RuntimeTypeHandle", () => Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().toString());
     });
 
     test("Structs methods are invoked correctly", () => {
-        assert(ptr(0xdeadbeef), () => {
+        assertEquals(ptr(0xdeadbeef), () => {
             const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().unbox();
             runtimeTypeHandle.method(".ctor").invoke(ptr(0xdeadbeef));
             return runtimeTypeHandle.method("get_Value").invoke();
         });
-        assert("System.RuntimeTypeHandle", () => Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().toString());
+        assertEquals("System.RuntimeTypeHandle", () => Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc().toString());
     });
 
     test("Boxing/unboxing structs works correctly", () => {
-        assert(ptr(0xdeadbeef), () => {
+        assertEquals(ptr(0xdeadbeef), () => {
             const runtimeTypeHandle = Il2Cpp.corlib.class("System.RuntimeTypeHandle").alloc();
             runtimeTypeHandle.method(".ctor").invoke(ptr(0xdeadbeef));
             return runtimeTypeHandle.unbox().box().unbox().box().field("value").value;
@@ -304,45 +304,45 @@ Il2Cpp.perform(() => {
     });
 
     test("Boxed enums fields are read correctly", () => {
-        assert(1, () => {
+        assertEquals(1, () => {
             const MemberTypes = Il2Cpp.corlib.class("System.Reflection.MemberTypes");
             return MemberTypes.field("Constructor").value.box().field("value__").value;
         });
     });
 
     test("Il2Cpp.Field::value::get (static)", () => {
-        assert(46, () => Il2Cpp.corlib.class("System.Type").initialize().field("Delimiter").value);
-        assert("Second", () => Il2Cpp.domain.assembly("GameAssembly").image.class("Class").initialize().field("enumfield").value.toString());
-        assert("79228162514264337593543950335", () => Il2Cpp.corlib.class("System.Decimal").initialize().field("MaxValue").value.toString());
-        assert("True", () => Il2Cpp.corlib.class("System.Boolean").initialize().field("TrueString").value.content);
+        assertEquals(46, () => Il2Cpp.corlib.class("System.Type").initialize().field("Delimiter").value);
+        assertEquals("Second", () => Il2Cpp.domain.assembly("GameAssembly").image.class("Class").initialize().field("enumfield").value.toString());
+        assertEquals("79228162514264337593543950335", () => Il2Cpp.corlib.class("System.Decimal").initialize().field("MaxValue").value.toString());
+        assertEquals("True", () => Il2Cpp.corlib.class("System.Boolean").initialize().field("TrueString").value.content);
     });
 
     test("Il2Cpp.Field::value::set (static)", () => {
-        assert(48, () => {
+        assertEquals(48, () => {
             const SystemType = Il2Cpp.corlib.class("System.Type").initialize();
             SystemType.field("Delimiter").value = 48;
             return SystemType.field("Delimiter").value;
         });
-        assert(48, () => {
+        assertEquals(48, () => {
             const SystemType = Il2Cpp.corlib.class("System.Type").initialize();
             const value = SystemType.field("Delimiter").type.class.alloc();
             value.field("m_value").value = 48;
             SystemType.field("Delimiter").value = value;
             return SystemType.field("Delimiter").value;
         });
-        assert("Third", () => {
+        assertEquals("Third", () => {
             const Class = Il2Cpp.domain.assembly("GameAssembly").image.class("Class");
             Class.field("enumfield").value = Class.field("enumfield").type.class.field("Third").value;
             return Class.field("enumfield").value.toString();
         });
-        assert("123456", () => {
+        assertEquals("123456", () => {
             const SystemDecimal = Il2Cpp.corlib.class("System.Decimal").initialize();
             const value = SystemDecimal.alloc();
             value.method(".ctor", 1).invoke(123456);
             SystemDecimal.field("MaxValue").value = value;
             return SystemDecimal.field("MaxValue").value.toString();
         });
-        assert("VeryTrue", () => {
+        assertEquals("VeryTrue", () => {
             const SystemBoolean = Il2Cpp.corlib.class("System.Boolean").initialize();
             SystemBoolean.field("TrueString").value = Il2Cpp.string("VeryTrue");
             return SystemBoolean.field("TrueString").value.content;
@@ -350,11 +350,11 @@ Il2Cpp.perform(() => {
     });
 
     test("Invoke a method that returns an enum value", () => {
-        assert("Unix", () => Il2Cpp.corlib.class("System.Environment").method("get_Platform").invoke().toString());
+        assertEquals("Unix", () => Il2Cpp.corlib.class("System.Environment").method("get_Platform").invoke().toString());
     });
 
     test("Invoke a method that takes an enum value", () => {
-        assert("Sunday", () => {
+        assertEquals("Sunday", () => {
             const DateTimeFormatInfo = Il2Cpp.corlib.class("System.Globalization.DateTimeFormatInfo").initialize();
             const DayOfWeek = Il2Cpp.corlib.class("System.DayOfWeek");
             return DateTimeFormatInfo.new().method("GetDayName").invoke(DayOfWeek.field("Sunday").value).content;
@@ -372,9 +372,9 @@ Il2Cpp.perform(() => {
 
         const xRef = Il2Cpp.reference(x);
 
-        assert(1234, () => xRef.handle.add(Decimal.field("lo").offset - Il2Cpp.Object.headerSize).readInt());
+        assertEquals(1234, () => xRef.handle.add(Decimal.field("lo").offset - Il2Cpp.Object.headerSize).readInt());
 
-        assert(-1, () => {
+        assertEquals(-1, () => {
             const Compare = Decimal.tryMethod("FCallCompare") ?? Decimal.tryMethod("decimalCompare");
             return Compare ? Compare.invoke(xRef, Il2Cpp.reference(y)) : Decimal.method("Sign").invoke(xRef);
         });
@@ -383,7 +383,7 @@ Il2Cpp.perform(() => {
     send(summary);
 });
 
-const summary = { type: "summary", passed: 0, failed: 0 };
+const summary = { type: "summary", passed: 0, failed: 0, failures: [] };
 
 function test(name, block) {
     const time = +new Date();
@@ -392,8 +392,13 @@ function test(name, block) {
         const duration = +new Date() - time;
         send(`  \x1b[32m\x1b[1m✓\x1b[22m ${name}\x1b[0m \x1b[2m${duration}ms\x1b[0m`);
         summary.passed++;
-    } catch (e) {
-        send(`  \x1b[31m\x1b[1m𐄂\x1b[22m ${name}\n    ${e.message}\x1b[0m`);
+    } catch (err) {
+        if (err instanceof AssertionError) {
+            err.stack = err.stack.trim();
+        } else {
+            err.stack = err.stack.substr(err.stack.indexOf("\n    at")).trim();
+        }
+        summary.failures.push(`  \x1b[31m\x1b[1m𐄂\x1b[22m ${name}\x1b[0m\n    \x1b[31m${err.message}\x1b[0m\n    \x1b[31m\x1b[3m\x1b[2m${err.stack}\x1b[0m`);
         summary.failed++;
     }
 }
@@ -406,25 +411,49 @@ function eq(a, b) {
         : a == b;
 }
 
-function assert(expected, getActual) {
+function assertEquals(expected, getActual) {
     const actual = getActual();
     if (!eq(expected, actual)) {
-        throw new Error(`${getActual}\n    \x1b[1m${expected}\x1b[22m was expected, but got \x1b[1m${actual}\x1b[22m`);
+        throw new AssertionError(`\x1b[1m${expected}\x1b[22m was expected, but got \x1b[1m${actual}\x1b[22m`, getActual);
     }
 }
 
-function disavow(unexpected, getActual) {
+function assertNotEquals(unexpected, getActual) {
     const actual = getActual();
     if (eq(unexpected, actual)) {
-        throw new Error(`${getActual}\n    \x1b[1m${unexpected}\x1b[22m was not expected`);
+        throw new AssertionError(`\x1b[1m${unexpected}\x1b[22m was not expected`, getActual);
     }
 }
 
-function throws(expected, block) {
+function assertTrue(getActual) {
+    return assertEquals(true, getActual);
+}
+
+function assertFalse(getActual) {
+    return assertEquals(false, getActual);
+}
+
+function assertNull(getActual) {
+    return assertEquals(null, getActual);
+}
+
+function assertNotNull(getActual) {
+    return assertNotEquals(null, getActual);
+}
+
+function assertThrows(expected, block) {
     try {
         block();
-        throw new Error("no errors");
+        throw new AssertionError("no errors", block);
     } catch (e) {
-        assert(expected, () => e.message.replaceAll(/\x1b\[[^m]+m/g, ""));
+        assertEquals(expected, () => e.message.replaceAll(/\x1b\[[^m]+m/g, ""));
+    }
+}
+
+class AssertionError extends Error {
+    constructor(message, fn) {
+        super(message);
+        this.name = "AssertionError";
+        this.stack = `\nin ${fn}`;
     }
 }
