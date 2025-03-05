@@ -76,8 +76,8 @@ Il2Cpp.perform(() => {
     });
 
     test("Il2Cpp.Image::classCount", () => {
-        assertEquals(13, () => Il2Cpp.domain.assembly("GameAssembly").image.classes.length);
-        assertEquals(13, () => Il2Cpp.domain.assembly("GameAssembly").image.classCount);
+        assertEquals(15, () => Il2Cpp.domain.assembly("GameAssembly").image.classes.length);
+        assertEquals(15, () => Il2Cpp.domain.assembly("GameAssembly").image.classCount);
     });
 
     test("Il2Cpp.Class::image", () => {
@@ -378,6 +378,31 @@ Il2Cpp.perform(() => {
             const Compare = Decimal.tryMethod("FCallCompare") ?? Decimal.tryMethod("decimalCompare");
             return Compare ? Compare.invoke(xRef, Il2Cpp.reference(y)) : Decimal.method("Sign").invoke(xRef);
         });
+    });
+
+    test("Methods are selected by generic parameter count when inflating", () => {
+        const Test = Il2Cpp.domain.assembly("GameAssembly").image.class("MethodInflateTest.Parent`1").inflate(Il2Cpp.corlib.class("System.Object"));
+
+        assertEquals(0, () => Test.method("A").inflate(Test).invoke());
+        assertEquals(1, () => Test.method("A").inflate(Test, Test).invoke());
+
+        assertEquals(1, () => Test.method("B").inflate(Test).invoke(NULL));
+        assertEquals(2, () => Test.method("B").inflate(Test, Test).invoke());
+
+        assertEquals(0, () => Test.method("C").invoke(NULL));
+        assertEquals(1, () => Test.method("C").inflate(Test).invoke(NULL));
+
+        assertThrows("could not find inflatable signature of method D with 1 generic parameter(s)", () => Test.method("D").inflate(Test));
+        assertThrows("could not find inflatable signature of method C with 2 generic parameter(s)", () => Test.method("C").inflate(Test, Test));
+    });
+
+    test("Methods are looked up in parent class when inflating", () => {
+        const Test = Il2Cpp.domain.assembly("GameAssembly").image.class("MethodInflateTest.Child");
+
+        assertEquals(0, () => Test.method("A").inflate(Test).invoke());
+        assertEquals(1, () => Test.method("B").inflate(Test).invoke(NULL));
+
+        assertEquals(3, () => Test.method("A").inflate(Test, Test, Test).invoke());
     });
 
     send(summary);

@@ -195,12 +195,17 @@ namespace Il2Cpp {
 
         /** Creates a generic instance of the current generic method. */
         inflate<R extends Il2Cpp.Method.ReturnType = T>(...classes: Il2Cpp.Class[]): Il2Cpp.Method<R> {
-            if (!this.isGeneric) {
-                raise(`cannot inflate method ${this.name} as it has no generic parameters`);
-            }
+            if (!this.isGeneric || this.generics.length != classes.length) {
+                let klass: Il2Cpp.Class | null = this.class;
+                while (klass) {
+                    const method = klass.methods.find(_ => _.name == this.name && _.isGeneric == true && _.generics.length == classes.length);
+                    if (method) {
+                        return method.inflate(...classes);
+                    }
+                    klass = klass.parent;
+                }
 
-            if (this.generics.length != classes.length) {
-                raise(`cannot inflate method ${this.name} as it needs ${this.generics.length} generic parameter(s), not ${classes.length}`);
+                raise(`could not find inflatable signature of method ${this.name} with ${classes.length} generic parameter(s)`);
             }
 
             const types = classes.map(_ => _.type.object);
@@ -277,9 +282,9 @@ namespace Il2Cpp {
             while (klass) {
                 const method = klass.methods.find(method => {
                     return (
-                      method.name == this.name &&
-                      method.parameterCount == parameterTypes.length &&
-                      method.parameters.every((e, i) => e.type.name == parameterTypes[i])
+                        method.name == this.name &&
+                        method.parameterCount == parameterTypes.length &&
+                        method.parameters.every((e, i) => e.type.name == parameterTypes[i])
                     );
                 }) as Il2Cpp.Method<U> | undefined;
                 if (method) {
