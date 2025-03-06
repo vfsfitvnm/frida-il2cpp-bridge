@@ -76,8 +76,8 @@ Il2Cpp.perform(() => {
     });
 
     test("Il2Cpp.Image::classCount", () => {
-        assertEquals(15, () => Il2Cpp.domain.assembly("GameAssembly").image.classes.length);
-        assertEquals(15, () => Il2Cpp.domain.assembly("GameAssembly").image.classCount);
+        assertEquals(16, () => Il2Cpp.domain.assembly("GameAssembly").image.classes.length);
+        assertEquals(16, () => Il2Cpp.domain.assembly("GameAssembly").image.classCount);
     });
 
     test("Il2Cpp.Class::image", () => {
@@ -237,6 +237,26 @@ Il2Cpp.perform(() => {
             array.set(4, 2147483647);
             return array.get(4);
         });
+    });
+
+    test("Il2Cpp.Object field lookup ignores static fields", () => {
+        const Class = Il2Cpp.domain.assembly("GameAssembly").image.class("Il2CppObjectTest");
+
+        assertNull(() => Class.new().tryField("F"));
+        assertThrows("couldn't find non-static field F in class Il2CppObjectTest", () => Class.new().field("F"));
+    });
+
+    test("Il2Cpp.Object method lookup ignores static methods", () => {
+        const Class = Il2Cpp.domain.assembly("GameAssembly").image.class("Il2CppObjectTest");
+
+        assertNotNull(() => Class.new().tryMethod("A"));
+        assertNull(() => Class.new().tryMethod("B"));
+        assertNull(() => Class.new().tryMethod("C", 1));
+        assertNotNull(() => Class.new().tryMethod("C"));
+        assertNotNull(() => Class.new().tryMethod("C", 0));
+
+        assertEquals(1, () => Class.new().method("A").invoke(NULL));
+        assertThrows("couldn't find non-static method B in class Il2CppObjectTest", () => Class.new().method("B"));
     });
 
     test("Every enum base type matches its 'value__' field type", () => {

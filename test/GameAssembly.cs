@@ -58,6 +58,36 @@ struct EmptyStruct
 
 }
 
+public class Il2CppObjectTest
+{
+    public static int F;
+
+    public static int A(int a)
+    {
+        return 0;
+    }
+
+    public int A (string a)
+    {
+        return 1;
+    }
+
+    public static int B()
+    {
+        return 2;
+    }
+
+    public static int C(int a)
+    {
+        return 3;
+    }
+
+    public int C()
+    {
+        return 4;
+    }
+}
+
 enum Enum
 {
     First,

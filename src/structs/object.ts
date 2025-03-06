@@ -25,12 +25,12 @@ namespace Il2Cpp {
 
         /** Gets the field with the given name. */
         field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> {
-            return this.class.field<T>(name).withHolder(this);
+            return this.tryField(name) ?? raise(`couldn't find non-static field ${name} in class ${this.class.type.name}`);
         }
 
         /** Gets the method with the given name. */
         method<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> {
-            return this.class.method<T>(name, parameterCount).withHolder(this);
+            return this.tryMethod<T>(name, parameterCount) ?? raise(`couldn't find non-static method ${name} in class ${this.class.type.name}`);
         }
 
         /** Creates a reference to this object. */
@@ -45,12 +45,22 @@ namespace Il2Cpp {
 
         /** Gets the field with the given name. */
         tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> | undefined {
-            return this.class.tryField<T>(name)?.withHolder(this);
+            const field = this.class.tryField<T>(name);
+            return field?.isStatic ? undefined : field?.withHolder(this);
         }
 
         /** Gets the field with the given name. */
         tryMethod<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> | undefined {
-            return this.class.tryMethod<T>(name, parameterCount)?.withHolder(this);
+            let method = this.class.tryMethod<T>(name, parameterCount);
+
+            if (method?.isStatic) {
+                method =
+                    (this.class.methods.find(
+                        _ => _.name == name && (parameterCount >= 0 ? _.parameterCount == parameterCount : true) && !_.isStatic
+                    ) as Il2Cpp.Method<T>) ?? null;
+            }
+
+            return method?.withHolder(this);
         }
 
         /** */
