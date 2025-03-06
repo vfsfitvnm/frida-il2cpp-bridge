@@ -463,15 +463,16 @@ Il2Cpp.perform(() => {
         assertEquals(2, () => Method2.overload(GameAssembly.class("Child311")).invoke(GameAssembly.class("Child311").new()));
     });
 
-    test("Overloading with instance methods", () => {
-        const GameAssembly = Il2Cpp.domain.assembly("GameAssembly").image;
-        const Test = GameAssembly.class("OverloadTest");
+    test("Overloading instance methods do not select static methods", () => {
+        const Test = Il2Cpp.domain.assembly("GameAssembly").image.class("OverloadTest");
 
-        assertThrows("cannot invoke non-static method D as it must be invoked throught a Il2Cpp.Object, not a Il2Cpp.Class", () =>
-            Test.method("D").overload("Root").invoke(NULL)
-        );
-        assertThrows("couldn't find overloaded method D(Rooat)", () => Test.method("D").overload("Rooat").invoke(NULL));
-        assertThrows("couldn't find overloaded method D(Rot)", () => Test.new().method("D").overload("Rot").invoke(NULL));
+        assertNotNull(() => Test.method("D").tryOverload("Child1"));
+        assertNull(() => Test.new().method("D").tryOverload("Child1"));
+        assertNull(() => Test.method("D").tryOverload("Rooat"));
+        assertNull(() => Test.new().method("D").tryOverload("Rot"));
+        assertFalse(() => Test.method("D").overload("Root").isStatic);
+        assertThrows("couldn't find overloaded method D(Rooat)", () => Test.method("D").overload("Rooat"));
+        assertThrows("couldn't find overloaded method D(Rot)", () => Test.new().method("D").overload("Rot"));
     });
 
     send(summary);

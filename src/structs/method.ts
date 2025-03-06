@@ -255,10 +255,10 @@ namespace Il2Cpp {
         /** Gets the overloaded method with the given parameter types. */
         overload(...typeNamesOrClasses: (string | Il2Cpp.Class)[]): Il2Cpp.Method<T> {
             const method = this.tryOverload<T>(...typeNamesOrClasses);
-return (
+            return (
                 method ?? raise(`couldn't find overloaded method ${this.name}(${typeNamesOrClasses.map(_ => (_ instanceof Il2Cpp.Class ? _.type.name : _))})`)
-);
-}
+            );
+        }
 
         /** @internal */
         *overloads(): Generator<Il2Cpp.Method> {
@@ -291,66 +291,66 @@ return (
 
             let candidate: [number, Il2Cpp.Method] | undefined = undefined;
 
-                loop: for (const method of this.overloads()) {
-                    if (method.parameterCount != typeNamesOrClasses.length) continue;
+            loop: for (const method of this.overloads()) {
+                if (method.parameterCount != typeNamesOrClasses.length) continue;
 
-                    let score = 0;
-                    let i = 0;
-                    for (const parameter of method.parameters) {
-                        const desiredTypeNameOrClass = typeNamesOrClasses[i];
-                        if (desiredTypeNameOrClass instanceof Il2Cpp.Class) {
-                            if (parameter.type.is(desiredTypeNameOrClass.type)) {
-                                score += 2;
-                            } else if (parameter.type.class.isAssignableFrom(desiredTypeNameOrClass)) {
-                                score += 1;
-                            } else {
-                                continue loop;
-                            }
-                        } else if (parameter.type.name == desiredTypeNameOrClass) {
+                let score = 0;
+                let i = 0;
+                for (const parameter of method.parameters) {
+                    const desiredTypeNameOrClass = typeNamesOrClasses[i];
+                    if (desiredTypeNameOrClass instanceof Il2Cpp.Class) {
+                        if (parameter.type.is(desiredTypeNameOrClass.type)) {
                             score += 2;
+                        } else if (parameter.type.class.isAssignableFrom(desiredTypeNameOrClass)) {
+                            score += 1;
                         } else {
+                            continue loop;
+                        }
+                    } else if (parameter.type.name == desiredTypeNameOrClass) {
+                        score += 2;
+                    } else {
+                        continue loop;
+                    }
+                    i++;
+                }
+
+                if (score < minScore) {
+                    continue;
+                } else if (score == maxScore) {
+                    return method as Il2Cpp.Method<U>;
+                } else if (candidate == undefined || score > candidate[0]) {
+                    candidate = [score, method];
+                } else if (score == candidate[0]) {
+                    // ```cs
+                    // class Parent {}
+                    // class Child0 extends Parent {}
+                    // class Child1 extends Parent {}
+                    // class Child10 extends Child1 {}
+                    //
+                    // class Methods {
+                    //   void Foo(obj: Parent) {}
+                    //   void Foo(obj: Child1) {}
+                    //}
+                    // ```
+                    // in this scenario, Foo(Parent) and Foo(Child1) have
+                    // the same score when looking for Foo(Child10) -
+                    // we must compare the two candidates to determine the
+                    // one that is "closer" to Foo(Child10)
+                    let i = 0;
+                    for (const parameter of candidate[1].parameters) {
+                        // in this case, Foo(Parent) is the candidate
+                        // overload: let's compare the parameter types - if
+                        // any of the candidate ones is a parent, then the
+                        // candidate method is not the closest overload
+                        // TODO: what happens with multiple parameters?
+                        if (parameter.type.class.isAssignableFrom(method.parameters[i].type.class)) {
+                            candidate = [score, method];
                             continue loop;
                         }
                         i++;
                     }
-
-                    if (score < minScore) {
-                        continue;
-                    } else if (score == maxScore) {
-                        return method as Il2Cpp.Method<U>;
-                    } else if (candidate == undefined || score > candidate[0]) {
-                        candidate = [score, method];
-                    } else if (score == candidate[0]) {
-                        // ```cs
-                        // class Parent {}
-                        // class Child0 extends Parent {}
-                        // class Child1 extends Parent {}
-                        // class Child10 extends Child1 {}
-                        //
-                        // class Methods {
-                        //   void Foo(obj: Parent) {}
-                        //   void Foo(obj: Child1) {}
-                        //}
-                        // ```
-                        // in this scenario, Foo(Parent) and Foo(Child1) have
-                        // the same score when looking for Foo(Child10) -
-                        // we must compare the two candidates to determine the
-                        // one that is "closer" to Foo(Child10)
-                        let i = 0;
-                        for (const parameter of candidate[1].parameters) {
-                            // in this case, Foo(Parent) is the candidate
-                            // overload: let's compare the parameter types - if
-                            // any of the candidate ones is a parent, then the
-                            // candidate method is not the closest overload
-                            // TODO: what happens with multiple parameters?
-                            if (parameter.type.class.isAssignableFrom(method.parameters[i].type.class)) {
-                                candidate = [score, method];
-                                continue loop;
-                            }
-                            i++;
-                        }
-                    }
-                            }
+                }
+            }
 
             return candidate?.[1] as Il2Cpp.Method<U> | undefined;
         }
@@ -377,7 +377,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
             }
 
             return new Proxy(this, {
-                get(target: Il2Cpp.Method<T>, property: keyof Il2Cpp.Method<T>): any {
+                get(target: Il2Cpp.Method<T>, property: keyof Il2Cpp.Method<T>, receiver: Il2Cpp.Method<T>): any {
                     switch (property) {
                         case "invoke":
                             // In Unity 5.3.5f1 and >= 2021.2.0f1, value types
@@ -399,11 +399,20 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                                     : instance.handle;
 
                             return target.invokeRaw.bind(target, handle);
+                        case "overloads":
+                            return function* () {
+                                for (const method of target[property]()) {
+                                    if (!method.isStatic) {
+                                        yield method;
+                                    }
+                                }
+                            };
                         case "inflate":
                         case "overload":
                         case "tryOverload":
+                            const member = Reflect.get(target, property).bind(receiver);
                             return function (...args: any[]) {
-                                return target[property](...args)?.withHolder(instance);
+                                return member(...args)?.withHolder(instance);
                             };
                     }
 
