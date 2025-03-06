@@ -196,15 +196,11 @@ namespace Il2Cpp {
         /** Creates a generic instance of the current generic method. */
         inflate<R extends Il2Cpp.Method.ReturnType = T>(...classes: Il2Cpp.Class[]): Il2Cpp.Method<R> {
             if (!this.isGeneric || this.generics.length != classes.length) {
-                let klass: Il2Cpp.Class | null = this.class;
-                while (klass) {
-                    const method = klass.methods.find(_ => _.name == this.name && _.isGeneric == true && _.generics.length == classes.length);
-                    if (method) {
+                for (const method of this.overloads()) {
+                    if (method.isGeneric && method.generics.length == classes.length) {
                         return method.inflate(...classes);
                     }
-                    klass = klass.parent;
                 }
-
                 raise(`could not find inflatable signature of method ${this.name} with ${classes.length} generic parameter(s)`);
             }
 
@@ -258,11 +254,23 @@ namespace Il2Cpp {
 
         /** Gets the overloaded method with the given parameter types. */
         overload(...typeNamesOrClasses: (string | Il2Cpp.Class)[]): Il2Cpp.Method<T> {
-            const result = this.tryOverload<T>(...typeNamesOrClasses);
+            const method = this.tryOverload<T>(...typeNamesOrClasses);
+return (
+                method ?? raise(`couldn't find overloaded method ${this.name}(${typeNamesOrClasses.map(_ => (_ instanceof Il2Cpp.Class ? _.type.name : _))})`)
+);
+}
 
-            if (result != undefined) return result;
-
-            raise(`couldn't find overloaded method ${this.name}(${typeNamesOrClasses.map(_ => (_ instanceof Il2Cpp.Class ? _.type.name : _))})`);
+        /** @internal */
+        *overloads(): Generator<Il2Cpp.Method> {
+            let klass: Il2Cpp.Class | null = this.class;
+            while (klass) {
+                for (const method of klass.methods) {
+                    if (this.name == method.name) {
+                        yield method;
+                    }
+                }
+                klass = klass.parent;
+            }
         }
 
         /** Gets the parameter with the given name. */
@@ -283,10 +291,8 @@ namespace Il2Cpp {
 
             let candidate: [number, Il2Cpp.Method] | undefined = undefined;
 
-            let klass: Il2Cpp.Class | null = this.class;
-            while (klass) {
-                loop: for (const method of klass.methods) {
-                    if (method.name != this.name || method.parameterCount != typeNamesOrClasses.length) continue;
+                loop: for (const method of this.overloads()) {
+                    if (method.parameterCount != typeNamesOrClasses.length) continue;
 
                     let score = 0;
                     let i = 0;
@@ -344,10 +350,7 @@ namespace Il2Cpp {
                             i++;
                         }
                     }
-                }
-
-                klass = klass.parent;
-            }
+                            }
 
             return candidate?.[1] as Il2Cpp.Method<U> | undefined;
         }
