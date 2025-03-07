@@ -426,53 +426,49 @@ Il2Cpp.perform(() => {
     });
 
     test("Overloading selection picks the correct method", () => {
-        const GameAssembly = Il2Cpp.domain.assembly("GameAssembly").image;
-        const Method = GameAssembly.class("OverloadTest").new().method("Method");
+        const T = Il2Cpp.domain.assembly("GameAssembly").image.class("OverloadTest");
 
-        assertThrows("couldn't find overloaded method Method(A,B)", () => Method.overload("A", "B"));
-        assertEquals(0, () => Method.overload("Root").invoke(GameAssembly.class("Root").new()));
-        assertEquals(1, () => Method.overload("Child1").invoke(GameAssembly.class("Child1").new()));
-        assertEquals(null, () => Method.tryOverload("Child11"));
-        assertEquals(null, () => Method.tryOverload("Child2"));
-        assertEquals(2, () => Method.overload("Child3").invoke(GameAssembly.class("Child3").new()));
-        assertEquals(4, () => Method.overload("Child4<Root>").invoke(GameAssembly.class("Child4`1").inflate(GameAssembly.class("Root")).new()));
-        assertEquals(null, () => Method.tryOverload("Child4<T>"));
-        assertEquals(null, () => Method.tryOverload("Child4<Child1>"));
+        assertThrows("couldn't find overloaded method A(A,B)", () => T.new().method("A").overload("A", "B"));
+        assertEquals(0, () => T.new().method("A").overload("OverloadTest.Root").invoke(NULL));
+        assertEquals(1, () => T.new().method("A").overload("OverloadTest.Child1").invoke(NULL));
+        assertNull(() => T.new().method("A").tryOverload("OverloadTest.Child11"));
+        assertNull(() => T.new().method("A").tryOverload("OverloadTest.Child2"));
+        assertEquals(2, () => T.new().method("A").overload("OverloadTest.Child3").invoke(NULL));
+        assertEquals(4, () => T.new().method("A").overload("OverloadTest.Child4<OverloadTest.Root>").invoke(NULL));
+        assertNull(() => T.new().method("A").tryOverload("OverloadTest.Child4<T>"));
+        assertNull(() => T.new().method("A").tryOverload("OverloadTest.Child4<OverloadTest.Child1>"));
     });
 
     test("Overloading selection looks in parent class", () => {
-        const GameAssembly = Il2Cpp.domain.assembly("GameAssembly").image;
-        const AnotherMethod = GameAssembly.class("OverloadTest2").new().method("AnotherMethod");
+        const T = Il2Cpp.domain.assembly("GameAssembly").image.class("OverloadTest").nested("Nested");
 
-        assertEquals(2, () => AnotherMethod.overload().invoke());
-        assertEquals(-1, () => AnotherMethod.overload("System.Int32").invoke(-1));
+        assertEquals(2, () => T.new().method("C").overload().invoke());
+        assertEquals(-1, () => T.new().method("C").overload("System.Int32").invoke(-1));
     });
 
     test("Overloading selection by type picks the most precise method possible", () => {
-        const GameAssembly = Il2Cpp.domain.assembly("GameAssembly").image;
-        const Method = GameAssembly.class("OverloadTest").new().method("Method");
-        const Method2 = GameAssembly.class("OverloadTest2").new().method("Method");
+        const T = Il2Cpp.domain.assembly("GameAssembly").image.class("OverloadTest");
 
-        assertEquals(0, () => Method.overload(GameAssembly.class("Root")).invoke(GameAssembly.class("Root").new()));
-        assertEquals(1, () => Method.overload(GameAssembly.class("Child1")).invoke(GameAssembly.class("Child1").new()));
-        assertEquals(1, () => Method.overload(GameAssembly.class("Child11")).invoke(GameAssembly.class("Child11").new()));
-        assertEquals(0, () => Method.overload(GameAssembly.class("Child2")).invoke(GameAssembly.class("Child2").new()));
-        assertEquals(2, () => Method.overload(GameAssembly.class("Child3")).invoke(GameAssembly.class("Child3").new()));
-        assertEquals(3, () => Method2.overload(GameAssembly.class("Child2")).invoke(GameAssembly.class("Child2").new()));
-        assertEquals(2, () => Method2.overload(GameAssembly.class("Child3")).invoke(GameAssembly.class("Child3").new()));
-        assertEquals(2, () => Method2.overload(GameAssembly.class("Child311")).invoke(GameAssembly.class("Child311").new()));
+        assertEquals(0, () => T.new().method("A").overload(T.nested("Root")).invoke(NULL));
+        assertEquals(1, () => T.new().method("A").overload(T.nested("Child1")).invoke(NULL));
+        assertEquals(1, () => T.new().method("A").overload(T.nested("Child11")).invoke(NULL));
+        assertEquals(0, () => T.new().method("A").overload(T.nested("Child2")).invoke(NULL));
+        assertEquals(2, () => T.new().method("A").overload(T.nested("Child3")).invoke(NULL));
+        assertEquals(3, () => T.nested("Nested").new().method("A").overload(T.nested("Child2")).invoke(NULL));
+        assertEquals(2, () => T.nested("Nested").new().method("A").overload(T.nested("Child3")).invoke(NULL));
+        assertEquals(2, () => T.nested("Nested").new().method("A").overload(T.nested("Child311")).invoke(NULL));
     });
 
     test("Overloading instance methods do not select static methods", () => {
-        const Test = Il2Cpp.domain.assembly("GameAssembly").image.class("OverloadTest");
+        const T = Il2Cpp.domain.assembly("GameAssembly").image.class("OverloadTest");
 
-        assertNotNull(() => Test.method("D").tryOverload("Child1"));
-        assertNull(() => Test.new().method("D").tryOverload("Child1"));
-        assertNull(() => Test.method("D").tryOverload("Rooat"));
-        assertNull(() => Test.new().method("D").tryOverload("Rot"));
-        assertFalse(() => Test.method("D").overload("Root").isStatic);
-        assertThrows("couldn't find overloaded method D(Rooat)", () => Test.method("D").overload("Rooat"));
-        assertThrows("couldn't find overloaded method D(Rot)", () => Test.new().method("D").overload("Rot"));
+        assertNotNull(() => T.method("D").tryOverload("OverloadTest.Child1"));
+        assertNull(() => T.new().method("D").tryOverload("OverloadTest.Child1"));
+        assertNull(() => T.method("D").tryOverload("OverloadTest.Rooat"));
+        assertNull(() => T.new().method("D").tryOverload("OverloadTest.Rot"));
+        assertFalse(() => T.method("D").overload("OverloadTest.Root").isStatic);
+        assertThrows("couldn't find overloaded method D(OverloadTest.Rooat)", () => T.method("D").overload("OverloadTest.Rooat"));
+        assertThrows("couldn't find overloaded method D(OverloadTest.Rot)", () => T.new().method("D").overload("OverloadTest.Rot"));
     });
 
     send(summary);

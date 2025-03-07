@@ -33,32 +33,6 @@ class Class : Interface
     }
 }
 
-public class Root {
-}
-
-public class Child1 : Root {
-}
-
-public class Child11 : Child1 {
-}
-
-public class Child2 : Root {
-}
-
-public class Child3 : Root {
-}
-
-public class Child31 : Child3 {
-}
-
-public class Child311 : Child31 {
-}
-
-public class Child4<T> : Root {
-}
-
-public class Child41<T, U> : Child4<T> {
-}
 
 public class OverloadTest {
     public int a;
@@ -68,66 +42,117 @@ public class OverloadTest {
         this.a = b;
     }
 
-    public int Method(Child3 instance) {
+    public int A(Child3 instance)
+    {
         return 2;
     }
 
-    public int Method(Root instance) {
+    public int A(Root instance)
+    {
         return 0;
     }
 
-    public int Method(Child1 instance) {
+    public int A(Child1 instance) 
+    {
         return 1;
     }
 
-    public int Method(Child4<Root> instance) {
+    public int A(Child4<Root> instance)
+    {
         return 4;
     }
 
-    public int Method<T>(Child4<Child4<T>> instance) {
+    public int A<T>(Child4<Child4<T>> instance)
+    {
         return 5;
     }
 
-    public int Method(Child41<Child1, Child2> instance) {
+    public int A(Child41<Child1, Child2> instance)
+    {
         return 6;
     }
 
-    public int Method2(Root a, Child1 b) {
+    public int B(Root a, Child1 b)
+    {
         return 0;
     }
 
-    public int Method2(Child1 a, Root b) {
+    public int B(Child1 a, Root b)
+    {
         return 1;
     }
 
-    public int AnotherMethod() {
+    public int C()
+    {
         return 0;
     }
 
-   public int AnotherMethod(int value) {
+    public int C(int value)
+    {
         return value;
     }
 
-    public static int D(Child1 a) {
+    public static int D(Child1 a)
+    {
         return 0;
     }
 
-    public int D(Root a) {
+    public int D(Root a)
+    {
         return this.a;
     }
-}
 
-public class OverloadTest2 : OverloadTest {
-    public OverloadTest2(int b) : base(b)
+    public class Nested : OverloadTest
+    {
+        public Nested(int b) : base(b)
+        {
+        }
+
+        public int A(Child2 instance)
+        {
+            return 3;
+        }
+
+        public new int C()
+        {
+            return 2;
+        }
+    }
+
+    public class Root
     {
     }
 
-    public int Method(Child2 instance) {
-        return 3;
+    public class Child1 : Root
+    {
     }
 
-    public new int AnotherMethod() {
-        return 2;
+    public class Child11 : Child1
+    {
+    }
+
+    public class Child2 : Root
+    {
+    }
+
+    public class Child3 : Root
+    {
+    }
+
+    public class Child31 : Child3
+    {
+    }
+
+    public class Child311 : Child31
+    {
+    }
+
+    public class Child4<T> : Root
+    {
+    }
+
+    public class Child41<T, U> : Child4<T>
+    {
     }
 }
 
