@@ -196,15 +196,11 @@ namespace Il2Cpp {
         /** Creates a generic instance of the current generic method. */
         inflate<R extends Il2Cpp.Method.ReturnType = T>(...classes: Il2Cpp.Class[]): Il2Cpp.Method<R> {
             if (!this.isGeneric || this.generics.length != classes.length) {
-                let klass: Il2Cpp.Class | null = this.class;
-                while (klass) {
-                    const method = klass.methods.find(_ => _.name == this.name && _.isGeneric == true && _.generics.length == classes.length);
-                    if (method) {
+                for (const method of this.overloads()) {
+                    if (method.isGeneric && method.generics.length == classes.length) {
                         return method.inflate(...classes);
                     }
-                    klass = klass.parent;
                 }
-
                 raise(`could not find inflatable signature of method ${this.name} with ${classes.length} generic parameter(s)`);
             }
 
@@ -257,12 +253,24 @@ namespace Il2Cpp {
         }
 
         /** Gets the overloaded method with the given parameter types. */
-        overload(...parameterTypes: string[]): Il2Cpp.Method<T> {
-            const result = this.tryOverload<T>(...parameterTypes);
+        overload(...typeNamesOrClasses: (string | Il2Cpp.Class)[]): Il2Cpp.Method<T> {
+            const method = this.tryOverload<T>(...typeNamesOrClasses);
+            return (
+                method ?? raise(`couldn't find overloaded method ${this.name}(${typeNamesOrClasses.map(_ => (_ instanceof Il2Cpp.Class ? _.type.name : _))})`)
+            );
+        }
 
-            if (result != undefined) return result;
-
-            raise(`couldn't find overloaded method ${this.name}(${parameterTypes})`);
+        /** @internal */
+        *overloads(): Generator<Il2Cpp.Method> {
+            let klass: Il2Cpp.Class | null = this.class;
+            while (klass) {
+                for (const method of klass.methods) {
+                    if (this.name == method.name) {
+                        yield method;
+                    }
+                }
+                klass = klass.parent;
+            }
         }
 
         /** Gets the parameter with the given name. */
@@ -277,22 +285,73 @@ namespace Il2Cpp {
         }
 
         /** Gets the overloaded method with the given parameter types. */
-        tryOverload<U extends Il2Cpp.Method.ReturnType = T>(...parameterTypes: string[]): Il2Cpp.Method<U> | undefined {
-            let klass: Il2Cpp.Class | null = this.class;
-            while (klass) {
-                const method = klass.methods.find(method => {
-                    return (
-                        method.name == this.name &&
-                        method.parameterCount == parameterTypes.length &&
-                        method.parameters.every((e, i) => e.type.name == parameterTypes[i])
-                    );
-                }) as Il2Cpp.Method<U> | undefined;
-                if (method) {
-                    return method;
+        tryOverload<U extends Il2Cpp.Method.ReturnType = T>(...typeNamesOrClasses: (string | Il2Cpp.Class)[]): Il2Cpp.Method<U> | undefined {
+            const minScore = typeNamesOrClasses.length * 1;
+            const maxScore = typeNamesOrClasses.length * 2;
+
+            let candidate: [number, Il2Cpp.Method] | undefined = undefined;
+
+            loop: for (const method of this.overloads()) {
+                if (method.parameterCount != typeNamesOrClasses.length) continue;
+
+                let score = 0;
+                let i = 0;
+                for (const parameter of method.parameters) {
+                    const desiredTypeNameOrClass = typeNamesOrClasses[i];
+                    if (desiredTypeNameOrClass instanceof Il2Cpp.Class) {
+                        if (parameter.type.is(desiredTypeNameOrClass.type)) {
+                            score += 2;
+                        } else if (parameter.type.class.isAssignableFrom(desiredTypeNameOrClass)) {
+                            score += 1;
+                        } else {
+                            continue loop;
+                        }
+                    } else if (parameter.type.name == desiredTypeNameOrClass) {
+                        score += 2;
+                    } else {
+                        continue loop;
+                    }
+                    i++;
                 }
-                klass = klass.parent;
+
+                if (score < minScore) {
+                    continue;
+                } else if (score == maxScore) {
+                    return method as Il2Cpp.Method<U>;
+                } else if (candidate == undefined || score > candidate[0]) {
+                    candidate = [score, method];
+                } else if (score == candidate[0]) {
+                    // ```cs
+                    // class Parent {}
+                    // class Child0 extends Parent {}
+                    // class Child1 extends Parent {}
+                    // class Child11 extends Child1 {}
+                    //
+                    // class Methods {
+                    //   void Foo(obj: Parent) {}
+                    //   void Foo(obj: Child1) {}
+                    //}
+                    // ```
+                    // in this scenario, Foo(Parent) and Foo(Child1) have
+                    // the same score when looking for Foo(Child11) -
+                    // we must compare the two candidates to determine the
+                    // one that is "closer" to Foo(Child11)
+                    let i = 0;
+                    for (const parameter of candidate[1].parameters) {
+                        // in this case, Foo(Parent) is the candidate
+                        // overload: let's compare the parameter types - if
+                        // any of the candidate ones is a parent, then the
+                        // candidate method is not the closest overload
+                        if (parameter.type.class.isAssignableFrom(method.parameters[i].type.class)) {
+                            candidate = [score, method];
+                            continue loop;
+                        }
+                        i++;
+                    }
+                }
             }
-            return undefined;
+
+            return candidate?.[1] as Il2Cpp.Method<U> | undefined;
         }
 
         /** Gets the parameter with the given name. */
@@ -317,7 +376,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
             }
 
             return new Proxy(this, {
-                get(target: Il2Cpp.Method<T>, property: keyof Il2Cpp.Method<T>): any {
+                get(target: Il2Cpp.Method<T>, property: keyof Il2Cpp.Method<T>, receiver: Il2Cpp.Method<T>): any {
                     switch (property) {
                         case "invoke":
                             // In Unity 5.3.5f1 and >= 2021.2.0f1, value types
@@ -339,11 +398,20 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                                     : instance.handle;
 
                             return target.invokeRaw.bind(target, handle);
+                        case "overloads":
+                            return function* () {
+                                for (const method of target[property]()) {
+                                    if (!method.isStatic) {
+                                        yield method;
+                                    }
+                                }
+                            };
                         case "inflate":
                         case "overload":
                         case "tryOverload":
+                            const member = Reflect.get(target, property).bind(receiver);
                             return function (...args: any[]) {
-                                return target[property](...args)?.withHolder(instance);
+                                return member(...args)?.withHolder(instance);
                             };
                     }
 

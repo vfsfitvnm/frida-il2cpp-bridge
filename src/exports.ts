@@ -503,6 +503,10 @@ namespace Il2Cpp {
             return r("il2cpp_is_vm_thread", "bool", ["pointer"]);
         },
 
+        get typeEquals() {
+            return r("il2cpp_type_equals", "bool", ["pointer", "pointer"]);
+        },
+
         get typeGetClass() {
             return r("il2cpp_class_from_type", "pointer", ["pointer"]);
         },
@@ -532,7 +536,7 @@ namespace Il2Cpp {
         const target = new NativeFunction(handle ?? raise(`couldn't resolve export ${exportName}`), retType, argTypes);
 
         if (target.isNull()) {
-            raise(`export ${exportName} points to NULL IL2CPP library has likely been stripped, obfuscated, or customized`)
+            raise(`export ${exportName} points to NULL IL2CPP library has likely been stripped, obfuscated, or customized`);
         }
 
         return target;

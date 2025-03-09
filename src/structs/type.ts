@@ -150,6 +150,10 @@ namespace Il2Cpp {
             return Il2Cpp.exports.typeGetTypeEnum(this);
         }
 
+        is(other: Il2Cpp.Type): boolean {
+            return !!Il2Cpp.exports.typeEquals(this, other);
+        }
+
         /** */
         toString(): string {
             return this.name;
