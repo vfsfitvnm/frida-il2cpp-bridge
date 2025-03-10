@@ -39,14 +39,14 @@ namespace Il2Cpp {
         }
 
         /** Gets the correct virtual method from the given virtual method. */
-        virtualMethod<T extends Il2Cpp.Method.ReturnType>(method: Il2Cpp.Method): Il2Cpp.Method<T> {
-            return new Il2Cpp.Method<T>(Il2Cpp.exports.objectGetVirtualMethod(this, method)).withHolder(this);
+        virtualMethod<T extends Il2Cpp.Method.ReturnType>(method: Il2Cpp.Method): Il2Cpp.BoundMethod<T> {
+            return new Il2Cpp.Method<T>(Il2Cpp.exports.objectGetVirtualMethod(this, method)).bind(this);
         }
 
         /** Gets the field with the given name. */
         tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> | undefined {
             const field = this.class.tryField<T>(name);
-            return field?.isStatic ? undefined : field?.withHolder(this);
+            return field?.isStatic ? undefined : field?.bind(this);
         }
 
         /** Gets the field with the given name. */
@@ -60,7 +60,7 @@ namespace Il2Cpp {
                     ) as Il2Cpp.Method<T>) ?? null;
             }
 
-            return method?.withHolder(this);
+            return method?.bind(this);
         }
 
         /** */

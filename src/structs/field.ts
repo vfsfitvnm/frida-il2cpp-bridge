@@ -121,10 +121,17 @@ ${this.isLiteral ? ` = ${this.type.class.isEnum ? read((this.value as Il2Cpp.Val
 ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)}`}`;
         }
 
-        /** @internal */
-        withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Field<T> {
+        /**
+         * @internal
+         * Binds the current field to a {@link Il2Cpp.Object} or a
+         * {@link Il2Cpp.ValueType} (also known as *instances*), so that it is
+         * possible to retrieve its value - see {@link Il2Cpp.Field.value} for
+         * details. \
+         * Binding a static field is forbidden.
+         */
+        bind(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.BoundField<T> {
             if (this.isStatic) {
-                raise(`cannot access static field ${this.class.type.name}::${this.name} from an object, use a class instead`);
+                raise(`cannot bind static field ${this.class.type.name}::${this.name} to an instance`);
             }
 
             const valueHandle = instance.handle.add(this.offset - (instance instanceof Il2Cpp.ValueType ? Il2Cpp.Object.headerSize : 0));
@@ -147,6 +154,30 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
                 }
             });
         }
+    }
+
+    /**
+     * A {@link Il2Cpp.Field} bound to a {@link Il2Cpp.Object} or a
+     * {@link Il2Cpp.ValueType} (also known as *instances*).
+     * ```ts
+     * const object: Il2Cpp.Object = Il2Cpp.string("Hello, world!").object;
+     * const m_length: Il2Cpp.BoundField<number> = object.field<number>("m_length");
+     * const length = m_length.value; // 13
+     * ```
+     * Of course, binding a static field does not make sense and may cause
+     * unwanted behaviors.
+     * 
+     * Binding can be done manually with:
+     * ```ts
+     * const SystemString = Il2Cpp.corlib.class("System.String");
+     * const m_length: Il2Cpp.Field<number> = SystemString.field<number>("m_length");
+     * 
+     * const object: Il2Cpp.Object = Il2Cpp.string("Hello, world!").object;
+     * // ＠ts-ignore
+     * const m_length_bound: Il2Cpp.BoundField<number> = m_length.bind(object);
+     * ```
+     */
+    export interface BoundField<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Field<T> {
     }
 
     export namespace Field {

@@ -369,10 +369,17 @@ ${this.name}\
 ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toString(16).padStart(8, `0`)}`}`;
         }
 
-        /** @internal */
-        withHolder(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.Method<T> {
+        /**
+         * @internal
+         * Binds the current method to a {@link Il2Cpp.Object} or a
+         * {@link Il2Cpp.ValueType} (also known as *instances*), so that it is
+         * possible to invoke it - see {@link Il2Cpp.Method.invoke} for
+         * details. \
+         * Binding a static method is forbidden.
+         */
+        bind(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.BoundMethod<T> {
             if (this.isStatic) {
-                raise(`cannot access static method ${this.class.type.name}::${this.name} from an object, use a class instead`);
+                raise(`cannot bind static method ${this.class.type.name}::${this.name} to an instance`);
             }
 
             return new Proxy(this, {
@@ -411,7 +418,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                         case "tryOverload":
                             const member = Reflect.get(target, property).bind(receiver);
                             return function (...args: any[]) {
-                                return member(...args)?.withHolder(instance);
+                                return member(...args)?.bind(instance);
                             };
                     }
 
@@ -440,6 +447,31 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
             );
         }
     }
+
+    /**
+     * A {@link Il2Cpp.Method} bound to a {@link Il2Cpp.Object} or a
+     * {@link Il2Cpp.ValueType} (also known as *instances*). \
+     * Invoking bound methods will pass the assigned instance as `this`.
+     * ```ts
+     * const object: Il2Cpp.Object = Il2Cpp.string("Hello, world!").object;
+     * const GetLength: Il2Cpp.BoundMethod<number> = object.method<number>("GetLength");
+     * // There is no need to pass the object when invoking GetLength!
+     * const length = GetLength.invoke(); // 13
+     * ```
+     * Of course, binding a static method does not make sense and may cause
+     * unwanted behaviors. \
+     *
+     * Binding can be done manually with:
+     * ```ts
+     * const SystemString = Il2Cpp.corlib.class("System.String");
+     * const GetLength: Il2Cpp.Method<number> = SystemString.method<number>("GetLength");
+     *
+     * const object: Il2Cpp.Object = Il2Cpp.string("Hello, world!").object;
+     * // ＠ts-ignore
+     * const GetLengthBound: Il2Cpp.BoundMethod<number> = GetLength.bind(object);
+     * ```
+     */
+    export interface BoundMethod<T extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType> extends Method<T> {}
 
     let maybeObjectHeaderSize = (): number => {
         const struct = Il2Cpp.corlib.class("System.RuntimeTypeHandle").initialize().alloc();
