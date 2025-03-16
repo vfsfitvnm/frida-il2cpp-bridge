@@ -134,19 +134,19 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
                 raise(`cannot bind static field ${this.class.type.name}::${this.name} to an instance`);
             }
 
-            const valueHandle = instance.handle.add(this.offset - (instance instanceof Il2Cpp.ValueType ? Il2Cpp.Object.headerSize : 0));
+            const offset = this.offset - (instance instanceof Il2Cpp.ValueType ? Il2Cpp.Object.headerSize : 0);
 
             return new Proxy(this, {
                 get(target: Il2Cpp.Field<T>, property: keyof Il2Cpp.Field): any {
                     if (property == "value") {
-                        return read(valueHandle, target.type);
+                        return read(instance.handle.add(offset), target.type);
                     }
                     return Reflect.get(target, property);
                 },
 
                 set(target: Il2Cpp.Field<T>, property: keyof Il2Cpp.Field, value: any): boolean {
                     if (property == "value") {
-                        write(valueHandle, value, target.type);
+                        write(instance.handle.add(offset), value, target.type);
                         return true;
                     }
 
@@ -166,19 +166,18 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
      * ```
      * Of course, binding a static field does not make sense and may cause
      * unwanted behaviors.
-     * 
+     *
      * Binding can be done manually with:
      * ```ts
      * const SystemString = Il2Cpp.corlib.class("System.String");
      * const m_length: Il2Cpp.Field<number> = SystemString.field<number>("m_length");
-     * 
+     *
      * const object: Il2Cpp.Object = Il2Cpp.string("Hello, world!").object;
      * // ＠ts-ignore
      * const m_length_bound: Il2Cpp.BoundField<number> = m_length.bind(object);
      * ```
      */
-    export interface BoundField<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Field<T> {
-    }
+    export interface BoundField<T extends Il2Cpp.Field.Type = Il2Cpp.Field.Type> extends Field<T> {}
 
     export namespace Field {
         export type Type = boolean | number | Int64 | UInt64 | NativePointer | Il2Cpp.Pointer | Il2Cpp.ValueType | Il2Cpp.Object | Il2Cpp.String | Il2Cpp.Array;
