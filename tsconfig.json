@@ -13,6 +13,7 @@
     "stripInternal": true,
     "plugins": [ 
       { "transform": "ts-transformer-inline-file/transformer" }
-    ],
-  }
+    ]
+  },
+  "exclude": ["dist", "test"]
 }

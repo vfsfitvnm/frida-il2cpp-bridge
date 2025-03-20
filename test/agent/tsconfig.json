@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": ["es2022"],
+    "moduleResolution": "bundler",
+    "outDir": "dist",
+    "outFile": "dist/index.js",
+    "mapRoot": ".",
+    "allowJs": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "declaration": false,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "stripInternal": true,
+    "removeComments": true,
+  },
+}

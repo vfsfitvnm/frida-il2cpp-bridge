@@ -5,14 +5,18 @@ UNITY_DIRS := $(wildcard unity/*/)
 
 dist: node_modules $(shell find src) tsconfig.json
 	@ ./node_modules/.bin/tspc
-	@ touch -m dist
+	@ touch -m "$@"
 
-node_modules:
+node_modules: package.json
 	@ npm i
-	@ touch -m node_modules
+	@ touch -m "$@"
 
-test: test/index.js test/agent.js dist build/host
-	@ node "$<"
+test: dist test/agent/dist build/host
+	@ node test/index.js
+
+test/agent/dist: node_modules $(shell find test/agent/src) test/agent/tsconfig.json
+	@ ./node_modules/.bin/tspc -p test/agent
+	@ touch -m "$@"
 
 build/host: test/host.c
 	@ mkdir -p build
@@ -24,7 +28,8 @@ $(UNITY_DIRS):
 assembly: $(UNITY_DIRS);
 
 clean:
-	@ rm -r dist
+	@ rm -rf dist
+	@ rm -rf test/agent/dist
 
 .DEFAULT_GOAL := dist
 .PHONY: clean test assembly $(UNITY_DIRS)
