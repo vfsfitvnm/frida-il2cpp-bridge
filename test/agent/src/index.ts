@@ -74,8 +74,8 @@ rpc.exports = {
     },
 
     "Il2Cpp.Image::classCount"() {
-        assert(Il2Cpp.domain.assembly("GameAssembly").image.classes.length).is(27);
-        assert(Il2Cpp.domain.assembly("GameAssembly").image.classCount).is(27);
+        assert(Il2Cpp.domain.assembly("GameAssembly").image.classes.length).is(28);
+        assert(Il2Cpp.domain.assembly("GameAssembly").image.classCount).is(28);
     },
 
     "Il2Cpp.Class::image"() {
@@ -225,6 +225,19 @@ rpc.exports = {
         array.set(4, 2147483647);
 
         assert(array.get(4)).is(2147483647);
+    },
+
+    "Il2Cpp.Object::base"() {
+        const T = Il2Cpp.domain.assembly("GameAssembly").image.class("Il2CppObjectTest").nested("BaseTest");
+        const instance = T.new();
+
+        assert(instance.method("D").returnType.class).is(T.parent!.type.class);
+        assert(instance.class).is(instance.method<Il2Cpp.Object>("D").invoke().class);
+        assert(instance.handle).is(instance.method<Il2Cpp.Object>("D").invoke().handle);
+
+        assert(instance.base.class).is(T.parent!.type.class);
+        assert(instance.base.base.class).is(T.parent!.parent!.type.class);
+        assert(() => instance.base.base.base.class).throws("class System.Object has no parent");
     },
 
     "Il2Cpp.Object field lookup ignores static fields"() {

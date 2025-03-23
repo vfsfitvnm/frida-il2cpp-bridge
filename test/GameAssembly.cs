@@ -218,6 +218,13 @@ public class Il2CppObjectTest
     {
         return 4;
     }
+
+    public class BaseTest : Il2CppObjectTest {
+        public Il2CppObjectTest D()
+        {
+            return this;
+        }
+    }
 }
 
 enum Enum

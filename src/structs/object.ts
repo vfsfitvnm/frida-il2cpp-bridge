@@ -6,6 +6,55 @@ namespace Il2Cpp {
             return Il2Cpp.corlib.class("System.Object").instanceSize;
         }
 
+        /**
+         * Returns the same object, but having its parent class as class.
+         * It basically is the C# `base` keyword, so that parent members can be
+         * accessed.
+         *
+         * **Example** \
+         * Consider the following classes:
+         * ```csharp
+         * class Foo
+         * {
+         *     int foo()
+         *     {
+         *          return 1;
+         *     }
+         * }
+         * class Bar : Foo
+         * {
+         *     new int foo()
+         *     {
+         *          return 2;
+         *     }
+         * }
+         * ```
+         * then:
+         * ```ts
+         * const Bar: Il2Cpp.Class = ...;
+         * const bar = Bar.new();
+         *
+         * console.log(bar.foo()); // 2
+         * console.log(bar.base.foo()); // 1
+         * ```
+         */
+        get base(): Il2Cpp.Object {
+            if (this.class.parent == null) {
+                raise(`class ${this.class.type.name} has no parent`);
+            }
+
+            return new Proxy(this, {
+                get(target: Il2Cpp.Object, property: keyof Il2Cpp.Object, receiver: Il2Cpp.Object): any {
+                    if (property == "class") {
+                        return Reflect.get(target, property).parent;
+                    } else if (property == "base") {
+                        return Reflect.getOwnPropertyDescriptor(Il2Cpp.Object.prototype, property)!.get!.bind(receiver)();
+                    }
+                    return Reflect.get(target, property);
+                }
+            });
+        }
+
         /** Gets the class of this object. */
         @lazy
         get class(): Il2Cpp.Class {
