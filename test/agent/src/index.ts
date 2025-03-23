@@ -74,8 +74,8 @@ rpc.exports = {
     },
 
     "Il2Cpp.Image::classCount"() {
-        assert(Il2Cpp.domain.assembly("GameAssembly").image.classes.length).is(28);
-        assert(Il2Cpp.domain.assembly("GameAssembly").image.classCount).is(28);
+        assert(Il2Cpp.domain.assembly("GameAssembly").image.classes.length).is(30);
+        assert(Il2Cpp.domain.assembly("GameAssembly").image.classCount).is(30);
     },
 
     "Il2Cpp.Class::image"() {
@@ -118,6 +118,18 @@ rpc.exports = {
 
     "Il2Cpp.Class::type"() {
         assert(Il2Cpp.corlib.class("System.String").type.handle).not(NULL);
+    },
+
+    "Il2Cpp.Class::hierarchy"() {
+        const T = Il2Cpp.domain.assembly("GameAssembly").image.class("Il2CppClassTest").nested("HierarchyTest");
+
+        assert(Array.from(T.hierarchy())).is([T, T.parent!, T.parent!.parent!]);
+        assert(Array.from(T.hierarchy({ includeCurrent: true }))).is([T, T.parent!, T.parent!.parent!]);
+        assert(Array.from(T.hierarchy({ includeCurrent: false }))).is([T.parent!, T.parent!.parent!]);
+
+        assert(Array.from(T.parent!.hierarchy())).is([T.parent!, T.parent!.parent!]);
+        assert(Array.from(T.parent!.parent!.hierarchy())).is([T.parent!.parent!]);
+        assert(Array.from(T.parent!.parent!.hierarchy({ includeCurrent: false }))).is([]);
     },
 
     "Il2Cpp.Class::isAbstract"() {

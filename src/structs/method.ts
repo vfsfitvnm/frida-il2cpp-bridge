@@ -262,14 +262,12 @@ namespace Il2Cpp {
 
         /** @internal */
         *overloads(): Generator<Il2Cpp.Method> {
-            let klass: Il2Cpp.Class | null = this.class;
-            while (klass) {
+            for (const klass of this.class.hierarchy()) {
                 for (const method of klass.methods) {
                     if (this.name == method.name) {
                         yield method;
                     }
                 }
-                klass = klass.parent;
             }
         }
 

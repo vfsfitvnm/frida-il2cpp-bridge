@@ -190,6 +190,13 @@ struct EmptyStruct
 
 }
 
+public class Il2CppClassTest
+{
+    public class HierarchyTest : Il2CppClassTest
+    {
+    }
+}
+
 public class Il2CppObjectTest
 {
     public static int F;

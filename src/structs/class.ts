@@ -236,6 +236,15 @@ namespace Il2Cpp {
             return this.tryField<T>(name) ?? raise(`couldn't find field ${name} in class ${this.type.name}`);
         }
 
+        /** Gets the hierarchy of the current class. */
+        *hierarchy(options?: { includeCurrent?: boolean }): Generator<Il2Cpp.Class> {
+            let klass: Il2Cpp.Class | null = options?.includeCurrent ?? true ? this : this.parent;
+            while (klass) {
+                yield klass;
+                klass = klass.parent;
+            }
+        }
+
         /** Builds a generic instance of the current generic class. */
         inflate(...classes: Il2Cpp.Class[]): Il2Cpp.Class {
             if (!this.isGeneric) {
