@@ -17,6 +17,22 @@ namespace Il2Cpp {
             return this.actualInstanceSize;
         }
 
+        /** Gets all the fields of the current class and its hierarchy. */
+        @lazy
+        get allFields(): Il2Cpp.Field[] {
+            return globalThis.Array.from(this.hierarchy())
+                .map(_ => _.fields)
+                .flat();
+        }
+
+        /** Gets all the methods of the current class and its hierarchy. */
+        @lazy
+        get allMethods(): Il2Cpp.Method[] {
+            return globalThis.Array.from(this.hierarchy())
+                .map(_ => _.methods)
+                .flat();
+        }
+
         /** Gets the array class which encompass the current class. */
         @lazy
         get arrayClass(): Il2Cpp.Class {
@@ -53,7 +69,7 @@ namespace Il2Cpp {
             return new Il2Cpp.Class(Il2Cpp.exports.classGetElementClass(this)).asNullable();
         }
 
-        /** Gets the fields of the current class. */
+        /** Gets the fields defined by the current class. */
         @lazy
         get fields(): Il2Cpp.Field[] {
             return readNativeIterator(_ => Il2Cpp.exports.classGetFields(this, _)).map(_ => new Il2Cpp.Field(_));
@@ -160,7 +176,7 @@ namespace Il2Cpp {
             return readNativeIterator(_ => Il2Cpp.exports.classGetInterfaces(this, _)).map(_ => new Il2Cpp.Class(_));
         }
 
-        /** Gets the methods implemented by the current class. */
+        /** Gets the methods defined by the current class. */
         @lazy
         get methods(): Il2Cpp.Method[] {
             return readNativeIterator(_ => Il2Cpp.exports.classGetMethods(this, _)).map(_ => new Il2Cpp.Method(_));
