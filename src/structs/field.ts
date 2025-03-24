@@ -129,7 +129,7 @@ ${this.isThreadStatic || this.isLiteral ? `` : ` // 0x${this.offset.toString(16)
          * details. \
          * Binding a static field is forbidden.
          */
-        bind(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.BoundField<T> {
+        bind(instance: Il2Cpp.InstanceType): Il2Cpp.BoundField<T> {
             if (this.isStatic) {
                 raise(`cannot bind static field ${this.class.type.name}::${this.name} to an instance`);
             }

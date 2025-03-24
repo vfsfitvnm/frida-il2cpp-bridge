@@ -375,7 +375,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
          * details. \
          * Binding a static method is forbidden.
          */
-        bind(instance: Il2Cpp.Object | Il2Cpp.ValueType): Il2Cpp.BoundMethod<T> {
+        bind(instance: Il2Cpp.InstanceType): Il2Cpp.BoundMethod<T> {
             if (this.isStatic) {
                 raise(`cannot bind static method ${this.class.type.name}::${this.name} to an instance`);
             }

@@ -30,6 +30,7 @@
 /// <reference path="./structs/field.ts">/>
 /// <reference path="./structs/gc-handle.ts">/>
 /// <reference path="./structs/image.ts">/>
+/// <reference path="./structs/instance-type.ts">/>
 /// <reference path="./structs/memory-snapshot.ts">/>
 /// <reference path="./structs/method.ts">/>
 /// <reference path="./structs/object.ts">/>
