@@ -201,6 +201,8 @@ public class Il2CppObjectTest
 {
     public static int F;
 
+    public int G;
+
     public static int A(int a)
     {
         return 0;
@@ -230,6 +232,24 @@ public class Il2CppObjectTest
         public Il2CppObjectTest D()
         {
             return this;
+        }
+    }
+
+    public class MemberLookupTest : Il2CppObjectTest {
+        public new static int G;
+
+        public int H;
+
+        public new static void C()
+        {
+        }
+
+        public static void D()
+        {
+        }
+
+        public void D(int a)
+        {
         }
     }
 }

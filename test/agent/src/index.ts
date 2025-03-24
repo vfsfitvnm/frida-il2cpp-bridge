@@ -74,8 +74,8 @@ rpc.exports = {
     },
 
     "Il2Cpp.Image::classCount"() {
-        assert(Il2Cpp.domain.assembly("GameAssembly").image.classes.length).is(30);
-        assert(Il2Cpp.domain.assembly("GameAssembly").image.classCount).is(30);
+        assert(Il2Cpp.domain.assembly("GameAssembly").image.classes.length).is(31);
+        assert(Il2Cpp.domain.assembly("GameAssembly").image.classCount).is(31);
     },
 
     "Il2Cpp.Class::image"() {
@@ -253,23 +253,29 @@ rpc.exports = {
     },
 
     "Il2Cpp.Object field lookup ignores static fields"() {
-        const Class = Il2Cpp.domain.assembly("GameAssembly").image.class("Il2CppObjectTest");
+        const T = Il2Cpp.domain.assembly("GameAssembly").image.class("Il2CppObjectTest").nested("MemberLookupTest");
 
-        assert(Class.new().tryField("F")).is(undefined);
-        assert(() => Class.new().field("F")).throws("couldn't find non-static field F in class Il2CppObjectTest");
+        assert(T.new().tryField("F")).is(undefined);
+        assert(() => T.new().field("F")).throws("couldn't find non-static field F in hierarchy of class Il2CppObjectTest.MemberLookupTest");
+
+        assert(T.new().tryField("H")).not(undefined);
+        assert(T.new().tryField("G")?.isStatic).is(false);
     },
 
     "Il2Cpp.Object method lookup ignores static methods"() {
-        const Class = Il2Cpp.domain.assembly("GameAssembly").image.class("Il2CppObjectTest");
+        const T = Il2Cpp.domain.assembly("GameAssembly").image.class("Il2CppObjectTest");
 
-        assert(Class.new().tryMethod("A")).not(undefined);
-        assert(Class.new().tryMethod("B")).is(undefined);
-        assert(Class.new().tryMethod("C", 1)).is(undefined);
-        assert(Class.new().tryMethod("C")).not(undefined);
-        assert(Class.new().tryMethod("C", 0)).not(undefined);
+        assert(T.new().tryMethod("A")).not(undefined);
+        assert(T.new().tryMethod("B")).is(undefined);
+        assert(T.new().tryMethod("C", 1)).is(undefined);
+        assert(T.new().tryMethod("C")).not(undefined);
+        assert(T.new().tryMethod("C", 0)).not(undefined);
 
-        assert(Class.new().method("A").invoke(NULL)).is(1);
-        assert(() => Class.new().method("B")).throws("couldn't find non-static method B in class Il2CppObjectTest");
+        assert(T.new().method("A").invoke(NULL)).is(1);
+        assert(() => T.new().method("B")).throws("couldn't find non-static method B in hierarchy of class Il2CppObjectTest");
+
+        assert(T.nested("MemberLookupTest").new().tryMethod("C")?.isStatic).is(false);
+        assert(T.nested("MemberLookupTest").new().tryMethod("D")?.isStatic).is(false);
     },
 
     "Every enum base type matches its 'value__' field type"() {

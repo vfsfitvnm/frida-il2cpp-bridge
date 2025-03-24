@@ -72,14 +72,14 @@ namespace Il2Cpp {
             return Il2Cpp.exports.objectGetSize(this);
         }
 
-        /** Gets the field with the given name. */
+        /** Gets the non-static field with the given name of the current class hierarchy. */
         field<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> {
-            return this.tryField(name) ?? raise(`couldn't find non-static field ${name} in class ${this.class.type.name}`);
+            return this.tryField(name) ?? raise(`couldn't find non-static field ${name} in hierarchy of class ${this.class.type.name}`);
         }
 
-        /** Gets the method with the given name. */
+        /** Gets the non-static method with the given name (and optionally parameter count) of the current class hierarchy. */
         method<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> {
-            return this.tryMethod<T>(name, parameterCount) ?? raise(`couldn't find non-static method ${name} in class ${this.class.type.name}`);
+            return this.tryMethod<T>(name, parameterCount) ?? raise(`couldn't find non-static method ${name} in hierarchy of class ${this.class.type.name}`);
         }
 
         /** Creates a reference to this object. */
@@ -92,21 +92,39 @@ namespace Il2Cpp {
             return new Il2Cpp.Method<T>(Il2Cpp.exports.objectGetVirtualMethod(this, method)).bind(this);
         }
 
-        /** Gets the field with the given name. */
+        /** Gets the non-static field with the given name of the current class hierarchy, if it exists. */
         tryField<T extends Il2Cpp.Field.Type>(name: string): Il2Cpp.Field<T> | undefined {
             const field = this.class.tryField<T>(name);
-            return field?.isStatic ? undefined : field?.bind(this);
+
+            if (field?.isStatic) {
+                // classes cannot have static and non-static fields with the
+                // same name, hence we can immediately check the parent
+                for (const klass of this.class.hierarchy({ includeCurrent: false })) {
+                    for (const field of klass.fields) {
+                        if (field.name == name && !field.isStatic) {
+                            return field.bind(this) as Il2Cpp.Field<T>;
+                        }
+                    }
+                }
+                return undefined;
+            }
+
+            return field?.bind(this);
         }
 
-        /** Gets the field with the given name. */
+        /** Gets the non-static method with the given name (and optionally parameter count) of the current class hierarchy, if it exists. */
         tryMethod<T extends Il2Cpp.Method.ReturnType>(name: string, parameterCount: number = -1): Il2Cpp.Method<T> | undefined {
-            let method = this.class.tryMethod<T>(name, parameterCount);
+            const method = this.class.tryMethod<T>(name, parameterCount);
 
             if (method?.isStatic) {
-                method =
-                    (this.class.methods.find(
-                        _ => _.name == name && (parameterCount >= 0 ? _.parameterCount == parameterCount : true) && !_.isStatic
-                    ) as Il2Cpp.Method<T>) ?? null;
+                for (const klass of this.class.hierarchy()) {
+                    for (const method of klass.methods) {
+                        if (method.name == name && !method.isStatic && (parameterCount < 0 || method.parameterCount == parameterCount)) {
+                            return method.bind(this) as Il2Cpp.Method<T>;
+                        }
+                    }
+                }
+                return undefined;
             }
 
             return method?.bind(this);
