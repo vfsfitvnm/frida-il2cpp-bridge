@@ -4,7 +4,6 @@
 /// <reference path="./utils/getter.ts">/>
 /// <reference path="./utils/lazy.ts">/>
 /// <reference path="./utils/native-struct.ts">/>
-/// <reference path="./utils/native-wait.ts">/>
 /// <reference path="./utils/offset-of.ts">/>
 /// <reference path="./utils/read-native-iterator.ts">/>
 /// <reference path="./utils/read-native-list.ts">/>

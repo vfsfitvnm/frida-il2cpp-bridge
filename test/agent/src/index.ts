@@ -484,8 +484,6 @@ rpc.exports = {
     $init(sourceMapPath: string, unityVersion: string) {
         Script.registerSourceMap("/index.js", new File(sourceMapPath, "r").readText());
         $EXPECTED_UNITY_VERSION = unityVersion;
-        return Object.keys(this).filter(_ => !_.startsWith("$"));
+        return Il2Cpp.perform(() => Object.keys(this).filter(_ => !_.startsWith("$")), "leak");
     }
 };
-
-Il2Cpp.perform(() => {}, "leak");
