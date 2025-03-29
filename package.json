@@ -26,6 +26,9 @@
   "scripts": {
     "prepare": "make dist"
   },
+  "bin": {
+    "frida-il2cpp-bridge": "cli/index.js"
+  },
   "prettier": {
     "arrowParens": "avoid",
     "bracketSpacing": true,
