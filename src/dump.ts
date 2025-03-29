@@ -69,7 +69,7 @@ namespace Il2Cpp {
      * classes within `System.Core` and `System.Runtime.CompilerServices.Unsafe`
      * are dumped into `System/Core.cs` and
      * `System/Runtime/CompilerServices/Unsafe.cs`, respectively.
-     * 
+     *
      * ```ts
      * Il2Cpp.perform(() => {
      *     Il2Cpp.dumpTree();
@@ -77,6 +77,7 @@ namespace Il2Cpp {
      * ```
      */
     export function dumpTree(path?: string, ignoreAlreadyExistingDirectory: boolean = false): void {
+        if (path && !path?.startsWith("/")) path = `${Il2Cpp.application.dataPath!}/${path}`;
         path = path ?? `${Il2Cpp.application.dataPath!}/${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
 
         if (!ignoreAlreadyExistingDirectory && directoryExists(path)) {
@@ -97,7 +98,7 @@ namespace Il2Cpp {
             }
 
             file.flush();
-            file.close();            
+            file.close();
         }
 
         ok(`dump saved to ${path}`);
