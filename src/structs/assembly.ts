@@ -53,5 +53,14 @@ namespace Il2Cpp {
 
             raise("couldn't find the object of the native assembly struct");
         }
+
+        /** */
+        toJSON() {
+            return {
+                handle: this.handle,
+                name: this.name,
+                classCount: this.image.classCount
+            };
+        }
     }
 }

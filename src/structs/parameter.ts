@@ -15,6 +15,14 @@ namespace Il2Cpp {
             this.type = type;
         }
 
+        toJSON() {
+            return {
+                name: this.name,
+                position: this.position,
+                type: this.type.class.handle
+            };
+        }
+
         /** */
         toString(): string {
             return `${this.type.name} ${this.name}`;
