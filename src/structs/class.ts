@@ -174,8 +174,8 @@ namespace Il2Cpp {
 
         /** Gets the namespace of the current class. */
         @lazy
-        get namespace(): string {
-            return Il2Cpp.exports.classGetNamespace(this).readUtf8String()!;
+        get namespace(): string | undefined {
+            return Il2Cpp.exports.classGetNamespace(this).readUtf8String()! || undefined;
         }
 
         /** Gets the classes nested inside the current class. */

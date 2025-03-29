@@ -107,7 +107,7 @@ rpc.exports = {
     "Il2Cpp.Class::namespace"() {
         assert(Il2Cpp.corlib.class("System.String").namespace).is("System");
         assert(Il2Cpp.corlib.class("System.Collections.Generic.List`1").namespace).is("System.Collections.Generic");
-        assert(Il2Cpp.corlib.class("<Module>").namespace).is("");
+        assert(Il2Cpp.corlib.class("<Module>").namespace).is(undefined);
     },
 
     "Il2Cpp.Class::fullname"() {
