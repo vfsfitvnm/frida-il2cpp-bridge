@@ -27,7 +27,7 @@
     "prepare": "make dist"
   },
   "bin": {
-    "frida-il2cpp-bridge": "cli/main.py"
+    "frida-il2cpp-bridge": "cli/main.py ciao"
   },
   "prettier": {
     "arrowParens": "avoid",
