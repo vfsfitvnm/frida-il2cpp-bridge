@@ -190,6 +190,12 @@ namespace Il2Cpp {
             return new Il2Cpp.Class(Il2Cpp.exports.classGetParent(this)).asNullable();
         }
 
+        /** Gets the pointer class of the current class. */
+        @lazy
+        get pointerClass(): Il2Cpp.Class {
+            return new Il2Cpp.Class(Il2Cpp.exports.classFromObject(this.type.object.method<Il2Cpp.Object>("MakePointerType").invoke()));
+        }
+
         /** Gets the rank (number of dimensions) of the current array class. */
         @lazy
         get rank(): number {

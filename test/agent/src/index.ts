@@ -196,6 +196,18 @@ rpc.exports = {
         assert(Method.parameter("array").type.class.elementClass).is(Il2Cpp.corlib.class("System.Boolean"));
     },
 
+    "Il2Cpp.Class::pointerClass"() {
+        assert(Il2Cpp.corlib.class("System.Void").pointerClass.name).is("Void*");
+        assert(Il2Cpp.corlib.class("System.Boolean").pointerClass.name).is("Boolean*");
+        assert(Il2Cpp.corlib.class("System.Boolean").pointerClass.pointerClass.name).is("Boolean**");
+        assert(Il2Cpp.domain.assembly("GameAssembly").image.class("Class").pointerClass.name).is("Class*");
+    },
+
+    "Pointer class is declared in the same assembly of its base type"() {
+        assert(Il2Cpp.corlib.class("System.Void").pointerClass.image.assembly).is(Il2Cpp.corlib.assembly);
+        assert(Il2Cpp.domain.assembly("GameAssembly").image.class("Class").pointerClass.image.assembly).is(Il2Cpp.domain.assembly("GameAssembly"));
+    },
+
     "Il2Cpp.Class::baseType"() {
         const Method = Il2Cpp.domain.assembly("GameAssembly").image.class("Class").method("Method");
 
