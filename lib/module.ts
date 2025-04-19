@@ -34,7 +34,7 @@ namespace Il2Cpp {
      * Waits for the IL2CPP native library to be loaded and initialized.
      */
     export async function initialize(blocking = false): Promise<boolean> {
-        const modulePromise = new Promise<Module>(resolve => {
+        const modulePromise = () => new Promise<Module>(resolve => {
             const moduleNames = getExpectedModuleNames();
 
             for (const moduleName of moduleNames) {
@@ -64,8 +64,8 @@ namespace Il2Cpp {
             // prettier-ignore
             value: Process.platform == "darwin"
                 ? Process.findModuleByAddress(DebugSymbol.fromName("il2cpp_init").address) 
-                    ?? await modulePromise
-                : await modulePromise
+                    ?? await modulePromise()
+                : await modulePromise()
         });
 
         // At this point, the IL2CPP native library has been loaded, but we
