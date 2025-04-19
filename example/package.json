@@ -1,0 +1,26 @@
+{
+  "name": "frida-il2cpp-bridge-example",
+  "private": true,
+  "source": "index.ts",
+  "type": "module",
+  "scripts": {
+    "build:esbuild": "npm exec esbuild -- --bundle --outfile=dist/index.js --watch index.ts",
+    "build:frida-compile": "npm exec frida-compile -- --output dist/index.js --watch index.ts",
+    "frida:local": "frida -l dist/index.js --runtime qjs",
+    "run:host": "npm run frida:local -- -f ../build/host --kill-on-exit -- ../build/2019.3.0f1/out"
+  },
+  "dependencies": {
+    "frida-il2cpp-bridge": "file:.."
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.2",
+    "frida-compile": "^16.4.2",
+    "@types/frida-gum": "^18.8.2"
+  },
+  "prettier": {
+    "tabWidth": 4,
+    "arrowParens": "avoid",
+    "trailingComma": "none",
+    "printWidth": 120
+  }
+}

@@ -7,7 +7,7 @@ dist: node_modules $(shell find src) tsconfig.json
 	@ ./node_modules/.bin/tspc
 	@ touch -m "$@"
 
-node_modules: package.json
+node_modules:
 	@ npm i
 	@ touch -m "$@"
 

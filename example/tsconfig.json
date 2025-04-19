@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+      "target": "esnext",
+      "lib": ["es2022"],
+      "esModuleInterop": false,
+      "moduleResolution": "bundler",
+      "allowJs": true,
+      "strict": true,
+      "sourceMap": false
+  },
+  "files": ["index.ts"],
+  "exclude": ["dist"]
+}

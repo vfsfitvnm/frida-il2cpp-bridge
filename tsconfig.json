@@ -15,5 +15,5 @@
       { "transform": "ts-transformer-inline-file/transformer" }
     ]
   },
-  "exclude": ["dist", "test"]
+  "exclude": ["dist", "test", "example"]
 }
