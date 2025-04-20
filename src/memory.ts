@@ -25,96 +25,96 @@ namespace Il2Cpp {
 
     /** @internal */
     export function read(pointer: NativePointer, type: Il2Cpp.Type): Il2Cpp.Field.Type {
-        switch (type.typeEnum) {
-            case Il2Cpp.Type.enum.boolean:
+        switch (type.enumValue) {
+            case Il2Cpp.Type.Enum.BOOLEAN:
                 return !!pointer.readS8();
-            case Il2Cpp.Type.enum.byte:
+            case Il2Cpp.Type.Enum.BYTE:
                 return pointer.readS8();
-            case Il2Cpp.Type.enum.unsignedByte:
+            case Il2Cpp.Type.Enum.UBYTE:
                 return pointer.readU8();
-            case Il2Cpp.Type.enum.short:
+            case Il2Cpp.Type.Enum.SHORT:
                 return pointer.readS16();
-            case Il2Cpp.Type.enum.unsignedShort:
+            case Il2Cpp.Type.Enum.USHORT:
                 return pointer.readU16();
-            case Il2Cpp.Type.enum.int:
+            case Il2Cpp.Type.Enum.INT:
                 return pointer.readS32();
-            case Il2Cpp.Type.enum.unsignedInt:
+            case Il2Cpp.Type.Enum.UINT:
                 return pointer.readU32();
-            case Il2Cpp.Type.enum.char:
+            case Il2Cpp.Type.Enum.CHAR:
                 return pointer.readU16();
-            case Il2Cpp.Type.enum.long:
+            case Il2Cpp.Type.Enum.LONG:
                 return pointer.readS64();
-            case Il2Cpp.Type.enum.unsignedLong:
+            case Il2Cpp.Type.Enum.ULONG:
                 return pointer.readU64();
-            case Il2Cpp.Type.enum.float:
+            case Il2Cpp.Type.Enum.FLOAT:
                 return pointer.readFloat();
-            case Il2Cpp.Type.enum.double:
+            case Il2Cpp.Type.Enum.DOUBLE:
                 return pointer.readDouble();
-            case Il2Cpp.Type.enum.nativePointer:
-            case Il2Cpp.Type.enum.unsignedNativePointer:
+            case Il2Cpp.Type.Enum.NINT:
+            case Il2Cpp.Type.Enum.NUINT:
                 return pointer.readPointer();
-            case Il2Cpp.Type.enum.pointer:
+            case Il2Cpp.Type.Enum.POINTER:
                 return new Il2Cpp.Pointer(pointer.readPointer(), type.class.baseType!);
-            case Il2Cpp.Type.enum.valueType:
+            case Il2Cpp.Type.Enum.VALUE_TYPE:
                 return new Il2Cpp.ValueType(pointer, type);
-            case Il2Cpp.Type.enum.object:
-            case Il2Cpp.Type.enum.class:
+            case Il2Cpp.Type.Enum.OBJECT:
+            case Il2Cpp.Type.Enum.CLASS:
                 return new Il2Cpp.Object(pointer.readPointer());
-            case Il2Cpp.Type.enum.genericInstance:
+            case Il2Cpp.Type.Enum.GENERIC_INSTANCE:
                 return type.class.isValueType ? new Il2Cpp.ValueType(pointer, type) : new Il2Cpp.Object(pointer.readPointer());
-            case Il2Cpp.Type.enum.string:
+            case Il2Cpp.Type.Enum.STRING:
                 return new Il2Cpp.String(pointer.readPointer());
-            case Il2Cpp.Type.enum.array:
-            case Il2Cpp.Type.enum.multidimensionalArray:
+            case Il2Cpp.Type.Enum.ARRAY:
+            case Il2Cpp.Type.Enum.NARRAY:
                 return new Il2Cpp.Array(pointer.readPointer());
         }
 
-        raise(`couldn't read the value from ${pointer} using an unhandled or unknown type ${type.name} (${type.typeEnum}), please file an issue`);
+        raise(`couldn't read the value from ${pointer} using an unhandled or unknown type ${type.name} (${type.enumValue}), please file an issue`);
     }
 
     /** @internal */
     export function write(pointer: NativePointer, value: any, type: Il2Cpp.Type): NativePointer {
-        switch (type.typeEnum) {
-            case Il2Cpp.Type.enum.boolean:
+        switch (type.enumValue) {
+            case Il2Cpp.Type.Enum.BOOLEAN:
                 return pointer.writeS8(+value);
-            case Il2Cpp.Type.enum.byte:
+            case Il2Cpp.Type.Enum.BYTE:
                 return pointer.writeS8(value);
-            case Il2Cpp.Type.enum.unsignedByte:
+            case Il2Cpp.Type.Enum.UBYTE:
                 return pointer.writeU8(value);
-            case Il2Cpp.Type.enum.short:
+            case Il2Cpp.Type.Enum.SHORT:
                 return pointer.writeS16(value);
-            case Il2Cpp.Type.enum.unsignedShort:
+            case Il2Cpp.Type.Enum.USHORT:
                 return pointer.writeU16(value);
-            case Il2Cpp.Type.enum.int:
+            case Il2Cpp.Type.Enum.INT:
                 return pointer.writeS32(value);
-            case Il2Cpp.Type.enum.unsignedInt:
+            case Il2Cpp.Type.Enum.UINT:
                 return pointer.writeU32(value);
-            case Il2Cpp.Type.enum.char:
+            case Il2Cpp.Type.Enum.CHAR:
                 return pointer.writeU16(value);
-            case Il2Cpp.Type.enum.long:
+            case Il2Cpp.Type.Enum.LONG:
                 return pointer.writeS64(value);
-            case Il2Cpp.Type.enum.unsignedLong:
+            case Il2Cpp.Type.Enum.ULONG:
                 return pointer.writeU64(value);
-            case Il2Cpp.Type.enum.float:
+            case Il2Cpp.Type.Enum.FLOAT:
                 return pointer.writeFloat(value);
-            case Il2Cpp.Type.enum.double:
+            case Il2Cpp.Type.Enum.DOUBLE:
                 return pointer.writeDouble(value);
-            case Il2Cpp.Type.enum.nativePointer:
-            case Il2Cpp.Type.enum.unsignedNativePointer:
-            case Il2Cpp.Type.enum.pointer:
-            case Il2Cpp.Type.enum.string:
-            case Il2Cpp.Type.enum.array:
-            case Il2Cpp.Type.enum.multidimensionalArray:
+            case Il2Cpp.Type.Enum.NINT:
+            case Il2Cpp.Type.Enum.NUINT:
+            case Il2Cpp.Type.Enum.POINTER:
+            case Il2Cpp.Type.Enum.STRING:
+            case Il2Cpp.Type.Enum.ARRAY:
+            case Il2Cpp.Type.Enum.NARRAY:
                 return pointer.writePointer(value);
-            case Il2Cpp.Type.enum.valueType:
+            case Il2Cpp.Type.Enum.VALUE_TYPE:
                 return Memory.copy(pointer, value, type.class.valueTypeSize), pointer;
-            case Il2Cpp.Type.enum.object:
-            case Il2Cpp.Type.enum.class:
-            case Il2Cpp.Type.enum.genericInstance:
+            case Il2Cpp.Type.Enum.OBJECT:
+            case Il2Cpp.Type.Enum.CLASS:
+            case Il2Cpp.Type.Enum.GENERIC_INSTANCE:
                 return value instanceof Il2Cpp.ValueType ? (Memory.copy(pointer, value, type.class.valueTypeSize), pointer) : pointer.writePointer(value);
         }
 
-        raise(`couldn't write value ${value} to ${pointer} using an unhandled or unknown type ${type.name} (${type.typeEnum}), please file an issue`);
+        raise(`couldn't write value ${value} to ${pointer} using an unhandled or unknown type ${type.name} (${type.enumValue}), please file an issue`);
     }
 
     /** @internal */
@@ -143,24 +143,24 @@ namespace Il2Cpp {
                 return new Il2Cpp.Reference(value, type);
             }
 
-            switch (type.typeEnum) {
-                case Il2Cpp.Type.enum.pointer:
+            switch (type.enumValue) {
+                case Il2Cpp.Type.Enum.POINTER:
                     return new Il2Cpp.Pointer(value, type.class.baseType!);
-                case Il2Cpp.Type.enum.string:
+                case Il2Cpp.Type.Enum.STRING:
                     return new Il2Cpp.String(value);
-                case Il2Cpp.Type.enum.class:
-                case Il2Cpp.Type.enum.genericInstance:
-                case Il2Cpp.Type.enum.object:
+                case Il2Cpp.Type.Enum.CLASS:
+                case Il2Cpp.Type.Enum.GENERIC_INSTANCE:
+                case Il2Cpp.Type.Enum.OBJECT:
                     return new Il2Cpp.Object(value);
-                case Il2Cpp.Type.enum.array:
-                case Il2Cpp.Type.enum.multidimensionalArray:
+                case Il2Cpp.Type.Enum.ARRAY:
+                case Il2Cpp.Type.Enum.NARRAY:
                     return new Il2Cpp.Array(value);
                 default:
                     return value;
             }
-        } else if (type.typeEnum == Il2Cpp.Type.enum.boolean) {
+        } else if (type.enumValue == Il2Cpp.Type.Enum.BOOLEAN) {
             return !!(value as number);
-        } else if (type.typeEnum == Il2Cpp.Type.enum.valueType && type.class.isEnum) {
+        } else if (type.enumValue == Il2Cpp.Type.Enum.VALUE_TYPE && type.class.isEnum) {
             return fromFridaValue([value], type);
         } else {
             return value;

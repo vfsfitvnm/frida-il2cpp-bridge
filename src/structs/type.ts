@@ -3,34 +3,41 @@ namespace Il2Cpp {
     export class Type extends NativeStruct {
         /** */
         @lazy
-        static get enum() {
-            const _ = (_: string, block = (_: Il2Cpp.Class): { type: Il2Cpp.Type } => _) => block(Il2Cpp.corlib.class(_)).type.typeEnum;
+        static get Enum() {
+            type NameToId = typeof map;
+            type IdToName = { [K in keyof NameToId as NameToId[K]]: K };
 
-            return {
-                void: _("System.Void"),
-                boolean: _("System.Boolean"),
-                char: _("System.Char"),
-                byte: _("System.SByte"),
-                unsignedByte: _("System.Byte"),
-                short: _("System.Int16"),
-                unsignedShort: _("System.UInt16"),
-                int: _("System.Int32"),
-                unsignedInt: _("System.UInt32"),
-                long: _("System.Int64"),
-                unsignedLong: _("System.UInt64"),
-                nativePointer: _("System.IntPtr"),
-                unsignedNativePointer: _("System.UIntPtr"),
-                float: _("System.Single"),
-                double: _("System.Double"),
-                pointer: _("System.IntPtr", _ => _.field("m_value")),
-                valueType: _("System.Decimal"),
-                object: _("System.Object"),
-                string: _("System.String"),
-                class: _("System.Array"),
-                array: _("System.Void", _ => _.arrayClass),
-                multidimensionalArray: _("System.Void", _ => new Il2Cpp.Class(Il2Cpp.exports.classGetArrayClass(_, 2))),
-                genericInstance: _("System.Int32", _ => _.interfaces.find(_ => _.name.endsWith("`1"))!)
+            const _ = (_: string, block = (_: Il2Cpp.Class): { type: Il2Cpp.Type } => _) => block(Il2Cpp.corlib.class(_)).type.enumValue;
+
+            const map = {
+                VOID: _("System.Void"),
+                BOOLEAN: _("System.Boolean"),
+                CHAR: _("System.Char"),
+                BYTE: _("System.SByte"),
+                UBYTE: _("System.Byte"),
+                SHORT: _("System.Int16"),
+                USHORT: _("System.UInt16"),
+                INT: _("System.Int32"),
+                UINT: _("System.UInt32"),
+                LONG: _("System.Int64"),
+                ULONG: _("System.UInt64"),
+                NINT: _("System.IntPtr"),
+                NUINT: _("System.UIntPtr"),
+                FLOAT: _("System.Single"),
+                DOUBLE: _("System.Double"),
+                POINTER: _("System.IntPtr", _ => _.field("m_value")),
+                VALUE_TYPE: _("System.Decimal"),
+                OBJECT: _("System.Object"),
+                STRING: _("System.String"),
+                CLASS: _("System.Array"),
+                ARRAY: _("System.Void", _ => _.arrayClass),
+                NARRAY: _("System.Void", _ => new Il2Cpp.Class(Il2Cpp.exports.classGetArrayClass(_, 2))),
+                GENERIC_INSTANCE: _("System.Int32", _ => _.interfaces.find(_ => _.name.endsWith("`1"))!)
             };
+
+            const reversed: IdToName = globalThis.Object.fromEntries(globalThis.Object.entries(map).map(_ => _.reverse()));
+
+            return globalThis.Object.assign(map, reversed);
         }
 
         /** Gets the class of this type. */
@@ -51,45 +58,45 @@ namespace Il2Cpp {
                 return "pointer";
             }
 
-            switch (this.typeEnum) {
-                case Il2Cpp.Type.enum.void:
+            switch (this.enumValue) {
+                case Il2Cpp.Type.Enum.VOID:
                     return "void";
-                case Il2Cpp.Type.enum.boolean:
+                case Il2Cpp.Type.Enum.BOOLEAN:
                     return "bool";
-                case Il2Cpp.Type.enum.char:
+                case Il2Cpp.Type.Enum.CHAR:
                     return "uchar";
-                case Il2Cpp.Type.enum.byte:
+                case Il2Cpp.Type.Enum.BYTE:
                     return "int8";
-                case Il2Cpp.Type.enum.unsignedByte:
+                case Il2Cpp.Type.Enum.UBYTE:
                     return "uint8";
-                case Il2Cpp.Type.enum.short:
+                case Il2Cpp.Type.Enum.SHORT:
                     return "int16";
-                case Il2Cpp.Type.enum.unsignedShort:
+                case Il2Cpp.Type.Enum.USHORT:
                     return "uint16";
-                case Il2Cpp.Type.enum.int:
+                case Il2Cpp.Type.Enum.INT:
                     return "int32";
-                case Il2Cpp.Type.enum.unsignedInt:
+                case Il2Cpp.Type.Enum.UINT:
                     return "uint32";
-                case Il2Cpp.Type.enum.long:
+                case Il2Cpp.Type.Enum.LONG:
                     return "int64";
-                case Il2Cpp.Type.enum.unsignedLong:
+                case Il2Cpp.Type.Enum.ULONG:
                     return "uint64";
-                case Il2Cpp.Type.enum.float:
+                case Il2Cpp.Type.Enum.FLOAT:
                     return "float";
-                case Il2Cpp.Type.enum.double:
+                case Il2Cpp.Type.Enum.DOUBLE:
                     return "double";
-                case Il2Cpp.Type.enum.nativePointer:
-                case Il2Cpp.Type.enum.unsignedNativePointer:
-                case Il2Cpp.Type.enum.pointer:
-                case Il2Cpp.Type.enum.string:
-                case Il2Cpp.Type.enum.array:
-                case Il2Cpp.Type.enum.multidimensionalArray:
+                case Il2Cpp.Type.Enum.NINT:
+                case Il2Cpp.Type.Enum.NUINT:
+                case Il2Cpp.Type.Enum.POINTER:
+                case Il2Cpp.Type.Enum.STRING:
+                case Il2Cpp.Type.Enum.ARRAY:
+                case Il2Cpp.Type.Enum.NARRAY:
                     return "pointer";
-                case Il2Cpp.Type.enum.valueType:
+                case Il2Cpp.Type.Enum.VALUE_TYPE:
                     return this.class.isEnum ? this.class.baseType!.fridaAlias : getValueTypeFields(this);
-                case Il2Cpp.Type.enum.class:
-                case Il2Cpp.Type.enum.object:
-                case Il2Cpp.Type.enum.genericInstance:
+                case Il2Cpp.Type.Enum.CLASS:
+                case Il2Cpp.Type.Enum.OBJECT:
+                case Il2Cpp.Type.Enum.GENERIC_INSTANCE:
                     return this.class.isStruct ? getValueTypeFields(this) : this.class.isEnum ? this.class.baseType!.fridaAlias : "pointer";
                 default:
                     return "pointer";
@@ -105,21 +112,21 @@ namespace Il2Cpp {
         /** Determines whether this type is primitive. */
         @lazy
         get isPrimitive(): boolean {
-            switch (this.typeEnum) {
-                case Il2Cpp.Type.enum.boolean:
-                case Il2Cpp.Type.enum.char:
-                case Il2Cpp.Type.enum.byte:
-                case Il2Cpp.Type.enum.unsignedByte:
-                case Il2Cpp.Type.enum.short:
-                case Il2Cpp.Type.enum.unsignedShort:
-                case Il2Cpp.Type.enum.int:
-                case Il2Cpp.Type.enum.unsignedInt:
-                case Il2Cpp.Type.enum.long:
-                case Il2Cpp.Type.enum.unsignedLong:
-                case Il2Cpp.Type.enum.float:
-                case Il2Cpp.Type.enum.double:
-                case Il2Cpp.Type.enum.nativePointer:
-                case Il2Cpp.Type.enum.unsignedNativePointer:
+            switch (this.enumValue) {
+                case Il2Cpp.Type.Enum.BOOLEAN:
+                case Il2Cpp.Type.Enum.CHAR:
+                case Il2Cpp.Type.Enum.BYTE:
+                case Il2Cpp.Type.Enum.UBYTE:
+                case Il2Cpp.Type.Enum.SHORT:
+                case Il2Cpp.Type.Enum.USHORT:
+                case Il2Cpp.Type.Enum.INT:
+                case Il2Cpp.Type.Enum.UINT:
+                case Il2Cpp.Type.Enum.LONG:
+                case Il2Cpp.Type.Enum.ULONG:
+                case Il2Cpp.Type.Enum.FLOAT:
+                case Il2Cpp.Type.Enum.DOUBLE:
+                case Il2Cpp.Type.Enum.NINT:
+                case Il2Cpp.Type.Enum.NUINT:
                     return true;
                 default:
                     return false;
@@ -144,9 +151,9 @@ namespace Il2Cpp {
             return new Il2Cpp.Object(Il2Cpp.exports.typeGetObject(this));
         }
 
-        /** Gets the type enum of the current type. */
+        /** Gets the {@link Il2Cpp.Type.Enum} value of the current type. */
         @lazy
-        get typeEnum(): number {
+        get enumValue(): number {
             return Il2Cpp.exports.typeGetTypeEnum(this);
         }
 
