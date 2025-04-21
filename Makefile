@@ -12,7 +12,7 @@ node_modules:
 	@ touch -m "$@"
 
 test: dist test/agent/dist build/host
-	@ node test/index.js
+	@ python3 test/main.py
 
 test/agent/dist: node_modules $(shell find test/agent/src) test/agent/tsconfig.json
 	@ ./node_modules/.bin/tspc -p test/agent

@@ -1,3 +1,12 @@
+function test(name: string, block: () => void) {
+    try {
+        block();
+        send({ name: name });
+    } catch (exception: any) {
+        send({ name: name, exception: exception.stack });
+    }
+}
+
 function assert(actual: () => any): CallbackAssertion;
 function assert<T>(actual: T): ValueAssertion<T>;
 

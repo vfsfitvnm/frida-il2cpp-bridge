@@ -24,7 +24,8 @@
     "dist"
   ],
   "scripts": {
-    "prepare": "make dist"
+    "prepare": "make dist",
+    "test": "make test"
   },
   "prettier": {
     "arrowParens": "avoid",
@@ -36,8 +37,7 @@
   "devDependencies": {
     "@types/frida-gum": "^18.8.2",
     "ts-patch": "^3.2.1",
-    "ts-transformer-inline-file": "^0.2.0",
-    "frida": "^16.7.3"
+    "ts-transformer-inline-file": "^0.2.0"
   },
   "overrides": {
     "ts-transformer-inline-file": {
