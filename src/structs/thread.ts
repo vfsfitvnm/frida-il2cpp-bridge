@@ -58,24 +58,21 @@ namespace Il2Cpp {
 
         /** @internal */
         @lazy
-        private get synchronizationContext(): Il2Cpp.Object {
+        private get synchronizationContext(): Il2Cpp.Object | null {
             const get_ExecutionContext = this.object.tryMethod<Il2Cpp.Object>("GetMutableExecutionContext") ?? this.object.method("get_ExecutionContext");
             const executionContext = get_ExecutionContext.invoke();
 
-            let synchronizationContext =
+            // From what I observed, only the main thread is supposed to have a
+            // synchronization context; however there are two cases where it is
+            // not available at all:
+            // 1) during early instrumentation;
+            // 2) it was dead code has it was stripped out.
+            const synchronizationContext =
                 executionContext.tryField<Il2Cpp.Object>("_syncContext")?.value ??
                 executionContext.tryMethod<Il2Cpp.Object>("get_SynchronizationContext")?.invoke() ??
                 this.tryLocalValue(Il2Cpp.corlib.class("System.Threading.SynchronizationContext"));
 
-            if (synchronizationContext == null || synchronizationContext.isNull()) {
-                if (this.handle.equals(Il2Cpp.mainThread.handle)) {
-                    raise(`couldn't find the synchronization context of the main thread, perhaps this is early instrumentation?`);
-                } else {
-                    raise(`couldn't find the synchronization context of thread #${this.managedId}, only the main thread is expected to have one`);
-                }
-            }
-
-            return synchronizationContext;
+            return synchronizationContext?.asNullable() ?? null;
         }
 
         /** Detaches the thread from the application domain. */
@@ -84,8 +81,12 @@ namespace Il2Cpp {
         }
 
         /** Schedules a callback on the current thread. */
-        schedule<T>(block: () => T | Promise<T>): Promise<T> {
-            const Post = this.synchronizationContext.method("Post");
+        schedule<T>(block: () => T): Promise<T> {
+            const Post = this.synchronizationContext?.tryMethod("Post");
+
+            if (Post == null) {
+                return Process.runOnThread(this.id, block);
+            }
 
             return new Promise(resolve => {
                 const delegate = Il2Cpp.delegate(Il2Cpp.corlib.class("System.Threading.SendOrPostCallback"), () => {
