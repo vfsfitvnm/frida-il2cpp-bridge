@@ -158,7 +158,11 @@ namespace Il2Cpp {
         }
 
         is(other: Il2Cpp.Type): boolean {
-            return !!Il2Cpp.exports.typeEquals(this, other);
+            try {
+                return !!Il2Cpp.exports.typeEquals(this, other);
+            } catch (_) {
+                return this.object.method<boolean>("Equals").invoke(other.object);
+            }
         }
 
         /** */
