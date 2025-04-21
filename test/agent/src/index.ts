@@ -11,6 +11,10 @@ Il2Cpp.perform(() => {
         assert(Il2Cpp.application.identifier).is("host");
     });
 
+    test("Application version is detected", () => {
+        assert(Il2Cpp.application.version).not(null);
+    });
+
     test("Il2Cpp.Thread::id", () => {
         assert(Il2Cpp.currentThread?.id).is(Process.getCurrentThreadId());
     });

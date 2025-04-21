@@ -40,7 +40,8 @@ namespace Il2Cpp {
         /**
          * Gets the version name of the current application, e.g. `4.12.8`.
          *
-         * **This information is not guaranteed to exist.**
+         * In case the version cannot be retrieved, an hash of the IL2CPP
+         * module is returned instead.
          *
          * ```ts
          * Il2Cpp.perform(() => {
@@ -49,8 +50,8 @@ namespace Il2Cpp {
          * });
          * ```
          */
-        get version(): string | null {
-            return unityEngineCall("get_version");
+        get version(): string {
+            return unityEngineCall("get_version") ?? exportsHash(Il2Cpp.module).toString(16);
         }
     };
 

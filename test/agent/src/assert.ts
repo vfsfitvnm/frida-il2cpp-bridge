@@ -37,7 +37,7 @@ class Assertion<T> {
         }
     }
 
-    not(unexpected: T) {
+    not(unexpected: T | null) {
         if (eq(unexpected, this.actual)) {
             throw new AssertionError(`\x1b[1m${unexpected}\x1b[22m was not expected`);
         }
