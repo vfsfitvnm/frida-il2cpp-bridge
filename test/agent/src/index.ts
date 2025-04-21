@@ -240,6 +240,27 @@ Il2Cpp.perform(() => {
         assert(Method.parameter("array").type.class.baseType).is(Il2Cpp.corlib.class("System.Boolean").type);
     });
 
+    test("Il2Cpp.Type::ENUM.VAR is assigned to generic parameters in a generic type definition", () => {
+        assert(Il2Cpp.corlib.class("System.Action`1").generics[0].type.enumValue).is(Il2Cpp.Type.Enum.VAR);
+        assert(
+            Il2Cpp.domain
+                .assembly("GameAssembly")
+                .image.class("AbstractGenericClass`2")
+                .generics.map(_ => _.type.enumValue)
+        ).is([Il2Cpp.Type.Enum.VAR, Il2Cpp.Type.Enum.VAR]);
+    });
+
+    test("Il2Cpp.Type::ENUM.MVAR is assigned to generic parameters in a generic method definition", () => {
+        assert(Il2Cpp.corlib.class("System.Array").method("AsReadOnly").generics[0].type.enumValue).is(Il2Cpp.Type.Enum.MVAR);
+        assert(
+            Il2Cpp.domain
+                .assembly("GameAssembly")
+                .image.class("Class")
+                .method("StaticGenericMethod")
+                .generics.map(_ => _.type.enumValue)
+        ).is([Il2Cpp.Type.Enum.MVAR, Il2Cpp.Type.Enum.MVAR]);
+    });
+
     test("Il2Cpp.String::content", () => {
         assert(Il2Cpp.string("vfsfitvnm").content).is("vfsfitvnm");
     });

@@ -4,12 +4,9 @@ namespace Il2Cpp {
         /** */
         @lazy
         static get Enum() {
-            type NameToId = typeof map;
-            type IdToName = { [K in keyof NameToId as NameToId[K]]: K };
-
             const _ = (_: string, block = (_: Il2Cpp.Class): { type: Il2Cpp.Type } => _) => block(Il2Cpp.corlib.class(_)).type.enumValue;
 
-            const map = {
+            const initial = {
                 VOID: _("System.Void"),
                 BOOLEAN: _("System.Boolean"),
                 CHAR: _("System.Char"),
@@ -35,9 +32,15 @@ namespace Il2Cpp {
                 GENERIC_INSTANCE: _("System.Int32", _ => _.interfaces.find(_ => _.name.endsWith("`1"))!)
             };
 
-            const reversed: IdToName = globalThis.Object.fromEntries(globalThis.Object.entries(map).map(_ => _.reverse()));
+            // VAR and MVAR require the rest of the values to be initialized;
+            // this is to avoid "Maximum call stack size exceeded"
+            Reflect.defineProperty(this, "Enum", { value: initial });
 
-            return globalThis.Object.assign(map, reversed);
+            return addFlippedEntries({
+                ...initial,
+                VAR: _("System.Action`1", _ => _.generics[0]),
+                MVAR: _("System.Array", _ => _.method("AsReadOnly", 1).generics[0])
+            });
         }
 
         /** Gets the class of this type. */
