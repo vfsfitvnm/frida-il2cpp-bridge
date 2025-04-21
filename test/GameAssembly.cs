@@ -195,6 +195,10 @@ public class Il2CppClassTest
     public class HierarchyTest : Il2CppClassTest
     {
     }
+
+    public class GenericsTest : System.Collections.Generic.List<System.Int32>
+    {
+    }
 }
 
 public class Il2CppObjectTest

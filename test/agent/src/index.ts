@@ -82,8 +82,8 @@ Il2Cpp.perform(() => {
     });
 
     test("Il2Cpp.Image::classCount", () => {
-        assert(Il2Cpp.domain.assembly("GameAssembly").image.classes.length).is(31);
-        assert(Il2Cpp.domain.assembly("GameAssembly").image.classCount).is(31);
+        assert(Il2Cpp.domain.assembly("GameAssembly").image.classes.length).is(32);
+        assert(Il2Cpp.domain.assembly("GameAssembly").image.classCount).is(32);
     });
 
     test("Il2Cpp.Class::image", () => {
@@ -122,6 +122,18 @@ Il2Cpp.perform(() => {
         assert(Il2Cpp.corlib.class("System.String").fullName).is("System.String");
         assert(Il2Cpp.corlib.class("System.Collections.Generic.List`1").fullName).is("System.Collections.Generic.List`1");
         assert(Il2Cpp.corlib.class("<Module>").fullName).is("<Module>");
+    });
+
+    test("Il2Cpp.Class::genericClass", () => {
+        const GenericsTest = Il2Cpp.domain.assembly("GameAssembly").image.class("Il2CppClassTest").nested("GenericsTest");
+        const List = Il2Cpp.corlib.class("System.Collections.Generic.List`1");
+
+        assert(List.genericClass).is(null);
+        assert(List.inflate(Il2Cpp.corlib.class("System.Int32")).genericClass).is(List);
+        assert(List.inflate(List).genericClass).is(List);
+
+        assert(GenericsTest.genericClass).is(null);
+        assert(GenericsTest.parent!.genericClass).is(List);
     });
 
     test("Il2Cpp.Class::type", () => {

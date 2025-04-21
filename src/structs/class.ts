@@ -71,6 +71,17 @@ namespace Il2Cpp {
             return this.namespace ? `${this.namespace}.${this.name}` : this.name;
         }
 
+        /** Gets the generic class of the current class if the current class is inflated. */
+        get genericClass(): Il2Cpp.Class | null {
+            // We leverage two things here:
+            // 1) inflated classes belong to the same assembly of the generic
+            // class;
+            // 2) inflated classes have the generic class name as their name,
+            // e.g. type name is Foo<Bar>, but class name is Foo`1.
+            const klass = this.image.tryClass(this.fullName)?.asNullable();
+            return klass?.equals(this) ? null : klass ?? null;
+        }
+
         /** Gets the generics parameters of this generic class. */
         @lazy
         get generics(): Il2Cpp.Class[] {
