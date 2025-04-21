@@ -7,6 +7,10 @@ Il2Cpp.perform(() => {
         assert(Il2Cpp.unityVersion).is("$UNITY_VERSION");
     });
 
+    test("Application identifier fallbacks to process name", () => {
+        assert(Il2Cpp.application.identifier).is("host");
+    });
+
     test("Il2Cpp.Thread::id", () => {
         assert(Il2Cpp.currentThread?.id).is(Process.getCurrentThreadId());
     });

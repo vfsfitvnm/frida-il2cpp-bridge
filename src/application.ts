@@ -23,7 +23,8 @@ namespace Il2Cpp {
          * Gets the identifier name of the current application, e.g.
          * `com.example.application` on Android.
          *
-         * **This information is not guaranteed to exist.**
+         * In case the identifier cannot be retrieved, the main module name is
+         * returned instead, which typically is the process name.
          *
          * ```ts
          * Il2Cpp.perform(() => {
@@ -32,8 +33,8 @@ namespace Il2Cpp {
          * });
          * ```
          */
-        get identifier(): string | null {
-            return unityEngineCall("get_identifier") ?? unityEngineCall("get_bundleIdentifier");
+        get identifier(): string {
+            return unityEngineCall("get_identifier") ?? unityEngineCall("get_bundleIdentifier") ?? Process.mainModule.name;
         },
 
         /**
