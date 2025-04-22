@@ -1,4 +1,4 @@
-/// <reference path="../../../src/index.ts">/>
+/// <reference path="../../../lib/index.ts">/>
 
 Script.registerSourceMap("/$UNITY_VERSION.js", new File("$SOURCE_MAP_PATH", "r").readText());
 

@@ -3,7 +3,7 @@ MAKEFLAGS += --no-builtin-rules
 
 UNITY_DIRS := $(wildcard unity/*/)
 
-dist: node_modules $(shell find src) tsconfig.json
+dist: node_modules $(shell find lib) tsconfig.json
 	@ ./node_modules/.bin/tspc
 	@ touch -m "$@"
 
