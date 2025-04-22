@@ -111,23 +111,6 @@ namespace Il2Cpp {
         }
 
         /** */
-        toJSON() {
-            return {
-                name: this.name,
-                type: this.type.name,
-                threadStatic: this.isThreadStatic,
-                static: this.isStatic,
-                literal: this.isLiteral,
-                value: this.isLiteral
-                    ? this.type.class.isEnum
-                        ? read((this.value as Il2Cpp.ValueType).handle, this.type.class.baseType!)
-                        : this.value
-                    : undefined,
-                offset: this.isThreadStatic || this.isLiteral ? undefined : this.offset
-            };
-        }
-
-        /** */
         toString(): string {
             return `\
 ${this.isThreadStatic ? `[ThreadStatic] ` : ``}\

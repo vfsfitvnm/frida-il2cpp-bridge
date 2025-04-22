@@ -338,23 +338,6 @@ namespace Il2Cpp {
         }
 
         /** */
-        toJSON() {
-            return {
-                handle: this.handle,
-                assembly: this.image.assembly.handle,
-                namespace: this.namespace,
-                name: this.name,
-                kind: this.isEnum ? `enum` : this.isStruct ? `struct` : this.isInterface ? `interface` : `class`,
-                parent: this.parent?.handle,
-                declaredIn: this.declaringClass?.handle,
-                generics: this.generics.length ? this.generics.map(_ => _.name) : undefined,
-                interfaces: this.interfaces.length ? this.interfaces.map(_ => _.handle) : undefined,
-                fields: this.fields.length ? this.fields : undefined,
-                methods: this.methods.length ? this.methods : undefined
-            };
-        }
-
-        /** */
         toString(): string {
             const inherited = [this.parent].concat(this.interfaces);
 

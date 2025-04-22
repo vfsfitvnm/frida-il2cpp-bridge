@@ -358,17 +358,6 @@ namespace Il2Cpp {
         }
 
         /** */
-        toJSON() {
-            return {
-                static: this.isStatic,
-                name: this.name,
-                returnType: this.returnType.class.handle,
-                parameters: this.parameters,
-                offset: this.virtualAddress.isNull() ? undefined : this.relativeVirtualAddress
-            };
-        }
-
-        /** */
         toString(): string {
             return `\
 ${this.isStatic ? `static ` : ``}\
