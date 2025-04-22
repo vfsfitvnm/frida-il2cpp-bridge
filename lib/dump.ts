@@ -1,5 +1,6 @@
 namespace Il2Cpp {
     /**
+     * @deprecated
      * Dumps the application, i.e. it creates a dummy `.cs` file that contains
      * all the class, field and method declarations.
      *
@@ -61,15 +62,17 @@ namespace Il2Cpp {
         file.flush();
         file.close();
         ok(`dump saved to ${destination}`);
+        showDeprecationNotice();
     }
 
     /**
+     * @deprecated
      * Just like {@link Il2Cpp.dump}, but a `.cs` file per assembly is
      * generated instead of having a single big `.cs` file. For instance, all
      * classes within `System.Core` and `System.Runtime.CompilerServices.Unsafe`
      * are dumped into `System/Core.cs` and
      * `System/Runtime/CompilerServices/Unsafe.cs`, respectively.
-     * 
+     *
      * ```ts
      * Il2Cpp.perform(() => {
      *     Il2Cpp.dumpTree();
@@ -97,10 +100,11 @@ namespace Il2Cpp {
             }
 
             file.flush();
-            file.close();            
+            file.close();
         }
 
         ok(`dump saved to ${path}`);
+        showDeprecationNotice();
     }
 
     function directoryExists(path: string): boolean {
@@ -109,5 +113,9 @@ namespace Il2Cpp {
 
     function createDirectoryRecursively(path: string) {
         Il2Cpp.corlib.class("System.IO.Directory").method("CreateDirectory").invoke(Il2Cpp.string(path));
+    }
+
+    function showDeprecationNotice() {
+        warn("this api will be removed in a future release, please use `npx frida-il2cpp-bridge dump` instead");
     }
 }
