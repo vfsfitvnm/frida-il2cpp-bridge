@@ -2,4 +2,7 @@ package-lock.json
 build
 dist
 node_modules
+__pycache__
 unity/*/Editor
+.vscode
+.DS_Store

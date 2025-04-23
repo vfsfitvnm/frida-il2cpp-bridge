@@ -21,12 +21,15 @@
   "type": "module",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist", "cli"
   ],
   "scripts": {
     "prepare": "make dist",
     "watch": "npm exec tspc -- --watch",
     "test": "make test"
+  },
+  "bin": {
+    "frida-il2cpp-bridge": "cli/main.py"
   },
   "prettier": {
     "arrowParens": "avoid",
