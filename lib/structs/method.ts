@@ -484,7 +484,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
     };
 
     export namespace Method {
-        export type ReturnType = void | Il2Cpp.Field.Type;
+        export type ReturnType = void | Il2Cpp.Field.Type | Il2Cpp.Reference;
 
         export const enum Attributes {
             MemberAccessMask = 0x0007,
