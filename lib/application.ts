@@ -58,10 +58,10 @@ namespace Il2Cpp {
     /**
      * Gets the Unity version of the current application.
      *
-     * **It is possible to override or manually set its value using a global
-     * variable:**
+     * **It is possible to override or manually set its value using
+     * {@link Il2Cpp.$config.unityVersion}:**
      * ```ts
-     * (globalThis as any).IL2CPP_UNITY_VERSION = "5.3.5f1";
+     * Il2Cpp.$config.unityVersion = "5.3.5f1";
      *
      * Il2Cpp.perform(() => {
      *     // prints 5.3.5f1
@@ -79,7 +79,7 @@ namespace Il2Cpp {
     // prettier-ignore
     getter(Il2Cpp, "unityVersion", () => {
         try {
-            const unityVersion = (globalThis as any).IL2CPP_UNITY_VERSION ?? unityEngineCall("get_unityVersion");
+            const unityVersion = Il2Cpp.$config.unityVersion ?? unityEngineCall("get_unityVersion");
 
             if (unityVersion != null) {
                 return unityVersion;

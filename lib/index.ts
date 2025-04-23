@@ -13,6 +13,7 @@
 /// <reference path="./utils/unity-version.ts">/>
 
 /// <reference path="./application.ts">/>
+/// <reference path="./config.ts">/>
 /// <reference path="./dump.ts">/>
 /// <reference path="./exception-listener.ts">/>
 /// <reference path="./exports.ts">/>

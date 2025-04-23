@@ -12,13 +12,9 @@ namespace Il2Cpp {
      * renamed by a nasty obfuscator.
      *
      * However, it is possible to override or set the handle of any of the
-     * exports by using a global variable:
+     * exports using {@link Il2Cpp.$config.exports}:
      * ```ts
-     * declare global {
-     *     let IL2CPP_EXPORTS: Record<string, () => NativePointer>;
-     * }
-     *
-     * IL2CPP_EXPORTS = {
+     * Il2Cpp.$config.exports = {
      *     il2cpp_image_get_class: () => Il2Cpp.module.base.add(0x1204c),
      *     il2cpp_class_get_parent: () => {
      *         return Memory.scanSync(Il2Cpp.module.base, Il2Cpp.module.size, "2f 10 ee 10 34 a8")[0].address;
@@ -530,8 +526,8 @@ namespace Il2Cpp {
     export declare const memorySnapshotExports: CModule;
     getter(Il2Cpp, "memorySnapshotExports", () => new CModule($inline_file("cmodules/memory-snapshot.c")), lazy);
 
-    function r<R extends NativeFunctionReturnType, A extends NativeFunctionArgumentType[] | []>(exportName: string, retType: R, argTypes: A) {
-        const handle = (globalThis as any).IL2CPP_EXPORTS?.[exportName]?.() ?? Il2Cpp.module.findExportByName(exportName) ?? memorySnapshotExports[exportName];
+    function r<R extends NativeFunctionReturnType, A extends NativeFunctionArgumentType[] | []>(exportName: `il2cpp_${string}`, retType: R, argTypes: A) {
+        const handle = Il2Cpp.$config.exports?.[exportName]?.() ?? Il2Cpp.module.findExportByName(exportName) ?? memorySnapshotExports[exportName];
 
         const target = new NativeFunction(handle ?? raise(`couldn't resolve export ${exportName}`), retType, argTypes);
 

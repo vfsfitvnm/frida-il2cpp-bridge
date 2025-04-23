@@ -14,9 +14,9 @@ namespace Il2Cpp {
      * a different name.
      *
      * In any case, it is possible to override or set the IL2CPP module name
-     * using a global variable:
+     * using {@link Il2Cpp.$config.moduleName}:
      * ```ts
-     * (globalThis as any).IL2CPP_MODULE_NAME = "CustomName.dylib";
+     * Il2Cpp.$config.moduleName = "CustomName.dylib";
      *
      * Il2Cpp.perform(() => {
      *     // ...
@@ -87,8 +87,8 @@ namespace Il2Cpp {
     }
 
     function getExpectedModuleNames(): string[] {
-        if ((globalThis as any).IL2CPP_MODULE_NAME) {
-            return [(globalThis as any).IL2CPP_MODULE_NAME];
+        if (Il2Cpp.$config.moduleName) {
+            return [Il2Cpp.$config.moduleName];
         }
 
         switch (Process.platform) {
