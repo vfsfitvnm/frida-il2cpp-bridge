@@ -43,8 +43,8 @@ namespace Il2Cpp {
      * ```
      */
     export function dump(fileName?: string, path?: string): void {
-        fileName = fileName ?? `${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}.cs`;
-        path = path ?? Il2Cpp.application.dataPath!;
+        fileName = fileName ?? `${Il2Cpp.application.identifier}_${Il2Cpp.application.version}.cs`;
+        path = path ?? Il2Cpp.application.dataPath ?? Process.getCurrentDir();
 
         createDirectoryRecursively(path);
 
@@ -80,7 +80,7 @@ namespace Il2Cpp {
      * ```
      */
     export function dumpTree(path?: string, ignoreAlreadyExistingDirectory: boolean = false): void {
-        path = path ?? `${Il2Cpp.application.dataPath!}/${Il2Cpp.application.identifier ?? "unknown"}_${Il2Cpp.application.version ?? "unknown"}`;
+        path = path ?? `${Il2Cpp.application.dataPath ?? Process.getCurrentDir()}/${Il2Cpp.application.identifier}_${Il2Cpp.application.version}`;
 
         if (!ignoreAlreadyExistingDirectory && directoryExists(path)) {
             raise(`directory ${path} already exists - pass ignoreAlreadyExistingDirectory = true to skip this check`);
