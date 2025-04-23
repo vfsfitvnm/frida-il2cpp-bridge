@@ -7,9 +7,12 @@
     "build:esbuild": "npm exec esbuild -- --bundle --outfile=dist/index.js --watch index.ts",
     "build:frida-compile": "npm exec frida-compile -- --output dist/index.js --watch index.ts",
     "frida:local": "frida -l dist/index.js --runtime qjs",
-    "run:host": "npm run frida:local -- -f ../build/host --kill-on-exit -- ../build/$UNITY_VERSION/out",
+    "run:host": "npm run frida:local -- --kill-on-exit -f ../build/host ../build/$UNITY_VERSION/out",
     "run:host:5.3.5f1": "UNITY_VERSION=5.3.5f1 npm run run:host",
-    "run:host:2019.3.0f1": "UNITY_VERSION=2019.3.0f1 npm run run:host"
+    "run:host:2019.3.0f1": "UNITY_VERSION=2019.3.0f1 npm run run:host",
+    "dump:host": "npm exec frida-il2cpp-bridge -- -f ../build/host ../build/$UNITY_VERSION/out dump --out-dir dist",
+    "dump:host:5.3.5f1": "UNITY_VERSION=5.3.5f1 npm run dump:host -- --no-type-keywords --actual-constructor-names --keep-implicit-base-classes",
+    "dump:host:2019.3.0f1":  "UNITY_VERSION=2019.3.0f1 npm run dump:host"
   },
   "dependencies": {
     "frida-il2cpp-bridge": "file:.."

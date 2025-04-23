@@ -39,6 +39,53 @@ or
 npm exec frida-il2cpp-bridge -- --help
 ```
 
+### Dumping
+
+Use the `dump` subcommand to dump an application:
+
+```
+$ npm exec frida-il2cpp-bridge -- dump --help
+usage: frida-il2cpp-bridge [options] dump [-h] [--out-dir OUT_DIR] [--cs-output {none,stdout,flat,tree}] [--no-namespaces] [--flatten-nested-classes] [--keep-implicit-base-classes]
+                                          [--enums-as-structs] [--no-type-keywords] [--actual-constructor-names] [--indentation-size INDENTATION_SIZE]
+
+options:
+  -h, --help            show this help message and exit
+  --out-dir OUT_DIR     where to save the dump (defaults to current working dir)
+  --cs-output {none,stdout,flat,tree}
+                        style of C# output (defaults to tree)
+                        -   none: do nothing;
+                        - stdout: print to console;
+                        -   flat: one single file (dump.cs);
+                        -   tree: directory structure having one file per assembly.
+  --no-namespaces       do not emit namespace blocks, and prepend namespace name in class declarations
+  --flatten-nested-classes
+                        write nested classes at the same level of their inclosing classes, and prepend enclosing class name in their declarations
+  --keep-implicit-base-classes
+                        write implicit base classes (class -> System.Object, struct -> System.ValueType, enum -> System.Enum) in class declarations
+  --enums-as-structs    write enum class declarations as structs
+  --no-type-keywords    use fully qualified names for builtin types instead of their keywords (e.g. use 'System.Int32' instead of 'int', or 'System.Object' instead of 'object')
+  --actual-constructor-names
+                        write actual constructors names (e.g. '.ctor' and '.cctor')
+  --indentation-size INDENTATION_SIZE
+                        indentation size (defaults to 4)
+```
+
+Example:
+
+```sh
+npm exec frida-il2cpp-bridge -- -f com.example.application dump --out-dir dumps
+```
+
+Output:
+
+```
+Spawning `com.example.application`...
+IL2CPP module loaded in 1.13s (id=com.example.application, version=1.12.8, unity version=2019.3.0f1)
+Dumping mscorlib: 2872 of 2872 classes
+Dumping GameAssembly: 32 of 32 classes
+Collected 2904 classes in 4.76s
+Dump saved to dumps/com.example.application/1.12.8
+```
 
 ## Testing
 
