@@ -49,10 +49,15 @@ namespace Il2Cpp {
                 onAdded(module: Module) {
                     if (moduleNames.includes(module.name)) {
                         moduleObserver.detach();
+                        clearTimeout(timeout);
                         resolve(module);
                     }
                 }
             });
+
+            const timeout = setTimeout(() => {
+                warn(`after 10 seconds, \x1b[3m${moduleNames[0]}\x1b[0m has not been loaded yet, is the app running?`);
+            }, 10000);
         });
 
         Reflect.defineProperty(Il2Cpp, "module", {
