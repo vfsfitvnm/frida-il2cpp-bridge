@@ -25,6 +25,7 @@
   ],
   "scripts": {
     "prepare": "make dist",
+    "watch": "npm exec tspc -- --watch",
     "test": "make test"
   },
   "prettier": {

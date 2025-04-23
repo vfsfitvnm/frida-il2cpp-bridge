@@ -4,7 +4,7 @@ MAKEFLAGS += --no-builtin-rules
 UNITY_DIRS := $(wildcard unity/*/)
 
 dist: node_modules $(shell find lib) tsconfig.json
-	@ ./node_modules/.bin/tspc
+	@ npm exec tspc
 	@ touch -m "$@"
 
 node_modules:
@@ -15,7 +15,7 @@ test: dist test/agent/dist build/host
 	@ python3 test/main.py
 
 test/agent/dist: node_modules $(shell find test/agent/src) test/agent/tsconfig.json
-	@ ./node_modules/.bin/tspc -p test/agent
+	@ npm exec tspc -- -p test/agent
 	@ touch -m "$@"
 
 build/host: test/host.c
