@@ -305,6 +305,46 @@ Il2Cpp.perform(() => {
         assert(() => instance.base.base.base.class).throws("class System.Object has no parent");
     });
 
+    test("Boxed primiteves are created using the expected types", () => {
+        assert(Il2Cpp.boxed(false).class).is(Il2Cpp.corlib.class("System.Boolean"));
+        assert(Il2Cpp.boxed(0).class).is(Il2Cpp.corlib.class("System.Int32"));
+        assert(Il2Cpp.boxed(NULL).class).is(Il2Cpp.corlib.class("System.IntPtr"));
+
+        assert(Il2Cpp.boxed(0, undefined).class).is(Il2Cpp.corlib.class("System.Int32"));
+        assert(Il2Cpp.boxed(0, "int8").class).is(Il2Cpp.corlib.class("System.SByte"));
+        assert(Il2Cpp.boxed(0, "int16").class).is(Il2Cpp.corlib.class("System.Int16"));
+        assert(Il2Cpp.boxed(0, "int32").class).is(Il2Cpp.corlib.class("System.Int32"));
+        assert(Il2Cpp.boxed(0, "int64").class).is(Il2Cpp.corlib.class("System.Int64"));
+        assert(Il2Cpp.boxed(0, "uint8").class).is(Il2Cpp.corlib.class("System.Byte"));
+        assert(Il2Cpp.boxed(0, "uint16").class).is(Il2Cpp.corlib.class("System.UInt16"));
+        assert(Il2Cpp.boxed(0, "uint32").class).is(Il2Cpp.corlib.class("System.UInt32"));
+        assert(Il2Cpp.boxed(0, "uint64").class).is(Il2Cpp.corlib.class("System.UInt64"));
+
+        assert(Il2Cpp.boxed(0, "char").class).is(Il2Cpp.corlib.class("System.Char"));
+
+        assert(Il2Cpp.boxed(NULL, undefined).class).is(Il2Cpp.corlib.class("System.IntPtr"));
+        assert(Il2Cpp.boxed(NULL, "intptr").class).is(Il2Cpp.corlib.class("System.IntPtr"));
+        assert(Il2Cpp.boxed(NULL, "uintptr").class).is(Il2Cpp.corlib.class("System.UIntPtr"));
+    });
+
+    test("Boxed primiteves have correct values", () => {
+        assert(Il2Cpp.boxed(false).field("m_value").value).is(false);
+        assert(Il2Cpp.boxed(true).field("m_value").value).is(true);
+        assert(Il2Cpp.boxed(12345).field("m_value").value).is(12345);
+        assert(Il2Cpp.boxed(ptr(12345)).field("m_value").value).is(ptr(12345));
+    });
+
+    test("Boxed primitives cannot be created if invalid values or types are provided", () => {
+        assert(() => Il2Cpp.boxed(0n as any).class).throws("Cannot create boxed primitive using value of type 'bigint'");
+        assert(() => Il2Cpp.boxed("something" as any).class).throws("Cannot create boxed primitive using value of type 'string'");
+
+        assert(() => Il2Cpp.boxed(0, "something" as any).class).throws("Unknown primitive type name 'something'");
+        assert(() => Il2Cpp.boxed(NULL, "else" as any).class).throws("Unknown primitive type name 'else'");
+
+        assert(() => Il2Cpp.boxed(NULL, "int8" as any).class).throws("expected an integer");
+        assert(() => Il2Cpp.boxed(0, "intptr" as any).class).throws("expected a pointer");
+    });
+
     test("Il2Cpp.Object field lookup ignores static fields", () => {
         const T = Il2Cpp.domain.assembly("GameAssembly").image.class("Il2CppObjectTest").nested("MemberLookupTest");
 
