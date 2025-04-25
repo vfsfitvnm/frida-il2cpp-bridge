@@ -573,4 +573,14 @@ Il2Cpp.perform(() => {
         assert(() => T.method("D").overload("OverloadTest.Rooat")).throws("couldn't find overloaded method D(OverloadTest.Rooat)");
         assert(() => T.new().method("D").overload("OverloadTest.Rot")).throws("couldn't find overloaded method D(OverloadTest.Rot)");
     });
+
+    test("Il2Cpp.Method::fromVirtualAddress", () => {
+        Il2Cpp.domain.assembly("GameAssembly").image.classes.forEach(_ => {
+            _.methods
+                .filter(_ => !_.virtualAddress.isNull())
+                .forEach(_ => {
+                    assert(Il2Cpp.Method.fromVirtualAddress(_.virtualAddress)).is(_);
+                });
+        });
+    });
 }).then(() => send({ action: "stop" }));

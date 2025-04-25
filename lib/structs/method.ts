@@ -149,13 +149,7 @@ namespace Il2Cpp {
 
         /** Gets the virtual address (VA) of this method. */
         get virtualAddress(): NativePointer {
-            const FilterTypeName = Il2Cpp.corlib.class("System.Reflection.Module").initialize().field<Il2Cpp.Object>("FilterTypeName").value;
-            const FilterTypeNameMethodPointer = FilterTypeName.field<NativePointer>("method_ptr").value;
-            const FilterTypeNameMethod = FilterTypeName.field<NativePointer>("method").value;
-
-            // prettier-ignore
-            const offset = FilterTypeNameMethod.offsetOf(_ => _.readPointer().equals(FilterTypeNameMethodPointer)) 
-                ?? raise("couldn't find the virtual address offset in the native method struct");
+            const offset = virtualAddressOffset();
 
             // prettier-ignore
             getter(Il2Cpp.Method.prototype, "virtualAddress", function (this: Il2Cpp.Method) {
@@ -445,6 +439,27 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                 this.fridaSignature
             );
         }
+
+        /** */
+        static fromVirtualAddress(virtualAddress: NativePointer): Il2Cpp.Method | undefined {
+            if (virtualAddress.isNull()) {
+                raise("virtual address cannot be null");
+            }
+
+            const pattern = virtualAddress.toMatchPattern();
+
+            for (const range of Process.enumerateRanges("rw-")) {
+                if (range.file != undefined) continue;
+
+                for (const match of Memory.scanSync(range.base, range.size, pattern)) {
+                    const method = new Il2Cpp.Method(match.address.sub(virtualAddressOffset()));
+                    try {
+                        method.toString();
+                        return method;
+                    } catch (_) {}
+                }
+            }
+        }
     }
 
     /**
@@ -482,6 +497,17 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
         // hence, we must "skip" the object header when invoking such methods.
         const offset = struct.field<NativePointer>("value").value.equals(ptr(0xdeadbeef)) ? 0 : Il2Cpp.Object.headerSize;
         return (maybeObjectHeaderSize = () => offset)();
+    };
+
+    let virtualAddressOffset = (): number => {
+        const FilterTypeName = Il2Cpp.corlib.class("System.Reflection.Module").initialize().field<Il2Cpp.Object>("FilterTypeName").value;
+        const FilterTypeNameMethodPointer = FilterTypeName.field<NativePointer>("method_ptr").value;
+        const FilterTypeNameMethod = FilterTypeName.field<NativePointer>("method").value;
+
+        const offset =
+            FilterTypeNameMethod.offsetOf(_ => _.readPointer().equals(FilterTypeNameMethodPointer)) ??
+            raise("couldn't find the virtual address offset in the native method struct");
+        return (virtualAddressOffset = () => offset)();
     };
 
     export namespace Method {
