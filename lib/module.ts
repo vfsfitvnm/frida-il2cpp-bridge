@@ -25,8 +25,7 @@ namespace Il2Cpp {
      */
     export declare const module: Module;
     getter(Il2Cpp, "module", () => {
-        const [moduleName, fallback] = getExpectedModuleNames();
-        return Process.findModuleByName(moduleName) ?? Process.getModuleByName(fallback);
+        return tryModule() ?? raise("Could not find IL2CPP module");
     });
 
     /**
@@ -34,39 +33,26 @@ namespace Il2Cpp {
      * Waits for the IL2CPP native library to be loaded and initialized.
      */
     export async function initialize(blocking = false): Promise<boolean> {
-        const modulePromise = () => new Promise<Module>(resolve => {
-            const moduleNames = getExpectedModuleNames();
-
-            for (const moduleName of moduleNames) {
-                const module = Process.findModuleByName(moduleName);
-                if (module != null) {
-                    resolve(module);
-                    return;
-                }
-            }
-
-            const moduleObserver = Process.attachModuleObserver({
-                onAdded(module: Module) {
-                    if (moduleNames.includes(module.name)) {
-                        moduleObserver.detach();
-                        clearTimeout(timeout);
-                        resolve(module);
+        const module =
+            tryModule() ??
+            (await new Promise<Module>(resolve => {
+                const [moduleName, fallbackModuleName] = getExpectedModuleNames();
+                const moduleObserver = Process.attachModuleObserver({
+                    onAdded(module: Module) {
+                        if (module.name == moduleName || (fallbackModuleName && module.name == fallbackModuleName)) {
+                            moduleObserver.detach();
+                            clearTimeout(timeout);
+                            resolve(module);
+                        }
                     }
-                }
-            });
+                });
 
-            const timeout = setTimeout(() => {
-                warn(`after 10 seconds, \x1b[3m${moduleNames[0]}\x1b[0m has not been loaded yet, is the app running?`);
-            }, 10000);
-        });
+                const timeout = setTimeout(() => {
+                    warn(`after 10 seconds, IL2CPP module '${moduleName}' has not been loaded yet, is the app running?`);
+                }, 10000);
+            }));
 
-        Reflect.defineProperty(Il2Cpp, "module", {
-            // prettier-ignore
-            value: Process.platform == "darwin"
-                ? Process.findModuleByAddress(DebugSymbol.fromName("il2cpp_init").address) 
-                    ?? await modulePromise()
-                : await modulePromise()
-        });
+        Reflect.defineProperty(Il2Cpp, "module", { value: module });
 
         // At this point, the IL2CPP native library has been loaded, but we
         // cannot interact with IL2CPP until `il2cpp_init` is done.
@@ -86,7 +72,17 @@ namespace Il2Cpp {
         return false;
     }
 
-    function getExpectedModuleNames(): string[] {
+    function tryModule(): Module | undefined {
+        const [moduleName, fallback] = getExpectedModuleNames();
+        return (
+            Process.findModuleByName(moduleName) ??
+            Process.findModuleByName(fallback ?? moduleName) ??
+            Process.findModuleByAddress(DebugSymbol.fromName("il2cpp_init").address) ??
+            undefined
+        );
+    }
+
+    function getExpectedModuleNames(): [string] | [string, string] {
         if (Il2Cpp.$config.moduleName) {
             return [Il2Cpp.$config.moduleName];
         }
