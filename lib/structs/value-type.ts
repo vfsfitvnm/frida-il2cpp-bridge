@@ -27,7 +27,7 @@ namespace Il2Cpp {
                 for (const klass of this.type.class.hierarchy()) {
                     for (const field of klass.fields) {
                         if (field.name == name && !field.isStatic) {
-                            return field.bind(this) as Il2Cpp.Field<T>;
+                            return field.bind(this) as Il2Cpp.BoundField<T>;
                         }
                     }
                 }
@@ -45,7 +45,7 @@ namespace Il2Cpp {
                 for (const klass of this.type.class.hierarchy()) {
                     for (const method of klass.methods) {
                         if (method.name == name && !method.isStatic && (parameterCount < 0 || method.parameterCount == parameterCount)) {
-                            return method.bind(this) as Il2Cpp.Method<T>;
+                            return method.bind(this) as Il2Cpp.BoundMethod<T>;
                         }
                     }
                 }
