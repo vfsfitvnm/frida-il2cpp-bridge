@@ -460,6 +460,11 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                 }
             }
         }
+
+        /** */
+        static fromRelativeVirtualAddress(relativeVirtualAddress: string | number): Il2Cpp.Method | undefined {
+            return this.fromVirtualAddress(Il2Cpp.module.base.add(ptr(relativeVirtualAddress)));
+        }
     }
 
     /**
