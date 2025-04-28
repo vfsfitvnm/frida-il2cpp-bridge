@@ -397,10 +397,10 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                             const handle =
                                 instance instanceof Il2Cpp.ValueType
                                     ? target.class.isValueType
-                                        ? instance.handle.add(maybeObjectHeaderSize() - Il2Cpp.Object.headerSize)
+                                        ? instance.handle.sub(structMethodsRequireObjectInstances() ? Il2Cpp.Object.headerSize : 0)
                                         : raise(`cannot invoke method ${target.class.type.name}::${target.name} against a value type, you must box it first`)
                                     : target.class.isValueType
-                                    ? instance.handle.add(maybeObjectHeaderSize())
+                                    ? instance.handle.add(structMethodsRequireObjectInstances() ? 0 : Il2Cpp.Object.headerSize)
                                     : instance.handle;
 
                             return target.invokeRaw.bind(target, handle);
@@ -434,7 +434,10 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                     const thisObject = this.isStatic
                         ? this.class
                         : this.class.isValueType
-                        ? new Il2Cpp.ValueType((args[0] as NativePointer).add(Il2Cpp.Object.headerSize - maybeObjectHeaderSize()), this.class.type)
+                        ? new Il2Cpp.ValueType(
+                              (args[0] as NativePointer).add(structMethodsRequireObjectInstances() ? Il2Cpp.Object.headerSize : 0),
+                              this.class.type
+                          )
                         : new Il2Cpp.Object(args[0] as NativePointer);
 
                     const parameters = this.parameters.map((_, i) => fromFridaValue(args[i + startIndex], _.type));
@@ -472,16 +475,16 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
      */
     export interface BoundMethod<T extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType> extends Method<T> {}
 
-    let maybeObjectHeaderSize = (): number => {
-        const struct = Il2Cpp.corlib.class("System.RuntimeTypeHandle").initialize().alloc();
-        struct.method(".ctor").invokeRaw(struct, ptr(0xdeadbeef));
+    let structMethodsRequireObjectInstances = (): boolean => {
+        const object = Il2Cpp.corlib.class("System.Int64").alloc();
+        object.field("m_value").value = 0xdeadbeef;
 
         // Here we check where the sentinel value is
         // if it's not where it is supposed to be, it means struct methods
         // assume they are receiving value types (that is a pointer to raw data)
         // hence, we must "skip" the object header when invoking such methods.
-        const offset = struct.field<NativePointer>("value").value.equals(ptr(0xdeadbeef)) ? 0 : Il2Cpp.Object.headerSize;
-        return (maybeObjectHeaderSize = () => offset)();
+        const result = object.method<boolean>("Equals", 1).overload(object.class).invokeRaw(object, 0xdeadbeef);
+        return (structMethodsRequireObjectInstances = () => result)();
     };
 
     export namespace Method {
