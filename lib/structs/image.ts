@@ -26,7 +26,14 @@ namespace Il2Cpp {
                 // without iterating all the classes first somehow blows things up at
                 // app startup, hence the `Array.from`.
                 const classes = globalThis.Array.from(types, _ => new Il2Cpp.Class(Il2Cpp.exports.classFromObject(_)));
-                classes.unshift(this.class("<Module>"));
+
+                // <Module> class does not always exist
+                // https://github.com/vfsfitvnm/frida-il2cpp-bridge/issues/627
+                const Module = this.tryClass("<Module>");
+                if (Module) {
+                    classes.unshift(Module);
+                }
+
                 return classes;
             } else {
                 return globalThis.Array.from(globalThis.Array(this.classCount), (_, i) => new Il2Cpp.Class(Il2Cpp.exports.imageGetClass(this, i)));
