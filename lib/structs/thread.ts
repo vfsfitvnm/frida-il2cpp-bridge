@@ -133,6 +133,37 @@ namespace Il2Cpp {
     /** Gets the attached threads. */
     export declare const attachedThreads: Il2Cpp.Thread[];
     getter(Il2Cpp, "attachedThreads", () => {
+        try {
+            Il2Cpp.exports.threadGetAttachedThreads;
+        } catch (error: any) {
+            if (error.name != "Il2CppError") throw error;
+
+            const currentThreadHandle = Il2Cpp.currentThread?.handle ?? raise("Current thread is not attached to IL2CPP");
+            const pattern = currentThreadHandle.toMatchPattern();
+
+            const threads: Il2Cpp.Thread[] = [];
+
+            for (const range of Process.enumerateRanges("rw-")) {
+                if (range.file == undefined) {
+                    const matches = Memory.scanSync(range.base, range.size, pattern);
+                    if (matches.length == 1) {
+                        while (true) {
+                            const handle = matches[0].address.sub(matches[0].size * threads.length).readPointer();
+
+                            if (handle.isNull() || !handle.readPointer().equals(currentThreadHandle.readPointer())) {
+                                break;
+                            }
+
+                            threads.unshift(new Il2Cpp.Thread(handle));
+                        }
+                        break;
+                    }
+                }
+            }
+
+            return threads;
+        }
+
         return readNativeList(Il2Cpp.exports.threadGetAttachedThreads).map(_ => new Il2Cpp.Thread(_));
     });
 
