@@ -18,7 +18,7 @@ A Frida module to dump, trace or hijack any Il2Cpp application at runtime, witho
 
 #### Unity version
 
-It should work for any Unity version in the range **5.3.0** - **2023.2.x**.
+It should work for any Unity version in the range **5.3.0** - **6000.1.x**.
 
 #### Platforms
 
