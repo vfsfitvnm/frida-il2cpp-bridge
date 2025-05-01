@@ -527,15 +527,26 @@ namespace Il2Cpp {
     getter(Il2Cpp, "memorySnapshotExports", () => new CModule($inline_file("cmodules/memory-snapshot.c")), lazy);
 
     function r<R extends NativeFunctionReturnType, A extends NativeFunctionArgumentType[] | []>(exportName: `il2cpp_${string}`, retType: R, argTypes: A) {
-        const handle = Il2Cpp.$config.exports?.[exportName]?.() ?? Il2Cpp.module.findExportByName(exportName) ?? memorySnapshotExports[exportName];
+        const handle: NativePointer | null | undefined =
+            Il2Cpp.$config.exports?.[exportName]?.() ?? Il2Cpp.module.findExportByName(exportName) ?? memorySnapshotExports[exportName];
 
-        const target = new NativeFunction(handle ?? raise(`couldn't resolve export ${exportName}`), retType, argTypes);
+        const target = new NativeFunction(handle ?? NULL, retType, argTypes);
 
-        if (target.isNull()) {
-            raise(`export ${exportName} points to NULL IL2CPP library has likely been stripped, obfuscated, or customized`);
-        }
-
-        return target;
+        return target.isNull()
+            ? new Proxy(target, {
+                  get(value: typeof target, name: keyof typeof target) {
+                      const property = value[name];
+                      return typeof property === "function" ? property.bind(value) : property;
+                  },
+                  apply() {
+                      if (handle == null) {
+                          raise(`couldn't resolve export ${exportName}`);
+                      } else if (handle.isNull()) {
+                          raise(`export ${exportName} points to NULL IL2CPP library has likely been stripped, obfuscated, or customized`);
+                      }
+                  }
+              })
+            : target;
     }
 
     declare const $inline_file: typeof import("ts-transformer-inline-file").$INLINE_FILE;

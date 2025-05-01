@@ -133,11 +133,7 @@ namespace Il2Cpp {
     /** Gets the attached threads. */
     export declare const attachedThreads: Il2Cpp.Thread[];
     getter(Il2Cpp, "attachedThreads", () => {
-        try {
-            Il2Cpp.exports.threadGetAttachedThreads;
-        } catch (error: any) {
-            if (error.name != "Il2CppError") throw error;
-
+        if (Il2Cpp.exports.threadGetAttachedThreads.isNull()) {
             const currentThreadHandle = Il2Cpp.currentThread?.handle ?? raise("Current thread is not attached to IL2CPP");
             const pattern = currentThreadHandle.toMatchPattern();
 
