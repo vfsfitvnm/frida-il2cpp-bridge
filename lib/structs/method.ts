@@ -363,6 +363,7 @@ namespace Il2Cpp {
 ${this.isStatic ? `static ` : ``}\
 ${this.returnType.name} \
 ${this.name}\
+${this.generics.length > 0 ? `<${this.generics.map(_ => _.type.name).join(",")}>` : ""}\
 (${this.parameters.join(`, `)});\
 ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toString(16).padStart(8, `0`)}`}`;
         }
