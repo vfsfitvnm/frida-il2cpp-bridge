@@ -37,19 +37,20 @@ namespace Il2Cpp {
             tryModule() ??
             (await new Promise<Module>(resolve => {
                 const [moduleName, fallbackModuleName] = getExpectedModuleNames();
-                const moduleObserver = Process.attachModuleObserver({
-                    onAdded(module: Module) {
-                        if (module.name == moduleName || (fallbackModuleName && module.name == fallbackModuleName)) {
-                            moduleObserver.detach();
-                            clearTimeout(timeout);
-                            resolve(module);
-                        }
-                    }
-                });
 
                 const timeout = setTimeout(() => {
                     warn(`after 10 seconds, IL2CPP module '${moduleName}' has not been loaded yet, is the app running?`);
                 }, 10000);
+
+                const moduleObserver = Process.attachModuleObserver({
+                    onAdded(module: Module) {
+                        if (module.name == moduleName || (fallbackModuleName && module.name == fallbackModuleName)) {
+                            resolve(module);
+                            clearTimeout(timeout);
+                            setImmediate(() => moduleObserver.detach());
+                        }
+                    }
+                });
             }));
 
         Reflect.defineProperty(Il2Cpp, "module", { value: module });
