@@ -13,14 +13,17 @@ namespace Il2Cpp {
                 // return an empty array; hence we use System.Reflection.Assembly::GetType
                 // to retrieve <Module>, a class/type that seems to be always present
                 // (despite being excluded from System.Reflection.Assembly::GetTypes).
-                return new Il2Cpp.Image(
+                const runtimeModule =
                     this.object
-                        .method<Il2Cpp.Object>("GetType", 1)
-                        .invoke(Il2Cpp.string("<Module>"))
-                        .method<Il2Cpp.Object>("get_Module")
-                        .invoke()
-                        .field<NativePointer>("_impl").value
-                );
+                        .tryMethod<Il2Cpp.Object>("GetType", 1)
+                        ?.invoke(Il2Cpp.string("<Module>"))
+                        ?.asNullable()
+                        ?.tryMethod<Il2Cpp.Object>("get_Module")
+                        ?.invoke() ??
+                    this.object.tryMethod<Il2Cpp.Array<Il2Cpp.Object>>("GetModules", 1)?.invoke(false)?.get(0) ??
+                    raise(`couldn't find the runtime module object of assembly ${this.name}`);
+
+                return new Il2Cpp.Image(runtimeModule.field<NativePointer>("_impl").value);
             }
 
             return new Il2Cpp.Image(Il2Cpp.exports.assemblyGetImage(this));
