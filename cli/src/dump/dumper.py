@@ -199,7 +199,11 @@ class Dumper:
 
         fields = class_dump.get("fields") or []
         literal_fields = [_ for _ in fields if _["is_literal"]]
-        static_fields = [_ for _ in fields if _["is_static"] and not _["is_literal"]]
+        static_fields = [
+            _
+            for _ in fields
+            if _["is_static"] and not _["is_thread_static"] and not _["is_literal"]
+        ]
         thread_static_fields = [_ for _ in fields if _["is_thread_static"]]
         instance_fields = [_ for _ in fields if not _["is_static"]]
 
