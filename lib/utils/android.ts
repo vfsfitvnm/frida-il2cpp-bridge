@@ -8,7 +8,7 @@ namespace Android {
     }, lazy);
 
     function getProperty(name: string): string | undefined {
-        const handle = Module.findExportByName("libc.so", "__system_property_get");
+        const handle = Process.findModuleByName("libc.so")?.findExportByName("__system_property_get");
 
         if (handle) {
             const __system_property_get = new NativeFunction(handle, "void", ["pointer", "pointer"]);
