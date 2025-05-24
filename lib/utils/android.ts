@@ -1,5 +1,10 @@
 /** @internal */
 namespace Android {
+
+    declare namespace Module {
+        function findExportByName(moduleName: string | null, exportName: string): NativePointer | null;
+    }
+
     export declare const apiLevel: number | null;
     // prettier-ignore
     getter(Android, "apiLevel", () => {
@@ -8,7 +13,7 @@ namespace Android {
     }, lazy);
 
     function getProperty(name: string): string | undefined {
-        const handle = Process.findModuleByName("libc.so")?.findExportByName("__system_property_get");
+        const handle = Module.findExportByName ? Module.findExportByName("libc.so", "__system_property_get") : Process.findModuleByName("libc.so")?.findExportByName("__system_property_get");
 
         if (handle) {
             const __system_property_get = new NativeFunction(handle, "void", ["pointer", "pointer"]);

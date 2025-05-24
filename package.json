@@ -24,7 +24,6 @@
     "dist", "cli"
   ],
   "scripts": {
-    "prepare": "make dist",
     "watch": "npm exec tspc -- --watch",
     "test": "make test"
   },
@@ -39,7 +38,7 @@
     "trailingComma": "none"
   },
   "devDependencies": {
-    "@types/frida-gum": "^19.0.0",
+    "@types/frida-gum": "^18.8.2||^19.0.0",
     "ts-patch": "^3.2.1",
     "ts-transformer-inline-file": "^0.2.0"
   },
