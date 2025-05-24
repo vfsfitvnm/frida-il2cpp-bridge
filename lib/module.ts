@@ -45,9 +45,11 @@ namespace Il2Cpp {
                 const moduleObserver = Process.attachModuleObserver({
                     onAdded(module: Module) {
                         if (module.name == moduleName || (fallbackModuleName && module.name == fallbackModuleName)) {
-                            resolve(module);
                             clearTimeout(timeout);
-                            setImmediate(() => moduleObserver.detach());
+                            setImmediate(() => {
+                                resolve(module);
+                                moduleObserver.detach();
+                            });
                         }
                     }
                 });
