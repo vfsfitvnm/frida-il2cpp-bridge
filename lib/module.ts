@@ -75,12 +75,20 @@ namespace Il2Cpp {
 
     function tryModule(): Module | undefined {
         const [moduleName, fallback] = getExpectedModuleNames();
-        return (
+        const module = (
             Process.findModuleByName(moduleName) ??
             Process.findModuleByName(fallback ?? moduleName) ??
-            Process.findModuleByAddress(DebugSymbol.fromName("il2cpp_init").address) ??
             undefined
         );
+        if (module) {
+            return module;
+        }
+        
+        if (Process.platform == "darwin") {
+            return Process.findModuleByAddress(DebugSymbol.fromName("il2cpp_init").address) ?? undefined;
+        }
+
+        return undefined;
     }
 
     function getExpectedModuleNames(): [string] | [string, string] {
