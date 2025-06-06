@@ -81,14 +81,14 @@ namespace Il2Cpp {
         }
 
         /** Schedules a callback on the current thread. */
-        schedule<T>(block: () => T): Promise<T> {
+        async schedule<T>(block: () => T | Promise<T>): Promise<T> {
             const Post = this.synchronizationContext?.tryMethod("Post");
 
             if (Post == null) {
-                return Process.runOnThread(this.id, block);
+                return await Process.runOnThread<T | Promise<T>>(this.id, block);
             }
 
-            return new Promise(resolve => {
+            return await new Promise<T>(resolve => {
                 const delegate = Il2Cpp.delegate(Il2Cpp.corlib.class("System.Threading.SendOrPostCallback"), () => {
                     const result = block();
                     setImmediate(() => resolve(result));
