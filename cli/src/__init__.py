@@ -3,7 +3,7 @@ from os import environ
 import json
 
 
-__name__ = environ.get("npm_lifecycle_script", "frida-il2cpp-bridge")
+__name__ = environ.get("npm_lifecycle_script", "frida-il2cpp-bridge").strip('"')
 
 NPM_MODULE_PATH = Path(__file__)
 while NPM_MODULE_PATH.stem != __name__:
