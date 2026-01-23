@@ -11,6 +11,8 @@ namespace Il2Cpp {
             // We previosly obtained an array whose content is known by calling
             // 'System.String::Split(NULL)' on a known string. However, that
             // method invocation somehow blows things up in Unity 2018.3.0f1.
+            //
+            // See https://github.com/vfsfitvnm/frida-il2cpp-bridge/pull/717
             const array = Il2Cpp.string("vfsfitvnm").object.method<Il2Cpp.Array>("ToCharArray", 0).invoke();
 
             // prettier-ignore
