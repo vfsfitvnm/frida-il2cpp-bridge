@@ -11,10 +11,10 @@ namespace Il2Cpp {
             // We previosly obtained an array whose content is known by calling
             // 'System.String::Split(NULL)' on a known string. However, that
             // method invocation somehow blows things up in Unity 2018.3.0f1.
-            const array = Il2Cpp.string("26d62ea6").object.method<Il2Cpp.Array>("ToCharArray", 0).invoke();
+            const array = Il2Cpp.string("vfsfitvnm").object.method<Il2Cpp.Array>("ToCharArray", 0).invoke();
 
             // prettier-ignore
-            const offset = Memory.scanSync(array.handle, 0xff, '32 00 36 00 64 00 36 00 32 00 65 00 61 00 36 00')[0]?.address?.sub(array.handle)
+            const offset = Memory.scanSync(array.handle, 0xff, "76 00 66 00 73 00 66 00 69 00 74 00 76 00 6e 00 6d 00")[0]?.address?.sub(array.handle)
                 ?? raise("couldn't find the elements offset in the native array struct");
 
             // prettier-ignore
