@@ -137,27 +137,56 @@ namespace Il2Cpp {
             const currentThreadHandle = Il2Cpp.currentThread?.handle ?? raise("Current thread is not attached to IL2CPP");
             const pattern = currentThreadHandle.toMatchPattern();
 
-            const threads: Il2Cpp.Thread[] = [];
+            // Memory ranges can become invalid between enumeration and scan
+            // in a live process. Retry the full scan up to 3 times before
+            // giving up, so a transient unmap doesn't silently produce an
+            // empty thread list (which would leave mainThread undefined).
+            for (let attempt = 0; attempt < 3; attempt++) {
+                const threads: Il2Cpp.Thread[] = [];
+                let crashed = false;
 
-            for (const range of Process.enumerateRanges("rw-")) {
-                if (range.file == undefined) {
-                    const matches = Memory.scanSync(range.base, range.size, pattern);
-                    if (matches.length == 1) {
-                        while (true) {
-                            const handle = matches[0].address.sub(matches[0].size * threads.length).readPointer();
+                for (const range of Process.enumerateRanges("rw-")) {
+                    if (range.file == undefined) {
+                        let matches: { address: NativePointer; size: number }[];
+                        try {
+                            matches = Memory.scanSync(range.base, range.size, pattern);
+                        } catch {
+                            crashed = true;
+                            break;
+                        }
+                        if (matches.length == 1) {
+                            try {
+                                while (true) {
+                                    const handle = matches[0].address.sub(matches[0].size * threads.length).readPointer();
 
-                            if (handle.isNull() || !handle.readPointer().equals(currentThreadHandle.readPointer())) {
+                                    if (handle.isNull() || !handle.readPointer().equals(currentThreadHandle.readPointer())) {
+                                        break;
+                                    }
+
+                                    threads.unshift(new Il2Cpp.Thread(handle));
+                                }
+                            } catch {
+                                crashed = true;
                                 break;
                             }
-
-                            threads.unshift(new Il2Cpp.Thread(handle));
+                            if (!crashed && threads.length > 0) {
+                                return threads;
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
+
+                if (!crashed && threads.length == 0) {
+                    // Completed the full scan without error but found nothing —
+                    // retrying won't help, avoid an infinite-feeling loop.
+                    return threads;
+                }
+                // A crash means a range was unmapped mid-scan — retry immediately
+                // with a fresh range enumeration.
             }
 
-            return threads;
+            return [];
         }
 
         return readNativeList(Il2Cpp.exports.threadGetAttachedThreads).map(_ => new Il2Cpp.Thread(_));
