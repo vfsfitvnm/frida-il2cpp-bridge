@@ -63,8 +63,17 @@ namespace Il2Cpp {
         // initialization is not completed yet.
         if (Il2Cpp.exports.getCorlib().isNull()) {
             return await new Promise<boolean>(resolve => {
+                const timeout = setTimeout(() => {
+                    if (!Il2Cpp.exports.getCorlib().isNull()) {
+                        warn(`resuming execution despite IL2CPP initialization not being captured in time, please open an issue as this is suboptimal`);
+                        interceptor.detach();
+                        resolve(false);
+                    }
+                }, 1000);
+
                 const interceptor = Interceptor.attach(Il2Cpp.exports.initialize, {
                     onLeave() {
+                        clearTimeout(timeout);
                         interceptor.detach();
                         blocking ? resolve(true) : setImmediate(() => resolve(false));
                     }
@@ -80,8 +89,8 @@ namespace Il2Cpp {
         return (
             Process.findModuleByName(moduleName) ??
             Process.findModuleByName(fallback ?? moduleName) ??
-            (Process.platform == "darwin" ? Process.findModuleByAddress(DebugSymbol.fromName("il2cpp_init").address) : undefined)
-            ?? undefined
+            (Process.platform == "darwin" ? Process.findModuleByAddress(DebugSymbol.fromName("il2cpp_init").address) : undefined) ??
+            undefined
         );
     }
 
