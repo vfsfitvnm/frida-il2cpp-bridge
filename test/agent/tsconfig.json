@@ -14,5 +14,8 @@
     "sourceMap": true,
     "stripInternal": true,
     "removeComments": true,
+    "plugins": [ 
+      { "transform": "ts-transformer-inline-file/transformer" }
+    ]
   },
 }
