@@ -1,6 +1,4 @@
-UNITY_CHANGESET := 9ea152932a88
-
-include ../common.mk
+include ../build.mk
 
 UNITY_LINKER := $(MAYBE_STRACE) $(IL2CPP_DIR)/build/deploy/UnityLinker
 IL2CPP := $(MAYBE_STRACE) $(IL2CPP_DIR)/build/deploy/il2cpp
@@ -16,7 +14,7 @@ ASSEMBLY_TARGET_CMD = $(IL2CPP) \
 	--dotnetprofile=unityaot-linux \
 	--cachedirectory="$(@D)/.." \
 	--generatedcppdir="$(<D)" \
-	--baselib-directory="$(EDITOR_DIR)/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_player_development_il2cpp/" \
+	--baselib-directory="$(EDITOR_DIR)/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_player_nondevelopment_il2cpp/" \
 	--outputpath="$@"
 
 CPP_TARGET_CMD = $(IL2CPP) \

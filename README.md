@@ -9,10 +9,10 @@ A Frida module to dump, trace or hijack any Il2Cpp application at runtime, witho
 
 ## Features
 
--   Dump classes, methods, fields and so on
--   Trace, intercept and replace method calls
--   Mess around with the C# runtime
--   Il2Cpp structs and global metadata (almost) free
+- Dump classes, methods, fields and so on
+- Trace, intercept and replace method calls
+- Mess around with the C# runtime
+- Il2Cpp structs and global metadata (almost) free
 
 ## Compatibility
 
@@ -92,16 +92,16 @@ Dump saved to dumps/com.example.application/1.12.8
 Over the time, it was realized that some testing was necessary, as supporting many Unity version makes introducing regressions or faulty features easy. Though it's far from being complete and bullet-proof, there's a minimal testing setup contributors can get advantage of to test their changes. \
 In order to test `frida-il2cpp-bridge`, a IL2CPP application is needed (of course). Here are some very useful resources:
 
--   [IL2CPP toolchain](https://katyscode.wordpress.com/2020/06/24/il2cpp-part-1/)
--   [Scripting](https://github.com/djkaty/Il2CppInspector/blob/116c6355e7ee3656eab85ca753f913d428abc7a3/Il2CppTests/il2cpp.ps1)
+- [IL2CPP toolchain](https://katyscode.wordpress.com/2020/06/24/il2cpp-part-1/)
+- [Scripting](https://github.com/djkaty/Il2CppInspector/blob/116c6355e7ee3656eab85ca753f913d428abc7a3/Il2CppTests/il2cpp.ps1)
 
-### Commands
+### Commands (local)
 
 Unity editors (so IL2CPP toolchains) will be downloaded and extracted automatically.
 
 **Prerequisites**
 
-1. Only Linux is currently supported;
+1. Only Linux (x86_64) is currently supported;
 2. Make sure to have `clang` and `make` installed.
 
 #### Build IL2CPP assemblies
@@ -125,6 +125,31 @@ make test
 ```
 
 Tests run against only the installed Unity versions.
+
+### Commands (Docker)
+
+Currently, testing-related commands for Linux (x86_64) are provided, however there's a Dockerfile so that it's possible to create a container on any OS or arch (a virtualization system/emulator might be required).
+
+**Prerequisites**
+
+1. Docker (or similar);
+2. Emulator/virtualization (_optional_).
+
+#### Build Docker image for a specific Unity version
+
+```sh
+make image UNITY_VERSION=2023.2.20f1
+```
+
+#### Run tests on already-built Docker images
+
+```sh
+make testd
+```
+
+#### Limitations
+
+- Image build for 2021.2.0f1 is currently broken.
 
 ## Acknowledgements
 

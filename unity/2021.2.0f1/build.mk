@@ -1,11 +1,11 @@
-UNITY_CHANGESET := 0e25a174756c
-
-include ../common.mk
+include ../build.mk
 
 UNITY_LINKER := $(MAYBE_STRACE) $(IL2CPP_DIR)/build/deploy/UnityLinker
 IL2CPP := $(MAYBE_STRACE) $(IL2CPP_DIR)/build/deploy/il2cpp
 
 MSCORLIB := $(MONOBL_DIR)/lib/mono/unityaot-linux/mscorlib.dll
+
+export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
 ASSEMBLY_TARGET_CMD = $(IL2CPP) \
 	--compile-cpp \
@@ -38,4 +38,5 @@ LINKED_DLL_TARGET_CMD = $(UNITY_LINKER) \
 	--dotnetprofile=unityaot-linux \
 	--descriptor-directory="$(LINKER_DESCRIPTORS_DIR)" \
 	--include-assembly="$<,$(MSCORLIB)" \
+	--disable-feature-setting=ssl \
 	--out="$(@D)"

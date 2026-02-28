@@ -1,6 +1,4 @@
-UNITY_CHANGESET := 6e14067f8a9a
-
-include ../common.mk
+include ../build.mk
 
 UNITY_LINKER := $(MONO) $(IL2CPP_DIR)/build/UnityLinker.exe
 IL2CPP := $(MONO) $(IL2CPP_DIR)/build/il2cpp.exe
@@ -33,6 +31,8 @@ LINKED_DLL_TARGET_CMD = $(UNITY_LINKER) \
 	--i18n=none \
 	--disable-keep-facades \
 	--core-action=link \
+	--dotnetruntime=il2cpp \
+	--dotnetprofile=net20 \
 	--descriptor-directory="$(LINKER_DESCRIPTORS_DIR)" \
 	--include-assembly="$<,$(MSCORLIB)" \
 	--out="$(@D)"

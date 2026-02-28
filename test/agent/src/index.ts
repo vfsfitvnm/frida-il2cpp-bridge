@@ -1,6 +1,6 @@
 /// <reference path="../../../lib/index.ts">/>
 
-Script.registerSourceMap("/$UNITY_VERSION.js", new File("$SOURCE_MAP_PATH", "r").readText());
+Script.registerSourceMap("/source.js", new File("$SOURCE_MAP_PATH", "r").readText());
 
 Il2Cpp.perform(() => {
     test("Unity version is detected", () => {

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/wait.h>
+#include <unistd.h>
 
 int
 main (int argc, char ** argv)
@@ -38,6 +38,8 @@ main (int argc, char ** argv)
 
   (*il2cpp_init) ("IL2CPP ROOT DOMAIN");
 
-  int status;
-  wait (&status);
+  while (1)
+  {
+    sleep (1);
+  }
 }
