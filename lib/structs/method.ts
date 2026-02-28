@@ -44,7 +44,7 @@ namespace Il2Cpp {
         /** Gets the generic parameters of this generic method. */
         @lazy
         get generics(): Il2Cpp.Class[] {
-            if (!this.isGeneric && !this.isInflated) {
+            if (!this.isGeneric) {
                 return [];
             }
 
@@ -400,8 +400,8 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                                         ? instance.handle.sub(structMethodsRequireObjectInstances() ? Il2Cpp.Object.headerSize : 0)
                                         : raise(`cannot invoke method ${target.class.type.name}::${target.name} against a value type, you must box it first`)
                                     : target.class.isValueType
-                                    ? instance.handle.add(structMethodsRequireObjectInstances() ? 0 : Il2Cpp.Object.headerSize)
-                                    : instance.handle;
+                                      ? instance.handle.add(structMethodsRequireObjectInstances() ? 0 : Il2Cpp.Object.headerSize)
+                                      : instance.handle;
 
                             return target.invokeRaw.bind(target, handle);
                         case "overloads":
@@ -434,11 +434,11 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                     const thisObject = this.isStatic
                         ? this.class
                         : this.class.isValueType
-                        ? new Il2Cpp.ValueType(
-                              (args[0] as NativePointer).add(structMethodsRequireObjectInstances() ? Il2Cpp.Object.headerSize : 0),
-                              this.class.type
-                          )
-                        : new Il2Cpp.Object(args[0] as NativePointer);
+                          ? new Il2Cpp.ValueType(
+                                (args[0] as NativePointer).add(structMethodsRequireObjectInstances() ? Il2Cpp.Object.headerSize : 0),
+                                this.class.type
+                            )
+                          : new Il2Cpp.Object(args[0] as NativePointer);
 
                     const parameters = this.parameters.map((_, i) => fromFridaValue(args[i + startIndex], _.type));
                     const result = block.call(thisObject, ...parameters);
