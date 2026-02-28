@@ -277,13 +277,13 @@ enum EmptyEnum
 
 }
 
-
 interface Interface
 {
 
 }
 
-namespace MethodInflateTest {
+namespace MethodInflateTest
+{
     class Parent<ClassType> {
         static int A<T>() {
             return 0;
@@ -326,5 +326,32 @@ namespace MethodInflateTest {
         static int A<T, U, V>() {
             return 3;
         }
+    }
+}
+
+class NullableTest
+{
+    int? n0;
+    System.Nullable<int> n1;
+    
+    public NullableTest(int? n0, System.Nullable<int> n1)
+    {
+        this.n0 = n0;
+        this.n1 = n1;
+    }
+
+    bool IsN0Null()
+    {
+        return this.n0 == null;
+    }
+
+    bool IsN1Null()
+    {
+        return !this.n1.HasValue;
+    }
+
+    static int CoalesceInt(int? a, int? b)
+    {
+        return a ?? b ?? 777;
     }
 }

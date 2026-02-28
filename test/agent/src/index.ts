@@ -82,8 +82,8 @@ Il2Cpp.perform(() => {
     });
 
     test("Il2Cpp.Image::classCount", () => {
-        assert(Il2Cpp.domain.assembly("GameAssembly").image.classes.length).is(32);
-        assert(Il2Cpp.domain.assembly("GameAssembly").image.classCount).is(32);
+        assert(Il2Cpp.domain.assembly("GameAssembly").image.classes.length).is(33);
+        assert(Il2Cpp.domain.assembly("GameAssembly").image.classCount).is(33);
     });
 
     test("Il2Cpp.Class::image", () => {
@@ -572,5 +572,51 @@ Il2Cpp.perform(() => {
         assert(T.method("D").overload("OverloadTest.Root").isStatic).is(false);
         assert(() => T.method("D").overload("OverloadTest.Rooat")).throws("couldn't find overloaded method D(OverloadTest.Rooat)");
         assert(() => T.new().method("D").overload("OverloadTest.Rot")).throws("couldn't find overloaded method D(OverloadTest.Rot)");
+    });
+
+    test("Nullable internal values are created correctly", () => {
+        const NullableTest = Il2Cpp.domain.assembly("GameAssembly").image.class("NullableTest");
+        const five = Il2Cpp.nullable(5);
+        const ten = Il2Cpp.nullable(10, Il2Cpp.corlib.class("System.Int32"));
+        const nullInt32 = Il2Cpp.nullable(null, Il2Cpp.corlib.class("System.Int32"));
+
+        assert(NullableTest.method<number>("CoalesceInt").invoke(nullInt32, nullInt32)).is(777);
+        assert(NullableTest.method<number>("CoalesceInt").invoke(ten, nullInt32)).is(10);
+        assert(NullableTest.method<number>("CoalesceInt").invoke(nullInt32, five)).is(5);
+        assert(NullableTest.method<number>("CoalesceInt").invoke(ten, five)).is(10);
+
+        const o = NullableTest.new();
+
+        assert(o.method<boolean>("IsN0Null").invoke()).is(true);
+        assert(o.method<boolean>("IsN1Null").invoke()).is(true);
+
+        o.method(".ctor").invoke(nullInt32, ten);
+
+        assert(o.method<boolean>("IsN0Null").invoke()).is(true);
+        assert(o.method<boolean>("IsN1Null").invoke()).is(false);
+    });
+
+    test("Nullable primitives are created using the expected default type", () => {
+        const SystemNullable = Il2Cpp.corlib.class("System.Nullable`1");
+
+        assert(Il2Cpp.nullable(true).type.class).is(SystemNullable.inflate(Il2Cpp.corlib.class("System.Boolean")));
+        assert(Il2Cpp.nullable(1).type.class).is(SystemNullable.inflate(Il2Cpp.corlib.class("System.Int32")));
+        assert(Il2Cpp.nullable(new Int64(1)).type.class).is(SystemNullable.inflate(Il2Cpp.corlib.class("System.Int64")));
+        assert(Il2Cpp.nullable(new UInt64(1)).type.class).is(SystemNullable.inflate(Il2Cpp.corlib.class("System.UInt64")));
+        assert(Il2Cpp.nullable(ptr(1)).type.class).is(SystemNullable.inflate(Il2Cpp.corlib.class("System.IntPtr")));
+    });
+
+    test("Nullable primitives are created using the expected provided type", () => {
+        const SystemNullable = Il2Cpp.corlib.class("System.Nullable`1");
+
+        assert(Il2Cpp.nullable(null, Il2Cpp.corlib.class("System.Byte")).type.class).is(SystemNullable.inflate(Il2Cpp.corlib.class("System.Byte")));
+        assert(Il2Cpp.nullable(1, Il2Cpp.corlib.class("System.UInt16")).type.class).is(SystemNullable.inflate(Il2Cpp.corlib.class("System.UInt16")));
+        assert(Il2Cpp.nullable(ptr(1), Il2Cpp.corlib.class("System.UIntPtr")).type.class).is(SystemNullable.inflate(Il2Cpp.corlib.class("System.UIntPtr")));
+    });
+
+    test("Nullable reference types cannot be created", () => {
+        assert(() => Il2Cpp.nullable(null as any, Il2Cpp.corlib.class("System.Object")).type.class).throws(
+            "Cannot create nullable value type out of a reference type 'System.Object'"
+        );
     });
 }).then(() => send({ action: "stop" }));
