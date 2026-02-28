@@ -28,7 +28,8 @@
   "scripts": {
     "prepare": "make dist",
     "watch": "npm exec tspc -- --watch",
-    "test": "make test"
+    "test": "make test",
+    "testd": "make testd"
   },
   "bin": {
     "frida-il2cpp-bridge": "cli/main.py"
