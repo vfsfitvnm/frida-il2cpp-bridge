@@ -22,6 +22,14 @@ USER ubuntu
 WORKDIR /home/ubuntu
 
 ARG UNITY_VERSION
+
+# For debugging a failing compilation:
+# COPY --from=unity-editor /home/ubuntu/unity ./unity
+# COPY ./unity/common.mk ./unity/common.mk
+# COPY ./unity/build.mk ./unity/build.mk
+# COPY ./unity/$UNITY_VERSION/build.mk ./unity/$UNITY_VERSION/build.mk
+# COPY ./test/GameAssembly.cs ./test/GameAssembly.cs
+
 RUN \
     --mount=type=bind,rw,from=unity-editor,src=/home/ubuntu/unity,dst=./unity \
     --mount=type=bind,src=./unity/common.mk,dst=./unity/common.mk \
