@@ -104,27 +104,17 @@ Unity editors (so IL2CPP toolchains) will be downloaded and extracted automatica
 1. Only Linux (x86_64) is currently supported;
 2. Make sure to have `clang` and `make` installed.
 
-#### Build IL2CPP assemblies
+#### Build IL2CPP assembly (`GameAssembly.so`) for a specific Unity version only
 
 ```sh
-make assemblies
+make assembly UNITY_VERSION=6000.3.10f1
 ```
 
-An assembly (`GameAssembly.so`) will be built for each of [tested Unity versions](https://github.com/vfsfitvnm/frida-il2cpp-bridge/tree/master/unity).
-
-#### Build IL2CPP assembly for a specific Unity version only
-
-```sh
-make unity/2019.3.0f1/
-```
-
-#### Run tests
+#### Run test on each assembly
 
 ```sh
 make test
 ```
-
-Tests run against only the installed Unity versions.
 
 ### Commands (Docker)
 
@@ -141,7 +131,35 @@ Currently, testing-related commands for Linux (x86_64) are provided, however the
 make image UNITY_VERSION=2023.2.20f1
 ```
 
-#### Run tests on already-built Docker images
+This creates a Docker image tagged as `frida-il2cpp-bridge-playground:2023.2.20f1` having roughly the following content:
+
+```
+~/
+└── build/
+    ├── 2023.2.20f1/
+    │   └── out
+    │       ├── Data
+    │       │   ├── Metadata
+    │       │   │  └── global-metadata.dat
+    │       │   ├── Resources
+    │       │   │  └── mscorlib.dll-resources.dat
+    │       └── GameAssembly.so
+    └── host
+```
+
+As you can see, it only contains artifacts (and `frida-server`, of course). However, multi stage Docker builds are used so that you can stop at any step:
+
+```sh
+# Just get the Unity editor in it
+docker build \
+  --platform linux/amd64 \
+  --build-arg UNITY_VERSION=2023.2.20f1 \
+  --target unity-editor \
+  -t unity:2023.2.20f1 \
+  test
+```
+
+#### Run tests on each Docker image
 
 ```sh
 make testd

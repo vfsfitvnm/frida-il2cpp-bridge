@@ -8,9 +8,9 @@ WORKDIR /home/ubuntu
 
 ARG UNITY_VERSION
 RUN \
-    --mount=type=bind,src=./unity/common.mk,dst=./unity/common.mk \
-    --mount=type=bind,src=./unity/editor.mk,dst=./unity/editor.mk \
-    --mount=type=bind,src=./unity/$UNITY_VERSION/editor.mk,dst=./unity/$UNITY_VERSION/editor.mk \
+    --mount=src=./unity/common.mk,dst=./unity/common.mk \
+    --mount=src=./unity/editor.mk,dst=./unity/editor.mk \
+    --mount=src=./unity/$UNITY_VERSION/editor.mk,dst=./unity/$UNITY_VERSION/editor.mk \
     make -C unity/$UNITY_VERSION -f editor.mk editor
 
 FROM $BASE_IMAGE AS build-host
@@ -28,19 +28,19 @@ ARG UNITY_VERSION
 # COPY ./unity/common.mk ./unity/common.mk
 # COPY ./unity/build.mk ./unity/build.mk
 # COPY ./unity/$UNITY_VERSION/build.mk ./unity/$UNITY_VERSION/build.mk
-# COPY ./test/GameAssembly.cs ./test/GameAssembly.cs
+# COPY ./src/GameAssembly.cs ./src/GameAssembly.cs
 
 RUN \
-    --mount=type=bind,rw,from=unity-editor,src=/home/ubuntu/unity,dst=./unity \
-    --mount=type=bind,src=./unity/common.mk,dst=./unity/common.mk \
-    --mount=type=bind,src=./unity/build.mk,dst=./unity/build.mk \
-    --mount=type=bind,src=./unity/$UNITY_VERSION/build.mk,dst=./unity/$UNITY_VERSION/build.mk \
-    --mount=type=bind,src=./test/GameAssembly.cs,dst=./test/GameAssembly.cs \
+    --mount=from=unity-editor,src=/home/ubuntu/unity/$UNITY_VERSION/Editor,dst=./unity/$UNITY_VERSION/Editor \
+    --mount=src=./unity/common.mk,dst=./unity/common.mk \
+    --mount=src=./unity/build.mk,dst=./unity/build.mk \
+    --mount=src=./unity/$UNITY_VERSION/build.mk,dst=./unity/$UNITY_VERSION/build.mk \
+    --mount=src=./src/GameAssembly.cs,dst=./src/GameAssembly.cs \
     make -C unity/$UNITY_VERSION -f build.mk assembly
 
 RUN \
-    --mount=type=bind,src=./test/host.c,target=./test/host.c \
-    clang -o build/host ./test/host.c
+    --mount=src=./src/host.c,dst=./src/host.c \
+    clang -o build/host src/host.c
 
 FROM $BASE_IMAGE AS final
 

@@ -1,7 +1,7 @@
 include ../build.mk
 
-UNITY_LINKER := $(MAYBE_STRACE) $(IL2CPP_DIR)/build/deploy/UnityLinker
-IL2CPP := $(MAYBE_STRACE) $(IL2CPP_DIR)/build/deploy/il2cpp
+UNITY_LINKER := $(IL2CPP_DIR)/build/deploy/UnityLinker
+IL2CPP := $(IL2CPP_DIR)/build/deploy/il2cpp
 
 MSCORLIB := $(MONOBL_DIR)/lib/mono/unityaot-linux/mscorlib.dll
 
