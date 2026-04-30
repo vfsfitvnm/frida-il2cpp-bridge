@@ -72,8 +72,10 @@ namespace Il2Cpp {
                 }, 1000);
 
                 const interceptor = Interceptor.attach(Il2Cpp.exports.initialize, {
-                    onLeave() {
+                    onEnter() {
                         clearTimeout(timeout);
+                    },
+                    onLeave() {
                         interceptor.detach();
                         blocking ? resolve(true) : setImmediate(() => resolve(false));
                     }
