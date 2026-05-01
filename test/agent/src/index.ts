@@ -82,8 +82,8 @@ Il2Cpp.perform(() => {
     });
 
     test("Il2Cpp.Image::classCount", () => {
-        assert(Il2Cpp.domain.assembly("GameAssembly").image.classes.length).is(33);
-        assert(Il2Cpp.domain.assembly("GameAssembly").image.classCount).is(33);
+        assert(Il2Cpp.domain.assembly("GameAssembly").image.classes.length).is(36);
+        assert(Il2Cpp.domain.assembly("GameAssembly").image.classCount).is(36);
     });
 
     test("Il2Cpp.Class::image", () => {
@@ -618,5 +618,36 @@ Il2Cpp.perform(() => {
         assert(() => Il2Cpp.nullable(null as any, Il2Cpp.corlib.class("System.Object")).type.class).throws(
             "Cannot create nullable value type out of a reference type 'System.Object'"
         );
+    });
+    // --- Struct return hook tests (Interceptor.replace via .implementation) ---
+
+    test("Hooked method returning medium struct with passthrough result", () => {
+        const SRT = Il2Cpp.domain.assembly("GameAssembly").image.class("StructReturnTest");
+        const method = SRT.method<Il2Cpp.ValueType>("GetMediumResult");
+
+        method.implementation = function (...args) {
+            return method.invoke(...args);
+        };
+
+        const result = method.invoke(3, 77);
+        assert(result.field<number>("Code").value).is(3);
+        assert(result.field<number>("Value").value).is(77);
+        SRT.method("GetMediumResult").revert();
+    });
+
+    test("Hooked method returning large struct (sret) with passthrough result", () => {
+        const SRT = Il2Cpp.domain.assembly("GameAssembly").image.class("StructReturnTest");
+        const method = SRT.method<Il2Cpp.ValueType>("GetLargeResult");
+        const msg = Il2Cpp.string("passthrough");
+        const entity = Il2Cpp.corlib.class("System.Object").new();
+
+        method.implementation = function (...args) {
+            return method.invoke(...args);
+        };
+
+        const result = method.invoke(5, msg, entity);
+        assert(result.field<number>("Reason").value).is(5);
+        assert(result.field<Il2Cpp.String>("Message").value.content).is("passthrough");
+        SRT.method("GetLargeResult").revert();
     });
 }).then(() => send({ action: "stop" }));
