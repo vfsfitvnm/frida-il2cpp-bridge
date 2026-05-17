@@ -24,43 +24,55 @@ namespace Il2Cpp {
      * ```
      */
     export function installExceptionListener(targetThread: "current" | "all" = "current"): InvocationListener {
-        const currentThread = Il2Cpp.exports.threadGetCurrent();
-    
-        const is64Bit = Process.pointerSize === 8;
-        if (Process.platform === 'windows') return Interceptor.attach(Module.findGlobalExportByName("RaiseException"), function (args) {
-            if (targetThread === "current" &&
-                !Il2Cpp.exports.threadGetCurrent().equals(currentThread)) {
-                return;
-            }
-    
-            const exceptionCode = args[0].toUInt32();
-            if (exceptionCode !== 0xE06D7363) {
-                return;
-            }
-    
-            const nArgs = args[2].toInt32();
-            const lpParams = args[3];
-    
-            const expectedArgs = is64Bit ? 4 : 3;
-            if (nArgs < expectedArgs || lpParams.isNull()) {
-                return;
-            }
-    
-            const ptrSize = Process.pointerSize;
-            const pExceptionObject = lpParams.add(ptrSize * 8).readPointer();
+        let target: NativePointer;
+        let impl: (this: InvocationContext, args: InvocationArguments) => Il2Cpp.Object | undefined;
 
-            if (!pExceptionObject.isNull()) {
-                const exceptionObj = new Il2Cpp.Object(pExceptionObject);
-                inform(exceptionObj);
-            }
-        });
-    
-        return Interceptor.attach(Il2Cpp.module.getExportByName("__cxa_throw"), function (args) {
+        switch (Process.platform) {
+            case "windows":
+                // On Windows, _CxxThrowException
+                // https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-raiseexception
+                //
+                // VOID RaiseException(
+                // [in] DWORD           dwExceptionCode,
+                // [in] DWORD           dwExceptionFlags,
+                // [in] DWORD           nNumberOfArguments,
+                // [in] const ULONG_PTR *lpArguments
+                // );
+                target = Module.getGlobalExportByName("RaiseException");
+                impl = function (args) {
+                    // Visual C++ compiler uses the following code for C++ exceptions
+                    if (args[0].toUInt32() != 0xe06d7363) {
+                        return;
+                    }
+
+                    const nArgs = args[2].toInt32();
+                    const lpParams = args[3];
+
+                    const expectedArgs = Process.pointerSize == 8 ? 4 : 3;
+                    if (nArgs < expectedArgs || lpParams.isNull()) {
+                        return;
+                    }
+
+                    return new Il2Cpp.Object(lpParams.add(Process.pointerSize * 8).readPointer());
+                };
+            default:
+                target = Il2Cpp.module.getExportByName("__cxa_throw");
+                impl = function (args) {
+                    return new Il2Cpp.Object(args[0].readPointer());
+                };
+        }
+
+        const currentThread = Il2Cpp.exports.threadGetCurrent();
+
+        return Interceptor.attach(target, function (args) {
             if (targetThread == "current" && !Il2Cpp.exports.threadGetCurrent().equals(currentThread)) {
                 return;
             }
-    
-            inform(new Il2Cpp.Object(args[0].readPointer()));
+
+            const exceptionObject = impl.bind(this)(args);
+            if (exceptionObject?.asNullable() != undefined) {
+                inform(exceptionObject);
+            }
         });
     }
 }
