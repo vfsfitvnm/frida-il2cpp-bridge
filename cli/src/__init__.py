@@ -5,9 +5,11 @@ import json
 
 __name__ = environ.get("npm_lifecycle_script", "frida-il2cpp-bridge").strip('"\'')
 
-NPM_MODULE_PATH = Path(__file__)
+NPM_MODULE_PATH = Path(__file__).resolve()
 while NPM_MODULE_PATH.stem != __name__:
     NPM_MODULE_PATH = NPM_MODULE_PATH.parent
+    if NPM_MODULE_PATH == NPM_MODULE_PATH.parent:
+        raise RuntimeError("Could not locate npm module path, please file a bug")
 
 with open(NPM_MODULE_PATH / "package.json", "r", encoding="utf-8") as file:
     __version__ = json.load(file)["version"]
