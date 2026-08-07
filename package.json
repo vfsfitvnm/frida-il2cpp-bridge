@@ -1,54 +1,55 @@
 {
-  "name": "frida-il2cpp-bridge",
-    "version": "0.13.1",
-  "description": "A Frida module to dump, trace or hijack any Il2Cpp application at runtime, without needing the global-metadata.dat file.",
-  "keywords": [
-    "frida",
-    "frida-gum",
-    "frida-gum-bridge",
-    "il2cpp",
-    "dump",
-    "trace",
-    "global-metadata"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/vfsfitvnm/frida-il2cpp-bridge.git"
-  },
-  "license": "MIT",
-  "author": "vfsfitvnm",
-  "exports": "./dist/index.js",
-  "module": "dist/index.js",
-  "main": "dist/index.js",
-  "type": "module",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist", "cli"
-  ],
-  "scripts": {
-    "prepare": "make dist",
-    "watch": "npm exec tspc -- --watch",
-    "test": "make test",
-    "testd": "make testd"
-  },
-  "bin": {
-    "frida-il2cpp-bridge": "cli/main.py"
-  },
-  "prettier": {
-    "arrowParens": "avoid",
-    "bracketSpacing": true,
-    "printWidth": 160,
-    "tabWidth": 4,
-    "trailingComma": "none"
-  },
-  "devDependencies": {
-    "@types/frida-gum": "^19.0.0",
-    "ts-patch": "^3.2.1",
-    "ts-transformer-inline-file": "^0.2.0"
-  },
-  "overrides": {
-    "ts-transformer-inline-file": {
-      "typescript": "^5.0.0"
+    "name": "frida-il2cpp-bridge",
+    "version": "0.13.2",
+    "description": "A Frida module to dump, trace or hijack any Il2Cpp application at runtime, without needing the global-metadata.dat file.",
+    "keywords": [
+        "frida",
+        "frida-gum",
+        "frida-gum-bridge",
+        "il2cpp",
+        "dump",
+        "trace",
+        "global-metadata"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/vfsfitvnm/frida-il2cpp-bridge.git"
+    },
+    "license": "MIT",
+    "author": "vfsfitvnm",
+    "exports": "./dist/index.js",
+    "module": "dist/index.js",
+    "main": "dist/index.js",
+    "type": "module",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "cli"
+    ],
+    "scripts": {
+        "prepare": "make dist",
+        "watch": "npm exec tspc -- --watch",
+        "test": "make test",
+        "testd": "make testd"
+    },
+    "bin": {
+        "frida-il2cpp-bridge": "cli/main.py"
+    },
+    "prettier": {
+        "arrowParens": "avoid",
+        "bracketSpacing": true,
+        "printWidth": 160,
+        "tabWidth": 4,
+        "trailingComma": "none"
+    },
+    "devDependencies": {
+        "@types/frida-gum": "^19.0.0",
+        "ts-patch": "^3.2.1",
+        "ts-transformer-inline-file": "^0.2.0"
+    },
+    "overrides": {
+        "ts-transformer-inline-file": {
+            "typescript": "^5.0.0"
+        }
     }
-  }
 }
