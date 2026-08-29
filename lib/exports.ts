@@ -243,6 +243,10 @@ namespace Il2Cpp {
             return r("il2cpp_gc_enable", "void", []);
         },
 
+        get gcForEachHeap() {
+            return r("il2cpp_gc_foreach_heap", "void", ["pointer", "pointer"]);
+        },
+
         get gcGetHeapSize() {
             return r("il2cpp_gc_get_heap_size", "int64", []);
         },

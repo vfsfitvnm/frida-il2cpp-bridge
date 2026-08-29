@@ -4,6 +4,37 @@ namespace Il2Cpp {
      */
     export const gc = {
         /**
+         * Gets the allocated heap sections managed by IL2CPP.
+         */
+        get heapSections(): MemoryRange[] {
+            const ranges: MemoryRange[] = [];
+
+            Il2Cpp.exports.gcForEachHeap(
+                new NativeCallback(
+                    (data: NativePointer, _: NativePointer) => {
+                        /**
+                         * struct Il2CppManagedMemorySection
+                         * {
+                         *     uint64_t sectionStartAddress;
+                         *     uint32_t sectionSize;
+                         *     uint8_t* sectionBytes;
+                         * };
+                         */
+                        ranges.push({
+                            base: data.readPointer(),
+                            size: data.add(Process.pointerSize).readU32()
+                        });
+                    },
+                    "void",
+                    ["pointer", "pointer"]
+                ),
+                NULL
+            );
+
+            return ranges;
+        },
+
+        /**
          * Gets the heap size in bytes.
          */
         get heapSize(): Int64 {
