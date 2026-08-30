@@ -48,7 +48,7 @@ RUN apt-get update && apt-get --no-install-recommends install -y xz-utils
 
 WORKDIR /bin
 
-ARG FRIDA_VERSION=17.7.3
+ARG FRIDA_VERSION=17.17.0
 ADD https://github.com/frida/frida/releases/download/$FRIDA_VERSION/frida-server-$FRIDA_VERSION-linux-x86_64.xz .
 RUN <<EOF
 xz -d frida-server-*.xz

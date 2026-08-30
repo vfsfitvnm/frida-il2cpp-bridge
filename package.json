@@ -43,7 +43,7 @@
         "trailingComma": "none"
     },
     "devDependencies": {
-        "@types/frida-gum": "^19.0.0",
+        "@types/frida-gum": "^19.10.0",
         "ts-patch": "^3.2.1",
         "ts-transformer-inline-file": "^0.2.0"
     },
