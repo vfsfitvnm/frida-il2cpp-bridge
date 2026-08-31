@@ -84,13 +84,28 @@ namespace Il2Cpp {
             if (unityVersion != null) {
                 return unityVersion;
             }
-        } catch(_) {
+        } catch (_) {
         }
 
-        const searchPattern = "69 6c 32 63 70 70";
+        const rangeProvider = function* () {
+            yield* Il2Cpp.module.enumerateSections()
+                .filter(_ => _.name == ".rodata" || _.name == ".rdata" || _.name == "__TEXT")
+                .map(_ => ({ base: _.address, size: _.size }));
 
-        for (const range of module.enumerateRanges("r--").concat(Process.getRangeByAddress(module.base))) {
-            for (let { address } of Memory.scanSync(range.base, range.size, searchPattern)) {
+            yield* Il2Cpp.module.enumerateRanges("r--");
+
+            yield* Process.enumerateRanges("r--").filter(_ => _.file != undefined && _.file.path != Il2Cpp.module.path);
+        }
+
+        for (const range of rangeProvider()) {
+            let matches: MemoryScanMatch[];
+            try {
+                matches = Memory.scanSync(range.base, range.size, "69 6c 32 63 70 70");
+            } catch (_) {
+                continue;
+            }
+
+            for (let { address } of matches) {
                 while (address.readU8() != 0) {
                     address = address.sub(1);
                 }
@@ -123,6 +138,6 @@ namespace Il2Cpp {
         const handle = Il2Cpp.exports.resolveInternalCall(Memory.allocUtf8String("UnityEngine.Application::" + method));
         const nativeFunction = new NativeFunction(handle, "pointer", []);
 
-        return nativeFunction.isNull() ? null : new Il2Cpp.String(nativeFunction()).asNullable()?.content ?? null;
+        return nativeFunction.isNull() ? null : (new Il2Cpp.String(nativeFunction()).asNullable()?.content ?? null);
     }
 }
