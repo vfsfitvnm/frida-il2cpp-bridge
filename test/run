@@ -1,146 +1,203 @@
 #!/usr/bin/env python3
 
+import logging
+import sys
+import time
+from concurrent.futures import Future
 from os import environ
-from threading import Semaphore
 from pathlib import Path
-from colorama import Fore, Style
-import frida
-import docker
+from typing import TypedDict
 
+import docker
+import frida
+from colorama import Fore, Style
 
 ROOT = Path(__file__).resolve().parent.parent
 AGENT_PATH = ROOT / "test" / "agent" / "dist" / "index.js"
 SOURCE_MAP_PATH = AGENT_PATH.with_name("index.js.map")
 
 
+class PassedUnitTest(TypedDict):
+    name: str
+
+
+class FailedUnitTest(TypedDict):
+    name: str
+    exception: str
+
+
 class TestRunner:
     def __init__(
         self,
         name: str,
-        device: frida.core.Device,
+        device: frida.Device,
         spawn_args: list[str],
-        script_variables: dict,
+        script_variables: dict[str, str],
     ) -> None:
-        self.lock = Semaphore(0)
-        self.passed = []
-        self.failed = []
         self.name = name
-        self.script_variables = script_variables
-        self.device = device
-        self.host = device.spawn(spawn_args)
+        self._device = device
+        self._spawn_args = spawn_args
+        self._script_variables = script_variables
+        self._completion = Future()
+        self._passed: list[PassedUnitTest] = []
+        self._failed: list[FailedUnitTest] = []
 
-    def prepare(self) -> None:
-        session = self.device.attach(self.host)
+        self._host = None
+        self._session = None
+        self._script = None
+
+        self._logger = logging.getLogger(self.name)
+
+    def __enter__(self) -> "TestRunner":
+        self._logger.info("Spawning target %s", self._spawn_args)
+        self._host = self._device.spawn(self._spawn_args)
+
+        self._logger.info("Attaching to host %s", self._host)
+        self._session = self._device.attach(self._host)
 
         source = AGENT_PATH.read_text(encoding="utf-8")
-        for key, value in self.script_variables.items():
-            source = source.replace(f"${key}", value)
+        for key, value in self._script_variables.items():
+            source = source.replace((f"${key}"), str(value))
 
-        self.script = session.create_script(source=source, name="source")
-        self.script.on("message", self.on_message)
-        self.script.load()
+        self._logger.info("Creating script")
+        self._script = self._session.create_script(source=source, name="source")
+        self._script.on("message", self._on_message)
+        self._script.load()
 
-    def run(self) -> None:
-        self.device.resume(self.host)
-        if not self.lock.acquire(timeout=10):
-            self.stop()
-            raise RuntimeError(f"Timed out when running tests for {self.name}")
+        self._logger.info("Target ready (paused)")
 
-    def stop(self) -> None:
-        self.lock.release()
-        self.script.unload()
-        self.device.kill(self.host)
+        return self
 
-    def on_message(self, message: frida.core.ScriptMessage, _):
+    def __exit__(self, exc_type, exc, tb) -> None:
+        self._script.unload()
+        self._device.kill(self._host)
+        self._session.detach()
+
+    def run(self) -> tuple[list[PassedUnitTest], list[FailedUnitTest]]:
+        self._logger.info("Resuming target")
+        self._device.resume(self._host)
+
+        self._logger.info("Waiting for completion")
+        self._completion.result(timeout=10)
+
+        self._logger.info(
+            "Run completed, %d test(s) passed, %d test(s) failed",
+            len(self._passed),
+            len(self._failed),
+        )
+
+        return self._passed, self._failed
+
+    def _on_message(self, message: frida.ScriptMessage, _):
         if message["type"] == "send" and (payload := message.get("payload")):
             if "name" in payload:
                 if "exception" in payload:
-                    self.failed.append(payload)
+                    self._failed.append(payload)
                 else:
-                    self.passed.append(payload)
-            elif action := payload.get("action"):
-                getattr(self, action)()
+                    self._passed.append(payload)
+            elif payload.get("action") == "stop":
+                self._completion.set_result(None)
         elif message["type"] == "error":
-            if stack := message.get("stack"):
-                print(stack)
-            else:
-                print(message["description"])
-
-
-# TOOD: refactor this spaghetti crap
-def main(use_docker: bool) -> int:
-    passed_count = 0
-    failed_count = 0
-
-    if use_docker:
-        client = docker.from_env()
-
-        containers = [
-            client.containers.run(
-                image=image,
-                ports={"27042/tcp": None},
-                volumes=[f"{SOURCE_MAP_PATH}/:/tmp/index.js.map"],
-                security_opt=["seccomp:unconfined"],
-                detach=True,
-            ) for image in client.images.list("frida-il2cpp-bridge-playground")
-        ]
-
-        if not containers:
-            print("No Docker images available, please build them with `make image UNITY_VERSION=...`")
-
-        for container in containers:
-            container.reload()
-
-        test_runners = [
-            TestRunner(
-                name=container.image.tags[0].split(":")[1],
-                device=frida.get_device_manager() \
-                    .add_remote_device("localhost:" + container.ports["27042/tcp"][0]["HostPort"]),
-                script_variables=dict(
-                    UNITY_VERSION=container.image.tags[0].split(":")[1],
-                    SOURCE_MAP_PATH="/tmp/index.js.map",
-                ),
-                spawn_args=["./build/host", f"./build/{container.image.tags[0].split(":")[1]}/out"],
-            ) for container in containers
-        ]
-    else:
-        test_runners = [
-            TestRunner(
-                name=build_path.name,
-                device=frida.get_local_device(),
-                script_variables=dict(
-                    UNITY_VERSION=build_path.name,
-                    SOURCE_MAP_PATH=str(SOURCE_MAP_PATH),
-                ),
-                spawn_args=[str(ROOT / "build" / "host"), str(build_path / "out")],
-            ) for build_path in (ROOT / "build").iterdir() if build_path.is_dir()
-        ]
-
-    for test_runner in test_runners:
-        test_runner.prepare()
-        print(f"{Fore.BLUE}►{Style.RESET_ALL} {test_runner.name}")
-        test_runner.run()
-
-        for passed in test_runner.passed:
-            passed_count += 1
-            print(f"  {Fore.GREEN}✓ {passed['name']}{Style.RESET_ALL}")
-        for failed in test_runner.failed:
-            failed_count += 1
-            print(
-                f"  {Fore.RED}𐄂 {failed['name']}: {str(failed['exception'])}{Style.RESET_ALL}"
+            self._completion.set_exception(
+                RuntimeError(
+                    message.get("stack")
+                    or message.get("description")
+                    or "Unhandled Frida script exception"
+                )
             )
 
-    if use_docker:
-        for container in containers:
-            container.remove(force=True)
 
-    if failed_count > 0:
-        print(f"{Fore.RED}𐄂{Style.RESET_ALL} {failed_count} test(s) failed")
-        return 1
-    else:
-        print(f"{Fore.BLUE}✓{Style.RESET_ALL} {passed_count} test(s) passed")
-        return 0
+class TestSuite:
+    def __init__(self, use_docker: bool):
+        self._use_docker = use_docker
+        self._logger = logging.getLogger(__name__)
+
+    def run(self):
+        passed_count = 0
+        failed_count = 0
+
+        for test_runner in self._test_runners:
+            with test_runner:
+                passed, failed = test_runner.run()
+
+                print(f"{Fore.BLUE}►{Style.RESET_ALL} {test_runner.name}")
+                for unit_test in passed:
+                    passed_count += 1
+                    print(f"  {Fore.GREEN}✓ {unit_test['name']}{Style.RESET_ALL}")
+                for unit_test in failed:
+                    failed_count += 1
+                    print(
+                        f"  {Fore.RED}𐄂 {unit_test['name']}: {unit_test['exception']}{Style.RESET_ALL}"
+                    )
+
+        if failed_count > 0:
+            print(f"{Fore.RED}𐄂{Style.RESET_ALL} {failed_count} test(s) failed")
+            return 1
+        else:
+            print(f"{Fore.BLUE}✓{Style.RESET_ALL} {passed_count} test(s) passed")
+            return 0
+
+    @property
+    def _test_runners(self):
+        return (
+            self._docker_test_runners if self._use_docker else self._local_test_runners
+        )
+
+    @property
+    def _local_test_runners(self):
+        for build_path in (ROOT / "build").iterdir():
+            if build_path.is_dir():
+                yield TestRunner(
+                    name=build_path.name,
+                    device=frida.get_local_device(),
+                    script_variables={
+                        "UNITY_VERSION": build_path.name,
+                        "SOURCE_MAP_PATH": str(SOURCE_MAP_PATH),
+                    },
+                    spawn_args=[str(ROOT / "build" / "host"), str(build_path / "out")],
+                )
+
+    @property
+    def _docker_test_runners(self):
+        client = docker.from_env()
+
+        for image in client.images.list("frida-il2cpp-bridge-playground"):
+            unity_version = image.tags[0].split(":", 1)[1]
+
+            self._logger.info("Starting Docker container tag=%s", image.tags[0])
+            container = client.containers.run(
+                image=image,
+                ports={"27042/tcp": None},
+                volumes=[f"{SOURCE_MAP_PATH}:/tmp/index.js.map"],
+                security_opt=["seccomp:unconfined"],
+                detach=True,
+            )
+
+            try:
+                container.reload()
+                time.sleep(0.5)
+
+                yield TestRunner(
+                    name=unity_version,
+                    device=frida.get_device_manager().add_remote_device(
+                        "localhost:" + container.ports["27042/tcp"][0]["HostPort"]
+                    ),
+                    script_variables={
+                        "UNITY_VERSION": unity_version,
+                        "SOURCE_MAP_PATH": "/tmp/index.js.map",
+                    },
+                    spawn_args=[
+                        "./build/host",
+                        f"./build/{unity_version}/out",
+                    ],
+                )
+            finally:
+                container.remove(force=True)
 
 
 if __name__ == "__main__":
-    exit(main(use_docker="DOCKER_HOST" in environ))
+    logging.basicConfig(
+        level=logging.INFO,
+        format="(%(name)s) %(levelname)s: %(message)s",
+    )
+    sys.exit(TestSuite(use_docker="DOCKER_HOST" in environ).run())

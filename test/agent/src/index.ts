@@ -1,6 +1,8 @@
 /// <reference path="../../../lib/index.ts">/>
 
-Script.registerSourceMap("/source.js", new File("$SOURCE_MAP_PATH", "r").readText());
+// for some reason File.readAllText raises "can't decode byte 0x00 in position 155632", but there
+// are NO invalid utf-8 bytes in there; and i'm tired...
+Script.registerSourceMap("/source.js", File.readAllBytes("$SOURCE_MAP_PATH").unwrap().readUtf8String()!);
 
 Il2Cpp.perform(() => {
     test("Unity version is detected", () => {

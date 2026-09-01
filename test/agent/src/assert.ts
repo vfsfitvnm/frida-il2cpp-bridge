@@ -3,7 +3,7 @@ function test(name: string, block: () => void) {
         block();
         send({ name: name });
     } catch (exception: any) {
-        send({ name: name, exception: exception.stack });
+        send({ name: name, exception: `${exception.message} (${exception.name})\n${exception.stack}` });
     }
 }
 
