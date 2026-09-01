@@ -1,6 +1,6 @@
 namespace Il2Cpp {
     export class Thread extends NativeStruct {
-        /** Gets the native id of the current thread. */
+        /** Gets the native id of the current thread, or -1 if it is somehow missing. */
         get id(): number {
             let get = function (this: Il2Cpp.Thread) {
                 return this.internal.field<UInt64>("thread_id").value.toNumber();
@@ -17,7 +17,13 @@ namespace Il2Cpp {
 
                 const _get = get;
                 get = function (this: Il2Cpp.Thread) {
-                    return ptr(_get.apply(this)).add(offset).readS32();
+                    const handle = ptr(_get.apply(this));
+                    // sometimes, for some thread, there is no info...
+                    if (handle.isNull()) {
+                        warn(`couldn't find thread id for ${this.handle}; returning a negative number, expect breakage`);
+                        return -1;
+                    }
+                    return handle.add(offset).readS32();
                 };
             }
 
