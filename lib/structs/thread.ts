@@ -138,19 +138,19 @@ namespace Il2Cpp {
             // in case il2cpp_thread_get_all_attached_threads is not available, we can scan the
             // memory to look for the current thread pointer, so that we get where s_AttachedThreads
             // is contiguously storing its values (pointers to threads)
-            const currentThreadHandle = Il2Cpp.currentThread?.handle ?? raise("current thread is not attached to IL2CPP");
-            const pattern = currentThreadHandle.toMatchPattern();
+            const currentThread = Il2Cpp.currentThread ?? raise("current thread is not attached to IL2CPP");
+            const pattern = currentThread.handle.toMatchPattern();
 
             // s_AttachedThreads is initialized at runtime (il2cpp_init) and it is managed by IL2CPP GC
             const rangeProvider = function* () {
-                // ranges where other static data allocated during il2cpp_init is
-                yield Process.getRangeByAddress(Il2Cpp.corlib.assembly.object);
-                yield Process.getRangeByAddress(Il2Cpp.corlib.class("System.Threading.Thread").staticFieldsData);
-
                 // ranges allocated by IL2CPP garbage collector
                 try {
                     yield* Il2Cpp.gc.heapSections;
                 } catch (_) {} // ignore missing export or native exceptions
+
+                // ranges where other static data allocated during il2cpp_init is
+                yield Process.getRangeByAddress(Il2Cpp.corlib.assembly.object);
+                yield Process.getRangeByAddress(Il2Cpp.corlib.class("System.Threading.Thread").staticFieldsData);
 
                 // last resort: every range in the whole process that is likely to be heap allocated
                 yield* Process.enumerateRanges("rw-").filter(_ => _.file == undefined);
@@ -164,18 +164,24 @@ namespace Il2Cpp {
                 } catch (_) {} // ignore access violation errors (https://github.com/vfsfitvnm/frida-il2cpp-bridge/issues/742)
 
                 if (matches.length == 1) {
-                    // we could be at the middle of the vector, so let's go to its head
-                    let { address } = matches[0];
-                    while (!address.sub(Process.pointerSize).readPointer().isNull()) {
-                        address = address.sub(Process.pointerSize);
-                    }
-
                     const threads: Il2Cpp.Thread[] = [];
+                    const iter = (index: number) => {
+                        const handle = matches[0].address.add(index * Process.pointerSize).readPointer();
 
-                    let handle: NativePointer;
-                    while (!(handle = address.add(Process.pointerSize * threads.length).readPointer()).isNull()) {
-                        threads.push(new Il2Cpp.Thread(handle));
-                    }
+                        // reject obvious non-pointers
+                        if (!handle.isNull() && Process.findRangeByAddress(handle) != null) {
+                            // try interpret the handle as an actual thread - Il2CppThread is a
+                            // Il2CppObject, so class addresses should match
+                            const thread = new Il2Cpp.Thread(handle);
+                            if (thread.object.class.equals(currentThread.object.class)) {
+                                return threads.push(thread);
+                            }
+                        }
+                    };
+
+                    for (let i = 0; iter(i); i--); // find previous threads
+                    threads.reverse();
+                    for (let i = 1; iter(i); i++); // find next threads
 
                     return threads;
                 }
