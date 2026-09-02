@@ -19,6 +19,7 @@
 /// <reference path="./exports.ts">/>
 /// <reference path="./filters.ts">/>
 /// <reference path="./gc.ts">/>
+/// <reference path="./interop.ts">/>
 /// <reference path="./memory.ts">/>
 /// <reference path="./module.ts">/>
 /// <reference path="./nullable.ts">/>

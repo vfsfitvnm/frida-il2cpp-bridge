@@ -193,6 +193,45 @@ namespace Il2Cpp {
             }
         }
 
+        /** */
+        hook(block: Il2Cpp.Method.HookCallback<T>): InvocationListener {
+            const startIndex = +!this.isStatic | +staticMethodsRequireInstanceParam();
+            const method = this;
+
+            const callbacks: InvocationListenerCallbacks = {};
+            if (block.onEnter) {
+                callbacks.onEnter = function (args: InvocationArguments) {
+                    const thisObject = method.isStatic
+                        ? method.class
+                        : method.class.isValueType
+                          ? new Il2Cpp.ValueType(args[0].add(structMethodsRequireObjectInstances() ? Il2Cpp.Object.headerSize : 0), method.class.type)
+                          : new Il2Cpp.Object(args[0]);
+
+                    block.onEnter?.bind(thisObject)({}, this);
+                };
+            }
+            if (block.onLeave) {
+                callbacks.onLeave = function (retval: InvocationReturnValue) {
+                    const context = this;
+                    block.onLeave?.(
+                        {
+                            type: method.returnType,
+                            get value(): T {
+                                return fromFridaInvocationReturnValue(context, retval, method.returnType) as T;
+                            },
+                            set value(value: T) {
+                                // TODO: float registers (e.g. xmm0) are used intead
+                                retval.replace(toFridaInvocationReturnValue(context, value, method.returnType));
+                            }
+                        },
+                        context
+                    );
+                };
+            }
+
+            return Interceptor.attach(this.virtualAddress, callbacks);
+        }
+
         /** Creates a generic instance of the current generic method. */
         inflate<R extends Il2Cpp.Method.ReturnType = T>(...classes: Il2Cpp.Class[]): Il2Cpp.Method<R> {
             if (!this.isGeneric || this.generics.length != classes.length) {
@@ -556,6 +595,23 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
             NoOptimization = 0x0040,
             SecurityMitigations = 0x0400,
             MaxMethodImplVal = 0xffff
+        }
+
+        export interface InvocationArguments {
+            [name: string]: Il2Cpp.Parameter.Type;
+        }
+
+        export interface InvocationReturnValue<T extends Il2Cpp.Method.ReturnType> {
+            type: Il2Cpp.Type;
+
+            get value(): T;
+
+            set value(value: T);
+        }
+
+        export interface HookCallback<R extends Il2Cpp.Method.ReturnType> {
+            onEnter?(this: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType, args: Il2Cpp.Method.InvocationArguments, context: InvocationContext): void;
+            onLeave?(retval: Il2Cpp.Method.InvocationReturnValue<R>, context: InvocationContext): void;
         }
     }
 }
