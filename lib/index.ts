@@ -2,7 +2,6 @@
 /// <reference path="./utils/console.ts">/>
 /// <reference path="./utils/decorate.ts">/>
 /// <reference path="./utils/getter.ts">/>
-/// <reference path="./utils/hash.ts">/>
 /// <reference path="./utils/lazy.ts">/>
 /// <reference path="./utils/native-struct.ts">/>
 /// <reference path="./utils/object.ts">/>

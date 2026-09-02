@@ -51,7 +51,15 @@ namespace Il2Cpp {
          * ```
          */
         get version(): string {
-            return unityEngineCall("get_version") ?? exportsHash(Il2Cpp.module).toString(16);
+            return (
+                unityEngineCall("get_version") ??
+                Il2Cpp.module
+                    .enumerateSections()
+                    .reduce((checksum, section) => {
+                        return [".text", "__text"].includes(section.name) ? checksum.update(ArrayBuffer.wrap(section.address, section.size)) : checksum;
+                    }, new Checksum("md5"))
+                    .getString()
+            );
         }
     };
 

@@ -12,7 +12,7 @@ namespace Il2Cpp {
                     if (this.#verbose) {
                         inform(message);
                     } else {
-                        const hash = cyrb53(message);
+                        const hash = Checksum.compute("md5", message);
                         if (!this.#state.history.has(hash)) {
                             this.#state.history.add(hash);
                             inform(message);
@@ -200,12 +200,12 @@ namespace Il2Cpp {
             this.#methods
                 ? filterMethods(this.#methods)
                 : this.#classes
-                ? filterClasses(this.#classes)
-                : this.#assemblies
-                ? filterAssemblies(this.#assemblies)
-                : this.#domain
-                ? filterDomain(this.#domain)
-                : undefined;
+                  ? filterClasses(this.#classes)
+                  : this.#assemblies
+                    ? filterAssemblies(this.#assemblies)
+                    : this.#domain
+                      ? filterDomain(this.#domain)
+                      : undefined;
 
             this.#assemblies = undefined;
             this.#classes = undefined;
@@ -254,7 +254,7 @@ namespace Il2Cpp {
         export interface State {
             depth: number;
             buffer: string[];
-            history: Set<number>;
+            history: Set<string>;
             flush: () => void;
         }
 
