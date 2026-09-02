@@ -30,7 +30,7 @@ namespace Il2Cpp {
                 types.push(parameter.type.fridaAlias);
             }
 
-            if (!this.isStatic || Il2Cpp.unityVersionIsBelow201830) {
+            if (!this.isStatic || staticMethodsRequireInstanceParam()) {
                 types.unshift("pointer");
             }
 
@@ -223,7 +223,7 @@ namespace Il2Cpp {
         invokeRaw(instance: NativePointerValue, ...parameters: Il2Cpp.Parameter.Type[]): T {
             const allocatedParameters = parameters.map(toFridaValue);
 
-            if (!this.isStatic || Il2Cpp.unityVersionIsBelow201830) {
+            if (!this.isStatic || staticMethodsRequireInstanceParam()) {
                 allocatedParameters.unshift(instance);
             }
 
@@ -428,7 +428,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
 
         /** @internal */
         wrap(block: (this: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType, ...parameters: Il2Cpp.Parameter.Type[]) => T): NativeCallback<any, any> {
-            const startIndex = +!this.isStatic | +Il2Cpp.unityVersionIsBelow201830;
+            const startIndex = +!this.isStatic | +staticMethodsRequireInstanceParam();
             return new NativeCallback(
                 (...args: NativeCallbackArgumentValue[]): NativeCallbackReturnValue => {
                     const thisObject = this.isStatic
@@ -474,6 +474,27 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
      * ```
      */
     export interface BoundMethod<T extends Il2Cpp.Method.ReturnType = Il2Cpp.Method.ReturnType> extends Method<T> {}
+
+    // in Unity < 2018.3.0, there is no difference between static and instance method native
+    // signatures: both have "this" as first parameter - of course, static methods "this" parameter
+    // can be NULL
+    //
+    // this runtime check avoids depending on the Unity version: retrieving it can either fail or
+    // can depend on static methods invocations (causing a mutual dependency that leads to stack
+    // overflow)
+    let staticMethodsRequireInstanceParam = (): boolean => {
+        const SystemObject = Il2Cpp.corlib.class("System.Object");
+        // static System.Boolean Equals(System.Object objA, System.Object objB);
+        const Equals = new NativeFunction(SystemObject.method("Equals", 2).virtualAddress, "bool", ["pointer", "pointer"]);
+        const sentinel = SystemObject.new();
+
+        // if static methods require "this", the following equality check is false: the second
+        // object to compare with would be the third argument, which we are not passing
+        const equality = Equals(sentinel, sentinel);
+
+        const result = !equality;
+        return (staticMethodsRequireInstanceParam = () => result)();
+    };
 
     let structMethodsRequireObjectInstances = (): boolean => {
         const object = Il2Cpp.corlib.class("System.Int64").alloc();
