@@ -132,7 +132,7 @@ namespace Il2Cpp {
     export declare const unityVersionIsBelow201830: boolean;
     // prettier-ignore
     getter(Il2Cpp, "unityVersionIsBelow201830", () => {
-        return UnityVersion.lt(unityVersion, "2018.3.0");
+            return UnityVersion.lt(unityVersion, "2018.3.0");
     }, lazy);
 
     /** @internal */
@@ -143,9 +143,13 @@ namespace Il2Cpp {
     }, lazy);
 
     function unityEngineCall(method: string): string | null {
-        const handle = Il2Cpp.exports.resolveInternalCall(Memory.allocUtf8String("UnityEngine.Application::" + method));
-        const nativeFunction = new NativeFunction(handle, "pointer", []);
+        const icallHandle = Il2Cpp.exports.resolveInternalCall(Memory.allocUtf8String("UnityEngine.Application::" + method));
 
-        return nativeFunction.isNull() ? null : (new Il2Cpp.String(nativeFunction()).asNullable()?.content ?? null);
+        return (
+            (icallHandle.isNull()
+                ? Il2Cpp.domain.tryAssembly("UnityEngine.CoreModule")?.image?.tryClass("UnityEngine.Application")?.tryMethod<Il2Cpp.String>(method)?.invoke()
+                : new Il2Cpp.String(new NativeFunction(icallHandle, "pointer", [])())
+            )?.asNullable()?.content ?? null
+        );
     }
 }
