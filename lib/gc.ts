@@ -101,7 +101,7 @@ namespace Il2Cpp {
 
             const chooseCallback = new NativeCallback(callback, "void", ["pointer", "int", "pointer"]);
 
-            if (Il2Cpp.unityVersionIsBelow202120) {
+            if (!Il2Cpp.exports.livenessCalculationBegin.isNull()) {
                 const onWorld = new NativeCallback(() => {}, "void", []);
                 const state = Il2Cpp.exports.livenessCalculationBegin(klass, 0, chooseCallback, NULL, onWorld, onWorld);
 

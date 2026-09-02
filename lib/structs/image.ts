@@ -10,7 +10,7 @@ namespace Il2Cpp {
         /** Gets the amount of classes defined in this image. */
         @lazy
         get classCount(): number {
-            if (Il2Cpp.unityVersionIsBelow201830) {
+            if (Il2Cpp.exports.imageGetClassCount.isNull()) {
                 return this.classes.length;
             } else {
                 return Il2Cpp.exports.imageGetClassCount(this);
@@ -20,7 +20,7 @@ namespace Il2Cpp {
         /** Gets the classes defined in this image. */
         @lazy
         get classes(): Il2Cpp.Class[] {
-            if (Il2Cpp.unityVersionIsBelow201830) {
+            if (Il2Cpp.exports.imageGetClass.isNull()) {
                 const types = this.assembly.object.method<Il2Cpp.Array<Il2Cpp.Object>>("GetTypes").invoke(false);
                 // In Unity 5.3.8f1, getting System.Reflection.Emit.OpCodes type name
                 // without iterating all the classes first somehow blows things up at

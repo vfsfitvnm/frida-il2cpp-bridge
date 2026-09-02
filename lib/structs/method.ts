@@ -30,7 +30,7 @@ namespace Il2Cpp {
                 types.push(parameter.type.fridaAlias);
             }
 
-            if (!this.isStatic || staticMethodsRequireInstanceParam()) {
+            if (this.nativeSignatureHasInstanceSlot) {
                 types.unshift("pointer");
             }
 
@@ -111,6 +111,11 @@ namespace Il2Cpp {
         @lazy
         get nativeFunction(): NativeFunction<any, any> {
             return new NativeFunction(this.virtualAddress, this.returnType.fridaAlias, this.fridaSignature as NativeFunctionArgumentType[]);
+        }
+
+        /** @internal */
+        get nativeSignatureHasInstanceSlot(): boolean {
+            return !this.isStatic || staticMethodsRequireInstanceParam();
         }
 
         /** Gets the encompassing object of the current method. */
@@ -223,7 +228,7 @@ namespace Il2Cpp {
         invokeRaw(instance: NativePointerValue, ...parameters: Il2Cpp.Parameter.Type[]): T {
             const allocatedParameters = parameters.map(toFridaValue);
 
-            if (!this.isStatic || staticMethodsRequireInstanceParam()) {
+            if (this.nativeSignatureHasInstanceSlot) {
                 allocatedParameters.unshift(instance);
             }
 
@@ -428,7 +433,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
 
         /** @internal */
         wrap(block: (this: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType, ...parameters: Il2Cpp.Parameter.Type[]) => T): NativeCallback<any, any> {
-            const startIndex = +!this.isStatic | +staticMethodsRequireInstanceParam();
+            const parameterStartIndex = +this.nativeSignatureHasInstanceSlot;
             return new NativeCallback(
                 (...args: NativeCallbackArgumentValue[]): NativeCallbackReturnValue => {
                     const thisObject = this.isStatic
@@ -440,7 +445,7 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                             )
                           : new Il2Cpp.Object(args[0] as NativePointer);
 
-                    const parameters = this.parameters.map((_, i) => fromFridaValue(args[i + startIndex], _.type));
+                    const parameters = this.parameters.map((_, i) => fromFridaValue(args[i + parameterStartIndex], _.type));
                     const result = block.call(thisObject, ...parameters);
                     return toFridaValue(result);
                 },

@@ -128,20 +128,6 @@ namespace Il2Cpp {
         raise("couldn't determine the Unity version, please specify it manually");
     }, lazy);
 
-    /** @internal */
-    export declare const unityVersionIsBelow201830: boolean;
-    // prettier-ignore
-    getter(Il2Cpp, "unityVersionIsBelow201830", () => {
-            return UnityVersion.lt(unityVersion, "2018.3.0");
-    }, lazy);
-
-    /** @internal */
-    export declare const unityVersionIsBelow202120: boolean;
-    // prettier-ignore
-    getter(Il2Cpp, "unityVersionIsBelow202120", () => {
-        return UnityVersion.lt(unityVersion, "2021.2.0");
-    }, lazy);
-
     function unityEngineCall(method: string): string | null {
         const icallHandle = Il2Cpp.exports.resolveInternalCall(Memory.allocUtf8String("UnityEngine.Application::" + method));
 

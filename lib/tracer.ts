@@ -286,7 +286,7 @@ namespace Il2Cpp {
         const applierWithParameters = (): Il2Cpp.Tracer.Apply => (method, state, threadId) => {
             const paddedVirtualAddress = method.relativeVirtualAddress.toString(16).padStart(8, "0");
 
-            const startIndex = +!method.isStatic | +Il2Cpp.unityVersionIsBelow201830;
+            const parameterStartIndex = +method.nativeSignatureHasInstanceSlot;
 
             const callback = function (this: CallbackContext | InvocationContext, ...args: any[]) {
                 if ((this as InvocationContext).threadId == threadId) {
@@ -294,7 +294,7 @@ namespace Il2Cpp {
                     const parameters = thisParameter ? [thisParameter].concat(method.parameters) : method.parameters;
 
                     // prettier-ignore
-                    state.buffer.push(`\x1b[2m0x${paddedVirtualAddress}\x1b[0m ${`│ `.repeat(state.depth++)}┌─\x1b[35m${method.class.type.name}::\x1b[1m${method.name}\x1b[0m\x1b[0m(${parameters.map(e => `\x1b[32m${e.name}\x1b[0m = \x1b[31m${fromFridaValue(args[e.position + startIndex], e.type)}\x1b[0m`).join(", ")})`);
+                    state.buffer.push(`\x1b[2m0x${paddedVirtualAddress}\x1b[0m ${`│ `.repeat(state.depth++)}┌─\x1b[35m${method.class.type.name}::\x1b[1m${method.name}\x1b[0m\x1b[0m(${parameters.map(e => `\x1b[32m${e.name}\x1b[0m = \x1b[31m${fromFridaValue(args[e.position + parameterStartIndex], e.type)}\x1b[0m`).join(", ")})`);
                 }
 
                 const returnValue = method.nativeFunction(...args);
