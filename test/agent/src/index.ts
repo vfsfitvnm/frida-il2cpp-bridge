@@ -621,4 +621,19 @@ Il2Cpp.perform(() => {
             "Cannot create nullable value type out of a reference type 'System.Object'"
         );
     });
+
+    test("Il2Cpp.Method::fromVirtualAddress", () => {
+        Il2Cpp.domain.assembly("GameAssembly").image.classes.forEach(klass => {
+            klass.methods
+                .filter(_ => !_.virtualAddress.isNull())
+                .forEach(method => {
+                    const actual = Il2Cpp.Method.fromVirtualAddress(method.virtualAddress);
+                    if (klass.isGeneric || method.isGeneric) {
+                        assert(actual.virtualAddress).is(method.virtualAddress);
+                    } else {
+                        assert(actual).is(method);
+                    }
+                });
+        });
+    });
 }).then(() => send({ action: "stop" }));

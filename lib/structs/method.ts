@@ -154,13 +154,7 @@ namespace Il2Cpp {
 
         /** Gets the virtual address (VA) of this method. */
         get virtualAddress(): NativePointer {
-            const FilterTypeName = Il2Cpp.corlib.class("System.Reflection.Module").initialize().field<Il2Cpp.Object>("FilterTypeName").value;
-            const FilterTypeNameMethodPointer = FilterTypeName.field<NativePointer>("method_ptr").value;
-            const FilterTypeNameMethod = FilterTypeName.field<NativePointer>("method").value;
-
-            // prettier-ignore
-            const offset = FilterTypeNameMethod.offsetOf(_ => _.readPointer().equals(FilterTypeNameMethodPointer)) 
-                ?? raise("couldn't find the virtual address offset in the native method struct");
+            const offset = virtualAddressOffset();
 
             // prettier-ignore
             getter(Il2Cpp.Method.prototype, "virtualAddress", function (this: Il2Cpp.Method) {
@@ -453,6 +447,146 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
                 this.fridaSignature
             );
         }
+
+        /**
+         * Attempts to find a {@link Il2Cpp.Method} given its virtual address, that is, the native
+         * function's first instruction address.
+         *
+         * Please note that different generic methods (or methods belonging to generic classes) may
+         * share the same virtual address due to IL2CPP generic sharing: as a consequence, an
+         * unexpected `Il2Cpp.Method` might be returned. However, such shared virtual addresses are
+         * not actually invocable, so any address taken from runtime execution (e.g. from tracing)
+         * is not affected.
+         *
+         * To resolve a method from any address within the native function body, use
+         * {@link Il2Cpp.Method.fromAnyAddress}.
+         * ```ts
+         * const virtualAddress: NativePointer = ...;
+         * Il2Cpp.Method.fromVirtualAddress(virtualAddress);
+         * ```
+         */
+        static fromVirtualAddress(virtualAddress: NativePointer): Il2Cpp.Method {
+            return this.tryFromVirtualAddress(virtualAddress) ?? raise(`couldn't find method at virtual address ${virtualAddress}`);
+        }
+
+        /**
+         * Just like {@link Il2Cpp.Method.fromVirtualAddress}, but returns `undefined` if no method
+         * is found.
+         * ```ts
+         * const virtualAddress: NativePointer = ...;
+         * Il2Cpp.Method.tryFromVirtualAddress(virtualAddress);
+         * ```
+         */
+        static tryFromVirtualAddress(virtualAddress: NativePointer): Il2Cpp.Method | undefined {
+            if (virtualAddress.isNull()) {
+                raise("method virtual address cannot be null");
+            }
+
+            const rangeProvider = function* () {
+                yield* rangesHavingMethodDefinitionsCache.values();
+
+                yield* Process.enumerateRanges("rw-").filter(_ => _.file == undefined);
+            };
+
+            for (const range of rangeProvider()) {
+                let matches: MemoryScanMatch[];
+                try {
+                    // TODO: replace with Memory.findPointers once it's stable
+                    matches = Memory.scanSync(range.base, range.size, virtualAddress.toMatchPattern());
+                } catch (_) {
+                    continue;
+                }
+
+                // method definitions (`MethodInfo` aka `Il2Cpp.Method`) hold their native function
+                // virtual address two times at most (methodPointer and virtualMethodPointer):
+                // ```cpp
+                // typedef struct MethodInfo
+                // {
+                //     Il2CppMethodPointer methodPointer;
+                //     Il2CppMethodPointer virtualMethodPointer;
+                //     InvokerMethod invoker_method;
+                //     const char* name;
+                //     Il2CppClass *klass;
+                // ...
+                // ```
+                // if the number of matches is not 2, it means that the given virtual address
+                // belongs to generic sharing
+                for (const { address } of matches) {
+                    const method = new Il2Cpp.Method(address.sub(virtualAddressOffset()));
+
+                    try {
+                        // make sure this is an actual struct
+                        if (method.name == null) {
+                            continue;
+                        }
+                    } catch (_) {
+                        continue;
+                    }
+
+                    // update cache in case of new or resized range
+                    const currentRange = rangesHavingMethodDefinitionsCache.get(range.base.toInt32());
+                    if (currentRange == undefined || currentRange.size != range.size) {
+                        rangesHavingMethodDefinitionsCache.set(range.base.toInt32(), range);
+                    }
+
+                    return method;
+                }
+            }
+        }
+
+        /**
+         * Attempts to find a {@link Il2Cpp.Method} given its relative virtual address, that is,
+         * the native function's first instruction offset from the IL2CPP module base.
+         * ```ts
+         * Il2Cpp.Method.fromRelativeVirtualAddress("0x004ac1e");
+         * ```
+         */
+        static fromRelativeVirtualAddress(relativeVirtualAddress: string | number): Il2Cpp.Method {
+            return (
+                this.tryFromRelativeVirtualAddress(relativeVirtualAddress) ?? raise(`couldn't find method with RVA 0x${relativeVirtualAddress.toString(16)}`)
+            );
+        }
+
+        /**
+         * Just like {@link Il2Cpp.Method.fromRelativeVirtualAddress}, but returns `undefined`
+         * if no method is found.
+         * ```ts
+         * Il2Cpp.Method.tryFromVirtualAddress("0x004ac1e");
+         * ```
+         */
+        static tryFromRelativeVirtualAddress(relativeVirtualAddress: string | number): Il2Cpp.Method | undefined {
+            return this.tryFromVirtualAddress(Il2Cpp.module.base.add(ptr(relativeVirtualAddress)));
+        }
+
+        /**
+         * Attempts to find the {@link Il2Cpp.Method} whose native function contains the given
+         * address.
+         * Unlike {@link Il2Cpp.Method.fromVirtualAddress}, this accepts any address within the
+         * native function body, not only its first instruction address.
+         *
+         * This combines {@link Process.findFunctionRange} and
+         * {@link Il2Cpp.Method.fromVirtualAddress}.
+         * ```ts
+         * const address: NativePointer = ...;
+         * Il2Cpp.Method.fromAnyAddress(address);
+         * ```
+         */
+        static fromAnyAddress(address: NativePointer): Il2Cpp.Method {
+            return this.tryFromAnyAddress(address) ?? raise(`couldn't find method containing address ${address}`);
+        }
+
+        /**
+         * Just like {@link Il2Cpp.Method.fromAnyAddress}, but returns `undefined` if no method
+         * is found.
+         * ```ts
+         * const address: NativePointer = ...;
+         * Il2Cpp.Method.tryFromAnyAddress(address);
+         * ```
+         */
+        static tryFromAnyAddress(address: NativePointer): Il2Cpp.Method | undefined {
+            const range = Process.findFunctionRange(address);
+            return range == null ? undefined : this.tryFromVirtualAddress(range.base);
+        }
     }
 
     /**
@@ -512,6 +646,19 @@ ${this.virtualAddress.isNull() ? `` : ` // 0x${this.relativeVirtualAddress.toStr
         const result = object.method<boolean>("Equals", 1).overload(object.class).invokeRaw(object, 0xdeadbeef);
         return (structMethodsRequireObjectInstances = () => result)();
     };
+
+    let virtualAddressOffset = (): number => {
+        const FilterTypeName = Il2Cpp.corlib.class("System.Reflection.Module").initialize().field<Il2Cpp.Object>("FilterTypeName").value;
+        const FilterTypeNameMethodPointer = FilterTypeName.field<NativePointer>("method_ptr").value;
+        const FilterTypeNameMethod = FilterTypeName.field<NativePointer>("method").value;
+
+        const offset =
+            FilterTypeNameMethod.offsetOf(_ => _.readPointer().equals(FilterTypeNameMethodPointer)) ??
+            raise("couldn't find the virtual address offset in the native method struct");
+        return (virtualAddressOffset = () => offset)();
+    };
+
+    const rangesHavingMethodDefinitionsCache = new Map<number, MemoryRange>();
 
     export namespace Method {
         export type ReturnType = void | Il2Cpp.Field.Type | Il2Cpp.Reference;
