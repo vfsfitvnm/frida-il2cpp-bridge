@@ -1,5 +1,20 @@
 namespace Il2Cpp {
     export class Thread extends NativeStruct {
+        /**
+         * Gets the managed thread associated with the given native thread id (if any).
+         *
+         * This is an alternative to {@link Il2Cpp.attachedThreads}:
+         * ```ts
+         * async function findAllThreads() {
+         *     const promises = Process.enumerateThreads().map(thread => Il2Cpp.Thread.fromId(thread.id));
+         *     return (await Promise.all(promises)).filter(thread => thread != null);
+         * }
+         * ```
+         */
+        static fromId(threadId: number): Promise<Il2Cpp.Thread | null> {
+            return Process.runOnThread(threadId, () => Il2Cpp.currentThread);
+        }
+
         /** Gets the native id of the current thread, or -1 if it is somehow missing. */
         get id(): number {
             let get = function (this: Il2Cpp.Thread) {
