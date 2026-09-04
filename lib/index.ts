@@ -14,7 +14,6 @@
 /// <reference path="./application.ts">/>
 /// <reference path="./boxed.ts">/>
 /// <reference path="./config.ts">/>
-/// <reference path="./dump.ts">/>
 /// <reference path="./exception-listener.ts">/>
 /// <reference path="./exports.ts">/>
 /// <reference path="./filters.ts">/>
