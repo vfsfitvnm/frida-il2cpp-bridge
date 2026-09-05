@@ -131,8 +131,49 @@ namespace Il2Cpp {
         }
 
         /** */
+        toJSON(): Record<string, Il2Cpp.Field.Type | "[Circular Reference]"> | null {
+            if (this.isNull()) {
+                return null;
+            }
+
+            const key = this.handle.toInt32();
+            if (toJSONSeenReferences.has(key)) {
+                return {
+                    $handle: this.handle,
+                    $wtf: "[Circular Reference]"
+                };
+            }
+            toJSONSeenReferences.add(key);
+
+            const object: Record<string, Il2Cpp.Field.Type> = {
+                $handle: this.handle
+            };
+
+            for (const field of this.class.fields) {
+                if (!field.isStatic) {
+                    const value = field.bind(this).value;
+
+                    if (typeof value == "object") {
+                        const toJSON = Reflect.get(value, "toJSON");
+                        if (toJSON) {
+                            object[field.name] = toJSON.call(value);
+                        } else {
+                            object[field.name] = value;
+                        }
+                    } else {
+                        object[field.name] = value;
+                    }
+                }
+            }
+
+            toJSONSeenReferences.delete(key);
+
+            return object;
+        }
+
+        /** */
         toString(): string {
-            return this.isNull() ? "null" : this.method<Il2Cpp.String>("ToString", 0).invoke().content ?? "null";
+            return this.isNull() ? "null" : (this.method<Il2Cpp.String>("ToString", 0).invoke().content ?? "null");
         }
 
         /** Unboxes the value type (either a primitive, a struct or an enum) out of this object. */
@@ -147,6 +188,8 @@ namespace Il2Cpp {
             return new Il2Cpp.GCHandle(Il2Cpp.exports.gcHandleNewWeakRef(this, +trackResurrection));
         }
     }
+
+    const toJSONSeenReferences = new Set();
 
     export namespace Object {
         export class Monitor {

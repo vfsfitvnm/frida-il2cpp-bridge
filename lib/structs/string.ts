@@ -32,6 +32,11 @@ namespace Il2Cpp {
         }
 
         /** */
+        toJSON(): string | null {
+            return this.isNull() ? null : this.content;
+        }
+
+        /** */
         toString(): string {
             return this.isNull() ? "null" : `"${this.content}"`;
         }
