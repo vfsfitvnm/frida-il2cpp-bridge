@@ -15,25 +15,29 @@ namespace Il2Cpp {
             return Process.runOnThread(threadId, () => Il2Cpp.currentThread);
         }
 
-        /** Gets the native id of the current thread, or -1 if it is somehow missing. */
+        /**
+         * Gets the native (operative system) thread id of this thread, or a negative number if
+         * it's not available.
+         */
         get id(): number {
             let get = function (this: Il2Cpp.Thread) {
                 return this.internal.field<UInt64>("thread_id").value.toNumber();
             };
 
-            // https://github.com/mono/linux-packaging-mono/blob/d586f84dfea30217f34b076a616a098518aa72cd/mono/utils/mono-threads.h#L642
+            // On POSIX, thread_id is the value from pthread_self, not the actual thread id
+            // https://github.com/mono/mono/blob/0f53e9e151d92944cacab3e24ac359410c606df6/mono/utils/mono-threads.h#L650-L658
             if (Process.platform != "windows") {
                 const currentThreadId = Process.getCurrentThreadId();
                 const currentPosixThread = ptr(get.apply(Il2Cpp.currentThread!));
 
-                // prettier-ignore
-                const offset = currentPosixThread.offsetOf(_ => _.readS32() == currentThreadId, 1024) ??
+                const offset =
+                    currentPosixThread.offsetOf(_ => _.readS32() == currentThreadId, 1024) ??
                     raise(`couldn't find the offset for determining the kernel id of a posix thread`);
 
-                const _get = get;
+                const getPosixThreadHandle = get;
                 get = function (this: Il2Cpp.Thread) {
-                    const handle = ptr(_get.apply(this));
-                    // sometimes, for some thread, there is no info...
+                    const handle = ptr(getPosixThreadHandle.apply(this));
+                    // I observed that thread_id can still be NULL
                     if (handle.isNull()) {
                         warn(`couldn't find thread id for ${this.handle}; returning a negative number, expect breakage`);
                         return -1;
@@ -47,10 +51,17 @@ namespace Il2Cpp {
             return this.id;
         }
 
-        /** Gets the encompassing internal object (System.Threding.InternalThreead) of the current thread. */
+        /**
+         * Gets the internal managed thread (`System.Threading.InternalThread`) of this thread - actually a
+         * [`MonoInternalThread`](https://github.com/mono/mono/blob/0f53e9e151d92944cacab3e24ac359410c606df6/mono/metadata/object-internals.h#L575).
+         */
         @lazy
         get internal(): Il2Cpp.Object {
-            return this.object.tryField<Il2Cpp.Object>("internal_thread")?.value ?? this.object;
+            return (
+                this.object.tryField<Il2Cpp.Object>("internal_thread")?.value ??
+                // in older Unity versions, `System.Threading.Thread` already was a `MonoInternalThread`
+                this.object
+            );
         }
 
         /** Determines whether the current thread is the garbage collector finalizer one. */
