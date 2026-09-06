@@ -143,7 +143,7 @@ class DumpCommand(FridaIl2CppBridgeCommand[AssemblyDump | ClassDump, dict]):
             default=False,
             help=dedent("""\
                 write actual constructors names
-                (without flag)          --no-type-keywords
+                (without flag)          --actual-constructor-names
                 class Foo               class Foo
                 {                       {
                     static Foo();           static void .cctor();
