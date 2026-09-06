@@ -1,6 +1,7 @@
 from typing import override
 
 import argparse
+from textwrap import dedent
 from pathlib import Path
 
 import colorama
@@ -44,49 +45,112 @@ class DumpCommand(FridaIl2CppBridgeCommand[AssemblyDump | ClassDump, dict]):
             "--cs-output",
             choices=["none", "stdout", "flat", "tree"],
             default="tree",
-            help=(
-                "style of C# output (defaults to tree)\n"
-                "-   none: do nothing;\n"
-                "- stdout: print to console;\n"
-                "-   flat: one single file (dump.cs);\n"
-                "-   tree: directory structure having one file per assembly."
-            ),
+            help=dedent("""\
+                style of C# output (defaults to tree)
+                -   none: do nothing;
+                - stdout: print to console;
+                -   flat: one single file (dump.cs);
+                -   tree: directory structure having one file per assembly.
+                """),
         )
         parser.add_argument(
             "--no-namespaces",
             action="store_true",
             default=False,
-            help="do not emit namespace blocks, and prepend namespace name in class declarations",
+            help=dedent("""\
+                do not emit namespace blocks, and prepend namespace name in class declarations
+                (without flag)          --no-namespaces
+                namespace Foo           class Foo.Bar
+                {                       {
+                    class Bar               ...
+                    {                   }
+                        ...
+                    }
+                }
+                """),
         )
         parser.add_argument(
             "--flatten-nested-classes",
             action="store_true",
             default=False,
-            help="write nested classes at the same level of their inclosing classes, and prepend enclosing class name in their declarations",
+            help=dedent("""\
+                write nested classes at the same level of their inclosing classes, and prepend enclosing class name in their declarations
+                (without flag)          --flatten-nested-classes
+                class Foo               class Foo
+                {                       {
+                    ...                     ...
+                                        }
+                    class Bar
+                    {                   class Foo.Bar
+                        ...             {
+                    }                       ...
+                }                       }
+                """),
         )
         parser.add_argument(
             "--keep-implicit-base-classes",
             action="store_true",
             default=False,
-            help="write implicit base classes (class -> System.Object, struct -> System.ValueType, enum -> System.Enum) in class declarations",
+            help=dedent("""\
+                write implicit base classes (class -> System.Object, struct -> System.ValueType, enum -> System.Enum) in class declarations
+                (without flag)          --keep-implicit-base-classes
+                class Foo               class Foo : System.Object
+                {                       {
+                }                       }
+
+                struct Bar              struct Bar : System.ValueType
+                {                       {
+                }                       }
+                
+                enum Baz                enum Baz : System.Enum
+                {                       {
+                }                       }
+                """),
         )
         parser.add_argument(
             "--enums-as-structs",
             action="store_true",
             default=False,
-            help="write enum class declarations as structs",
+            help=dedent("""\
+                write enum class declarations as structs
+                (without flag)          --enums-as-structs
+                enum Foo                struct Foo
+                {                       {
+                    First = 0,              int value__; // 0x10
+                    Second = 1,             static Foo First = 0;
+                }                           static Foo Second = 1;
+                                        }
+            """),
         )
         parser.add_argument(
             "--no-type-keywords",
             action="store_true",
             default=False,
-            help="use fully qualified names for builtin types instead of their keywords (e.g. use 'System.Int32' instead of 'int', or 'System.Object' instead of 'object')",
+            help=dedent("""\
+                use fully qualified names for builtin types instead of their keywords
+                (without flag)          --no-type-keywords
+                class Foo               class Foo
+                {                       {
+                    int a;                  System.Int32 a;
+
+                    void B(string c);       System.Void B(System.String c);
+                }                       }
+            """),
         )
         parser.add_argument(
             "--actual-constructor-names",
             action="store_true",
             default=False,
-            help="write actual constructors names (e.g. '.ctor' and '.cctor')",
+            help=dedent("""\
+                write actual constructors names
+                (without flag)          --no-type-keywords
+                class Foo               class Foo
+                {                       {
+                    static Foo();           static void .cctor();
+
+                    Foo();                  void .ctor();
+                }                       }
+            """),
         )
         parser.add_argument(
             "--indentation-size",

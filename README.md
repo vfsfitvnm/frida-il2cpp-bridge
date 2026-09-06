@@ -45,8 +45,9 @@ Use the `dump` subcommand to dump an application:
 
 ```
 $ npm exec frida-il2cpp-bridge -- dump --help
-usage: frida-il2cpp-bridge [options] dump [-h] [--out-dir OUT_DIR] [--cs-output {none,stdout,flat,tree}] [--no-namespaces] [--flatten-nested-classes] [--keep-implicit-base-classes]
-                                          [--enums-as-structs] [--no-type-keywords] [--actual-constructor-names] [--indentation-size INDENTATION_SIZE]
+usage: frida-il2cpp-bridge [args ...] dump [-h] [--out-dir OUT_DIR] [--cs-output {none,stdout,flat,tree}] [--no-namespaces] [--flatten-nested-classes]
+                                           [--keep-implicit-base-classes] [--enums-as-structs] [--no-type-keywords] [--actual-constructor-names]
+                                           [--indentation-size INDENTATION_SIZE]
 
 options:
   -h, --help            show this help message and exit
@@ -58,14 +59,65 @@ options:
                         -   flat: one single file (dump.cs);
                         -   tree: directory structure having one file per assembly.
   --no-namespaces       do not emit namespace blocks, and prepend namespace name in class declarations
+                        (without flag)          --no-namespaces
+                        namespace Foo           class Foo.Bar
+                        {                       {
+                            class Bar               ...
+                            {                   }
+                                ...
+                            }
+                        }
   --flatten-nested-classes
                         write nested classes at the same level of their inclosing classes, and prepend enclosing class name in their declarations
+                        (without flag)          --flatten-nested-classes
+                        class Foo               class Foo
+                        {                       {
+                            ...                     ...
+                                                }
+                            class Bar
+                            {                   class Foo.Bar
+                                ...             {
+                            }                       ...
+                        }                       }
   --keep-implicit-base-classes
                         write implicit base classes (class -> System.Object, struct -> System.ValueType, enum -> System.Enum) in class declarations
+                        (without flag)          --keep-implicit-base-classes
+                        class Foo               class Foo : System.Object
+                        {                       {
+                        }                       }
+                        
+                        struct Bar              struct Bar : System.ValueType
+                        {                       {
+                        }                       }
+                        
+                        enum Baz                enum Baz : System.Enum
+                        {                       {
+                        }                       }
   --enums-as-structs    write enum class declarations as structs
-  --no-type-keywords    use fully qualified names for builtin types instead of their keywords (e.g. use 'System.Int32' instead of 'int', or 'System.Object' instead of 'object')
+                        (without flag)          --enums-as-structs
+                        enum Foo                struct Foo
+                        {                       {
+                            First = 0,              int value__; // 0x10
+                            Second = 1,             static Foo First = 0;
+                        }                           static Foo Second = 1;
+                                                }
+  --no-type-keywords    use fully qualified names for builtin types instead of their keywords
+                        (without flag)          --no-type-keywords
+                        class Foo               class Foo
+                        {                       {
+                            int a;                  System.Int32 a;
+                        
+                            void B(string c);       System.Void B(System.String c);
+                        }                       }
   --actual-constructor-names
-                        write actual constructors names (e.g. '.ctor' and '.cctor')
+                        write actual constructors names
+                        (without flag)          --no-type-keywords
+                        class Foo               class Foo
+                        {                       {
+                            static Foo();           static void .cctor();
+                        
+                            Foo();                  void .ctor();
+                        }                       }
   --indentation-size INDENTATION_SIZE
                         indentation size (defaults to 4)
 ```

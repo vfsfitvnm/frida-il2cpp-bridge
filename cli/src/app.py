@@ -5,7 +5,6 @@ import argparse
 from pathlib import Path
 import colorama
 import frida
-from frida.core import ScriptMessage
 
 from .utils.app import Application, Command
 from . import NPM_MODULE_PATH, __name__, __version__
@@ -91,7 +90,7 @@ class FridaIl2CppBridgeApplication(Application):
             self._script.unload()
             self._script = None
 
-    def _process_message(self, message: ScriptMessage, _) -> None:
+    def _process_message(self, message: frida.ScriptMessage, _) -> None:
         if message["type"] == "send" and (payload := message.get("payload")):
             match payload.get("action"):
                 case "init":
